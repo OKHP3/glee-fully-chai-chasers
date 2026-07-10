@@ -9,9 +9,9 @@ Your vertical slice had solid bones — engine/UI boundaries held, tests were re
 ## Ground rules (unchanged, non-negotiable)
 
 1. `docs/DESIGN-SPEC.md` is canonical. `docs/CANON.md` and `docs/IP-GUARDRAILS.md` are law. Do not edit any doc except your own handoff/validation logs.
-2. NEVER touch, read, copy, or derive from `reference-photos/` or `private-work/`. No brand names/logos/audio samples. No photos of any person, anywhere.
+2. Likeness policy (DECISION-LOG S15): you MAY view `reference-photos/` for the cats' markings and personality, but NO photograph or photorealistic rendering of any person or cat ships in the product or gets committed to shipped asset paths. All shipped character art is original illustration. `private-work/` stays untouched. No brand names/logos/audio samples anywhere.
 3. Engine (`src/engine/`) stays pure TS, zero DOM. UI computes zero math. Small conventional commits.
-4. Do not delete, skip, `.skip()`, weaken, or widen `src/engine/simulation.test.ts`. Those gates are the definition of "the math is right." (Exception: if a gate is impossible because of a genuine spec contradiction, STOP and write the issue to `docs/REPLIT-VALIDATION-LOG.md` instead of hacking the test.)
+4. Do not delete, skip, `.skip()`, weaken, or widen `src/engine/simulation.test.ts`. Those gates are the definition of "the math is right." The oracle honors `SKIP_ORACLE=1` for the CI deploy job ONLY — never set it in your own runs; your validation loop always runs the full oracle. (Exception: if a gate is impossible because of a genuine spec contradiction, STOP and write the issue to `docs/REPLIT-VALIDATION-LOG.md` instead of hacking the test.)
 
 ## Workstream A — Fix the math (highest priority)
 
@@ -34,6 +34,7 @@ Replace the emoji-in-gray-boxes look entirely. The quality bar: **a 2026-27 casu
 2. **Scene:** layered night-garden background (gradient sky, twinkling mint stars, silhouetted garden foreground), a row of five hovering cat-saucers above the reels that bob idly and BEAM during cascades.
 3. **Motion (transform/opacity only, 60fps):** reel spin with staggered stops and overshoot bounce; win-line flash; **beam-up** (winners float up into saucers, shrink + glow); **gravity drop-in** with per-reel stagger and squash landing; coin balance count-up ticker; cascade meter as a firefly jar that visibly fills and buzzes at 3; full-screen celebration overlays scaled to win size; UniGlee butterfly-storm takeover.
 4. **Typography & layout polish:** real hierarchy, safe-area insets, glowing SPARKLE! button with idle pulse. Respect `prefers-reduced-motion` with deliberate short fades (not instant snaps).
+   **Easter-egg density:** lean hard into `docs/CANON.md` — the jewel-toned mermaid-pattern tumbler as the top symbol, the number 12 recurring (12x callout, 12-slot jar caps, level-12 fanfare), mixtape/VHS/grunge-and-70s-soft-rock nods, cozy-witchy candle-and-crystal touches, quips in her three registers. Specificity is the whole gift.
 5. **Audio:** add the two sequenced loops (dreamy 70s soft-rock base; grungier free-spin loop) to the existing synth — original composition only — plus cat pop-in motifs (Joey boogie riff, Phoebe purr-trill).
 
 ## Workstream D — Cat pop-ins as moments
