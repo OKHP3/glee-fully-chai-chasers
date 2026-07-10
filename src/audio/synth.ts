@@ -90,4 +90,17 @@ export function playBonusFanfare(): void {
   [392, 523.25, 659.25, 783.99].forEach((freq, i) => tone(freq, i * 0.08, 0.35, 0.22, "sawtooth"));
 }
 
+/** AskJamie Wheel spin-up — a ratchety descending tick loop. */
+export function playWheelTick(): void {
+  for (let i = 0; i < 14; i++) {
+    tone(440 - i * 6, i * 0.16, 0.05, 0.1, "square");
+  }
+}
+
+/** "TWELVE PUMPS!" jackpot callout — canon-sacred number 12, docs/CANON.md. */
+export function playTwelvePumps(): void {
+  const notes = [261.63, 329.63, 392, 523.25, 659.25, 783.99];
+  notes.forEach((freq, i) => tone(freq, i * 0.07, 0.4, 0.25, "sawtooth"));
+}
+
 export { musicEnabled };

@@ -58,6 +58,7 @@ export interface SpinResult {
   totalWin: number;
   cascades: number;
   freeSpinsAwarded: number;      // via FREE_SPIN_LADDER, doubled by double_sparkle
+  doubleSparkleApplied: boolean; // true if freeSpinsAwarded was doubled this spin
   catVisit?: CatVisit;
   unigleeTriggered: boolean;
   treatsCollected: TreatKind[];

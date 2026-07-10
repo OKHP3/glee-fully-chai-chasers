@@ -36,25 +36,25 @@ export const PAYLINES: number[][] = [
 
 /** × line-bet multipliers. Wilds pay as `tumbler` when forming their own line. */
 export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: number }>> = {
-  tumbler: { 3: 20, 4: 60, 5: 400 },
-  butterfly: { 3: 15, 4: 45, 5: 250 },
-  mixtape: { 3: 12, 4: 35, 5: 150 },
-  crystal: { 3: 10, 4: 30, 5: 120 },
-  chai: { 3: 8, 4: 20, 5: 80 },
-  candle: { 3: 8, 4: 20, 5: 80 },
-  cassette: { 3: 5, 4: 12, 5: 50 },
-  gnome: { 3: 5, 4: 12, 5: 50 },
-  mailbox: { 3: 3, 4: 8, 5: 25 },
-  vhs: { 3: 3, 4: 8, 5: 25 },
-  teapot: { 3: 3, 4: 8, 5: 25 },
-  yarn: { 3: 3, 4: 8, 5: 25 },
+  tumbler: { 3: 56, 4: 167, 5: 1112 },
+  butterfly: { 3: 42, 4: 125, 5: 694 },
+  mixtape: { 3: 33, 4: 96, 5: 417 },
+  crystal: { 3: 27, 4: 82, 5: 334 },
+  chai: { 3: 21, 4: 56, 5: 222 },
+  candle: { 3: 21, 4: 56, 5: 222 },
+  cassette: { 3: 13, 4: 33, 5: 139 },
+  gnome: { 3: 13, 4: 33, 5: 139 },
+  mailbox: { 3: 8, 4: 21, 5: 69 },
+  vhs: { 3: 8, 4: 21, 5: 69 },
+  teapot: { 3: 8, 4: 21, 5: 69 },
+  yarn: { 3: 8, 4: 21, 5: 69 },
 };
 
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */
 const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_boogie", "uniglee"];
 
-function isWild(symbol: SymbolId): boolean {
+export function isWild(symbol: SymbolId): boolean {
   return WILDS.includes(symbol);
 }
 

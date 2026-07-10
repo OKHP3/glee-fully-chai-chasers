@@ -6,23 +6,26 @@ import "./style.css";
 import { unlock, setSfxEnabled, playToolboxChime } from "./audio/synth";
 import { loadGameState } from "./state";
 import { renderBoard } from "./ui/board";
+import { symbolSvg } from "./ui/symbols";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
 function renderSplash(): void {
   app.innerHTML = `
-    <div class="h-full w-full flex flex-col items-center justify-center gap-6"
-         style="background: linear-gradient(#1a1f3c, #2d1f4c)">
-      <div class="text-6xl">🎰🦋</div>
-      <h1 class="text-2xl font-bold text-amber-100 text-center px-8">
+    <div class="relative h-full w-full flex flex-col items-center justify-center gap-6 night-garden overflow-hidden">
+      <div class="flex items-center gap-2 relative z-10">
+        <div class="w-16 h-16">${symbolSvg("crystal")}</div>
+        <div class="w-16 h-16">${symbolSvg("butterfly")}</div>
+      </div>
+      <h1 class="relative z-10 text-2xl font-bold text-amber-100 text-center px-8">
         Glee-fully Chai Chasers
       </h1>
-      <p class="text-amber-200/70 text-center px-10">
+      <p class="relative z-10 text-amber-200/70 text-center px-10">
         Iced chai, two cats, and zero real money.
       </p>
       <button id="tap-in"
-        class="mt-4 px-8 py-4 rounded-2xl bg-orange-600 text-white text-lg font-semibold active:scale-95 transition-transform min-h-[64px]">
-        Tap to open the Toolbox 🧰
+        class="relative z-10 mt-4 px-8 py-4 rounded-2xl bg-orange-600 text-white text-lg font-semibold active:scale-95 transition-transform min-h-[64px]">
+        Tap to open the Toolbox
       </button>
     </div>
   `;
@@ -37,4 +40,13 @@ function renderSplash(): void {
   });
 }
 
-renderSplash();
+// Dev-only QA aid: `#board` skips the splash tap-in gate so screenshots/manual
+// QA can reach the main board without a user gesture. Never referenced by
+// game logic; safe to leave in since it changes nothing for real players.
+if (location.hash === "#board") {
+  const state = loadGameState();
+  setSfxEnabled(state.soundOn);
+  renderBoard(app, state);
+} else {
+  renderSplash();
+}
