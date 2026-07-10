@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* Palette per docs/ASSET-CHECKLIST.md style anchor */
+:root {
+  --cc-navy: #1a1f3c;
+  --cc-purple: #2d1f4c;
+  --cc-orange: #d35b2d;
+  --cc-butter: #f5d576;
+  --cc-mint: #9fe8c5;
+  --cc-pink: #e8a5b8;
+}
+
+html, body { height: 100%; margin: 0; background: var(--cc-navy); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

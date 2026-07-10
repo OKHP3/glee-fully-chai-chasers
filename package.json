@@ -1,0 +1,21 @@
+{
+  "name": "glee-fully-chai-chasers",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A free, fan-made cascading-reels game starring Joey & Phoebe. Original art, fictional currency, real love.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0",
+    "vitest": "^2.1.0"
+  }
+}
