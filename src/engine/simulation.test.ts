@@ -54,7 +54,9 @@ function simulate(): SimStats {
  * the oracle on every push so the red/green status stays visible. Locally and
  * in Replit's validation loop, `npm test` always runs the full oracle.
  */
-const skipOracle = typeof process !== "undefined" && process.env.SKIP_ORACLE === "1";
+const skipOracle =
+  typeof globalThis !== "undefined" &&
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.SKIP_ORACLE === "1";
 
 describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded spins vs DESIGN-SPEC §4`, () => {
   const s = simulate();
