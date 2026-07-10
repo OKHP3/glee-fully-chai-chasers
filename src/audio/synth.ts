@@ -29,10 +29,17 @@ export function isUnlocked(): boolean {
 
 /** Must be called from within a user-gesture handler (the splash tap). */
 export function unlock(): void {
-  if (!ctx) {
-    ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+  try {
+    if (!ctx) {
+      ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    }
+    void resume();
+  } catch {
+    /* Web Audio unavailable/blocked in this embedding context (e.g. a
+       restrictive iframe sandbox) — game must still be playable without
+       sound rather than dying on the splash tap. */
+    ctx = null;
   }
-  void resume();
 }
 
 export async function resume(): Promise<void> {

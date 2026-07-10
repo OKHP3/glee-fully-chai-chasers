@@ -33,9 +33,13 @@ function renderSplash(): void {
   // iOS requires a user gesture to unlock AudioContext — this button is that gesture.
   document.querySelector("#tap-in")?.addEventListener("click", () => {
     const state = loadGameState();
-    setSfxEnabled(state.soundOn);
-    unlock();
-    playToolboxChime();
+    try {
+      setSfxEnabled(state.soundOn);
+      unlock();
+      playToolboxChime();
+    } catch {
+      /* Audio is best-effort — never let it block the game from opening. */
+    }
     renderBoard(app, state);
   });
 }
