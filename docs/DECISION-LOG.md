@@ -23,6 +23,7 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 | S11 (was D4) | 2026-07-10 | **Currency = Glee-coins** (slot semantics). **Chai Sparks = XP/progression**, repurposed from Codex proposal | Slot feel preserved; Codex's non-monetary progress idea survives as the meta-game |
 | S12 (was D5) | 2026-07-10 | Cat-only photos may ship publicly as curated cutout assets (list in `private-work/photo-triage.md`); `reference-photos/` stays gitignored; each shipped derivative gets an ASSET-CHECKLIST row | Cats aren't people; Glee photos remain absolute-never (S4) |
 | S13 | 2026-07-10 | `docs/DESIGN-SPEC.md` v2 is the **canonical spec**; COLLABORATIVE-VISION.md is the honored pre-alpha foundation (adoption/supersession table in spec §2) | Jamie's ruling; Replit joins the party building from DESIGN-SPEC only |
+| S14 | 2026-07-10 | **Replit owns the Round-2 implementation sprint** (math fix, free spins/wheel, presentation overhaul, cat moments) under `docs/prompts/REPLIT-ROUND-2-PROMPT.md` with a mandatory validation loop. **Claude owns the spec oracle** (`src/engine/simulation.test.ts` — may not be weakened) and reviews Replit's output. Slice-1 assessment: `docs/ASSESSMENT-REPLIT-SLICE-1.md` | Jamie's direction 2026-07-10: quantified gaps (RTP 14% vs 96%, free spins 1/1235 vs 1/35, "built in 1987" presentation) require a forced test-and-iterate loop |
 
 ## Workstream owners
 
