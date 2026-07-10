@@ -1,0 +1,2 @@
+- [Slot-game engine/UI verification approach](slot-game-qa-hooks.md) — for canvas-only screenshot QA, temporarily export overlay-trigger functions from the UI module, verify, then remove before finishing.
+- [Doubling/multiplier fields need explicit test support](spin-result-doubling-fields.md) — when a modifier can scale an awarded value, expose an explicit boolean/flag on the result type rather than loosening assertions.
