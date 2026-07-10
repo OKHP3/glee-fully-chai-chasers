@@ -5,6 +5,10 @@
  * unlocked scenes, best cascade, daily-bonus date, settings (sound, reduced motion).
  * A visible "start fresh" reset action is required (vision doc §5).
  */
+import type { TreatJar } from "./engine/features";
+import { emptyTreatJar } from "./engine/features";
+import { STARTING_BALANCE } from "./engine/economy";
+
 const PREFIX = "ccv1.";
 
 export function load<T>(key: string, fallback: T): T {
@@ -28,4 +32,43 @@ export function resetAll(): void {
   for (const k of Object.keys(localStorage)) {
     if (k.startsWith(PREFIX)) localStorage.removeItem(k);
   }
+}
+
+/** Settings + progress shape for the vertical slice. Extend as features land. */
+export interface GameState {
+  balance: number;
+  bet: number;
+  xp: number;
+  treatJar: TreatJar;
+  bestCascade: number;
+  spinsSincePopIn: number;
+  soundOn: boolean;
+  reducedMotion: boolean;
+}
+
+export function loadGameState(): GameState {
+  return {
+    balance: load("balance", STARTING_BALANCE),
+    bet: load("bet", 25),
+    xp: load("xp", 0),
+    treatJar: load("treatJar", emptyTreatJar()),
+    bestCascade: load("bestCascade", 0),
+    spinsSincePopIn: load("spinsSincePopIn", 0),
+    soundOn: load("soundOn", true),
+    reducedMotion: load(
+      "reducedMotion",
+      typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)").matches : false,
+    ),
+  };
+}
+
+export function saveGameState(state: GameState): void {
+  save("balance", state.balance);
+  save("bet", state.bet);
+  save("xp", state.xp);
+  save("treatJar", state.treatJar);
+  save("bestCascade", state.bestCascade);
+  save("spinsSincePopIn", state.spinsSincePopIn);
+  save("soundOn", state.soundOn);
+  save("reducedMotion", state.reducedMotion);
 }

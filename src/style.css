@@ -18,3 +18,13 @@ html, body { height: 100%; margin: 0; background: var(--cc-navy); }
     transition-duration: 0.01ms !important;
   }
 }
+
+.cell {
+  transition: transform 180ms ease-out, opacity 180ms ease-out, background-color 180ms ease-out;
+}
+
+.cell.win-flash {
+  background-color: var(--cc-butter);
+  opacity: 0.9;
+  transform: scale(1.08);
+}
