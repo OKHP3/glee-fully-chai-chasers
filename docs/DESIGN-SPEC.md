@@ -1,0 +1,191 @@
+# DESIGN-SPEC.md — Glee-fully Chai Chasers
+## The Canonical Game Specification (v2 — Snyder Cut)
+
+**Author:** Claude · **Date:** 2026-07-10 · **Status:** **CANONICAL** — approved direction per Jamie's ruling 2026-07-10 (see DECISION-LOG.md S8-S12)
+**Relationship to COLLABORATIVE-VISION.md:** that document is the pre-alpha foundation; this spec supersedes it where they conflict and absorbs its best elements (see §2). All tools build from THIS document.
+
+---
+
+## 1. Vision & design pillars
+
+This is a *slot machine*. Glee loves slot machines — specifically the Planet Moolah cascade family. The gift is not a tasteful adjacent puzzle game; it's **her game, with the money surgically removed and the love dialed to twelve**.
+
+Five pillars, in priority order:
+
+1. **It must feel like her game.** Cascades, a visible meter climbing toward free spins, stacked wilds, a legendary rare symbol, a bonus wheel. The dopamine architecture is faithful; the skin is 100% original.
+2. **Specificity is love.** Iced chai (never hot), the mermaid tumbler, the number 12, Boogie Bites for Joey only, Phoebe's universal appetite, Glee-isms in her actual registers. Every detail should make her say "OMG, this is so Glee-coded."
+3. **Generous and honest.** Real slot variance, ~96% RTP, but a bust-proof balance, no purchases, no ads, no dark patterns. Meters never lie. Losing is impossible; *anticipation* is the product.
+4. **Retro-bright midnight.** PNW night garden under mint-green stars. Warm, theatrical, cartoon-cozy. Never casino-floor literal, never sterile.
+5. **iPhone-first, instantly legible.** She opens it from her home screen and knows what to tap with zero instructions.
+
+## 2. Codex foundation: adopted vs. superseded
+
+| From COLLABORATIVE-VISION.md | Verdict | Disposition |
+|---|---|---|
+| Milestone scenes (Iced Chai Break, Butterfly Burst, Cat Constellation, Glee Mode) | **ADOPTED** | Become progression rewards — §10 |
+| "Chai Captain" abstract Glee presence (no likeness) | **ADOPTED** | §11; also settled as S4 |
+| Non-negotiables table (no money/ads/tracking; browser-local saves; original assets) | **ADOPTED** | Mirrored in IP-GUARDRAILS + acceptance criteria §16 |
+| Versioned localStorage, reset action, reduced motion, accessibility, sound toggle | **ADOPTED** | §13, §14 |
+| Treat naming "Chicken Comets" / "Salmon Stars" | **ADOPTED** | Better than my generic pouches |
+| Token-efficient collaboration rules, one owner per deliverable | **ADOPTED** | Lives in AGENTS.md |
+| "Chai Sparks" | **ADOPTED, REPURPOSED** | Not the currency — it's the XP/progression meter (§9). Currency is Glee-coins |
+| Cascade-collection puzzle framing, "deterministic or deliberately generous matching," no payout math | **SUPERSEDED** | It's a slot. Real paylines, real RNG, real variance — with a safety net (§9) |
+| React | **SUPERSEDED** | Vanilla TS (D2/S9). One animation-heavy screen; the engine is pure TS regardless |
+| Illustrations-only cats, no photo derivatives | **PARTIALLY SUPERSEDED** | Hybrid (§6): illustrated reel symbols, photo sticker-cutouts for pop-in moments. Cat photos only; Glee photos never (S4) |
+| "Sparkle!" as the spin control name | **ADOPTED** | The spin button says SPARKLE! |
+
+## 3. Game structure & screen flow
+
+```
+Splash ("Tap to open the Toolbox 🧰", unlocks audio)
+  └─ Birthday Reveal (first launch on/after 07/17 only — §12)
+       └─ MAIN BOARD (the game; 95% of time lives here)
+            ├─ Free Spins (wheel → modifier → spins; same board, night-shifts to aurora)
+            ├─ Chai Tea Bonus (12-tumbler pick shelf)
+            ├─ Milestone Scene interludes (~20s, skippable)
+            ├─ Daily Bonus Wheel (once per calendar day)
+            └─ Settings (sound, motion, reset, "About this gift")
+```
+
+Portrait 390x844 layout, top to bottom: status bar (level + Chai Sparks meter) → cascade meter (huge, center-stage — it IS the game) → 5x4 reel window with saucers hovering above → Treat Jar (left edge) + AskJamie perch (right edge) → bet bar (coin balance, bet stepper, SPARKLE! button ≥64px tall).
+
+## 4. Board, symbols & paytable
+
+5 reels × 4 rows, 25 fixed paylines (classic Moolah skeleton), left-to-right evaluation, wilds substitute for all paying symbols. Bet levels: 25 / 50 / 125 / 250 / 625 / 1250 coins (25-credit-style increments; level 6 unlocks at player level 12, obviously).
+
+Paytable (× line bet; tuned by simulation, these are the starting values):
+
+| Symbol | 3-kind | 4-kind | 5-kind | Notes |
+|---|---|---|---|---|
+| 🧜 Mermaid Tumbler | 20 | 60 | 400 | Top symbol. THE cup |
+| 🦋 Butterfly | 15 | 45 | 250 | |
+| 📼 Mixtape | 12 | 35 | 150 | |
+| 🔮 Crystal | 10 | 30 | 120 | |
+| 🥤 Iced chai to-go | 8 | 20 | 80 | Also the Chai Bonus scatter (§8) |
+| 🕯 Cinnamon candle | 8 | 20 | 80 | Unlit. No steam anywhere in this game |
+| 📻 Cassette | 5 | 12 | 50 | |
+| 🍄 Garden gnome | 5 | 12 | 50 | Giant Gnome Mode celebrity (§7) |
+| 📬 Mailbox / 📼 VHS / 🫖 Teapot / 🧶 Yarn | 3 | 8 | 25 | Low tier |
+| Treat pouches | — | — | — | Non-paying feature symbols, reels 1/3/5 (§6) |
+| Saucer-Cat Wilds | pay as top symbol | | | Stacked 6-7 high (§5) |
+| UniGlee 🦋🌈 | — | — | — | Legend, not a line symbol (§5) |
+
+Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%):
+
+| Event | Frequency |
+|---|---|
+| Any cascade (spin produces ≥1 win) | ~1 in 2.9 spins |
+| Free spins via meter (4+ cascades) | ~1 in 35 spins |
+| 8+ cascade mega-trigger | ~1 in 900 spins |
+| Chai Tea Bonus (3+ scatters) | ~1 in 110 spins |
+| Cat pop-in | ~1 in 30 spins (pity-weighted, §6) |
+| UniGlee | ~1 in 400 spins |
+| Overall RTP | 96% ±0.5 |
+
+## 5. Cascades, wilds & the UniGlee
+
+**Cascade loop:** evaluate 25 lines → winning symbols beam up into the saucers (float-shrink-flash, 380ms) → columns compress down → new symbols drop from the saucer bays (staggered per reel, 90ms offsets) → re-evaluate. Repeat to dead board. Each cascade tier plays a rising arpeggio one step higher — by cascade 4+ it's musical euphoria.
+
+**Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow. Ladder: **4→7, 5→10, 6→15, 7→20, 8→50, 9→75, 10→100, 11+→200 free spins.** At meter 3 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Retriggers during free spins use the same ladder.
+
+**Saucer-Cat Wilds:** Joey-saucer and Phoebe-saucer wilds arrive in stacks up to 6-7 high on reels 2-5, substitute for all paying symbols, pay as Mermaid Tumbler when forming their own line.
+
+**Specialty wilds** — earned when a specialty-marked wild participates in a line win; queued, ONE fires per dead board (extras stay queued, exactly the Moolah rhythm):
+
+| Specialty | Effect |
+|---|---|
+| **Sparkle Sort** | "Hold up, doing a sparkle sort…" — 5-11 random symbols shatter to glitter; forced cascade. Wilds and scatters immune |
+| **Drop-In Saucer** | A reel shifts so a full wild stack crowns it |
+| **Double Sparkle** | Next free-spin award from the ladder is doubled |
+| **Facts-on-Facts** | During free spins, wilds carry coin prizes (collected on beam-up) |
+
+**The UniGlee 🦋🌈** (~1/400): screen dims to deep violet, a rainbow butterfly crosses the board trailing stardust, and the full package lands: Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts. Near-guaranteed monster bonus. This is the legend, the story she tells other people. First UniGlee unlocks the Butterfly Burst scene permanently (§10).
+
+## 6. The Treat Jar & Cat Pop-Ins (signature system)
+
+**Treats:** three non-paying pouch symbols on reels 1/3/5 — **Chicken Comets** (butter-yellow), **Salmon Stars** (dusty blue), **Boogie Bites** (midnight navy, rarest, sparkly). Landing one flies it into the **Treat Jar** (persistent across sessions; caps at 12 of each because of course it does).
+
+**Pop-ins** (~1/30 spins, pity-weighted: rate doubles after 15 spins without a win event):
+
+- **Phoebe** (60% of visits): strolls across the bottom of the reels, generously proportioned and magnificent. If the jar holds ANY treat, she eats one (her choice, animated) and delivers a **Treat Party**: Sparkle Sort blast + affectionate screen-wide purr shake. If a bonus is one cascade away, her party instead nudges the meter +1.
+- **Joey** (40% of visits): appears on top of a saucer, judges the board with yellow eyes. Helps ONLY if **Boogie Bites** are stocked (canon S7). He does a two-second boogie first, then delivers a **Boogie Boost**: Drop-In Saucer wild stack + meter +1. Rarer treat, stronger assist — the economy of being Glee's favorite boy.
+- **Jar empty / no Boogie Bites for Joey:** the cat knocks exactly one symbol off the board anyway (single-cell reshuffle — occasionally completes a line, always gets a chuckle) and exits with an unimpressed tail flick. Quip: *"Phoebe has reviewed your offering. Phoebe is unmoved."* / *"Joey requires Boogie Bites. Joey is a professional."*
+- **Both cats simultaneously** (rare, ~1/500): **Cat Constellation** (§10) — guaranteed cascade + scene unlock progress.
+
+Photo sticker-cutouts (real Joey & Phoebe, background-removed, white sticker outline) are used for pop-in and scene moments — photographic charm exactly where the surprise lands. Reel-symbol wilds use illustrated saucer-cat art for small-size legibility. Cat photos ship publicly (S12); Glee photos never (S4).
+
+## 7. Free spins & the AskJamie Wheel
+
+Meter hits 4+ → celebration → **AskJamie spins the wheel** (his avatar at the crank). One modifier per bonus:
+
+| Wedge | Modifier |
+|---|---|
+| **We're Multiplying** (40%) | Each free spin, wilds carry a random multiplier: 2x-5x common, 8x uncommon, and the 12x jackpot callout — **"TWELVE PUMPS!"** with the whole screen doing a chai-colored shockwave |
+| **Giant Gnome Mode** (35%) | 2x2 mega-symbols land on reels 2-3/4-5, gnome dignity fully intact |
+| **We Want Our Chai Back** (25%) | AskJamie lobs iced chai tumblers onto the board — 1-3 extra wilds rain in per spin |
+
+Free spins play on an aurora-shifted board (navy → violet-green), same cascade rules, retriggers live. Double Sparkle doubles the entry award. Exit screen always ends warm: total, best cascade, and a Glee-ism sized to the result (Glee-Lite for modest, Bleeds Glee for monsters).
+
+## 8. Chai Tea Bonus (pick game)
+
+3+ iced-chai scatters anywhere → the board flips to a café shelf holding **12 to-go tumblers**. Pick tumblers; each holds coin awards (bet-scaled), +1 extra pick, or the **Mermaid Cup** — mini-jackpot (50× bet) plus a toast animation: *"To Glee. Freak'n facts on facts."* One tumbler holds the **spill** (ends picking) — but the spill is never the first pick, and the exit line is kind: *"Even a spilled chai waters the garden. Take your winnings, gorgeous."*
+
+## 9. Economy & progression
+
+- **Currency: Glee-coins** (S11). Bet/win/balance — full slot semantics, zero money language, never purchasable.
+- Start: 1,000,000 Glee-coins. If balance < one max-bet spin: **AskJamie finds coins under the couch** — cheerful animation, +500k. Bust is impossible; the refill is a joke, not a shame.
+- **Chai Sparks = XP** (Codex's term, repurposed): every spin earns Sparks (scaled by bet), filling the level meter. Levels unlock bet tiers, scenes (§10), and cosmetics (board trims, saucer colors, quip packs). **Level 12 is a major celebration.**
+- **Daily Bonus Wheel:** once per calendar day, 100k-1M coins + a random treat for the jar. Streaks acknowledged, never punished ("Day 3! The cats noticed.").
+- All persistence via versioned localStorage (`ccv1.*`), reset action in settings.
+
+## 10. Milestone scenes (Codex adoption — as progression rewards)
+
+Twenty-second skippable interludes, unlocked by clear milestones, then re-viewable from a collection shelf:
+
+| Scene | Unlock |
+|---|---|
+| **Iced Chai Break** | Level 5 — the tumbler assembles itself under the stars, straw lands like Excalibur |
+| **Butterfly Burst** | First UniGlee — the garden fills with butterflies spelling a tiny "G" |
+| **Cat Constellation** | First double pop-in — Joey & Phoebe drawn in stars, boogie included |
+| **Glee Mode** | Level 12 — the whole board goes full Bleeds-Glee: maximal sparkle, cursive neon, the best quips, permanent toggle unlocked |
+
+Scenes award nothing but delight and a collection checkmark. That's the point.
+
+## 11. Presentation
+
+- **Palette:** midnight navy `#1a1f3c` → violet `#2d1f4c` sky, mint stars `#9fe8c5`, burnt orange `#d35b2d` (site-canon accent), butter `#f5d576`, dusty pink `#e8a5b8`.
+- **The Chai Captain:** Glee's presence without likeness — her *things* own the top of the screen: the tumbler on a shelf, a cardigan on a hook, a butterfly clip by the meter. During Glee Mode they glow. She is the weather of this world, not a sprite in it.
+- **Animation language:** transform/opacity only, springy ease-outs, 60fps. Cascade beam-ups are the hero animation — polish those first.
+- **Audio:** Web Audio synth per src/audio/README.md. Base loop: dreamy 70s soft-rock progression (Rhodes-ish pad, brushed rhythm). Free spins: 90s-grunge-tinged loop (low fuzzed fifths, still warm). Theremin saucers, banjo-twang plucks, rising cascade arpeggio, purr-trill and boogie-riff cat motifs, brass fanfare. Vibes, never samples.
+- **Copy deck registers** (per site persona): Glee-Lite for routine wins ("Done and sparkling."), Glee-Rich default ("Do you love this? Wait. No. *Really* love it?"), Bleeds Glee for bonuses and UniGlee ("OMG. This is SO Glee-coded. Freak'n facts on FACTS."). Homage lines nod at her shows by energy, never verbatim quotes.
+
+## 12. The Birthday Reveal
+
+First launch on/after 2026-07-17 (date check, one-time flag): night sky, two saucers fly in carrying a banner — **"Happy Birthday, Glee"** — Joey and Phoebe pop out, a chai tumbler descends into her hand silhouette, and one line from Jamie (text he writes himself, stored in one obvious constant: `BIRTHDAY_MESSAGE`). Then the Toolbox opens and the game begins with a full Treat Jar and 2,000,000 coins. Skippable after first view; re-watchable from the scene shelf.
+
+## 13. Settings & accessibility
+
+Sound toggle (default on), music/SFX split sliders, **reduced motion** (fades replace drops; honors `prefers-reduced-motion` automatically), quip volume (Lite/Rich/Bleeds), reset with confirm, "About this gift" (the README story, in-game). Aria-live announces wins; all controls labeled; touch targets ≥48px.
+
+## 14. Technical contract
+
+Vanilla TypeScript + Vite + Tailwind (S9). `src/engine/` pure TS, seeded RNG, vitest-covered (event-frequency table §4 is the test oracle). `src/ui/` renders `SpinResult` steps; owns zero math. PWA: manifest + service worker, offline after first load. Deploy: push → Actions (privacy gate, brand gate, tests) → Pages. localStorage only. No backend, ever.
+
+## 15. Build order & cut lines (deadline: playable by 07/12, polished by 07/16)
+
+1. **Core** (cannot cut): reels, paylines, cascades, meter, free spins, bet bar, balance, SPARKLE!, deploy, sound core, persistence.
+2. **Signature** (cut last): Treat Jar + pop-ins, wheel modifiers, quip system, birthday reveal.
+3. **Riches** (cut first if needed): Chai Bonus, UniGlee, scenes, daily wheel, XP/levels, cosmetics.
+
+If the 17th arrives early, tier 1 + 2 IS the gift. Tier 3 ships as "new features appearing in your game" across the following weeks — a gift that keeps unwrapping.
+
+## 16. Acceptance criteria (Codex's list, kept nearly whole)
+
+- Glee opens it on her iPhone from a home-screen icon and understands it with zero instructions.
+- Every tap resolves legibly and positively; no money or purchase language exists anywhere.
+- Joey, Phoebe, iced chai, and the number 12 feel unmistakably specific to her.
+- Visibly Glee-fully; not confusable with any casino game, beverage, or pet-food brand.
+- Progress survives refresh and app restart; reset works.
+- No Glee photo, unlicensed media, or private file in the repo, its history, or the bundle (CI-gated).
+- Builds clean, no console errors, reduced motion respected, 60fps on a recent iPhone.
+- Jamie watches her play it for ten minutes and she doesn't ask a single "how do I" question. She just plays.

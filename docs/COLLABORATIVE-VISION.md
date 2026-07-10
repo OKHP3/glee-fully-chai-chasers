@@ -1,6 +1,8 @@
 # Collaborative Vision: Glee-fully Iced Chai Chasers
 
-**Status:** proposal for cross-tool review  
+> **⚖️ RESOLUTION (2026-07-10, per §11 protocol):** Jamie reviewed this proposal against Claude's slot-framing spec and ruled: **Claude's vision is canonical, superimposed on this foundation.** See `DESIGN-SPEC.md` (v2) — its §2 table records exactly which elements of this document were adopted (milestone scenes, Chai Captain, non-negotiables, accessibility contract, treat naming, collaboration rules) and which were superseded (puzzle framing, React, illustrations-only cats, Chai Sparks-as-currency — Sparks live on as XP). Settled decisions S8-S13 in `DECISION-LOG.md`. **All tools, including Replit on arrival, build from DESIGN-SPEC.md.** This document remains as the honored pre-alpha record.
+
+**Status:** resolved — superseded by DESIGN-SPEC.md v2 (adoption table in its §2)  
 **Purpose:** provide a common product direction before parallel build work begins  
 **Decision owner:** Jamie, with Glee's delight and comfort as the final quality bar
 
