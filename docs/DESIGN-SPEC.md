@@ -112,7 +112,7 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 - **Jar empty / no Boogie Bites for Joey:** the cat knocks exactly one symbol off the board anyway (single-cell reshuffle — occasionally completes a line, always gets a chuckle) and exits with an unimpressed tail flick. Quip: *"Phoebe has reviewed your offering. Phoebe is unmoved."* / *"Joey requires Boogie Bites. Joey is a professional."*
 - **Both cats simultaneously** (rare, ~1/500): **Cat Constellation** (§10) — guaranteed cascade + scene unlock progress.
 
-Photo sticker-cutouts (real Joey & Phoebe, background-removed, white sticker outline) are used for pop-in and scene moments — photographic charm exactly where the surprise lands. Reel-symbol wilds use illustrated saucer-cat art for small-size legibility. Cat photos ship publicly (S12); Glee photos never (S4).
+All shipped cat art is **original illustration** (S15 — no photos or photorealistic renderings of the cats in the product): curvy tuxedo Phoebe, slender gray yellow-eyed Joey, drawn in the retro-bright house style for both reel wilds and pop-in moments. The reference photos inform markings, proportions, and personality only. Glee may appear as a cartoon avatar (S15), never photorealistic (S4).
 
 ## 7. Free spins & the AskJamie Wheel
 

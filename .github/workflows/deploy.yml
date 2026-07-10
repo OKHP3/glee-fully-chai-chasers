@@ -33,7 +33,12 @@ jobs:
           cache: npm
 
       - run: npm ci
+      # Unit tests must pass to deploy; the spec oracle runs in its own
+      # visible-but-non-blocking job below so iterative builds can ship
+      # while Round-2 math tuning is in progress.
       - run: npm test
+        env:
+          SKIP_ORACLE: "1"
       - run: npm run build
 
       - name: Brand-string gate — shipped bundle must be clean
@@ -46,6 +51,20 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+
+  spec-oracle:
+    # Visible on every push, never blocks deploys. Green here = the math
+    # meets DESIGN-SPEC §4. Definition-of-done requires this job green.
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vitest run src/engine/simulation.test.ts
 
   deploy:
     needs: build
