@@ -42,7 +42,8 @@ describe("spin", () => {
         treatJar: emptyTreatJar(),
         spinsSincePopIn: 0,
       });
-      expect(result.freeSpinsAwarded).toBe(freeSpinsForCascades(result.cascades));
+      const expected = freeSpinsForCascades(result.cascades);
+      expect(result.freeSpinsAwarded).toBe(result.doubleSparkleApplied ? expected * 2 : expected);
     }
   });
 });
