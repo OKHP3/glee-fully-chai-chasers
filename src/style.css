@@ -48,19 +48,23 @@ html, body { height: 100%; margin: 0; background: var(--cc-navy); }
 
 /* ── Mechanical reel spin ───────────────────────────────────────────────── */
 
-/* While spinning: blur cells so rapid symbol changes look like motion blur */
+/* While spinning: blur cells so rapid symbol changes look like motion blur.
+   Keep blur small (1px) — larger values spread beyond cell bounds and bleed
+   into adjacent cells even with overflow:hidden on the reel div. */
 .reel-spinning .cell {
-  filter: blur(2px);
-  opacity: 0.75;
+  filter: blur(1px);
+  opacity: 0.72;
   transition: none;
 }
 
-/* Landing bounce: reel snaps down into position when it stops */
+/* Landing bounce: reel snaps up from below into position when it stops.
+   Keep downward overshoot ≤ 2px so the bottom cell stays within #fs-grid's
+   overflow:hidden clip (4px gap leaves room for a small bounce). */
 @keyframes reel-land {
-  0%   { transform: translateY(-10px); opacity: 0.8; }
-  55%  { transform: translateY(5px);  opacity: 1;   }
-  78%  { transform: translateY(-3px);               }
-  100% { transform: translateY(0);                  }
+  0%   { transform: translateY(-8px); opacity: 0.85; }
+  55%  { transform: translateY(2px);  opacity: 1;    }
+  78%  { transform: translateY(-1px);                }
+  100% { transform: translateY(0);                   }
 }
 
 .reel-landing {
@@ -131,10 +135,12 @@ html, body { height: 100%; margin: 0; background: var(--cc-navy); }
   animation: symbol-pop 220ms ease-out;
 }
 
+/* Overshoot capped at 1.04 — a perceptible but safe bounce that stays within
+   the reel div's overflow:hidden clip (was 1.12, which bled into adjacent rows). */
 @keyframes symbol-pop {
-  0% { transform: scale(0.4); opacity: 0; }
-  70% { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); }
+  0%   { transform: scale(0.4);  opacity: 0; }
+  70%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1);               }
 }
 
 .cat-popin {

@@ -125,7 +125,7 @@ function treatJarHtml(state: GameState): string {
 function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): string {
   let html = "";
   for (let reel = 0; reel < REELS; reel++) {
-    html += `<div class="flex flex-col gap-1" data-reel="${reel}">`;
+    html += `<div class="flex flex-col gap-1 overflow-hidden" data-reel="${reel}">`;
     for (let row = 0; row < ROWS; row++) {
       const symbol = grid[reel][row].symbol;
       html += `<div class="cell flex items-center justify-center rounded-lg bg-white/5 p-1.5" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}</div>`;
@@ -475,8 +475,12 @@ async function playFreeSpinSession(
   bgLayer?.classList.add("aurora");
 
   const overlay = document.createElement("div");
-  overlay.className = "fixed inset-0 z-40 flex flex-col text-amber-100 night-garden aurora";
+  // Do NOT put night-garden on this element — that CSS rule sets position:absolute
+  // which would override Tailwind's fixed, making the overlay non-fixed and letting
+  // the base board bleed through. Use a child div for the background instead.
+  overlay.className = "fixed inset-0 z-40 flex flex-col text-amber-100";
   overlay.innerHTML = `
+    <div class="night-garden aurora" aria-hidden="true"></div>
     ${gardenDecor()}
     <div class="relative z-10 h-full w-full flex flex-col">
       <header class="px-4 pt-3 text-center text-sm font-semibold text-amber-300">
