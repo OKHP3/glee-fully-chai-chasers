@@ -128,7 +128,7 @@ function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): string {
     html += `<div class="flex flex-col gap-1" data-reel="${reel}">`;
     for (let row = 0; row < ROWS; row++) {
       const symbol = grid[reel][row].symbol;
-      html += `<div class="cell w-14 h-14 flex items-center justify-center rounded-lg bg-white/5 p-1.5" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}</div>`;
+      html += `<div class="cell flex items-center justify-center rounded-lg bg-white/5 p-1.5" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}</div>`;
     }
     html += "</div>";
   }
@@ -245,41 +245,154 @@ async function runSpin(
   renderBoard(root, state);
 }
 
-function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
-  return new Promise((resolve) => {
-    const grid = root.querySelector<HTMLDivElement>("#reel-grid")!;
-    const meter = root.querySelector<HTMLSpanElement>("#meter-count")!;
-    let i = 0;
+/* ── Mechanical reel-spin helpers ────────────────────────────────────────── */
 
-    const next = () => {
-      if (i >= steps.length) {
-        resolve();
-        return;
-      }
-      const step = steps[i];
-      grid.innerHTML = renderGridHtml(step.grid);
-      grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("symbol-pop"));
-      meter.textContent = String(step.meterAfter);
+/**
+ * Symbols shown while reels are spinning (common, visually distinct pool).
+ * Wilds and specials are deliberately excluded so they only appear on the
+ * real result, preserving their visual impact as the reel stops.
+ */
+const SPIN_SYMS: readonly SymbolId[] = [
+  "chai", "crystal", "butterfly", "gnome", "tumbler",
+  "mailbox", "vhs", "teapot", "yarn", "candle",
+] as const;
 
-      if (step.wins.length > 0) {
-        playCascadeArpeggio(step.meterAfter);
-        for (const win of step.wins) {
-          for (const [reel, row] of win.positions) {
-            const cell = grid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`);
-            cell?.classList.add("win-flash");
-          }
-        }
-        playWinPluck();
-      } else {
-        playCascadeTick();
-      }
+/**
+ * How many consecutive reels from left-0 share the same symbol on ANY row.
+ * Used to compute anticipation delay bonuses for later reels.
+ */
+function getLongestMatchRun(grid: CascadeStep["grid"]): number {
+  let max = 1;
+  for (let row = 0; row < ROWS; row++) {
+    const sym0 = grid[0][row].symbol;
+    let run = 1;
+    for (let reel = 1; reel < REELS; reel++) {
+      if (grid[reel][row].symbol === sym0) { run++; } else { break; }
+    }
+    if (run > max) max = run;
+  }
+  return max;
+}
 
-      i++;
-      window.setTimeout(next, 480);
-    };
+/**
+ * Step 0 of every spin: all five reels spin simultaneously (blurring symbols
+ * flicker past), then stop one-by-one left-to-right with a landing bounce.
+ *
+ * Anticipation system — if the result has consecutive matches from reel 0,
+ * later reels spin proportionally longer to build tension:
+ *   ≥2 match → reel 2 takes +400 ms extra
+ *   ≥3 match → reel 3 takes +550 ms extra on top of that
+ *   ≥4 match → reel 4 takes +850 ms extra on top of that
+ *   5-way    → reel 4 gets an additional +650 ms jackpot slow-down
+ *
+ * Every reel's column also gets a brief golden-glow "suspense" pulse when a
+ * match is still live after it stops (so the player notices the streak).
+ */
+async function animateInitialSpin(root: HTMLElement, step: CascadeStep): Promise<void> {
+  const grid = root.querySelector<HTMLDivElement>("#reel-grid");
+  if (!grid) return;
 
-    next();
+  const reelDivs = Array.from(grid.querySelectorAll<HTMLDivElement>("[data-reel]"));
+  const finalGrid = step.grid;
+  const matchRun = getLongestMatchRun(finalGrid);
+
+  // Absolute stop times from spin start (ms). Base spacing = 350 ms per reel.
+  const stopTimes = [700, 1050, 1400, 1750, 2100];
+  if (matchRun >= 2) { stopTimes[2] += 400; stopTimes[3] += 400; stopTimes[4] += 400; }
+  if (matchRun >= 3) { stopTimes[3] += 550; stopTimes[4] += 550; }
+  if (matchRun >= 4) { stopTimes[4] += 850; }
+  if (matchRun >= 5) { stopTimes[4] += 650; }
+
+  // Start all reels spinning — rapidly cycle symbols + blur
+  const intervals = reelDivs.map((reelDiv) => {
+    reelDiv.classList.add("reel-spinning");
+    return window.setInterval(() => {
+      if (!document.contains(reelDiv)) return;
+      reelDiv.querySelectorAll<HTMLDivElement>(".cell").forEach((cell) => {
+        const sym = SPIN_SYMS[Math.floor(Math.random() * SPIN_SYMS.length)];
+        cell.innerHTML = symbolSvg(sym);
+      });
+    }, 65);
   });
+
+  const spinStart = Date.now();
+
+  for (let i = 0; i < REELS; i++) {
+    const waitMs = stopTimes[i] - (Date.now() - spinStart);
+    if (waitMs > 0) await sleep(waitMs);
+
+    window.clearInterval(intervals[i]);
+    const reelDiv = reelDivs[i];
+    if (!document.contains(reelDiv)) continue;
+
+    reelDiv.classList.remove("reel-spinning");
+
+    // Snap to final symbols
+    reelDiv.querySelectorAll<HTMLDivElement>(".cell").forEach((cell, row) => {
+      const sym = finalGrid[i][row].symbol as SymbolId;
+      cell.innerHTML = symbolSvg(sym);
+      cell.dataset.symbol = sym;
+    });
+
+    // Bounce landing animation
+    reelDiv.classList.add("reel-landing");
+    window.setTimeout(() => reelDiv.classList.remove("reel-landing"), 380);
+
+    playCascadeTick();
+
+    // Suspense glow when a run is still alive after this reel stops
+    if (i > 0 && i < REELS - 1 && i < matchRun - 1) {
+      reelDiv.classList.add("reel-suspense");
+      window.setTimeout(() => reelDiv.classList.remove("reel-suspense"), 960);
+      if (i === 2) playWinPluck();          // 3-in-a-row tension sound
+      if (i === 3) playBonusFanfare();      // 4-in-a-row excitement sound
+    }
+  }
+
+  // Settle time before evaluating wins
+  await sleep(320);
+}
+
+async function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
+  if (steps.length === 0) return;
+
+  const grid = root.querySelector<HTMLDivElement>("#reel-grid")!;
+  const meter = root.querySelector<HTMLSpanElement>("#meter-count")!;
+
+  // Step 0: mechanical reel spin
+  await animateInitialSpin(root, steps[0]);
+  meter.textContent = String(steps[0].meterAfter);
+
+  if (steps[0].wins.length > 0) {
+    playCascadeArpeggio(steps[0].meterAfter);
+    for (const win of steps[0].wins) {
+      for (const [reel, row] of win.positions) {
+        grid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+      }
+    }
+    playWinPluck();
+  }
+
+  // Steps 1+: cascade refills (symbols drop in from above)
+  for (let i = 1; i < steps.length; i++) {
+    await sleep(480);
+    const step = steps[i];
+    grid.innerHTML = renderGridHtml(step.grid);
+    grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("symbol-pop"));
+    meter.textContent = String(step.meterAfter);
+
+    if (step.wins.length > 0) {
+      playCascadeArpeggio(step.meterAfter);
+      for (const win of step.wins) {
+        for (const [reel, row] of win.positions) {
+          grid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+        }
+      }
+      playWinPluck();
+    } else {
+      playCascadeTick();
+    }
+  }
 }
 
 /** Animated cat pop-in moment — docs §11, "Workstream D". */

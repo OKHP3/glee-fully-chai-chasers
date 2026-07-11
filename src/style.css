@@ -8,6 +8,21 @@
   --cc-butter: #f5d576;
   --cc-mint: #9fe8c5;
   --cc-pink: #e8a5b8;
+
+  /*
+   * Responsive cell size: pick whichever is smaller — fitting 5 columns into
+   * the viewport width, or fitting 4 rows into the viewport height minus the
+   * ~18rem of chrome (header, meter, footer, labels). Clamp between 44 px
+   * (minimum tap target) and 120 px (looks good on large tablets/desktops).
+   */
+  --cell-sz: clamp(
+    44px,
+    min(
+      calc((100vw - 3rem) / 5),
+      calc((100dvh - 18rem) / 4)
+    ),
+    120px
+  );
 }
 
 html, body { height: 100%; margin: 0; background: var(--cc-navy); }
@@ -20,6 +35,8 @@ html, body { height: 100%; margin: 0; background: var(--cc-navy); }
 }
 
 .cell {
+  width: var(--cell-sz);
+  height: var(--cell-sz);
   transition: transform 180ms ease-out, opacity 180ms ease-out, background-color 180ms ease-out;
 }
 
@@ -27,6 +44,38 @@ html, body { height: 100%; margin: 0; background: var(--cc-navy); }
   background-color: var(--cc-butter);
   opacity: 0.9;
   transform: scale(1.08);
+}
+
+/* ── Mechanical reel spin ───────────────────────────────────────────────── */
+
+/* While spinning: blur cells so rapid symbol changes look like motion blur */
+.reel-spinning .cell {
+  filter: blur(2px);
+  opacity: 0.75;
+  transition: none;
+}
+
+/* Landing bounce: reel snaps down into position when it stops */
+@keyframes reel-land {
+  0%   { transform: translateY(-10px); opacity: 0.8; }
+  55%  { transform: translateY(5px);  opacity: 1;   }
+  78%  { transform: translateY(-3px);               }
+  100% { transform: translateY(0);                  }
+}
+
+.reel-landing {
+  animation: reel-land 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Anticipation flash — subtle glow on the reel strip after a partial match */
+@keyframes reel-suspense {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 0 2px var(--cc-butter); }
+}
+
+.reel-suspense {
+  border-radius: 0.5rem;
+  animation: reel-suspense 0.45s ease-in-out 2;
 }
 
 .night-garden {
