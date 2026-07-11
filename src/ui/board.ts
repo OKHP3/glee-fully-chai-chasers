@@ -288,11 +288,12 @@ function getLongestMatchRun(grid: CascadeStep["grid"]): number {
  * Every reel's column also gets a brief golden-glow "suspense" pulse when a
  * match is still live after it stops (so the player notices the streak).
  */
-async function animateInitialSpin(root: HTMLElement, step: CascadeStep): Promise<void> {
-  const grid = root.querySelector<HTMLDivElement>("#reel-grid");
-  if (!grid) return;
-
-  const reelDivs = Array.from(grid.querySelectorAll<HTMLDivElement>("[data-reel]"));
+/**
+ * Accepts the actual grid DOM element directly so this function works
+ * for both the base-game #reel-grid and the free-spin #fs-grid.
+ */
+async function animateInitialSpin(gridEl: HTMLDivElement, step: CascadeStep): Promise<void> {
+  const reelDivs = Array.from(gridEl.querySelectorAll<HTMLDivElement>("[data-reel]"));
   const finalGrid = step.grid;
   const matchRun = getLongestMatchRun(finalGrid);
 
@@ -360,7 +361,7 @@ async function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<vo
   const meter = root.querySelector<HTMLSpanElement>("#meter-count")!;
 
   // Step 0: mechanical reel spin
-  await animateInitialSpin(root, steps[0]);
+  await animateInitialSpin(grid, steps[0]);
   meter.textContent = String(steps[0].meterAfter);
 
   if (steps[0].wins.length > 0) {
@@ -472,74 +473,111 @@ async function playFreeSpinSession(
 ): Promise<void> {
   const bgLayer = root.querySelector<HTMLDivElement>("#bg-layer");
   bgLayer?.classList.add("aurora");
-  document.body.classList.add("aurora-mode");
 
   const overlay = document.createElement("div");
   overlay.className = "fixed inset-0 z-40 flex flex-col text-amber-100 night-garden aurora";
   overlay.innerHTML = `
     ${gardenDecor()}
     <div class="relative z-10 h-full w-full flex flex-col">
-      <header class="px-4 pt-3 text-center text-sm">
-        <span>${wheelWedgeLabel(wedge)} — Free Spins</span>
+      <header class="px-4 pt-3 text-center text-sm font-semibold text-amber-300">
+        ✦ ${wheelWedgeLabel(wedge)} — Free Spins ✦
       </header>
-      <div class="mx-4 mt-2 rounded-xl bg-black/20 px-3 py-2 text-center text-sm">
-        Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span> · Round win: <span id="fs-round-win">0</span>
+      <div class="mx-4 mt-2 rounded-xl bg-black/30 px-3 py-2 text-center text-sm">
+        Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span>
+        &nbsp;·&nbsp; Round win: <span id="fs-round-win">0</span>
+        &nbsp;·&nbsp; Cascade: <span id="fs-meter">0</span>
       </div>
       <main class="flex-1 flex items-center justify-center px-2">
-        <div id="fs-grid" class="grid grid-cols-5 gap-1 bg-black/25 rounded-2xl p-2"></div>
+        <div id="fs-grid" class="grid grid-cols-5 gap-1 bg-black/25 rounded-2xl p-2 overflow-hidden backdrop-blur-sm"></div>
       </main>
-      <div id="fs-status" class="min-h-[2rem] px-4 text-center text-sm"></div>
+      <div id="fs-status" class="min-h-[2.5rem] px-4 text-center text-sm text-amber-200" aria-live="polite"></div>
     </div>
   `;
   root.appendChild(overlay);
 
-  const grid = overlay.querySelector<HTMLDivElement>("#fs-grid")!;
+  const fsGrid = overlay.querySelector<HTMLDivElement>("#fs-grid")!;
   const indexEl = overlay.querySelector<HTMLSpanElement>("#fs-index")!;
   const totalEl = overlay.querySelector<HTMLSpanElement>("#fs-total")!;
   const roundWinEl = overlay.querySelector<HTMLSpanElement>("#fs-round-win")!;
+  const meterEl = overlay.querySelector<HTMLSpanElement>("#fs-meter")!;
   const statusEl = overlay.querySelector<HTMLDivElement>("#fs-status")!;
+
+  // Seed the grid with the first round's initial layout so reel divs exist
+  // before animateInitialSpin queries them. They'll immediately be blurred by
+  // the spinning animation so the player never sees this "preview".
+  if (rounds.length > 0) {
+    fsGrid.innerHTML = renderGridHtml(rounds[0].steps[0].grid);
+  }
+
+  let totalWinSoFar = 0;
 
   for (let r = 0; r < rounds.length; r++) {
     const round = rounds[r];
     indexEl.textContent = String(r + 1);
     totalEl.textContent = String(rounds.length);
-    roundWinEl.textContent = round.totalWin.toLocaleString();
+    statusEl.textContent = "";
 
-    for (const step of round.steps) {
-      grid.innerHTML = renderGridHtml(step.grid);
-      grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
+    // ── Step 0: mechanical reel spin (same system as base game) ──────────
+    await animateInitialSpin(fsGrid, round.steps[0]);
+    meterEl.textContent = String(round.steps[0].meterAfter);
+
+    if (round.steps[0].wins.length > 0) {
+      playCascadeArpeggio(round.steps[0].meterAfter);
+      for (const win of round.steps[0].wins) {
+        for (const [reel, row] of win.positions) {
+          fsGrid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+        }
+      }
+      playWinPluck();
+    }
+
+    // ── Steps 1+: cascade refills ─────────────────────────────────────────
+    for (let s = 1; s < round.steps.length; s++) {
+      await sleep(460);
+      const step = round.steps[s];
+      fsGrid.innerHTML = renderGridHtml(step.grid);
+      fsGrid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("symbol-pop"));
+      meterEl.textContent = String(step.meterAfter);
+
       if (step.wins.length > 0) {
         playCascadeArpeggio(step.meterAfter);
+        for (const win of step.wins) {
+          for (const [reel, row] of win.positions) {
+            fsGrid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+          }
+        }
         playWinPluck();
       } else {
         playCascadeTick();
       }
-      await sleep(360);
     }
 
+    // ── Round result callouts ─────────────────────────────────────────────
+    await sleep(300);
+    totalWinSoFar += round.totalWin;
+    roundWinEl.textContent = totalWinSoFar.toLocaleString();
+
     if (round.twelvePumps) {
-      statusEl.textContent = "TWELVE PUMPS! 12x wild multiplier!";
+      statusEl.textContent = "TWELVE PUMPS! 12× wild multiplier!";
       playTwelvePumps();
-      await sleep(900);
+      await sleep(1000);
     } else if (round.extraWildsAdded > 0) {
-      statusEl.textContent = "We Want Our Chai Back — extra wilds landed!";
-      await sleep(500);
+      statusEl.textContent = "We Want Our Chai Back — extra wilds!";
+      await sleep(600);
     } else if (round.totalWin > 0) {
       statusEl.textContent = `+${round.totalWin.toLocaleString()} coins`;
-      await sleep(400);
-    } else {
-      statusEl.textContent = "";
+      await sleep(450);
     }
+
     if (round.freeSpinsAwarded > 0) {
       statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins!`;
       playBonusFanfare();
-      await sleep(800);
+      await sleep(900);
     }
   }
 
   overlay.remove();
   bgLayer?.classList.remove("aurora");
-  document.body.classList.remove("aurora-mode");
   void state; // state saved by caller after totals are tallied
 }
 
