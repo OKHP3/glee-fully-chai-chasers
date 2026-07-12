@@ -43,7 +43,7 @@ export function xpIntoLevel(xp: number): { level: number; into: number; span: nu
 }
 
 /**
- * Bust-proof invariant (docs §9): if balance can't cover one more spin at the
+ * Automatic-refill invariant (docs §9): if balance can't cover one more spin at the
  * current bet, AskJamie "finds coins under the couch." Returns the new
  * balance (unchanged if no refill was needed).
  */

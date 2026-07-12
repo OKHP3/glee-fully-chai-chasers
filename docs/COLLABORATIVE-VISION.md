@@ -8,7 +8,7 @@
 
 ## 1. The promise
 
-Build a small, public, browser-based birthday game that lets Glee enjoy the *feeling* of a bright, escalating casino-style cascade game without money, purchases, loss pressure, casino branding, or copied assets.
+Build a small, public, browser-based birthday game that gives Glee a bright, escalating cascade experience made especially for her, expressed through original Glee-fully characters, art, sound, terminology, and personality.
 
 The game is an original Glee-fully experience: **iced chai, Joey, Phoebe, butterflies, warm absurdity, and a friendly AskJamie-style co-pilot**. Its job is to create repeatable moments of delight, not to simulate gambling.
 
@@ -18,7 +18,7 @@ The game is an original Glee-fully experience: **iced chai, Joey, Phoebe, butter
 | --- | --- |
 | Touch-first, mobile-browser play | Real money, wagering, purchases, ads, or a cash-out system |
 | Original characters, art, copy, sound, and game rules | Casino/game logos, titles, art, reel strips, UI layouts, audio, or code |
-| Generous, understandable progress | Punishing scarcity, deceptive near-misses, or loss-chasing prompts |
+| Generous, understandable progress | Hidden, misleading, or needlessly frustrating progression systems |
 | Browser-local saves only | Accounts, backend, personal-data collection, or tracking by default |
 | Glee-fully warmth and retro-bright style | Glee's actual photo or likeness in the public game without her clear approval |
 
@@ -110,7 +110,7 @@ The release is ready when:
 ## 10. Review questions for the team
 
 1. Is “cascade puzzle/collection game” the right primary framing, or should the board be less slot-like?
-2. What degree of randomness feels joyful without recreating the compulsion pattern the gift is meant to avoid?
+2. What degree of randomness feels joyful while keeping every outcome positive and pressure-free?
 3. Which three or four milestone scenes would most delight Glee?
 4. Should the public build ship with no real-photo derivatives at all, with a separate private birthday build for any personal material?
 5. What is the minimal delightful MVP that can be polished by the birthday deadline?

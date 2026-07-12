@@ -2,10 +2,13 @@
  * Main-board rendering & animation. Consumes engine `SpinResult`/`CascadeStep`
  * objects and animates them; owns zero game math (per src/ui/README.md contract).
  * Spec: docs/DESIGN-SPEC.md §3 (layout), §7 (free spins/wheel), §11 (animation).
+ * Visual system: docs/prompts/DESIGN-AGENT-PROMPT.md / docs/DESIGN-HANDOFF.md.
  *
- * Zero emoji on the shipped board — all symbols/cats/wheel are original inline
- * SVG (src/ui/symbols.ts). Night-garden backdrop + drifting saucers/fireflies
- * are CSS-only (src/style.css) to keep this file DOM-orchestration only.
+ * Zero emoji on the shipped board — all symbols/cats/saucers/jar/wheel are
+ * original inline SVG (src/ui/symbols.ts). The board is housed in an
+ * illustrated "cabinet": marquee header, ornate reel-window frame, an
+ * illustrated firefly-jar meter, a console-style bet bar, and a layered
+ * night-garden scene behind it all (CSS + SVG, no canvas/WebGL).
  */
 import type { CascadeStep, SpinResult, SymbolId } from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
@@ -16,7 +19,17 @@ import { mulberry32, productionSeed } from "../engine/rng";
 import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinRoundResult, type WheelWedge } from "../engine/freespins";
 import type { GameState } from "../state";
 import { resetAll, saveGameState } from "../state";
-import { symbolSvg, catSprite, wheelSvg } from "./symbols";
+import {
+  symbolSvg,
+  catSprite,
+  wheelHeroArt,
+  saucerSvg,
+  gardenForegroundSvg,
+  fireflyJarSvg,
+  gleeAvatarSvg,
+  askJamieSvg,
+  type CatPose,
+} from "./symbols";
 import {
   isUnlocked,
   playBonusFanfare,
@@ -31,56 +44,82 @@ import {
 
 let statusTimeout: number | undefined;
 
-export function renderBoard(root: HTMLElement, state: GameState): void {
+export function renderBoard(
+  root: HTMLElement,
+  state: GameState,
+  visibleGrid?: CascadeStep["grid"],
+): void {
   const level = xpIntoLevel(state.xp);
   const bets = availableBetLevels(level.level);
+  const settledGrid = visibleGrid ?? spin({
+    rng: mulberry32(20260717),
+    betPerLine: 1,
+    treatJar: state.treatJar,
+    spinsSincePopIn: 0,
+  }).steps[0].grid;
 
   root.innerHTML = `
-    <div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden">
+    <div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden cc-root">
       <div class="night-garden" id="bg-layer">${gardenDecor()}</div>
-      <div class="relative z-10 h-full w-full flex flex-col">
-        <header class="flex items-center justify-between px-4 pt-3 text-sm">
-          <span aria-label="Player level">Lvl ${level.level} · ${level.into}/${level.span} Chai Sparks</span>
-          <button id="settings-btn" class="min-w-[48px] min-h-[48px] flex items-center justify-center" aria-label="Settings">
-            <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#f5d576" stroke-width="1.8" aria-hidden="true">
-              <circle cx="12" cy="12" r="3.2"/>
-              <path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/>
-            </svg>
-          </button>
+      <div class="relative z-10 h-full w-full flex flex-col cc-shell">
+        <header class="marquee">
+          <div class="marquee-bulbs" aria-hidden="true">${bulbRow()}</div>
+          <div class="marquee-row">
+            <span class="level-chip" aria-label="Player level">Lvl ${level.level}<em>${level.into}/${level.span} Sparks</em></span>
+            <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+            <button id="settings-btn" class="chrome-btn" aria-label="Settings">
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#f5d576" stroke-width="1.8" aria-hidden="true">
+                <circle cx="12" cy="12" r="3.2"/>
+                <path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/>
+              </svg>
+            </button>
+          </div>
         </header>
 
-        <div id="cascade-meter" class="mx-4 mt-2 rounded-xl bg-black/20 px-3 py-2 text-center text-sm" aria-live="polite">
-          Cascade meter: <span id="meter-count">0</span>
+        <div class="jar-meter" aria-live="polite" aria-label="Firefly cascade meter">
+          <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(0)}</div>
+          <div class="jar-meter-copy">
+            <span class="jar-meter-kicker">Firefly Cascade</span>
+            <strong id="meter-count" class="jar-meter-count">0 / 4</strong>
+            <small>Reach 4 to unlock 7 free spins</small>
+          </div>
         </div>
 
-        <main class="flex-1 flex flex-col items-center justify-center gap-1 px-2">
-          <div id="reel-grid" class="grid grid-cols-5 gap-1 bg-black/25 rounded-2xl p-2 backdrop-blur-sm" role="img" aria-label="Reel board">
-            ${renderGridHtml(spin({ rng: mulberry32(1), betPerLine: 1, treatJar: state.treatJar, spinsSincePopIn: 0 }).steps[0].grid)}
+        <main class="cabinet-frame">
+          <span class="ornament ornament-tl">${miniStar()}</span>
+          <span class="ornament ornament-tr">${miniStar()}</span>
+          <span class="ornament ornament-bl">${miniStar()}</span>
+          <span class="ornament ornament-br">${miniStar()}</span>
+          <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
+            ${renderGridHtml(settledGrid)}
           </div>
         </main>
 
-        <div class="flex items-center justify-between px-4 text-sm">
-          <div id="treat-jar" aria-label="Treat Jar" class="flex items-center gap-2">
+        <div class="companion-row">
+          <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
+            <span class="treat-jar-title">Treat Jar</span>
             ${treatJarHtml(state)}
           </div>
-          <div id="askjamie-perch" aria-label="AskJamie" class="text-xs opacity-70">AskJamie</div>
+          <div id="askjamie-perch" aria-label="AskJamie" class="askjamie-housing">
+            <div class="askjamie-icon">${askJamieSvg()}</div>
+            <span>AskJamie</span>
+          </div>
         </div>
 
-        <div id="status-line" class="min-h-[1.5rem] px-4 text-center text-sm text-amber-200/90" aria-live="polite"></div>
+        <div id="status-line" class="status-line" aria-live="polite"></div>
 
-        <footer class="flex items-center gap-2 px-4 py-3">
-          <span class="text-sm" aria-label="Glee-coin balance">${state.balance.toLocaleString()} coins</span>
+        <footer class="bet-console">
+          <div class="coin-chip" aria-label="Glee-coin balance">${state.balance.toLocaleString()}<em>coins</em></div>
           <div class="flex-1"></div>
-          <button id="bet-down" class="min-w-[48px] min-h-[48px] rounded-lg bg-white/10" aria-label="Decrease bet">−</button>
-          <span class="text-sm w-16 text-center" id="bet-display">${state.bet}</span>
-          <button id="bet-up" class="min-w-[48px] min-h-[48px] rounded-lg bg-white/10" aria-label="Increase bet">+</button>
-          <button id="sparkle-btn"
-            class="ml-2 px-8 min-h-[64px] rounded-2xl bg-orange-600 text-white text-lg font-bold active:scale-95 transition-transform">
-            SPARKLE!
+          <button id="bet-down" class="chrome-btn" aria-label="Decrease bet">−</button>
+          <span class="bet-display" id="bet-display">${state.bet}</span>
+          <button id="bet-up" class="chrome-btn" aria-label="Increase bet">+</button>
+          <button id="sparkle-btn" class="sparkle-btn">
+            <span>SPARKLE!</span>
           </button>
         </footer>
 
-        <div class="px-4 pb-2 text-center text-xs">
+        <div class="settings-row">
           <label class="inline-flex items-center gap-2">
             <input type="checkbox" id="sound-toggle" ${state.soundOn ? "checked" : ""} class="min-w-[24px] min-h-[24px]" />
             Sound
@@ -94,41 +133,77 @@ export function renderBoard(root: HTMLElement, state: GameState): void {
   wireControls(root, state, bets);
 }
 
+function bulbRow(): string {
+  return Array.from({ length: 16 }, (_, i) => `<span class="bulb" style="animation-delay:${(i % 4) * 0.18}s"></span>`).join("");
+}
+
+function miniStar(): string {
+  return `<svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true">
+    <path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/>
+  </svg>`;
+}
+
 function gardenDecor(): string {
   const saucers = [
-    { top: "8%", left: "12%", delay: "0s" },
-    { top: "14%", left: "70%", delay: "1.4s" },
+    { top: "4%", left: "8%", delay: "0s", v: 1 as const },
+    { top: "2%", left: "32%", delay: "0.8s", v: 2 as const },
+    { top: "5%", left: "50%", delay: "1.6s", v: 3 as const },
+    { top: "2%", left: "68%", delay: "2.4s", v: 4 as const },
+    { top: "4%", left: "86%", delay: "1.2s", v: 5 as const },
   ];
-  const fireflies = Array.from({ length: 8 }, (_, i) => ({
-    top: `${10 + ((i * 37) % 70)}%`,
-    left: `${5 + ((i * 53) % 90)}%`,
+  const stars = Array.from({ length: 26 }, (_, i) => ({
+    top: `${4 + ((i * 17) % 55)}%`,
+    left: `${3 + ((i * 41) % 94)}%`,
+    delay: `${(i % 6) * 0.5}s`,
+    fast: i % 3 === 0,
+  }));
+  const fireflies = Array.from({ length: 6 }, (_, i) => ({
+    top: `${45 + ((i * 37) % 30)}%`,
+    left: `${8 + ((i * 53) % 84)}%`,
     delay: `${(i % 5) * 0.7}s`,
   }));
+
   const saucerHtml = saucers
-    .map((s) => `<div class="saucer" style="top:${s.top};left:${s.left};animation-delay:${s.delay}"></div>`)
+    .map(
+      (s, i) => `
+      <div class="saucer-unit" data-saucer="${i}" style="top:${s.top};left:${s.left};animation-delay:${s.delay}">
+        <div class="saucer-beam"></div>
+        <div class="saucer-art">${saucerSvg(s.v)}</div>
+      </div>`,
+    )
+    .join("");
+  const starHtml = stars
+    .map((s) => `<div class="star ${s.fast ? "star-fast" : "star-slow"}" style="top:${s.top};left:${s.left};animation-delay:${s.delay}"></div>`)
     .join("");
   const fireflyHtml = fireflies
     .map((f) => `<div class="firefly" style="top:${f.top};left:${f.left};animation-delay:${f.delay}"></div>`)
     .join("");
-  return saucerHtml + fireflyHtml;
+
+  return `
+    <div class="aurora-ribbons"><span></span><span></span><span></span></div>
+    ${starHtml}
+    ${saucerHtml}
+    ${fireflyHtml}
+    <div class="garden-foreground">${gardenForegroundSvg()}</div>
+  `;
 }
 
 function treatJarHtml(state: GameState): string {
   const jar = state.treatJar;
   return `
-    <span title="Chicken Comets" class="inline-flex items-center gap-1"><span class="w-4 h-4 inline-block">${symbolSvg("treat_chicken")}</span>${jar.chicken}</span>
-    <span title="Salmon Stars" class="inline-flex items-center gap-1"><span class="w-4 h-4 inline-block">${symbolSvg("treat_salmon")}</span>${jar.salmon}</span>
-    <span title="Boogie Bites" class="inline-flex items-center gap-1"><span class="w-4 h-4 inline-block">${symbolSvg("treat_boogie")}</span>${jar.boogie}</span>
+    <span title="Chicken Comets" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_chicken")}</span>${jar.chicken}</span>
+    <span title="Salmon Stars" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_salmon")}</span>${jar.salmon}</span>
+    <span title="Boogie Bites" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_boogie")}</span>${jar.boogie}</span>
   `;
 }
 
 function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): string {
   let html = "";
   for (let reel = 0; reel < REELS; reel++) {
-    html += `<div class="flex flex-col gap-1 overflow-hidden" data-reel="${reel}">`;
+    html += `<div class="reel-col" data-reel="${reel}">`;
     for (let row = 0; row < ROWS; row++) {
       const symbol = grid[reel][row].symbol;
-      html += `<div class="cell flex items-center justify-center rounded-lg bg-white/5 p-1.5" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}</div>`;
+      html += `<div class="cell" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}</div>`;
     }
     html += "</div>";
   }
@@ -142,6 +217,13 @@ function setStatus(root: HTMLElement, message: string): void {
   statusTimeout = window.setTimeout(() => {
     el.textContent = "";
   }, 4000);
+}
+
+function updateJar(root: HTMLElement, count: number): void {
+  const icon = root.querySelector<HTMLDivElement>("#jar-icon");
+  if (icon) icon.innerHTML = fireflyJarSvg(count);
+  const label = root.querySelector<HTMLSpanElement>("#meter-count");
+  if (label) label.textContent = `${count} / 4`;
 }
 
 function wireControls(root: HTMLElement, state: GameState, bets: number[]): void {
@@ -201,6 +283,7 @@ async function runSpin(
 
   state.balance -= state.bet;
   sparkleBtn.disabled = true;
+  sparkleBtn.classList.add("is-spinning");
 
   const result = spin({
     rng: mulberry32(productionSeed()),
@@ -219,201 +302,223 @@ async function runSpin(
     state.treatJar = addTreat(state.treatJar, treat);
   }
 
+  if (result.unigleeTriggered) {
+    playBonusFanfare();
+    await showUnigleeTakeover(root);
+  } else if (result.totalWin > 0) {
+    await showWinCelebration(root, result.totalWin, state.bet);
+  }
+
   if (result.catVisit) {
     state.spinsSincePopIn = 0;
     state.treatJar = consumeForVisit(state.treatJar, result.catVisit);
-    await showCatPopIn(root, result.catVisit.cat, result.catVisit.quip);
+    await showCatPopIn(root, result.catVisit.cat, result.catVisit.fed, result.catVisit.quip);
     if (result.catVisit.fed) playBonusFanfare();
   } else {
     state.spinsSincePopIn += 1;
   }
 
-  if (result.unigleeTriggered) {
-    setStatus(root, "UNIGLEE! Freak'n facts on FACTS.");
-    playBonusFanfare();
-  } else if (result.totalWin > 0) {
-    setStatus(root, `Nice cascade! +${result.totalWin.toLocaleString()} coins.`);
-  }
-
   saveGameState(state);
+
+  const btnAgain = root.querySelector<HTMLButtonElement>("#sparkle-btn");
+  btnAgain?.classList.remove("is-spinning");
 
   if (result.freeSpinsAwarded > 0) {
     await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
     return;
   }
 
-  renderBoard(root, state);
+  renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
 }
 
-/* ── Mechanical reel-spin helpers ────────────────────────────────────────── */
+function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
+  return new Promise((resolve) => {
+    const grid = root.querySelector<HTMLDivElement>("#reel-grid")!;
+    let i = 0;
 
-/**
- * Symbols shown while reels are spinning (common, visually distinct pool).
- * Wilds and specials are deliberately excluded so they only appear on the
- * real result, preserving their visual impact as the reel stops.
- */
-const SPIN_SYMS: readonly SymbolId[] = [
-  "chai", "crystal", "butterfly", "gnome", "tumbler",
-  "mailbox", "vhs", "teapot", "yarn", "candle",
-] as const;
-
-/**
- * How many consecutive reels from left-0 share the same symbol on ANY row.
- * Used to compute anticipation delay bonuses for later reels.
- */
-function getLongestMatchRun(grid: CascadeStep["grid"]): number {
-  let max = 1;
-  for (let row = 0; row < ROWS; row++) {
-    const sym0 = grid[0][row].symbol;
-    let run = 1;
-    for (let reel = 1; reel < REELS; reel++) {
-      if (grid[reel][row].symbol === sym0) { run++; } else { break; }
-    }
-    if (run > max) max = run;
-  }
-  return max;
-}
-
-/**
- * Step 0 of every spin: all five reels spin simultaneously (blurring symbols
- * flicker past), then stop one-by-one left-to-right with a landing bounce.
- *
- * Anticipation system — if the result has consecutive matches from reel 0,
- * later reels spin proportionally longer to build tension:
- *   ≥2 match → reel 2 takes +400 ms extra
- *   ≥3 match → reel 3 takes +550 ms extra on top of that
- *   ≥4 match → reel 4 takes +850 ms extra on top of that
- *   5-way    → reel 4 gets an additional +650 ms jackpot slow-down
- *
- * Every reel's column also gets a brief golden-glow "suspense" pulse when a
- * match is still live after it stops (so the player notices the streak).
- */
-/**
- * Accepts the actual grid DOM element directly so this function works
- * for both the base-game #reel-grid and the free-spin #fs-grid.
- */
-async function animateInitialSpin(gridEl: HTMLDivElement, step: CascadeStep): Promise<void> {
-  const reelDivs = Array.from(gridEl.querySelectorAll<HTMLDivElement>("[data-reel]"));
-  const finalGrid = step.grid;
-  const matchRun = getLongestMatchRun(finalGrid);
-
-  // Absolute stop times from spin start (ms). Base spacing = 350 ms per reel.
-  const stopTimes = [700, 1050, 1400, 1750, 2100];
-  if (matchRun >= 2) { stopTimes[2] += 400; stopTimes[3] += 400; stopTimes[4] += 400; }
-  if (matchRun >= 3) { stopTimes[3] += 550; stopTimes[4] += 550; }
-  if (matchRun >= 4) { stopTimes[4] += 850; }
-  if (matchRun >= 5) { stopTimes[4] += 650; }
-
-  // Start all reels spinning — rapidly cycle symbols + blur
-  const intervals = reelDivs.map((reelDiv) => {
-    reelDiv.classList.add("reel-spinning");
-    return window.setInterval(() => {
-      if (!document.contains(reelDiv)) return;
-      reelDiv.querySelectorAll<HTMLDivElement>(".cell").forEach((cell) => {
-        const sym = SPIN_SYMS[Math.floor(Math.random() * SPIN_SYMS.length)];
-        cell.innerHTML = symbolSvg(sym);
-      });
-    }, 65);
-  });
-
-  const spinStart = Date.now();
-
-  for (let i = 0; i < REELS; i++) {
-    const waitMs = stopTimes[i] - (Date.now() - spinStart);
-    if (waitMs > 0) await sleep(waitMs);
-
-    window.clearInterval(intervals[i]);
-    const reelDiv = reelDivs[i];
-    if (!document.contains(reelDiv)) continue;
-
-    reelDiv.classList.remove("reel-spinning");
-
-    // Snap to final symbols
-    reelDiv.querySelectorAll<HTMLDivElement>(".cell").forEach((cell, row) => {
-      const sym = finalGrid[i][row].symbol as SymbolId;
-      cell.innerHTML = symbolSvg(sym);
-      cell.dataset.symbol = sym;
-    });
-
-    // Bounce landing animation
-    reelDiv.classList.add("reel-landing");
-    window.setTimeout(() => reelDiv.classList.remove("reel-landing"), 380);
-
-    playCascadeTick();
-
-    // Suspense glow when a run is still alive after this reel stops
-    if (i > 0 && i < REELS - 1 && i < matchRun - 1) {
-      reelDiv.classList.add("reel-suspense");
-      window.setTimeout(() => reelDiv.classList.remove("reel-suspense"), 960);
-      if (i === 2) playWinPluck();          // 3-in-a-row tension sound
-      if (i === 3) playBonusFanfare();      // 4-in-a-row excitement sound
-    }
-  }
-
-  // Settle time before evaluating wins
-  await sleep(320);
-}
-
-async function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
-  if (steps.length === 0) return;
-
-  const grid = root.querySelector<HTMLDivElement>("#reel-grid")!;
-  const meter = root.querySelector<HTMLSpanElement>("#meter-count")!;
-
-  // Step 0: mechanical reel spin
-  await animateInitialSpin(grid, steps[0]);
-  meter.textContent = String(steps[0].meterAfter);
-
-  if (steps[0].wins.length > 0) {
-    playCascadeArpeggio(steps[0].meterAfter);
-    for (const win of steps[0].wins) {
-      for (const [reel, row] of win.positions) {
-        grid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+    const next = () => {
+      if (i >= steps.length) {
+        resolve();
+        return;
       }
-    }
-    playWinPluck();
-  }
-
-  // Steps 1+: cascade refills (symbols drop in from above)
-  for (let i = 1; i < steps.length; i++) {
-    await sleep(480);
-    const step = steps[i];
-    grid.innerHTML = renderGridHtml(step.grid);
-    grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("symbol-pop"));
-    meter.textContent = String(step.meterAfter);
-
-    if (step.wins.length > 0) {
-      playCascadeArpeggio(step.meterAfter);
-      for (const win of step.wins) {
-        for (const [reel, row] of win.positions) {
-          grid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+      const step = steps[i];
+      grid.innerHTML = renderGridHtml(step.grid);
+      grid.querySelectorAll<HTMLElement>(".cell").forEach((cell, index) => {
+        if (i === 0) {
+          cell.classList.add("symbol-pop");
+          return;
         }
+        cell.style.setProperty("--drop-delay", `${(index % ROWS) * 22 + Math.floor(index / ROWS) * 14}ms`);
+        cell.classList.add("beam-drop");
+      });
+      updateJar(root, step.meterAfter);
+
+      if (step.wins.length > 0) {
+        const winningCells = new Set<HTMLDivElement>();
+        playCascadeArpeggio(step.meterAfter);
+        beamToSaucers(root);
+        for (const win of step.wins) {
+          for (const [reel, row] of win.positions) {
+            const cell = grid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`);
+            cell?.classList.add("win-flash");
+            if (cell) {
+              winningCells.add(cell);
+              spawnParticles(root, cell, 3);
+            }
+          }
+        }
+        window.setTimeout(() => {
+          winningCells.forEach((cell) => cell.classList.add("beam-up"));
+        }, 220);
+        playWinPluck();
+      } else {
+        playCascadeTick();
       }
-      playWinPluck();
-    } else {
-      playCascadeTick();
-    }
+
+      i++;
+      window.setTimeout(next, 480);
+    };
+
+    next();
+  });
+}
+
+/** Fires the saucer fleet's tractor beams briefly — the win "beam-up" hero moment. */
+function beamToSaucers(root: HTMLElement): void {
+  const bg = root.querySelector("#bg-layer, .night-garden");
+  const beams = (bg ?? root).querySelectorAll<HTMLDivElement>(".saucer-beam");
+  beams.forEach((beam) => {
+    beam.classList.add("beaming");
+    window.setTimeout(() => beam.classList.remove("beaming"), 700);
+  });
+}
+
+/** Small CSS particle burst from a winning cell — capped, cheap (transform/opacity only). */
+function spawnParticles(root: HTMLElement, cell: Element, count: number): void {
+  const rect = cell.getBoundingClientRect();
+  const rootRect = root.getBoundingClientRect();
+  const layer = root.querySelector<HTMLDivElement>("#particle-layer") ?? createParticleLayer(root);
+  for (let n = 0; n < count; n++) {
+    const p = document.createElement("span");
+    p.className = "particle";
+    const angle = (n / count) * 360 + Math.random() * 40;
+    const dist = 18 + Math.random() * 14;
+    p.style.setProperty("--dx", `${Math.cos((angle * Math.PI) / 180) * dist}px`);
+    p.style.setProperty("--dy", `${Math.sin((angle * Math.PI) / 180) * dist}px`);
+    p.style.left = `${rect.left - rootRect.left + rect.width / 2}px`;
+    p.style.top = `${rect.top - rootRect.top + rect.height / 2}px`;
+    layer.appendChild(p);
+    window.setTimeout(() => p.remove(), 650);
   }
 }
 
-/** Animated cat pop-in moment — docs §11, "Workstream D". */
-function showCatPopIn(root: HTMLElement, cat: "joey" | "phoebe", quip: string): Promise<void> {
+function createParticleLayer(root: HTMLElement): HTMLDivElement {
+  const layer = document.createElement("div");
+  layer.id = "particle-layer";
+  layer.className = "particle-layer";
+  root.querySelector(".cc-root")?.appendChild(layer);
+  return layer;
+}
+
+/** Win-tier celebration overlay — nice / big / huge, per docs §11 "celebration kit". */
+function showWinCelebration(root: HTMLElement, amount: number, bet: number): Promise<void> {
+  const ratio = amount / Math.max(1, bet);
+  const tier = ratio >= 40 ? "huge" : ratio >= 15 ? "big" : ratio >= 5 ? "nice" : null;
+  if (!tier) {
+    setStatus(root, `+${amount.toLocaleString()} coins`);
+    return Promise.resolve();
+  }
+  const label = tier === "huge" ? "HUGE WIN!" : tier === "big" ? "BIG WIN!" : "NICE WIN!";
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
-    overlay.className = "cat-popin";
+    overlay.className = `win-tier win-tier-${tier}`;
     overlay.innerHTML = `
-      <div class="mb-24 flex flex-col items-center gap-2">
-        <div class="cat-sprite">${catSprite(cat)}</div>
-        <div class="cat-quip max-w-[280px] rounded-2xl bg-white/95 px-4 py-2 text-center text-sm text-[#2d1f4c] shadow-lg">
-          ${quip}
-        </div>
-      </div>
+      <div class="win-tier-burst">${burstDots(tier === "huge" ? 24 : tier === "big" ? 16 : 10)}</div>
+      <div class="win-tier-label">${label}</div>
+      <div class="win-tier-amount">+${amount.toLocaleString()} coins</div>
     `;
-    root.appendChild(overlay);
+    root.querySelector(".cc-root")?.appendChild(overlay);
+    playBonusFanfare();
+    const dur = tier === "huge" ? 2400 : tier === "big" ? 1900 : 1400;
     window.setTimeout(() => {
       overlay.remove();
       resolve();
-    }, 2200);
+    }, dur);
+  });
+}
+
+function burstDots(count: number): string {
+  return Array.from({ length: Math.min(count, 30) }, (_, i) => {
+    const angle = (i / count) * 360;
+    return `<span class="burst-dot" style="--angle:${angle}deg;--delay:${(i % 6) * 0.03}s"></span>`;
+  }).join("");
+}
+
+/** Animated cat pop-in moment — sequences pose states per docs §6/§11. */
+function showCatPopIn(root: HTMLElement, cat: "joey" | "phoebe", fed: boolean, quip: string): Promise<void> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "cat-popin";
+    const spriteEl = document.createElement("div");
+    spriteEl.className = "cat-sprite";
+    const quipEl = document.createElement("div");
+    quipEl.className = "cat-quip";
+    quipEl.textContent = quip;
+    const wrap = document.createElement("div");
+    wrap.className = "cat-popin-inner";
+    wrap.append(spriteEl, quipEl);
+    overlay.appendChild(wrap);
+    root.querySelector(".cc-root")?.appendChild(overlay);
+
+    const isJoeyAssist = fed && cat === "joey";
+    const sequence: CatPose[] = isJoeyAssist ? ["strut", "assist", "eat"] : fed ? ["strut", "eat"] : ["strut", "unimpressed"];
+    let idx = 0;
+    const paint = () => {
+      spriteEl.innerHTML = catSprite(cat, sequence[idx]);
+    };
+    paint();
+    const stepMs = 750;
+    const interval = window.setInterval(() => {
+      idx++;
+      if (idx >= sequence.length) {
+        window.clearInterval(interval);
+        return;
+      }
+      paint();
+    }, stepMs);
+
+    window.setTimeout(() => {
+      window.clearInterval(interval);
+      overlay.remove();
+      resolve();
+    }, stepMs * sequence.length + 500);
+  });
+}
+
+/** UniGlee legend takeover — violet dim, butterfly storm, Glee avatar. ~1/400 (docs §5). */
+function showUnigleeTakeover(root: HTMLElement): Promise<void> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "uniglee-takeover";
+    const butterflies = Array.from({ length: 14 }, (_, i) => {
+      const left = 4 + ((i * 41) % 92);
+      const delay = (i % 7) * 0.25;
+      const dur = 3.2 + (i % 4) * 0.6;
+      return `<div class="uniglee-butterfly" style="left:${left}%;animation-delay:${delay}s;animation-duration:${dur}s">${symbolSvg("butterfly")}</div>`;
+    }).join("");
+    overlay.innerHTML = `
+      <div class="uniglee-butterflies">${butterflies}</div>
+      <div class="uniglee-content">
+        <div class="uniglee-avatar">${gleeAvatarSvg()}</div>
+        <div class="uniglee-title">UNIGLEE!</div>
+        <div class="uniglee-sub">Freak'n facts on FACTS.</div>
+      </div>
+    `;
+    root.querySelector(".cc-root")?.appendChild(overlay);
+    window.setTimeout(() => {
+      overlay.remove();
+      resolve();
+    }, 2600);
   });
 }
 
@@ -430,7 +535,9 @@ async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAw
   saveGameState(state);
 
   await showBonusSummary(root, session.totalWin, session.retriggers);
-  renderBoard(root, state);
+  const lastRound = session.rounds[session.rounds.length - 1];
+  const lastStep = lastRound?.steps[lastRound.steps.length - 1];
+  renderBoard(root, state, lastStep?.grid);
 }
 
 function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWedge> {
@@ -439,14 +546,21 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
     const finalDeg = 1080 + { multiplying: 30, giant_gnome: 150, chai_back: 270 }[wedge];
 
     const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#1a1f3c]/95 text-amber-100";
+    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
     overlay.innerHTML = `
-      <h2 class="text-xl font-bold text-center px-8">Free Spins! Spin the AskJamie Wheel</h2>
-      <div class="relative w-56 h-56">
-        <div id="wheel-ring" class="wheel-wedge-ring w-full h-full" style="--wheel-final-deg:${finalDeg}deg">
-          ${wheelSvg()}
+      <h2 class="wheel-heading"><span>Free Spins!</span> Joey &amp; Phoebe's Sparkle Wheel</h2>
+      <div class="wheel-stage">
+        ${wheelHeroArt()}
+        <div class="wheel-glow-ring"></div>
+        <div id="wheel-ring" class="wheel-energy-ring" style="--wheel-final-deg:${finalDeg}deg">
+          <span></span><span></span><span></span>
         </div>
-        <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-[14px] border-l-transparent border-r-transparent border-t-amber-200"></div>
+        <div class="wheel-pointer"></div>
+      </div>
+      <div class="wheel-legends" aria-hidden="true">
+        <span><b>×2–×12</b> Wild sparkle</span>
+        <span><b>Giant Toolbox</b> collector mode</span>
+        <span><b>Iced Chai</b> wild rain</span>
       </div>
       <p id="wheel-result" class="min-h-[1.5rem] text-center font-semibold"></p>
     `;
@@ -473,126 +587,100 @@ async function playFreeSpinSession(
 ): Promise<void> {
   const bgLayer = root.querySelector<HTMLDivElement>("#bg-layer");
   bgLayer?.classList.add("aurora");
+  document.body.classList.add("aurora-mode");
 
   const overlay = document.createElement("div");
-  // Do NOT put night-garden on this element — that CSS rule sets position:absolute
-  // which would override Tailwind's fixed, making the overlay non-fixed and letting
-  // the base board bleed through. Use a child div for the background instead.
-  overlay.className = "fixed inset-0 z-40 flex flex-col text-amber-100";
+  overlay.className = "free-spins-overlay text-amber-100";
   overlay.innerHTML = `
-    <div class="night-garden aurora" aria-hidden="true"></div>
-    ${gardenDecor()}
+    <div class="night-garden aurora">${gardenDecor()}</div>
     <div class="relative z-10 h-full w-full flex flex-col">
-      <header class="px-4 pt-3 text-center text-sm font-semibold text-amber-300">
-        ✦ ${wheelWedgeLabel(wedge)} — Free Spins ✦
+      <header class="marquee">
+        <div class="marquee-row">
+          <span class="level-chip">${wheelWedgeLabel(wedge)}</span>
+          <h1 class="marquee-title">Free Spins</h1>
+        </div>
       </header>
-      <div class="mx-4 mt-2 rounded-xl bg-black/30 px-3 py-2 text-center text-sm">
-        Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span>
-        &nbsp;·&nbsp; Round win: <span id="fs-round-win">0</span>
-        &nbsp;·&nbsp; Cascade: <span id="fs-meter">0</span>
+      <div class="jar-meter">
+        <div class="jar-meter-text">Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span> · Round win: <span id="fs-round-win">0</span></div>
       </div>
-      <main class="flex-1 flex items-center justify-center px-2">
-        <div id="fs-grid" class="grid grid-cols-5 gap-1 bg-black/25 rounded-2xl p-2 overflow-hidden backdrop-blur-sm"></div>
+      <main class="cabinet-frame">
+        <div id="fs-grid" class="reel-grid"></div>
       </main>
-      <div id="fs-status" class="min-h-[2.5rem] px-4 text-center text-sm text-amber-200" aria-live="polite"></div>
+      <div id="fs-status" class="status-line"></div>
     </div>
   `;
   root.appendChild(overlay);
 
-  const fsGrid = overlay.querySelector<HTMLDivElement>("#fs-grid")!;
+  const grid = overlay.querySelector<HTMLDivElement>("#fs-grid")!;
   const indexEl = overlay.querySelector<HTMLSpanElement>("#fs-index")!;
   const totalEl = overlay.querySelector<HTMLSpanElement>("#fs-total")!;
   const roundWinEl = overlay.querySelector<HTMLSpanElement>("#fs-round-win")!;
-  const meterEl = overlay.querySelector<HTMLSpanElement>("#fs-meter")!;
   const statusEl = overlay.querySelector<HTMLDivElement>("#fs-status")!;
-
-  // Seed the grid with the first round's initial layout so reel divs exist
-  // before animateInitialSpin queries them. They'll immediately be blurred by
-  // the spinning animation so the player never sees this "preview".
-  if (rounds.length > 0) {
-    fsGrid.innerHTML = renderGridHtml(rounds[0].steps[0].grid);
-  }
-
-  let totalWinSoFar = 0;
 
   for (let r = 0; r < rounds.length; r++) {
     const round = rounds[r];
     indexEl.textContent = String(r + 1);
     totalEl.textContent = String(rounds.length);
-    statusEl.textContent = "";
+    roundWinEl.textContent = round.totalWin.toLocaleString();
 
-    // ── Step 0: mechanical reel spin (same system as base game) ──────────
-    await animateInitialSpin(fsGrid, round.steps[0]);
-    meterEl.textContent = String(round.steps[0].meterAfter);
-
-    if (round.steps[0].wins.length > 0) {
-      playCascadeArpeggio(round.steps[0].meterAfter);
-      for (const win of round.steps[0].wins) {
-        for (const [reel, row] of win.positions) {
-          fsGrid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
-        }
-      }
-      playWinPluck();
-    }
-
-    // ── Steps 1+: cascade refills ─────────────────────────────────────────
-    for (let s = 1; s < round.steps.length; s++) {
-      await sleep(460);
-      const step = round.steps[s];
-      fsGrid.innerHTML = renderGridHtml(step.grid);
-      fsGrid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("symbol-pop"));
-      meterEl.textContent = String(step.meterAfter);
-
+    for (const step of round.steps) {
+      grid.innerHTML = renderGridHtml(step.grid);
+      grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
       if (step.wins.length > 0) {
         playCascadeArpeggio(step.meterAfter);
-        for (const win of step.wins) {
-          for (const [reel, row] of win.positions) {
-            fsGrid.querySelector<HTMLDivElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
-          }
-        }
         playWinPluck();
       } else {
         playCascadeTick();
       }
+      await sleep(360);
     }
-
-    // ── Round result callouts ─────────────────────────────────────────────
-    await sleep(300);
-    totalWinSoFar += round.totalWin;
-    roundWinEl.textContent = totalWinSoFar.toLocaleString();
 
     if (round.twelvePumps) {
-      statusEl.textContent = "TWELVE PUMPS! 12× wild multiplier!";
+      await showTwelvePumps(overlay);
       playTwelvePumps();
-      await sleep(1000);
     } else if (round.extraWildsAdded > 0) {
-      statusEl.textContent = "We Want Our Chai Back — extra wilds!";
-      await sleep(600);
+      statusEl.textContent = "We Want Our Chai Back — extra wilds landed!";
+      await sleep(500);
     } else if (round.totalWin > 0) {
       statusEl.textContent = `+${round.totalWin.toLocaleString()} coins`;
-      await sleep(450);
+      await sleep(400);
+    } else {
+      statusEl.textContent = "";
     }
-
     if (round.freeSpinsAwarded > 0) {
       statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins!`;
       playBonusFanfare();
-      await sleep(900);
+      await sleep(800);
     }
   }
 
   overlay.remove();
   bgLayer?.classList.remove("aurora");
+  document.body.classList.remove("aurora-mode");
   void state; // state saved by caller after totals are tallied
+}
+
+function showTwelvePumps(overlay: HTMLElement): Promise<void> {
+  return new Promise((resolve) => {
+    const callout = document.createElement("div");
+    callout.className = "twelve-pumps";
+    callout.innerHTML = `<div class="twelve-pumps-ring">${burstDots(20)}</div><div class="twelve-pumps-text">TWELVE PUMPS!<span>12x wild multiplier</span></div>`;
+    overlay.appendChild(callout);
+    window.setTimeout(() => {
+      callout.remove();
+      resolve();
+    }, 1300);
+  });
 }
 
 function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number): Promise<void> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-[#1a1f3c]/95 text-amber-100";
+    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="text-2xl font-bold">Free Spins Complete!</h2>
       <p class="text-lg">You won ${totalWin.toLocaleString()} coins${retriggers > 0 ? ` (with ${retriggers} retrigger${retriggers > 1 ? "s" : ""}!)` : ""}</p>
-      <button id="bonus-continue" class="mt-4 px-8 py-3 rounded-2xl bg-orange-600 text-white text-lg font-bold min-h-[56px]">Continue</button>
+      <button id="bonus-continue" class="sparkle-btn mt-4">Continue</button>
     `;
     root.appendChild(overlay);
     playBonusFanfare();

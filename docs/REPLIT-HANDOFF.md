@@ -151,7 +151,7 @@ Scope: playable vertical slice per the Replit Implementation Brief, built on `do
 - 25 fixed paylines, full paytable from spec §4, wild substitution, wilds pay as `tumbler`.
 - Treat Jar collection (Chicken Comets / Salmon Stars / Boogie Bites, cap 12 each) and cat pop-ins: Phoebe assists with any treat, **Joey only assists when Boogie Bites are stocked** (canon S7, unit-tested).
 - UniGlee detection surfaces a status line; free-spin ladder award is computed and reported (actual free-spin *gameplay* is stubbed — see below).
-- Bust-proof economy: balance can never strand below the current bet (AskJamie "finds coins under the couch," tested).
+- Automatic-refill economy: balance never strands below the current bet (AskJamie "finds coins under the couch," tested).
 - Chai Sparks XP accrual and level display; balance, bet, XP, Treat Jar, best cascade, and settings persist through `src/state.ts` (`ccv1.*`), verified by refresh.
 - Sound toggle (persisted, defaults on) and automatic `prefers-reduced-motion` detection (CSS-level fade override already present in `src/style.css`; JS-level "replace drops with fades" is not yet special-cased beyond the CSS media query — see follow-up).
 - `npm run test` (23 tests, all engine modules) and `npm run build` (tsc + vite) both pass clean, no console errors observed in manual play.

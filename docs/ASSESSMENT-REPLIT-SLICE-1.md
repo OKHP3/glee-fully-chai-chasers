@@ -5,7 +5,7 @@
 
 - Architecture discipline: engine/UI/audio boundaries held exactly as specified; `src/engine/` has zero DOM imports (verified); UI computes no math.
 - 23 real unit tests, all passing; `tsc` clean; production build clean (verified independently in sandbox).
-- Canon rules encoded and tested: Joey refuses to assist without Boogie Bites; bust-proof refill invariant holds; `ccv1.*` persistence works.
+- Canon rules encoded and tested: Joey refuses to assist without Boogie Bites; the automatic-refill invariant holds; `ccv1.*` persistence works.
 - The handoff doc is honest — stubs are labeled as stubs, placeholder weights flagged as placeholder.
 
 ## What's broken — quantified (100k-spin seeded simulation vs DESIGN-SPEC §4)

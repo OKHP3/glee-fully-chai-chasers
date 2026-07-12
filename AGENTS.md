@@ -4,7 +4,7 @@ Canonical guide for every AI system working in this repo (Claude, ChatGPT/Codex,
 
 ## What this is
 
-A free, browser-based, mobile-first slot-style game — a birthday gift from Jamie to Glee Hill (07/17). Inspired by the *Invaders from the Planet Moolah* mechanical family, expressed entirely in original Glee-fully™ canon. No real money, no purchases, no ads, no backend, no tracking. Vite + TypeScript + Tailwind SPA deployed to GitHub Pages.
+A free, browser-based, mobile-first slot-style game — a birthday gift from Jamie to Glee Hill (07/17). Inspired by the *Invaders from the Planet Moolah* mechanical family, expressed entirely in original Glee-fully™ canon. Fictional Glee-coins only; no purchases, ads, backend, or tracking. Vite + TypeScript + Tailwind SPA deployed to GitHub Pages.
 
 ## Read in this order
 
@@ -28,7 +28,7 @@ A free, browser-based, mobile-first slot-style game — a birthday gift from Jam
 
 - `reference-photos/` and `private-work/` are gitignored. NEVER commit, copy, or derive public assets from them without Jamie's explicit per-file approval. Photos of Glee never ship, period.
 - No copyrighted audio/video (no Friends, Schitt's Creek, Stevie Nicks clips), no brand names/logos/trade dress (no WMS/L&W/SciPlay, Starbucks, Tazo, Swig Life, Cat Man Doo, Orijen) in shipped assets or code identifiers. Homage by silhouette, palette, and vibe only. See `docs/IP-GUARDRAILS.md`.
-- No purchase language, no real-currency framing, no dark patterns. Generous math, honest meters.
+- Use fictional Glee-coins, generous math, accurate meters, and no purchase language.
 
 ## Build commands
 

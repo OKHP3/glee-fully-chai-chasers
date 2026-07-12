@@ -10,7 +10,7 @@ Zero DOM imports. Everything deterministic under a seeded RNG. Vitest coverage r
 | `paylines.ts` | 25 fixed lines, left-to-right evaluation, wild substitution, paytable | ☐ TODO |
 | `cascade.ts` | Cascade loop: evaluate → remove → refill → repeat; meter; specialty-wild queue (one per dead board, extras queue) | ☐ TODO |
 | `features.ts` | Cat visits (Phoebe any-treat / Joey boogie-only, pity weighting), UniGlee package, wheel modifiers, Chai Bonus pick math | ☐ TODO |
-| `economy.ts` | Balance/bet/win in Sparks, bust-proof refill trigger, XP/levels, daily bonus gating | ☐ TODO |
+| `economy.ts` | Balance/bet/win in Sparks, automatic refill trigger, XP/levels, daily bonus gating | ☐ TODO |
 
 Required tests (see docs/DESIGN-SPEC.md §5):
 - payline evaluation against hand-computed grids
