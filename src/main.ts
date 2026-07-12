@@ -12,7 +12,8 @@ const app = document.querySelector<HTMLDivElement>("#app")!;
 
 function renderSplash(): void {
   app.innerHTML = `
-    <div class="relative h-full w-full flex flex-col items-center justify-center gap-6 night-garden overflow-hidden">
+    <div class="relative h-full w-full flex flex-col items-center justify-center gap-6 overflow-hidden">
+      <div class="night-garden" aria-hidden="true"></div>
       <div class="flex items-center gap-2 relative z-10">
         <div class="w-16 h-16">${symbolSvg("crystal")}</div>
         <div class="w-16 h-16">${symbolSvg("butterfly")}</div>
