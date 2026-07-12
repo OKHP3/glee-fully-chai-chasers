@@ -8,13 +8,13 @@
 
 ## 1. Vision & design pillars
 
-This is a *slot machine*. Glee loves slot machines — specifically the Planet Moolah cascade family. The gift is not a tasteful adjacent puzzle game; it's **her game, with the money surgically removed and the love dialed to twelve**.
+This is a *slot-style game*. Glee loves this style of cascading-reels play, especially the Planet Moolah mechanical family. The gift is not an adjacent puzzle game; it is **the play experience she loves, reimagined in original Glee-fully canon with the love dialed to twelve**.
 
 Five pillars, in priority order:
 
-1. **It must feel like her game.** Cascades, a visible meter climbing toward free spins, stacked wilds, a legendary rare symbol, a bonus wheel. The dopamine architecture is faithful; the skin is 100% original.
+1. **It must feel like her game.** Cascades, a visible meter climbing toward free spins, stacked wilds, a legendary rare symbol, a bonus wheel. The satisfying mechanical rhythm is faithful; the expression is 100% original.
 2. **Specificity is love.** Iced chai (never hot), the mermaid tumbler, the number 12, Boogie Bites for Joey only, Phoebe's universal appetite, Glee-isms in her actual registers. Every detail should make her say "OMG, this is so Glee-coded."
-3. **Generous and honest.** Real slot variance, ~96% RTP, but a bust-proof balance, no purchases, no ads, no dark patterns. Meters never lie. Losing is impossible; *anticipation* is the product.
+3. **Generous and honest.** Real slot variance and ~96% RTP, paired with an automatic Glee-coin refill, no purchases, and no ads. Meters always report progress accurately; anticipation and celebration are the experience.
 4. **Retro-bright midnight.** PNW night garden under mint-green stars. Warm, theatrical, cartoon-cozy. Never casino-floor literal, never sterile.
 5. **iPhone-first, instantly legible.** She opens it from her home screen and knows what to tap with zero instructions.
 
@@ -63,9 +63,9 @@ Paytable (× line bet; tuned by simulation, these are the starting values):
 | 🔮 Crystal | 10 | 30 | 120 | |
 | 🥤 Iced chai to-go | 8 | 20 | 80 | Also the Chai Bonus scatter (§8) |
 | 🕯 Cinnamon candle | 8 | 20 | 80 | Unlit. No steam anywhere in this game |
-| 📻 Cassette | 5 | 12 | 50 | |
-| 🍄 Garden gnome | 5 | 12 | 50 | Giant Gnome Mode celebrity (§7) |
-| 📬 Mailbox / 📼 VHS / 🫖 Teapot / 🧶 Yarn | 3 | 8 | 25 | Low tier |
+| 🧶 Glee Cardigan | 5 | 12 | 50 | Dusty pink, butterfly button |
+| 🧰 Glee Toolbox | 5 | 12 | 50 | Giant Toolbox Mode celebrity (§7) |
+| 🦋 Butterfly clip / 📼 VHS / 🌌 Aurora keepsake / 12 charm | 3 | 8 | 25 | Personally meaningful low tier |
 | Treat pouches | — | — | — | Non-paying feature symbols, reels 1/3/5 (§6) |
 | Saucer-Cat Wilds | pay as top symbol | | | Stacked 6-7 high (§5) |
 | UniGlee 🦋🌈 | — | — | — | Legend, not a line symbol (§5) |
@@ -116,13 +116,13 @@ All shipped cat art is **original illustration** (S15 — no photos or photoreal
 
 ## 7. Free spins & the AskJamie Wheel
 
-Meter hits 4+ → celebration → **AskJamie spins the wheel** (his avatar at the crank). One modifier per bonus:
+Meter hits 4+ → celebration → **AskJamie spins Joey & Phoebe's Sparkle Wheel** (his avatar at the crank; Joey and Phoebe perched on the rim). One modifier per bonus:
 
 | Wedge | Modifier |
 |---|---|
 | **We're Multiplying** (40%) | Each free spin, wilds carry a random multiplier: 2x-5x common, 8x uncommon, and the 12x jackpot callout — **"TWELVE PUMPS!"** with the whole screen doing a chai-colored shockwave |
-| **Giant Gnome Mode** (35%) | 2x2 mega-symbols land on reels 2-3/4-5, gnome dignity fully intact |
-| **We Want Our Chai Back** (25%) | AskJamie lobs iced chai tumblers onto the board — 1-3 extra wilds rain in per spin |
+| **Giant Toolbox Mode** (35%) | 2x2 mega-keepsakes land on reels 2-3/4-5, with Phoebe supervising from the open Toolbox |
+| **Iced Chai Wild Rain** (25%) | AskJamie lobs iced chai tumblers onto the board — 1-3 extra wilds rain in per spin |
 
 Free spins play on an aurora-shifted board (navy → violet-green), same cascade rules, retriggers live. Double Sparkle doubles the entry award. Exit screen always ends warm: total, best cascade, and a Glee-ism sized to the result (Glee-Lite for modest, Bleeds Glee for monsters).
 
@@ -133,7 +133,7 @@ Free spins play on an aurora-shifted board (navy → violet-green), same cascade
 ## 9. Economy & progression
 
 - **Currency: Glee-coins** (S11). Bet/win/balance — full slot semantics, zero money language, never purchasable.
-- Start: 1,000,000 Glee-coins. If balance < one max-bet spin: **AskJamie finds coins under the couch** — cheerful animation, +500k. Bust is impossible; the refill is a joke, not a shame.
+- Start: 1,000,000 Glee-coins. If balance < one max-bet spin: **AskJamie finds coins under the couch** — cheerful animation, +500k. The automatic refill keeps play uninterrupted and lands as a recurring joke.
 - **Chai Sparks = XP** (Codex's term, repurposed): every spin earns Sparks (scaled by bet), filling the level meter. Levels unlock bet tiers, scenes (§10), and cosmetics (board trims, saucer colors, quip packs). **Level 12 is a major celebration.**
 - **Daily Bonus Wheel:** once per calendar day, 100k-1M coins + a random treat for the jar. Streaks acknowledged, never punished ("Day 3! The cats noticed.").
 - All persistence via versioned localStorage (`ccv1.*`), reset action in settings.

@@ -35,4 +35,6 @@ The gift succeeds on specificity. These facts are load-bearing. Source: Jamie (2
 
 ## Hard canon violations (instant rejection)
 
-Hot chai. Photos of Glee. Cow/farm/"Moolah" trade dress. Brand names or logos of any kind. Fat jokes about Phoebe. Sad or punishing moments — this game never scolds, never shows losses as failure, never lets the balance hit zero without AskJamie cheerfully fixing it.
+Hot chai. Photos of Glee. Cow/farm/"Moolah" trade dress. Brand names or logos of any kind. Fat jokes about Phoebe. Sad or punishing moments — this game never scolds, never frames a quiet spin as failure, and AskJamie cheerfully tops up the Glee-coin balance whenever needed.
+
+**Narrative canon (all public artifacts, all agents):** the game exists because Jamie wanted to give Glee a personalized birthday game built around a genre she loves. That is the entire public motivation. No public document, post, commit message, or in-game copy may frame it as corrective, therapeutic, financial, or problem-solving — and raw working notes or pasted prompt dumps are never committed as project artifacts.

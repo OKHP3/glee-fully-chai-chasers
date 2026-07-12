@@ -7,21 +7,23 @@ Status: ☐ todo · ◐ in progress · ☑ done
 
 | Asset | Spec | Owner | Provenance | Status |
 |---|---|---|---|---|
-| Joey (illustrated) | Slender gray, yellow eyes, boogie pose set: idle, strut, boogie, unimpressed, assist | ChatGPT imagegen (brief below) or Claude SVG | original | ☐ |
-| Phoebe (illustrated) | Curvy tuxedo, white chest/paws, pose set: idle, flop, treat-party, unimpressed, assist | same | original | ☐ |
+| Joey (illustrated) | Slender gray, yellow eyes; wheel-rim and saucer-wild production art | ChatGPT imagegen, 2026-07-11 | original | ☑ `public/assets/joey-phoebe-wheel.png`, `joey-phoebe-wilds.png` |
+| Phoebe (illustrated) | Curvy tuxedo, white chest/paws; wheel-rim and saucer-wild production art | ChatGPT imagegen, 2026-07-11 | original | ☑ same files |
 | AskJamie avatar | Existing cartoon | drop-in from askjamie.bot | Jamie-owned | ☑ (asset exists) |
 | Chai Captain motifs | Tumbler, butterfly clip, cardigan palette — silhouette/mood only, no likeness | Claude SVG | original | ☐ |
 
-## Symbols (one SVG each, 256x256 design grid)
+## Symbols (production sprite atlas; equal 4×4 cells)
 
 | Tier | Assets | Status |
 |---|---|---|
-| High | mermaid tumbler (iced, straw), butterfly, mixtape, crystal | ☐ |
-| Mid | iced chai to-go cup, cinnamon candle (unlit ok — no hot-drink steam!), cassette, gnome | ☐ |
-| Low | mailbox, VHS tape, teapot (cold-brew joke), yarn ball | ☐ |
-| Treats | Chicken Comets (yellow pouch), Salmon Stars (blue pouch), Boogie Bites (navy pouch) | ☐ |
-| Wilds | Joey-saucer, Phoebe-saucer (stacked variants) | ☐ |
-| Legend | UniGlee rainbow butterfly | ☐ |
+| High | mermaid tumbler (iced, straw), midnight butterfly, Glee Mix Tape, crystal cluster | ☑ `public/assets/glee-symbol-atlas.png` |
+| Mid | iced chai cup, unlit cinnamon candle, Glee cardigan, Glee Toolbox | ☑ same atlas |
+| Low | butterfly hair clip, VHS tape, aurora keepsake, sacred Twelve charm | ☑ same atlas |
+| Treats | Chicken Comets (yellow), Salmon Stars (blue), Boogie Bites (navy) | ☑ same atlas |
+| Wilds | Joey-saucer and Phoebe-saucer | ☑ `public/assets/joey-phoebe-wilds.png` |
+| Legend | UniGlee rainbow butterfly | ☑ symbol atlas |
+
+Generated source prompts were constrained to original, unbranded illustration; no reference photo was uploaded or transformed. Engine IDs for five replaced prototype symbols remain temporarily stable so this art-only pass cannot perturb tested reel weights or payout math.
 
 ## UI / scenes
 

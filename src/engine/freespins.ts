@@ -127,9 +127,9 @@ export function wheelWedgeLabel(wedge: WheelWedge): string {
     case "multiplying":
       return "We're Multiplying";
     case "giant_gnome":
-      return "Giant Gnome Mode";
+      return "Giant Toolbox Mode";
     case "chai_back":
-      return "We Want Our Chai Back";
+      return "Iced Chai Wild Rain";
   }
 }
 

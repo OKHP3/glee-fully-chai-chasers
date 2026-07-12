@@ -93,7 +93,7 @@ Suggested visual feedback: button compression, reel settle bounce, mint sparkle 
 - Do not ship cat-photo cutouts until Jamie supplies a per-file approved asset path and the asset is recorded in `docs/ASSET-CHECKLIST.md`.
 - Never use the names/logos/trade dress of casino, beverage, pet-food, television, or music brands. Search all new source strings before handoff.
 - No purchases, ads, accounts, telemetry, real-currency words, cash-out, or odds/RTP displayed to the player.
-- Keep the balance bust-proof and the progress meter honest. Never create a shaming or exploitative “loss” flow.
+- Keep the automatic balance refill reliable and the progress meter accurate. Quiet spins remain warm, quick, and judgment-free.
 
 ## Scope and cut line
 
