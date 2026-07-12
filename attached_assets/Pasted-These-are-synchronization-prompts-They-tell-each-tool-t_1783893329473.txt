@@ -1,0 +1,218 @@
+These are synchronization prompts. They tell each tool to acknowledge the baseline before changing anything.
+
+### Claude threads
+
+:::writing{variant="chat_message" id="26481"}
+Jamie has established a new cross-tool consolidation ruling for Glee-fully Chai Chasers. Treat this message as authoritative project direction.
+
+Repository: https://github.com/OKHP3/glee-fully-chai-chasers
+
+INTEGRATION BASELINE
+
+GitHub main commit `1b6d72dff171d6b199129eb8fa4739cf086fd0b5`, or a later descendant preserving S19, is the integrated implementation baseline.
+
+Before doing any work:
+
+1. Pull the current GitHub `main`.
+2. Read, in order:
+   - `AGENTS.md`
+   - `docs/DESIGN-SPEC.md`
+   - `docs/IMPLEMENTATION-BASELINE.md`, when present
+   - `docs/DECISION-LOG.md`, especially S17-S19
+   - `docs/CANON.md`
+   - `docs/IP-GUARDRAILS.md`
+   - `docs/ASSET-CHECKLIST.md`
+3. Compare your thread’s assumptions and pending work with the current repository.
+4. Do not edit anything until you have acknowledged the authority boundaries below.
+
+AUTHORITY BY LAYER
+
+- Claude remains authoritative for the canonical specification, game mechanics, pure-TypeScript engine math, event-frequency simulation oracle, canon-checked copy, and bounded feature design.
+- The current S18 Codex/ChatGPT production-art and UI implementation is authoritative for presentation, interaction, responsive layout, symbol identity, Joey/Phoebe treatment, and the public narrative.
+- GitHub `main` is the only source of truth and production deployment source.
+- Replit is a bounded implementation and preview environment, not a competing canonical codebase.
+- Jamie remains the decision owner.
+
+PROTECTED PRESENTATION BASELINE
+
+Do not broadly regenerate, replace, or roll back these files or assets:
+
+- `src/ui/board.ts`
+- `src/ui/symbols.ts`
+- `src/style.css`
+- `public/assets/glee-symbol-atlas.png`
+- `public/assets/joey-phoebe-wheel.png`
+- `public/assets/joey-phoebe-wilds.png`
+- decisions S17-S19
+- the approved public-story language
+
+The current baseline replaces the old generic gnome, pink yarn ball, mailbox, teapot, duplicate cassette, tiny prototype SVG art, indistinct cats, stretched reel cells, and character-light wheel presentation.
+
+Its approved presentation includes:
+
+- Glee’s cardigan, Toolbox, butterfly clip, aurora keepsake, sacred Twelve charm, iced chai, and three treat pouches;
+- distinct illustrated Joey and Phoebe art;
+- Joey and Phoebe framing the free-spin wheel;
+- an iPhone-first 5×4 cabinet with near-square cells;
+- prominent Firefly Cascade hierarchy;
+- safe-area handling and proper touch targets;
+- genuine final-reel settlement;
+- beam-up and staggered-drop cascade animation;
+- corrected GitHub Pages and app-icon paths.
+
+Several old engine identifiers intentionally remain unchanged beneath the new art. Do not rename them during UI work or modify their reel weights, probabilities, or payouts.
+
+CLAUDE’S CONTINUING ROLE
+
+Continue to protect and improve:
+
+- `src/engine/` as pure TypeScript with zero DOM dependencies;
+- the simulation oracle and event-frequency targets;
+- typed engine-to-UI result boundaries;
+- canon-checked feature behavior and copy;
+- narrow implementations of unfinished features.
+
+Do not restore Claude’s older presentation layer merely because it originated in a previous Claude thread. Preserve the useful engine/spec work and integrate it beneath the current visual baseline.
+
+If this thread contains uncommitted work based on an older checkout:
+
+- stop;
+- compare it against current `main`;
+- retain only bounded improvements that remain applicable;
+- discard visual rollback material;
+- do not copy the entire older tree over the repository.
+
+PUBLIC NARRATIVE
+
+The only public motivation is: Jamie created a personalized birthday game around a genre Glee loves.
+
+Do not introduce corrective, therapeutic, financial, recovery, coping, or problem-solving framing anywhere—including documentation, commit messages, code comments, PR descriptions, or game copy.
+
+YOUR FIRST RESPONSE
+
+Do not change files yet. First report:
+
+1. the commit currently checked out;
+2. whether it contains `1b6d72d` and S18/S19;
+3. what work in this Claude thread remains useful;
+4. what work is stale or would conflict with the protected baseline;
+5. the single bounded next deliverable you recommend;
+6. the exact files that deliverable would touch;
+7. confirmation that you will not broadly replace the current UI/art.
+
+Wait for Jamie’s approval before implementing that deliverable.
+:::
+
+### Replit
+
+Paste this into the existing Replit App’s Agent conversation:
+
+:::writing{variant="chat_message" id="63590"}
+Jamie has established a new canonical integration baseline for Glee-fully Chai Chasers. This is a synchronization instruction, not permission to regenerate or redesign the application.
+
+Canonical repository:
+https://github.com/OKHP3/glee-fully-chai-chasers
+
+Target baseline:
+GitHub `main` commit `1b6d72dff171d6b199129eb8fa4739cf086fd0b5`, or a later descendant preserving decision S19.
+
+STOP AND SYNCHRONIZE
+
+Before editing any file:
+
+1. Stop work on every checkpoint created before S18.
+2. Pull or re-import the canonical GitHub repository.
+3. Confirm the checkout contains commit `1b6d72d` or a later descendant.
+4. Read:
+   - `AGENTS.md`
+   - `docs/DESIGN-SPEC.md`
+   - `docs/IMPLEMENTATION-BASELINE.md`, when present
+   - `docs/DECISION-LOG.md`, especially S17-S19
+   - `docs/CANON.md`
+   - `docs/IP-GUARDRAILS.md`
+   - the v3 section at the top of `docs/REPLIT-HANDOFF.md`
+5. Run, without changing code:
+   - `npm ci`
+   - `npm test`
+   - `npm run build`
+6. Report the checked-out commit and the results of those checks.
+
+If the existing Replit App cannot cleanly pull GitHub, do not reconcile two entire source trees and do not paste individual files over one another. Create a fresh Replit import from the canonical GitHub repository and use the older Replit project only as historical reference.
+
+AUTHORITY AND OWNERSHIP
+
+- GitHub `main` is the sole source of truth and production deployment source.
+- Replit is a bounded implementation and preview environment.
+- Claude’s canonical specification, engine math, and simulation oracle remain authoritative.
+- The current S18 Codex/ChatGPT production-art and UI pass is authoritative for presentation, interaction, responsive layout, and public narrative.
+- Jamie is the decision owner.
+
+PROTECTED FROM ROLLBACK
+
+Do not broadly regenerate, replace, modernize, or restore older versions of:
+
+- `src/ui/board.ts`
+- `src/ui/symbols.ts`
+- `src/style.css`
+- `public/assets/glee-symbol-atlas.png`
+- `public/assets/joey-phoebe-wheel.png`
+- `public/assets/joey-phoebe-wilds.png`
+- decisions S17-S19
+- the approved public narrative
+
+Do not restore the older SVG/gnome/pink-ball/mailbox/teapot/yarn presentation. Do not replace Joey and Phoebe with generic cat heads. Do not stretch the mobile cabinet or return the board to its repeated decorative resting grid.
+
+The current baseline deliberately preserves several legacy engine identifiers underneath replacement art. Do not rename those identifiers or change game math during visual work.
+
+REPLIT’S VALID CONTINUING CONTRIBUTION
+
+Replit’s earlier engine tuning, free-spin flow, validation loop, and implementation experience remain valuable and are incorporated into the product.
+
+Future Replit work must be one bounded additive assignment, such as:
+
+- Birthday Reveal;
+- Chai Tea Bonus pick shelf;
+- Daily Bonus Wheel;
+- one milestone scene;
+- literal Giant Toolbox 2×2 board visuals;
+- iced-chai wild-rain visuals;
+- music-loop implementation;
+- service-worker/offline verification;
+- asset-size optimization;
+- one saved iPhone regression pass.
+
+This list is not permission to implement all of them. Jamie will assign one deliverable at a time.
+
+DELIVERY RULES
+
+For any future assignment:
+
+1. Start from the synchronized GitHub baseline.
+2. Touch only the files required for the assigned deliverable.
+3. Preserve the engine/UI boundary.
+4. Show Jamie the proposed file list before editing.
+5. Run tests and the production build afterward.
+6. provide an actual iPhone-size preview and concise diff summary.
+7. Do not push or sync back to GitHub until Jamie approves the diff.
+8. Never overwrite GitHub with an older Replit checkpoint.
+
+PUBLIC NARRATIVE
+
+The only public story is that Jamie created a personalized birthday game around a genre Glee loves.
+
+Do not introduce corrective, therapeutic, financial, recovery, coping, or problem-solving framing into any public artifact.
+
+YOUR FIRST RESPONSE
+
+Do not make changes yet. Reply with:
+
+- the commit currently checked out;
+- whether the Replit project is synchronized with GitHub;
+- test and build results;
+- any differences between this App and the canonical repository;
+- which older Replit work must be discarded;
+- one bounded next task recommendation;
+- confirmation that you will not regenerate or overwrite the protected baseline.
+
+Then wait for Jamie’s approval.
+:::
