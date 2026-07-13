@@ -37,6 +37,10 @@ Generated source prompts were constrained to original, unbranded illustration; n
 
 Chai Chase launch, saucer theremin, cascade arpeggio tiers 1-8, win plucks, fanfare, distinct Joey boogie cue, Phoebe purr/trill cue, and UniGlee shimmer sting. Base loop, chapter stems, and final sound mix remain in progress. Sound toggle default ON, must be perfect muted.
 
+| Asset | Spec | Owner | Provenance | Status |
+|---|---|---|---|---|
+| Chai Chase base score | 60-second, 80 BPM, 20-bar loop: warm electric-piano-like pad, brushed synthesized rhythm, low fifth pulse, aurora shimmer, and sparse original lead | Codex, 2026-07-12 | original Web Audio synthesis; no samples or external melodic source | ☑ `src/audio/music.ts` |
+
 ## Image-generation brief (for ChatGPT workflow — Route 2)
 
 Style anchor for ALL raster art: "retro-bright mid-century cartoon, flat colors with soft grain, warm cream background, palette: burnt orange #d35b2d, teal, butter yellow, dusty pink, midnight navy sky with mint-green stars. Friendly rounded shapes, thick clean outlines, no text, no brands, transparent background, sticker-style."

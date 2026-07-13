@@ -26,6 +26,13 @@ export function isUnlocked(): boolean {
   return ctx !== null;
 }
 
+/** Shared context for the original music sequencer. Never create a second
+ * context: iOS is much more reliable when music and effects share the
+ * gesture-unlocked audio graph. */
+export function getAudioContext(): AudioContext | null {
+  return ctx;
+}
+
 /** Must be called from within a user-gesture handler (the splash tap). */
 export function unlock(): void {
   try {

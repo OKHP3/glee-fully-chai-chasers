@@ -43,9 +43,11 @@ import {
   playWheelTick,
   playFullFlavorFrenzy,
   playStrangerDangerPanic,
+  setMusicEnabled,
   setSfxEnabled,
   unlock,
 } from "../audio/synth";
+import { startBaseMusic, stopBaseMusic } from "../audio/music";
 
 let statusTimeout: number | undefined;
 
@@ -260,6 +262,9 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
   soundToggle.addEventListener("change", () => {
     state.soundOn = soundToggle.checked;
     setSfxEnabled(state.soundOn);
+    setMusicEnabled(state.soundOn);
+    if (state.soundOn) startBaseMusic();
+    else stopBaseMusic();
     saveGameState(state);
   });
 
@@ -272,6 +277,7 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
 
   sparkleBtn.addEventListener("click", () => {
     if (!isUnlocked()) unlock();
+    startBaseMusic();
     if (sparkleBtn.disabled) return;
     void runSpin(root, state, sparkleBtn);
   });
