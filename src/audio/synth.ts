@@ -113,6 +113,13 @@ export function playPhoebeCue(): void {
   tone(783.99, 0.25, 0.2, 0.12, "triangle");
 }
 
+/** Original house-doorbell ding-dong, played whenever a doorbell lands. */
+export function playDoorbellRing(): void {
+  tone(880, 0, 0.18, 0.18, "sine");
+  tone(659.25, 0.2, 0.28, 0.16, "sine");
+  tone(1318.51, 0.02, 0.08, 0.06, "triangle");
+}
+
 /** Doorbell Panic: a bright, original two-note chime followed by a cat-flight burst. */
 export function playStrangerDangerPanic(): void {
   tone(988, 0, 0.18, 0.2, "square");

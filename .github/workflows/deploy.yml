@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
 
       - name: Privacy gate — no private assets may exist in the tree
         run: |
@@ -29,8 +29,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
-          check-latest: true
+          node-version: 22
           cache: npm
 
       - run: npm ci
@@ -49,7 +48,7 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
@@ -59,11 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
-          check-latest: true
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npx vitest run src/engine/simulation.test.ts
@@ -76,4 +74,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
