@@ -195,7 +195,7 @@ export function wheelWedgeLabel(wedge: WheelWedge): string {
     case "chai_back":
       return "Iced Chai Wild Rain";
     case "doorbell_panic":
-      return "Stranger Danger Panic";
+      return "Doorbell Panic";
     case "treat_time_morning":
       return "Morning Treat Time";
     case "treat_time_nighttime":

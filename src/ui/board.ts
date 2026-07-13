@@ -373,7 +373,7 @@ function showDoorbellPanic(
     overlay.className = "doorbell-panic-banner";
     overlay.innerHTML = `
       <div class="doorbell-panic-bell">${symbolSvg("doorbell")}</div>
-      <div class="doorbell-panic-title">STRANGER DANGER PANIC!</div>
+      <div class="doorbell-panic-title">DOORBELL PANIC!</div>
       <div class="doorbell-panic-sub">Joey &amp; Phoebe fled into ${spinsAwarded} free spins!</div>
     `;
     root.querySelector(".cc-root")?.appendChild(overlay);
@@ -771,7 +771,7 @@ async function playFreeSpinSession(
     }
 
     if (round.panicWildsAdded > 0) {
-      statusEl.textContent = `STRANGER DANGER! ${round.panicWildsAdded} flying wild cats!`;
+      statusEl.textContent = `DOORBELL PANIC! ${round.panicWildsAdded} flying wild cats!`;
       playJoeyCue();
       playPhoebeCue();
       await sleep(520);
