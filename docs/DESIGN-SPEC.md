@@ -26,7 +26,7 @@ Five pillars, in priority order:
 |---|---|---|
 | Milestone scenes (Iced Chai Break, Butterfly Burst, Cat Constellation, Glee Mode) | **ADOPTED** | Become progression rewards — §10 |
 | "Chai Captain" abstract Glee presence (no likeness) | **ADOPTED** | §11; also settled as S4 |
-| Non-negotiables table (no money/ads/tracking; browser-local saves; original assets) | **ADOPTED** | Mirrored in IP-GUARDRAILS + acceptance criteria §16 |
+| Non-negotiables table (no money/ads; browser-local saves; original assets) | **ADOPTED, AMENDED by S25** | Limited aggregate reach measurement is permitted; no advertising, personalization, accounts, or game telemetry. |
 | Versioned localStorage, reset action, reduced motion, accessibility, sound toggle | **ADOPTED** | §13, §14 |
 | Treat naming "Chicken Comets" / "Salmon Stars" | **ADOPTED** | Better than my generic pouches |
 | Token-efficient collaboration rules, one owner per deliverable | **ADOPTED** | Lives in AGENTS.md |
@@ -171,7 +171,7 @@ Sound toggle (default on), music/SFX split sliders, **reduced motion** (fades re
 
 ## 14. Technical contract
 
-Vanilla TypeScript + Vite + Tailwind (S9). `src/engine/` pure TS, seeded RNG, vitest-covered (event-frequency table §4 is the test oracle). `src/ui/` renders `SpinResult` steps; owns zero math. PWA: manifest + service worker, offline after first load. Deploy: push → Actions (privacy gate, brand gate, tests) → Pages. localStorage only. No backend, ever.
+Vanilla TypeScript + Vite + Tailwind (S9). `src/engine/` pure TS, seeded RNG, vitest-covered (event-frequency table §4 is the test oracle). `src/ui/` renders `SpinResult` steps; owns zero math. PWA: manifest + service worker, offline after first load. Deploy: push → Actions (privacy gate, brand gate, tests) → Pages. Game persistence is localStorage only; there is no product backend. S25 permits one constrained Google Analytics tag for aggregate reach measurement, as defined in `docs/ANALYTICS-PRIVACY.md`.
 
 ## 15. Build order & cut lines (deadline: playable by 07/12, polished by 07/16)
 

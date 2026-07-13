@@ -33,7 +33,7 @@ This inventory distinguishes declared versions from the versions actually resolv
 ## What is not in the shipped solution
 
 - No React runtime; the app is vanilla TypeScript and DOM/CSS.
-- No backend, database, account system, analytics, or tracking service.
+- No product backend, database, or account system. One constrained Google Analytics tag measures aggregate reach only; its limits are defined in `docs/ANALYTICS-PRIVACY.md`.
 - No Python runtime or Python package ships to GitHub Pages.
 - No service worker is present yet, so the manifest alone should not be described as a fully offline PWA.
 - `playwright-core` is present in the local `node_modules` directory as an extraneous package, but it is not declared in `package.json` and is not part of the solution's dependency contract.

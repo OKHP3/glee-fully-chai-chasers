@@ -49,12 +49,18 @@
         document.addEventListener(
           'prerenderingchange',
           function () {
-            gtag('config', 'G-89W66VMGPB');
+            gtag('config', 'G-89W66VMGPB', {
+              allow_google_signals: false,
+              allow_ad_personalization_signals: false,
+            });
           },
           { once: true },
         );
       } else {
-        gtag('config', 'G-89W66VMGPB');
+        gtag('config', 'G-89W66VMGPB', {
+          allow_google_signals: false,
+          allow_ad_personalization_signals: false,
+        });
       }
     </script>
 

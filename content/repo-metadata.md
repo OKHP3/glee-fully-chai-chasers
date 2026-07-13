@@ -6,7 +6,7 @@ For use in the README-overhaul PR description, and to paste into GitHub's repo S
 
 ## GitHub "About" description (target: ≤350 characters)
 
-> A free cascading-reels birthday game starring two cats, iced chai, butterflies, and fictional Glee-coins. Built by a council of AI tools from a canonical spec, decision log, and test-oracle-gated game engine. No purchases, ads, accounts, or tracking. Not affiliated with any game studio or brand.
+> A free cascading-reels birthday game starring two cats, iced chai, butterflies, and fictional Glee-coins. Built by a council of AI tools from a canonical spec, decision log, and test-oracle-gated game engine. No purchases, ads, or accounts; limited aggregate reach measurement only. Not affiliated with any game studio or brand.
 
 Character count: verify before publishing (target remains within GitHub's 350-character limit).
 
