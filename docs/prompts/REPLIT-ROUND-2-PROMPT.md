@@ -1,5 +1,7 @@
 # REPLIT ROUND 2 — Make It Feel Like 2027, Not 1987
 
+> **OBSOLETE PROMPT — DO NOT RUN.** Replit must use `REPLIT-HANDOFF.md` v3 and `GAME-REALIGNMENT-2026-07-12.md` against the protected implementation baseline.
+
 *(Paste everything below this line into Replit Agent.)*
 
 ---

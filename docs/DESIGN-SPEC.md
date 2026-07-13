@@ -4,6 +4,8 @@
 **Author:** Claude · **Date:** 2026-07-10 · **Status:** **CANONICAL** — approved direction per Jamie's ruling 2026-07-10 (see DECISION-LOG.md S8-S12)
 **Relationship to COLLABORATIVE-VISION.md:** that document is the pre-alpha foundation; this spec supersedes it where they conflict and absorbs its best elements (see §2). All tools build from THIS document.
 
+> **APPROVED AMENDMENT — 2026-07-12:** `GAME-REALIGNMENT-2026-07-12.md` and decisions S20-S23 supersede this document wherever it uses GPT-Toolbox metaphors, treats twelve as sacred/system-wide, or describes the earlier short UniGlee package. Claude owns the eventual v3 math/spec integration; no tool may use the older language to roll back the approved Chai Chase direction.
+
 ---
 
 ## 1. Vision & design pillars

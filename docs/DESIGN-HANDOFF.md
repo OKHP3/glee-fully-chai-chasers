@@ -1,5 +1,7 @@
 # DESIGN-HANDOFF.md — Visual Overhaul (Cascading Reels Cabinet)
 
+> **HISTORICAL ARTIFACT — DO NOT IMPLEMENT FROM THIS FILE.** It records a completed pre-realignment pass. Current collaborators must read `DESIGN-SPEC.md`, `GAME-REALIGNMENT-2026-07-12.md`, `IMPLEMENTATION-BASELINE.md`, and `DECISION-LOG.md` instead.
+
 **Role:** art director / visual implementer, per `docs/prompts/DESIGN-AGENT-PROMPT.md`.
 **Scope respected:** `src/ui/symbols.ts`, `src/ui/board.ts`, `src/style.css`, `public/icons/**`, `public/fonts/**`. Zero changes to `src/engine/**`, `src/state.ts`, `src/audio/**`, `package.json` deps, or any other doc.
 **Verification method:** real headless-browser screenshots (Playwright + Chromium, sandboxed in this session) of the actual Vite dev server at 390×844 — not a mockup. Where noted below, a moment was reviewed by code inspection only because its trigger rate made it too rare to force on camera in the session budget; those are flagged explicitly rather than claimed as visually confirmed.

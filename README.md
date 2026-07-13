@@ -2,7 +2,7 @@
 
 **A birthday gift, playable in a browser.**
 
-One-line hook: her own cascade game, starring two cats, a mermaid tumbler, and a dozen easter eggs only she'll catch.
+One-line hook: her own chai-chase cascade game, starring two cats, a mermaid tumbler, and keepsakes only she'll recognize.
 
 **[▶ Play now](https://okhp3.github.io/glee-fully-chai-chasers/)** (best on an iPhone, added to your home screen)
 
@@ -16,13 +16,13 @@ One-line hook: her own cascade game, starring two cats, a mermaid tumbler, and a
 
 Glee loves cascading-reels games: the kind with a meter that climbs toward something, wilds that stack, and a legendary symbol you tell people about when it lands. So Jamie built one especially for her.
 
-Her game was created from scratch with the love dialed to twelve. Real paylines, real cascades, a free-spin wheel, and a rare legendary symbol, all reimagined inside the Glee-fully universe with fictional Glee-coins, iced chai, butterflies, and two extremely opinionated cats.
+Her game was created from scratch with the love turned all the way up. Real paylines, real cascades, a free-spin wheel, and a rare legendary symbol, all reimagined inside the Glee-fully universe with fictional Glee-coins, iced chai, butterflies, music-night keepsakes, books, PNW aurora, and two extremely opinionated cats.
 
 It was built by a council of AI tools directed by her husband, Jamie, working from a canonical spec, a decision log, and a test suite that wouldn't let the math ship dishonest. That process is documented in `docs/` for anyone curious how a solo human can direct multiple AI systems toward one coherent product. This repo is as much a portfolio piece in AI project management as it is a birthday card.
 
 ## What it is
 
-Five reels, four rows, 25 paylines. Tap **SPARKLE!** and the board cascades: winning symbols beam up, new ones drop in, and it keeps going until the board goes quiet. A firefly meter tracks your cascade streak; fill it and Joey's uncle-figure co-pilot AskJamie spins a wheel to send you into free spins. Land enough iced-chai scatters and you get the Chai Tea Bonus, a twelve-tumbler pick shelf, because twelve is the sacred number here. Land the UniGlee (roughly 1 in 400 spins) and the whole screen turns violet for a monster bonus package. The balance is deliberately generous, and AskJamie cheerfully finds more Glee-coins under the couch whenever they are needed.
+Five reels, four rows, 25 paylines. Tap **SPARKLE!** and the board cascades: winning symbols beam up, new ones drop in, and it keeps going until the board goes quiet. A firefly meter tracks your cascade streak; fill it and Joey's uncle-figure co-pilot AskJamie spins a wheel to send you into free spins. Along the way, Joey and Phoebe chase the intensely flavored iced chai through music, books, butterflies, aurora, and shared-life keepsakes. The rare UniGlee rainbow butterfly turns the night mythic when it appears. The balance is deliberately generous, and AskJamie cheerfully finds more Glee-coins under the couch whenever they are needed.
 
 ## Who built it
 
@@ -40,15 +40,15 @@ Jamie directed a council of AI tools, each with a bounded job. Claude wrote the 
 
 **Cat pop-ins.** Roughly once every 30 spins, Phoebe or Joey wanders across the board. Phoebe helps for any treat in the jar. Joey, Glee's favorite boy, only shows up for Boogie Bites. If the jar's empty, you get an unimpressed tail flick and a quip instead.
 
-**Joey & Phoebe's Sparkle Wheel.** Free spins open with the cats perched on a jewel-lit wheel: wild multipliers up to the legendary **TWELVE PUMPS!** (12x), Giant Toolbox collector mode, or an iced-chai wild rain.
+**Joey & Phoebe's Sparkle Wheel.** Free spins open with the cats perched on a jewel-lit wheel: wild multipliers, a Keepsake Constellation of mega-symbols, or an iced-chai wild rain.
 
-**Chai Tea Bonus.** Land three or more iced-chai scatters and pick from twelve tumblers for coin prizes, extra picks, or the Mermaid Cup mini-jackpot.
+**Chai Quest chapters — in development.** Future additions rotate through Phoebe's treat and lap quests, Joey's laundry “help,” music-night trails, and aurora book moments instead of repeating one generic bonus screen.
 
-**UniGlee.** The legendary rainbow-butterfly event, roughly 1 in 400 spins: the whole bonus package at once, and the story she'll tell other people.
+**UniGlee.** The legendary rainbow-butterfly event lives inside Jamie's permitted 1-in-300 to 1-in-1,000 band. Its next engine pass expands it into a 100–500-spin mythic marathon of varied cat and keepsake chapters, with the math simulation required to stay honest.
 
 ## How it was built
 
-This repo runs on a written constitution, not vibes. `docs/DESIGN-SPEC.md` is the canonical game spec; every feature above traces back to a numbered section there. `docs/DECISION-LOG.md` records every settled call with its rationale, so no tool ever re-litigates a resolved question. `docs/CANON.md` locks down the facts that make this Glee's game and nobody else's (iced chai only, the number 12, which cat gets which treat). `docs/IP-GUARDRAILS.md` sets the legal guardrails everyone builds inside.
+This repo runs on a written constitution, not vibes. `docs/DESIGN-SPEC.md` is the canonical game spec; every feature above traces back to a numbered section there. `docs/DECISION-LOG.md` records every settled call with its rationale, so no collaborator re-litigates a resolved question. `docs/CANON.md` locks down the facts that make this Glee's game and nobody else's (iced chai only, the cats' personalities, and which cat gets which treat). `docs/IP-GUARDRAILS.md` sets the legal guardrails everyone builds inside.
 
 The math had to earn its numbers. `src/engine/simulation.test.ts` runs a 200,000-spin seeded simulation against the spec's target frequencies (RTP, free-spin rate, mega-cascade rate, UniGlee rate) and fails the build if any of them drift outside their band. The first implementation pass shipped at 14% RTP and a free-spin rate 35 times too rare; the test oracle caught it, and a documented validation loop (`docs/REPLIT-VALIDATION-LOG.md`) tuned the engine until every gate went green. That test still runs in CI on every push. It doesn't get weakened to make a deadline.
 

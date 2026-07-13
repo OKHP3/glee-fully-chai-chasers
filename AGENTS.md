@@ -9,18 +9,21 @@ A free, browser-based, mobile-first slot-style game — a birthday gift from Jam
 ## Read in this order
 
 1. `docs/DESIGN-SPEC.md` — **THE canonical spec** (v2, approved by Jamie 2026-07-10). Build from this.
-2. `docs/DECISION-LOG.md` — settled decisions S1-S13. **If a future decision is open, do not build on either side of it.**
-3. `docs/COLLABORATIVE-VISION.md` — honored pre-alpha foundation (Codex); resolved and superseded where it conflicts with the spec (adoption table: spec §2).
-4. `docs/CANON.md` — Glee-fully facts. Get these wrong and the gift fails. Iced chai ONLY.
-5. `docs/IP-GUARDRAILS.md` — hard legal rules. Non-negotiable.
-6. `docs/RESEARCH-BRIEF.md` — Planet Moolah mechanics study (what we may echo, with sources).
-7. `docs/ASSET-CHECKLIST.md` — every asset, its owner, status, and provenance rule.
+2. `docs/IMPLEMENTATION-BASELINE.md` — **THE canonical running state and cross-tool handoff.** Rebase onto it; never overwrite it from an older checkpoint.
+3. `docs/GAME-REALIGNMENT-2026-07-12.md` — **approved Chai Chase amendment.** No GPT-Toolbox metaphors; twelve is chai history, not system-wide mythology; UniGlee becomes the 100–500-spin mythic marathon.
+4. `docs/DECISION-LOG.md` — settled decisions. **If a future decision is open, do not build on either side of it.**
+5. `docs/COLLABORATIVE-VISION.md` — honored pre-alpha foundation (Codex); resolved and superseded where it conflicts with the spec (adoption table: spec §2).
+6. `docs/CANON.md` — Glee-fully facts. Get these wrong and the gift fails. Iced chai ONLY.
+7. `docs/IP-GUARDRAILS.md` — hard legal rules. Non-negotiable.
+8. `docs/RESEARCH-BRIEF.md` — Planet Moolah mechanics study (what we may echo, with sources).
+9. `docs/ASSET-CHECKLIST.md` — every asset, its owner, status, and provenance rule.
 
 ## Coordination rules (multi-tool, token-efficient)
 
 - One owner per deliverable. Check `docs/DECISION-LOG.md` assignments before starting; don't rebuild a component another tool owns.
 - Bounded artifacts only: a mechanics table, a component, a scene script, a QA pass. Not "improve the game."
 - Don't silently replace others' docs. Add a dated section or companion file, propose, and let Jamie rule (per COLLABORATIVE-VISION §11).
+- Before editing, identify the Git commit and compare it with `docs/IMPLEMENTATION-BASELINE.md`. Never copy an older Claude or Replit tree over the protected UI/art baseline.
 - Engine code (`src/engine/`) is pure TypeScript with zero DOM imports and unit tests. UI code never contains game math. This boundary is the one architectural rule that is not up for debate.
 - Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`). Small commits; the human diff-reviews everything.
 
