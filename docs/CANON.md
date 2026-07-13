@@ -6,7 +6,7 @@ The gift succeeds on specificity. These facts are load-bearing. Source: Jamie (2
 
 - Presence in game: the **Chai Captain**. A cartoon/avatar-style Glee is permitted (S15) — think emoji-adjacent, retro-bright illustration in the site's style. **Never a photo or photorealistic rendering of her** (her explicit preference). Her *things* (tumbler, cardigan, butterfly clip) carry her presence wherever the avatar isn't.
 - **Chai: ICED ONLY. Glee hates hot chai.** Any hot-beverage imagery (steam, mugs, kettles) is a canon violation. Former order: Starbucks iced venti, 12 pumps chai, non-fat milk — until the recipe change; now home-brewed with a classic chai latte concentrate, iced, in a beloved jewel-toned mermaid-pattern 24oz tumbler with straw.
-- **The number 12 is sacred** (12 pumps). Use it: max multiplier 12x ("Twelve Pumps!"), 12-item pick screens, level-12 celebrations.
+- **Chai intensity is the meaning; twelve is not sacred.** Twelve pumps was the remembered expression of Glee wanting a boldly flavored iced chai. Keep at most one chai-specific wink to it; do not turn twelve into unrelated charms, levels, pick counts, multipliers, or decoration.
 - Aesthetic: retro-bright, 80s/90s nostalgia, mixtapes, cozy-witchy (Practical Magic energy), butterflies, color-coded joy, Pacific Northwest / grunge-adjacent. Yakima-born, Alaska-raised.
 - Loves: Schitt's Creek, Friends, Stevie Nicks / Fleetwood Mac, chai, her cats, the Planet Moolah slot family. (Homage by vibe only — see IP-GUARDRAILS.)
 
@@ -37,4 +37,6 @@ The gift succeeds on specificity. These facts are load-bearing. Source: Jamie (2
 
 Hot chai. Photos of Glee. Cow/farm/"Moolah" trade dress. Brand names or logos of any kind. Fat jokes about Phoebe. Sad or punishing moments — this game never scolds, never frames a quiet spin as failure, and AskJamie cheerfully tops up the Glee-coin balance whenever needed.
 
-**Narrative canon (all public artifacts, all agents):** the game exists because Jamie wanted to give Glee a personalized birthday game built around a genre she loves. That is the entire public motivation. No public document, post, commit message, or in-game copy may frame it as corrective, therapeutic, financial, or problem-solving — and raw working notes or pasted prompt dumps are never committed as project artifacts.
+**Game-world boundary:** Toolbox, Tool, Tool-ette, branch, leaf, and similar organization vocabulary belongs to the separate Glee-fully custom-GPT ecosystem. It is not game canon. The game's fantasy is Joey and Phoebe helping Glee on the Chai Chase through music, books, PNW/Alaska keepsakes, and their shared life.
+
+**Narrative canon (all public artifacts, all agents):** the game exists because Jamie wanted to give Glee a personalized birthday game built around a genre she loves. That is the entire public motivation. Do not invent or imply any additional backstory, and never commit raw working notes or pasted prompt dumps as project artifacts.

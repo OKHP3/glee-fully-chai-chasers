@@ -1,5 +1,7 @@
 # Replit Implementation Brief — Glee-fully Iced Chai Chasers
 
+> **HISTORICAL ARTIFACT — DO NOT IMPLEMENT FROM THIS FILE.** Use `REPLIT-HANDOFF.md` v3 plus `GAME-REALIGNMENT-2026-07-12.md`; those files supersede this vertical-slice brief.
+
 ## Your role
 
 You are joining a shared, multi-agent repository. Build a polished, **functional vertical slice** of this static, mobile-first game for Glee's iPhone 17 Pro Max. Do not restart it, replace the architecture, or rewrite others' documents. Extend the current repository deliberately and leave clear, small commits.
