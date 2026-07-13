@@ -11,6 +11,7 @@ Every tool and every commit follows these. Not legal advice; a conservative zero
 | Cat Man Doo / Orijen / Chewy | No brand names, logos, or traced packaging | Generic pouches echoing silhouette/color: Chicken Comets (yellow), Salmon Stars (blue), Boogie Bites (navy) |
 | Glee's likeness | No photos of Glee in repo, game, history, or derived assets | Abstract Chai Captain presence; original illustrated avatar only if she approves the design |
 | Gambling optics | No real money, purchases, ads, cash-out, or odds claims; no "casino" in name/store text | README states: free fan-made birthday gift, fictional currency, no wagering, not affiliated with any casino, game studio, or brand |
+| Reach measurement | One constrained Google Analytics tag may measure aggregate site reach | No advertising, personalization, accounts, custom identifiers, or game-state telemetry; follow `docs/ANALYTICS-PRIVACY.md` |
 
 ## Enforcement
 

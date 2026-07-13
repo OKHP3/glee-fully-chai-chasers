@@ -334,7 +334,7 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 
       <section class="settings-card about-card">
         <h3>About this gift</h3>
-        <p>A cozy, original Chai Chase for Glee — fictional Glee-coins only, with no purchases, ads, or tracking.</p>
+        <p>A cozy, original Chai Chase for Glee — fictional Glee-coins only, with no purchases or ads. Basic reach measurement helps Jamie understand how the gift is finding people.</p>
       </section>
 
       <button id="settings-reset" class="reset-progress-btn">Start fresh</button>

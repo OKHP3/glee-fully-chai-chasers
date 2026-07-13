@@ -19,7 +19,7 @@ The game is an original Glee-fully experience: **iced chai, Joey, Phoebe, butter
 | Touch-first, mobile-browser play | Real money, wagering, purchases, ads, or a cash-out system |
 | Original characters, art, copy, sound, and game rules | Casino/game logos, titles, art, reel strips, UI layouts, audio, or code |
 | Generous, understandable progress | Hidden, misleading, or needlessly frustrating progression systems |
-| Browser-local saves only | Accounts, backend, personal-data collection, or tracking by default |
+| Browser-local saves and limited aggregate reach measurement (S25) | Accounts, product backend, personal-data collection, advertising, personalization, or game telemetry |
 | Glee-fully warmth and retro-bright style | Glee's actual photo or likeness in the public game without her clear approval |
 
 The reference slot family is an *emotional/mechanical study* only: a cascade can lead to a visible, celebratory milestone. We must independently implement the rules, visual language, characters, sound, terminology, and board treatment.
@@ -69,6 +69,7 @@ The board should feel like a tiny midnight garden/constellation: iced chai tumbl
 - Do not use Glee's face. An abstract Chai Captain—colors, accessories, silhouette, or mood—is the right substitute.
 - Do not use TV clips, recorded music, brand packaging, product logos, or casino media. Use original or appropriately licensed sound and art.
 - HEIC conversions are stored as reusable project references; a PNG-backed SVG is a file-format compatibility wrapper, not true vector art.
+- S25 permits only the constrained Google Analytics reach measurement documented in `docs/ANALYTICS-PRIVACY.md`; it is not permission for advertising, personalization, accounts, or game-state tracking.
 
 ## 7. Suggested division of work
 

@@ -34,4 +34,4 @@ This one's a birthday gift. Jamie built it for Glee around a genre she enjoys, t
 
 No account. No download beyond adding it to your home screen if you want the full app feel. Just tap Sparkle and see what happens.
 
-*Free. Fan-made. Fictional currency only. No wagering, no purchases, no ads, no accounts, no tracking. Not affiliated with any casino, game studio, or brand.*
+*Free. Fan-made. Fictional currency only. No wagering, purchases, ads, or accounts. Limited aggregate reach measurement helps Jamie understand how the gift is finding people; it does not measure game play or enable advertising or personalization. Not affiliated with any casino, game studio, or brand.*
