@@ -46,6 +46,124 @@ body {
   box-shadow: 0 0 80px rgba(0, 0, 0, 0.46);
 }
 
+/* ------------------------------------------------------------------ */
+/* Chai Chase splash — audio unlock + game fantasy                     */
+/* ------------------------------------------------------------------ */
+
+.chai-splash {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff4e0;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(65, 184, 183, .12), transparent 34%),
+    linear-gradient(180deg, #070d20 0%, #121437 58%, #21123e 100%);
+}
+
+.chai-splash-art {
+  position: absolute;
+  z-index: 0;
+  inset: 0 auto auto 50%;
+  width: min(100%, 500px);
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+  filter: saturate(1.02) contrast(1.02);
+}
+
+.chai-splash-copy {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 500px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding:
+    env(safe-area-inset-top, 0px)
+    24px
+    max(34px, calc(env(safe-area-inset-bottom, 0px) + 20px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+}
+
+.chai-splash-title {
+  max-width: 420px;
+  margin: 0;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(34px, 9.2vw, 48px);
+  font-weight: 800;
+  line-height: .94;
+  letter-spacing: -.025em;
+  color: #fff1cf;
+  text-wrap: balance;
+  text-shadow:
+    0 2px 0 rgba(87, 42, 19, .65),
+    0 0 18px rgba(245, 213, 118, .35);
+}
+
+.chai-splash-subtitle {
+  max-width: 330px;
+  margin: 14px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(255, 238, 197, .86);
+  text-wrap: balance;
+  text-shadow: 0 2px 5px rgba(4, 6, 20, .9);
+}
+
+.chai-splash-button {
+  width: min(100%, 360px);
+  min-height: 68px;
+  margin-top: 22px;
+  padding: 13px 24px;
+  border: 2px solid rgba(255, 226, 153, .72);
+  border-radius: 22px;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(17px, 4.8vw, 21px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .035em;
+  color: #fff6df;
+  background: linear-gradient(160deg, #f47b3f, #d94d18 58%, #a52e11);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .25),
+    0 0 0 3px rgba(240, 130, 74, .16),
+    0 5px 0 #77210f,
+    0 11px 24px rgba(0, 0, 0, .42),
+    0 0 26px rgba(245, 213, 118, .18);
+  cursor: pointer;
+  transition: transform 100ms ease-out, filter 120ms ease-out, box-shadow 120ms ease-out;
+}
+
+.chai-splash-button:hover { filter: brightness(1.07); }
+.chai-splash-button:active {
+  transform: translateY(3px) scale(.985);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .2),
+    0 0 0 3px rgba(240, 130, 74, .14),
+    0 2px 0 #77210f,
+    0 7px 16px rgba(0, 0, 0, .38);
+}
+.chai-splash-button:focus-visible {
+  outline: 3px solid var(--cc-mint);
+  outline-offset: 5px;
+}
+
+@media (max-height: 760px) {
+  .chai-splash-copy { padding-bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 14px)); }
+  .chai-splash-title { font-size: clamp(30px, 8.4vw, 42px); }
+  .chai-splash-subtitle { margin-top: 10px; font-size: 14px; }
+  .chai-splash-button { min-height: 64px; margin-top: 16px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -879,7 +997,7 @@ body {
   to { transform: scale(0.2) rotate(25deg); opacity: 0; }
 }
 
-.twelve-pumps {
+.full-flavor-frenzy {
   position: absolute;
   inset: 0;
   z-index: 50;
@@ -889,8 +1007,8 @@ body {
   background: radial-gradient(ellipse at 50% 50%, rgba(211, 91, 45, 0.5), rgba(20, 10, 40, 0.85) 75%);
   animation: win-tier-fade 200ms ease-out;
 }
-.twelve-pumps-ring { position: absolute; inset: 0; }
-.twelve-pumps-text {
+.full-flavor-frenzy-ring { position: absolute; inset: 0; }
+.full-flavor-frenzy-text {
   position: relative;
   z-index: 1;
   font-family: "Baloo Display", "Arial Black", sans-serif;
@@ -905,7 +1023,7 @@ body {
   box-shadow: 0 0 26px rgba(211, 91, 45, 0.7);
   animation: win-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.twelve-pumps-text span {
+.full-flavor-frenzy-text span {
   display: block;
   font-size: 12px;
   font-weight: 600;

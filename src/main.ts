@@ -3,31 +3,29 @@
  * Spec: docs/DESIGN-SPEC.md §3. Real UI now lives in src/ui/board.ts.
  */
 import "./style.css";
-import { unlock, setSfxEnabled, playToolboxChime } from "./audio/synth";
+import { unlock, setSfxEnabled, playChaiChaseStart } from "./audio/synth";
 import { loadGameState } from "./state";
 import { renderBoard } from "./ui/board";
-import { symbolSvg } from "./ui/symbols";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
 function renderSplash(): void {
   app.innerHTML = `
-    <div class="relative h-full w-full flex flex-col items-center justify-center gap-6 overflow-hidden">
-      <div class="night-garden" aria-hidden="true"></div>
-      <div class="flex items-center gap-2 relative z-10">
-        <div class="w-16 h-16">${symbolSvg("crystal")}</div>
-        <div class="w-16 h-16">${symbolSvg("butterfly")}</div>
+    <div class="chai-splash">
+      <img
+        class="chai-splash-art"
+        src="${import.meta.env.BASE_URL}assets/chai-chase-splash.png"
+        alt=""
+        aria-hidden="true"
+      />
+      <div class="chai-splash-copy">
+        <h1 class="chai-splash-title">Glee-fully Chai Chasers</h1>
+        <p class="chai-splash-subtitle">Joey and Phoebe are ready. The chai chase is on.</p>
+        <button id="tap-in"
+          class="chai-splash-button">
+          START THE CHAI CHASE
+        </button>
       </div>
-      <h1 class="relative z-10 text-2xl font-bold text-amber-100 text-center px-8">
-        Glee-fully Chai Chasers
-      </h1>
-      <p class="relative z-10 text-amber-200/70 text-center px-10">
-        Iced chai, two cats, and twelve kinds of sparkle.
-      </p>
-      <button id="tap-in"
-        class="relative z-10 mt-4 px-8 py-4 rounded-2xl bg-orange-600 text-white text-lg font-semibold active:scale-95 transition-transform min-h-[64px]">
-        Tap to open the Toolbox
-      </button>
     </div>
   `;
 
@@ -36,7 +34,7 @@ function renderSplash(): void {
     const state = loadGameState();
     setSfxEnabled(state.soundOn);
     unlock();
-    playToolboxChime();
+    playChaiChaseStart();
     renderBoard(app, state);
   });
 }

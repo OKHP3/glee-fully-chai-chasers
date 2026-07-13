@@ -366,11 +366,11 @@ export function symbolSvg(id: SymbolId): string {
     // Engine IDs stay stable so the tested math is untouched; the shipped art
     // now follows Glee's canon instead of the prototype object names.
     cassette: "66.667% 33.333%", // cozy cardigan
-    gnome: "100% 33.333%", // Glee Toolbox
+    gnome: "100% 33.333%", // moonlit book stack
     mailbox: "0% 66.667%", // butterfly hair clip
     vhs: "33.333% 66.667%",
     teapot: "66.667% 66.667%", // Alaska/PNW aurora keepsake
-    yarn: "100% 66.667%", // sacred Twelve charm
+    yarn: "100% 66.667%", // shared-life keepsake locket
     treat_chicken: "0% 100%",
     treat_salmon: "33.333% 100%",
     treat_boogie: "66.667% 100%",
@@ -524,7 +524,7 @@ export function saucerSvg(variant: 1 | 2 | 3 | 4 | 5 = 1): string {
 
 /**
  * Illustrated night-garden foreground silhouette — fence, plants, mailbox,
- * a parked toolbox (nods to "open the Toolbox" splash line). Flat silhouette
+ * and a small moonlit book stack. Flat silhouette
  * so it reads as background, not a competing focal layer.
  */
 export function gardenForegroundSvg(): string {
@@ -548,10 +548,11 @@ export function gardenForegroundSvg(): string {
       <path d="M-16 18a16 12 0 0 1 32 0z" fill="#17103a"/>
       <rect x="-16" y="18" width="32" height="16" rx="2" fill="#17103a"/>
     </g>
-    <g transform="translate(230 58)">
-      <rect x="-16" y="6" width="32" height="16" rx="2" fill="#1c1440"/>
-      <rect x="-18" y="0" width="36" height="8" rx="2" fill="#17103a"/>
-      <rect x="-4" y="-4" width="8" height="5" rx="1" fill="#17103a"/>
+    <g transform="translate(230 58) rotate(-3)">
+      <rect x="-17" y="12" width="34" height="8" rx="2" fill="#1c1440"/>
+      <rect x="-14" y="4" width="31" height="8" rx="2" fill="#17103a"/>
+      <rect x="-18" y="-4" width="33" height="8" rx="2" fill="#1c1440"/>
+      <path d="M-12 0h20" fill="none" stroke="#2a2051" stroke-width="1.5"/>
     </g>
     <path d="M300 78c-2-16 5-28 13-28s11 12 9 28z" fill="#17103a"/>
     <path d="M318 78c-1-10 4-18 9-18s9 8 8 18z" fill="#1c1440"/>

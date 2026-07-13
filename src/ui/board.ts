@@ -35,9 +35,12 @@ import {
   playBonusFanfare,
   playCascadeArpeggio,
   playCascadeTick,
+  playJoeyCue,
+  playPhoebeCue,
+  playUniGleeSting,
   playWinPluck,
   playWheelTick,
-  playTwelvePumps,
+  playFullFlavorFrenzy,
   setSfxEnabled,
   unlock,
 } from "../audio/synth";
@@ -303,7 +306,7 @@ async function runSpin(
   }
 
   if (result.unigleeTriggered) {
-    playBonusFanfare();
+    playUniGleeSting();
     await showUnigleeTakeover(root);
   } else if (result.totalWin > 0) {
     await showWinCelebration(root, result.totalWin, state.bet);
@@ -312,6 +315,8 @@ async function runSpin(
   if (result.catVisit) {
     state.spinsSincePopIn = 0;
     state.treatJar = consumeForVisit(state.treatJar, result.catVisit);
+    if (result.catVisit.cat === "joey") playJoeyCue();
+    else playPhoebeCue();
     await showCatPopIn(root, result.catVisit.cat, result.catVisit.fed, result.catVisit.quip);
     if (result.catVisit.fed) playBonusFanfare();
   } else {
@@ -558,8 +563,8 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
         <div class="wheel-pointer"></div>
       </div>
       <div class="wheel-legends" aria-hidden="true">
-        <span><b>×2–×12</b> Wild sparkle</span>
-        <span><b>Giant Toolbox</b> collector mode</span>
+        <span><b>Growing wilds</b> Extra sparkle</span>
+        <span><b>Keepsake Constellation</b> mega-keepsakes</span>
         <span><b>Iced Chai</b> wild rain</span>
       </div>
       <p id="wheel-result" class="min-h-[1.5rem] text-center font-semibold"></p>
@@ -636,8 +641,8 @@ async function playFreeSpinSession(
     }
 
     if (round.twelvePumps) {
-      await showTwelvePumps(overlay);
-      playTwelvePumps();
+      await showFullFlavorFrenzy(overlay);
+      playFullFlavorFrenzy();
     } else if (round.extraWildsAdded > 0) {
       statusEl.textContent = "We Want Our Chai Back — extra wilds landed!";
       await sleep(500);
@@ -660,11 +665,11 @@ async function playFreeSpinSession(
   void state; // state saved by caller after totals are tallied
 }
 
-function showTwelvePumps(overlay: HTMLElement): Promise<void> {
+function showFullFlavorFrenzy(overlay: HTMLElement): Promise<void> {
   return new Promise((resolve) => {
     const callout = document.createElement("div");
-    callout.className = "twelve-pumps";
-    callout.innerHTML = `<div class="twelve-pumps-ring">${burstDots(20)}</div><div class="twelve-pumps-text">TWELVE PUMPS!<span>12x wild multiplier</span></div>`;
+    callout.className = "full-flavor-frenzy";
+    callout.innerHTML = `<div class="full-flavor-frenzy-ring">${burstDots(20)}</div><div class="full-flavor-frenzy-text">FULL-FLAVOR FRENZY!<span>A bold wild multiplier</span></div>`;
     overlay.appendChild(callout);
     window.setTimeout(() => {
       callout.remove();
