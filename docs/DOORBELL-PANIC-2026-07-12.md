@@ -11,6 +11,12 @@ Approved bounded bonus amendment from Jamie. This document complements the canon
 - The trigger banner remains visible while Joey and Phoebe begin fleeing; the triggering doorbells are highlighted as the board's dead space.
 - Each panic spin preloads 3–6 Joey/Phoebe wilds onto randomly selected payline coordinates before ordinary cascade evaluation. They remain ordinary wilds for payout purposes, but receive the panic landing animation.
 
+### Discoverability tuning — 2026-07-13
+
+- A paired trigger lands at approximately 1 in 300 base spins.
+- A single blocker lands at approximately 1 in 150 base spins.
+- Combined, a player has approximately a 1 in 100 chance to see at least one doorbell on a base spin. This keeps the gag rare while making it discoverable during a normal play session.
+
 ## Implementation boundary
 
 The trigger, blocker behavior, award roll, and panic wild placement are pure TypeScript under `src/engine/`. The board owns only the banner, animation, audio cue, and presentation of the typed result. The doorbell is original inline SVG art; it uses no real-product logo, name, or trade dress.

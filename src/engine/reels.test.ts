@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
-import { REELS, ROWS, cascadeColumn, spinGrid } from "./reels";
+import { DOORBELL_PAIR_RATE, DOORBELL_SINGLE_RATE, REELS, ROWS, cascadeColumn, spinGrid } from "./reels";
 
 describe("spinGrid", () => {
   it("produces a deterministic REELS x ROWS grid for a seeded rng", () => {
@@ -28,6 +28,12 @@ describe("spinGrid", () => {
         expect(grid[reel].some((cell) => cell.symbol === "doorbell")).toBe(false);
       }
     }
+  });
+
+  it("uses discoverable but still rare doorbell odds", () => {
+    expect(DOORBELL_PAIR_RATE).toBeCloseTo(1 / 300);
+    expect(DOORBELL_SINGLE_RATE).toBeCloseTo(1 / 150);
+    expect(DOORBELL_PAIR_RATE + DOORBELL_SINGLE_RATE).toBeCloseTo(1 / 100);
   });
 });
 

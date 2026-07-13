@@ -17,6 +17,10 @@ import { PAYLINES } from "./paylines";
 export const REELS = 5;
 export const ROWS = 4;
 
+/** Doorbell events are rare, but frequent enough to be discoverable in a normal session. */
+export const DOORBELL_PAIR_RATE = 1 / 300;
+export const DOORBELL_SINGLE_RATE = 1 / 150;
+
 function repeat(symbol: SymbolId, count: number): SymbolId[] {
   return new Array(count).fill(symbol) as SymbolId[];
 }
@@ -127,11 +131,11 @@ export function spinGrid(rng: Rng): Grid {
   // doorbells visible as true blockers once they land. One or two may appear;
   // the pair is aligned to a real payline so the gag is discoverable.
   const eventRoll = rng();
-  if (eventRoll < 1 / 2000) {
+  if (eventRoll < DOORBELL_PAIR_RATE) {
     const line = PAYLINES[Math.floor(rng() * PAYLINES.length)];
     grid[0][line[0]] = { symbol: "doorbell" };
     grid[1][line[1]] = { symbol: "doorbell" };
-  } else if (eventRoll < 2 / 2000) {
+  } else if (eventRoll < DOORBELL_PAIR_RATE + DOORBELL_SINGLE_RATE) {
     const reel = rng() < 0.5 ? 0 : 1;
     const row = Math.floor(rng() * ROWS);
     grid[reel][row] = { symbol: "doorbell" };
