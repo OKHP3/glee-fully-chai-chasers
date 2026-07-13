@@ -8,7 +8,7 @@
  *
  * Vertical-slice note: this ships the first original motif palette for the
  * Chai Chase, cascades, Joey, Phoebe, UniGlee, and bonus transitions. Music
- * loops remain follow-up work — see GAME-REALIGNMENT-2026-07-12.md.
+ * loops remain follow-up work — see docs/GAME-REALIGNMENT-2026-07-12.md.
  */
 let ctx: AudioContext | null = null;
 let musicEnabled = true;
