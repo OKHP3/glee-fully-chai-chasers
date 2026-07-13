@@ -251,6 +251,24 @@ const SYMBOL_SVG: Record<SymbolId, string> = {
   `,
     { glow: "255, 158, 203" },
   ),
+  doorbell: wrap(
+    `
+    <defs>
+      <linearGradient id="doorbellGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f5d576"/><stop offset="100%" stop-color="#d35b2d"/>
+      </linearGradient>
+    </defs>
+    ${grounding("doorbellGr", 24, 41, 13, 4)}
+    <rect x="12" y="7" width="24" height="34" rx="6" fill="url(#doorbellGrad)" stroke="${INK}" stroke-width="1.6"/>
+    <rect x="16" y="11" width="16" height="9" rx="3" fill="#20163a" opacity=".9"/>
+    <circle cx="24" cy="29" r="6" fill="#fff4e0" stroke="${INK}" stroke-width="1.3"/>
+    <circle cx="24" cy="29" r="2.1" fill="#d35b2d"/>
+    <path d="M18 43h12" stroke="#fff4e0" stroke-width="1.4" stroke-linecap="round" opacity=".75"/>
+    <path d="M9 24c-3-2-3-5 0-7M39 24c3-2 3-5 0-7" fill="none" stroke="#9fe8c5" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+    ${sheen("doorbellSheen", 18, 13, 7, 8)}
+  `,
+    { glow: "245, 213, 118" },
+  ),
   // --- treats (feature symbols) ------------------------------------------
   treat_chicken: wrap(
     `

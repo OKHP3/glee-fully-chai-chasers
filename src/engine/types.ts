@@ -11,6 +11,8 @@ export type SymbolId =
   | "chai" | "candle" | "cassette" | "gnome"
   // low
   | "mailbox" | "vhs" | "teapot" | "yarn"
+  // blocker / bonus trigger
+  | "doorbell"
   // treats (feature symbols, reels 1/3/5 only)
   | "treat_chicken" | "treat_salmon" | "treat_boogie"
   // wilds & legend
@@ -29,6 +31,12 @@ export interface LineWin {
   count: number;           // consecutive from reel 0
   payout: number;          // in Sparks, bet-scaled
   positions: Array<[reel: number, row: number]>;
+}
+
+export interface DoorbellTrigger {
+  lineIndex: number;
+  positions: Array<[reel: number, row: number]>;
+  freeSpinsAwarded: number;
 }
 
 export interface CascadeStep {
@@ -62,6 +70,7 @@ export interface SpinResult {
   catVisit?: CatVisit;
   unigleeTriggered: boolean;
   treatsCollected: TreatKind[];
+  doorbellPanic?: DoorbellTrigger;
 }
 
 export interface EngineConfig {

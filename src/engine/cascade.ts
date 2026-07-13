@@ -10,7 +10,7 @@
 import type { CascadeStep, Grid, SpecialtyWild, SpinResult, SymbolId, TreatKind } from "./types";
 import { FREE_SPIN_LADDER } from "./types";
 import { REELS, ROWS, cascadeColumn, spinGrid, stripFor } from "./reels";
-import { evaluateLines, isWild } from "./paylines";
+import { evaluateLines, findDoorbellTrigger, isWild } from "./paylines";
 import { rollCatVisit, type TreatJar } from "./features";
 import type { Rng } from "./rng";
 
@@ -99,11 +99,19 @@ export interface SpinInput {
   betPerLine: number;
   treatJar: TreatJar;
   spinsSincePopIn: number;
+  /** Optional preloaded board used by free-spin modifiers. */
+  startingGrid?: Grid;
+}
+
+export function rollDoorbellFreeSpins(rng: Rng): number {
+  return 5 + Math.floor(rng() * 16);
 }
 
 /** Runs one full spin -> cascade-to-dead-board sequence. */
-export function spin({ rng, betPerLine, treatJar, spinsSincePopIn }: SpinInput): SpinResult {
-  let grid = spinGrid(rng);
+export function spin({ rng, betPerLine, treatJar, spinsSincePopIn, startingGrid }: SpinInput): SpinResult {
+  let grid = startingGrid
+    ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
+    : spinGrid(rng);
   const steps: CascadeStep[] = [];
   const treatsCollected = collectTreats(grid);
   const unigleeTriggered = rng() < UNIGLEE_RATE;
@@ -112,6 +120,7 @@ export function spin({ rng, betPerLine, treatJar, spinsSincePopIn }: SpinInput):
   let cascades = 0;
   let doubleSparkleActive = false;
   const queue: SpecialtyWild[] = [];
+  let doorbellPanic: SpinResult["doorbellPanic"];
 
   if (unigleeTriggered) {
     // "The full package": Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts.
@@ -122,6 +131,10 @@ export function spin({ rng, betPerLine, treatJar, spinsSincePopIn }: SpinInput):
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
+    if (!doorbellPanic) {
+      const trigger = findDoorbellTrigger(grid, 0);
+      if (trigger) doorbellPanic = { ...trigger, freeSpinsAwarded: rollDoorbellFreeSpins(rng) };
+    }
     const wins = evaluateLines(grid, betPerLine);
 
     if (wins.length === 0) {
@@ -177,7 +190,11 @@ export function spin({ rng, betPerLine, treatJar, spinsSincePopIn }: SpinInput):
   const catVisit = rollCatVisit(rng, treatJar, spinsSincePopIn);
   const ladderAward = freeSpinsForCascades(cascades);
   const doubleSparkleApplied = doubleSparkleActive && ladderAward > 0;
-  const freeSpinsAwarded = doubleSparkleApplied ? ladderAward * 2 : ladderAward;
+  const freeSpinsAwarded = doorbellPanic
+    ? doorbellPanic.freeSpinsAwarded
+    : doubleSparkleApplied
+      ? ladderAward * 2
+      : ladderAward;
 
   return {
     steps,
@@ -188,6 +205,7 @@ export function spin({ rng, betPerLine, treatJar, spinsSincePopIn }: SpinInput):
     catVisit,
     unigleeTriggered,
     treatsCollected,
+    doorbellPanic,
   };
 }
 

@@ -113,6 +113,13 @@ export function playPhoebeCue(): void {
   tone(783.99, 0.25, 0.2, 0.12, "triangle");
 }
 
+/** Doorbell Panic: a bright, original two-note chime followed by a cat-flight burst. */
+export function playStrangerDangerPanic(): void {
+  tone(988, 0, 0.18, 0.2, "square");
+  tone(1318.51, 0.12, 0.2, 0.18, "square");
+  [220, 277.18, 329.63, 415.3].forEach((freq, i) => tone(freq, 0.32 + i * 0.07, 0.16, 0.13, "triangle"));
+}
+
 /** UniGlee's mythic arrival — glassy lift, breath, then a wide butterfly shimmer. */
 export function playUniGleeSting(): void {
   [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {

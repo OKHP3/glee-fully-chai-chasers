@@ -30,6 +30,16 @@ describe("free spin rounds", () => {
       expect(spinFreeRound(rng, "chai_back", 1).totalWin).toBeGreaterThanOrEqual(0);
     }
   });
+
+  it("doorbell panic rounds preload several Joey/Phoebe wilds", () => {
+    const round = spinFreeRound(mulberry32(1234), "doorbell_panic", 1);
+    const firstGrid = round.steps[0].grid;
+    const wildCount = firstGrid.flat().filter((cell) => cell.symbol === "wild_joey" || cell.symbol === "wild_phoebe").length;
+    expect(round.panicWildsAdded).toBeGreaterThanOrEqual(3);
+    expect(round.panicWildsAdded).toBeLessThanOrEqual(6);
+    expect(wildCount).toBeGreaterThanOrEqual(round.panicWildsAdded);
+    expect(round.twelvePumps).toBe(false);
+  });
 });
 
 describe("free spin session", () => {

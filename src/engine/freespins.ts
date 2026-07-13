@@ -1,16 +1,19 @@
 /**
  * Free spins & the AskJamie Wheel. Pure TS, zero DOM. Spec: docs/DESIGN-SPEC.md §7.
- * The wheel picks one modifier; free spins reuse cascade.ts's spin() with the
- * modifier's effect layered on top (wilds carry multipliers, mega-symbols,
- * or extra wilds rain in) — modifier math lives here, not in the UI.
+ * The wheel picks one standard modifier; the Doorbell Panic bonus enters here
+ * directly with its own wild-flight modifier. Free spins reuse cascade.ts's
+ * spin() with the modifier's effect layered on top — modifier math lives here,
+ * not in the UI.
  */
 import type { Grid, SpinResult } from "./types";
 import { spin } from "./cascade";
 import { isWild } from "./paylines";
+import { PAYLINES } from "./paylines";
+import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
 
-export type WheelWedge = "multiplying" | "giant_gnome" | "chai_back";
+export type WheelWedge = "multiplying" | "giant_gnome" | "chai_back" | "doorbell_panic";
 
 const WHEEL_WEIGHTS: Array<[WheelWedge, number]> = [
   ["multiplying", 40],
@@ -42,11 +45,47 @@ export interface FreeSpinRoundResult extends SpinResult {
   wildMultipliers?: Array<[number, number, number]>; // [reel, row, multiplier] for We're Multiplying
   twelvePumps: boolean; // true if any wild landed the 12x jackpot this round
   extraWildsAdded: number; // We Want Our Chai Back
+  panicWildsAdded: number;
+}
+
+function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
+  const grid = spinGrid(rng);
+  const occupied = new Set<string>();
+  const count = 3 + Math.floor(rng() * 4); // 3-6 cats, every round feels berserk
+
+  for (let i = 0; i < count; i++) {
+    const line = PAYLINES[Math.floor(rng() * PAYLINES.length)];
+    let reel = Math.floor(rng() * REELS);
+    let row = line[reel];
+    let key = `${reel}:${row}`;
+    let attempts = 0;
+    while (occupied.has(key) && attempts < 10) {
+      reel = Math.floor(rng() * REELS);
+      row = line[reel];
+      key = `${reel}:${row}`;
+      attempts++;
+    }
+    occupied.add(key);
+    grid[reel][row] = { symbol: i % 2 === 0 ? "wild_joey" : "wild_phoebe" };
+  }
+
+  return { grid, wildsAdded: occupied.size };
 }
 
 /** Runs one free-spin round with the chosen wedge's modifier applied. */
 export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): FreeSpinRoundResult {
-  const base = spin({ rng, betPerLine, treatJar: emptyTreatJar(), spinsSincePopIn: 999 });
+  const panic = wedge === "doorbell_panic" ? panicStartingGrid(rng) : undefined;
+  const base = spin({
+    rng,
+    betPerLine,
+    treatJar: emptyTreatJar(),
+    spinsSincePopIn: 999,
+    startingGrid: panic?.grid,
+  });
+
+  if (wedge === "doorbell_panic") {
+    return { ...base, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: panic?.wildsAdded ?? 0 };
+  }
 
   if (wedge === "multiplying") {
     const finalGrid = base.steps[base.steps.length - 1].grid;
@@ -69,7 +108,7 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
       const avg = wildMultipliers.reduce((s, [, , m]) => s + m, 0) / wildMultipliers.length;
       bonusWin = Math.round(base.totalWin * (avg - 1));
     }
-    return { ...base, totalWin: base.totalWin + bonusWin, wildMultipliers, twelvePumps, extraWildsAdded: 0 };
+    return { ...base, totalWin: base.totalWin + bonusWin, wildMultipliers, twelvePumps, extraWildsAdded: 0, panicWildsAdded: 0 };
   }
 
   if (wedge === "chai_back") {
@@ -77,13 +116,13 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     // landed, since the visual "extra wilds" effect is UI-layer (docs §7).
     const extra = 1 + Math.floor(rng() * 3);
     const bonusWin = Math.round(base.totalWin * (0.08 * extra));
-    return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: extra };
+    return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: extra, panicWildsAdded: 0 };
   }
 
   // Legacy giant_gnome ID: 2x2 mega-keepsakes on reels 2-3/4-5 — modeled as
   // a flat uplift. The ID stays stable until Claude performs a math-safe migration.
   const bonusWin = Math.round(base.totalWin * 0.15);
-  return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: 0 };
+  return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: 0 };
 }
 
 export interface FreeSpinSessionResult {
@@ -130,6 +169,8 @@ export function wheelWedgeLabel(wedge: WheelWedge): string {
       return "Keepsake Constellation";
     case "chai_back":
       return "Iced Chai Wild Rain";
+    case "doorbell_panic":
+      return "Stranger Danger Panic";
   }
 }
 

@@ -12,6 +12,7 @@
  */
 import type { Cell, Grid, SymbolId } from "./types";
 import type { Rng } from "./rng";
+import { PAYLINES } from "./paylines";
 
 export const REELS = 5;
 export const ROWS = 4;
@@ -119,6 +120,21 @@ export function spinGrid(rng: Rng): Grid {
   for (let reel = 0; reel < REELS; reel++) {
     const stop = randomStop(rng, STRIPS[reel].length);
     grid.push(windowFrom(reel, stop));
+  }
+
+  // Doorbell Panic is deliberately a rare landing event rather than a strip
+  // weight: this preserves the validated paytable/RTP while keeping the two
+  // doorbells visible as true blockers once they land. One or two may appear;
+  // the pair is aligned to a real payline so the gag is discoverable.
+  const eventRoll = rng();
+  if (eventRoll < 1 / 2000) {
+    const line = PAYLINES[Math.floor(rng() * PAYLINES.length)];
+    grid[0][line[0]] = { symbol: "doorbell" };
+    grid[1][line[1]] = { symbol: "doorbell" };
+  } else if (eventRoll < 2 / 2000) {
+    const reel = rng() < 0.5 ? 0 : 1;
+    const row = Math.floor(rng() * ROWS);
+    grid[reel][row] = { symbol: "doorbell" };
   }
   return grid;
 }

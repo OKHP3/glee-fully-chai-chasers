@@ -41,6 +41,7 @@ import {
   playWinPluck,
   playWheelTick,
   playFullFlavorFrenzy,
+  playStrangerDangerPanic,
   setSfxEnabled,
   unlock,
 } from "../audio/synth";
@@ -305,7 +306,10 @@ async function runSpin(
     state.treatJar = addTreat(state.treatJar, treat);
   }
 
-  if (result.unigleeTriggered) {
+  if (result.doorbellPanic) {
+    playStrangerDangerPanic();
+    await showDoorbellPanic(root, result.doorbellPanic.freeSpinsAwarded, result.doorbellPanic.positions);
+  } else if (result.unigleeTriggered) {
     playUniGleeSting();
     await showUnigleeTakeover(root);
   } else if (result.totalWin > 0) {
@@ -329,11 +333,36 @@ async function runSpin(
   btnAgain?.classList.remove("is-spinning");
 
   if (result.freeSpinsAwarded > 0) {
-    await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
+    if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
+    else await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
     return;
   }
 
   renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
+}
+
+function showDoorbellPanic(
+  root: HTMLElement,
+  spinsAwarded: number,
+  positions: Array<[number, number]>,
+): Promise<void> {
+  return new Promise((resolve) => {
+    positions.forEach(([reel, row]) => {
+      root.querySelector<HTMLDivElement>(`#reel-grid [data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("doorbell-ringing");
+    });
+    const overlay = document.createElement("div");
+    overlay.className = "doorbell-panic-banner";
+    overlay.innerHTML = `
+      <div class="doorbell-panic-bell">${symbolSvg("doorbell")}</div>
+      <div class="doorbell-panic-title">STRANGER DANGER PANIC!</div>
+      <div class="doorbell-panic-sub">Joey &amp; Phoebe fled into ${spinsAwarded} free spins!</div>
+    `;
+    root.querySelector(".cc-root")?.appendChild(overlay);
+    window.setTimeout(() => {
+      overlay.remove();
+      resolve();
+    }, 1550);
+  });
 }
 
 function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
@@ -545,10 +574,26 @@ async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAw
   renderBoard(root, state, lastStep?.grid);
 }
 
+async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
+  const rng = mulberry32(productionSeed());
+  const session = runFreeSpinSession(rng, "doorbell_panic", betPerLine(state.bet), spinsAwarded);
+
+  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+
+  state.balance += session.totalWin;
+  state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
+  saveGameState(state);
+
+  await showBonusSummary(root, session.totalWin, session.retriggers);
+  const lastRound = session.rounds[session.rounds.length - 1];
+  const lastStep = lastRound?.steps[lastRound.steps.length - 1];
+  renderBoard(root, state, lastStep?.grid);
+}
+
 function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWedge> {
   return new Promise((resolve) => {
     const wedge = spinWheel(rng);
-    const finalDeg = 1080 + { multiplying: 30, giant_gnome: 150, chai_back: 270 }[wedge];
+    const finalDeg = 1080 + { multiplying: 30, giant_gnome: 150, chai_back: 270, doorbell_panic: 0 }[wedge];
 
     const overlay = document.createElement("div");
     overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
@@ -595,14 +640,14 @@ async function playFreeSpinSession(
   document.body.classList.add("aurora-mode");
 
   const overlay = document.createElement("div");
-  overlay.className = "free-spins-overlay text-amber-100";
+  overlay.className = `free-spins-overlay text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""}`;
   overlay.innerHTML = `
     <div class="night-garden aurora">${gardenDecor()}</div>
     <div class="relative z-10 h-full w-full flex flex-col">
       <header class="marquee">
         <div class="marquee-row">
           <span class="level-chip">${wheelWedgeLabel(wedge)}</span>
-          <h1 class="marquee-title">Free Spins</h1>
+          <h1 class="marquee-title">${wedge === "doorbell_panic" ? "Panic Spins" : "Free Spins"}</h1>
         </div>
       </header>
       <div class="jar-meter">
@@ -630,6 +675,7 @@ async function playFreeSpinSession(
 
     for (const step of round.steps) {
       grid.innerHTML = renderGridHtml(step.grid);
+      grid.classList.toggle("panic-grid", wedge === "doorbell_panic");
       grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
       if (step.wins.length > 0) {
         playCascadeArpeggio(step.meterAfter);
@@ -640,7 +686,12 @@ async function playFreeSpinSession(
       await sleep(360);
     }
 
-    if (round.twelvePumps) {
+    if (round.panicWildsAdded > 0) {
+      statusEl.textContent = `STRANGER DANGER! ${round.panicWildsAdded} flying wild cats!`;
+      playJoeyCue();
+      playPhoebeCue();
+      await sleep(520);
+    } else if (round.twelvePumps) {
       await showFullFlavorFrenzy(overlay);
       playFullFlavorFrenzy();
     } else if (round.extraWildsAdded > 0) {

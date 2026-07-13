@@ -1030,3 +1030,107 @@ body {
   color: #2d1f4c;
   -webkit-text-stroke: 0;
 }
+
+/* ------------------------------------------------------------------ */
+/* Doorbell Panic bonus                                                */
+/* ------------------------------------------------------------------ */
+
+.doorbell-ringing {
+  position: relative;
+  z-index: 3;
+  background: linear-gradient(160deg, rgba(245, 213, 118, .65), rgba(211, 91, 45, .45));
+  box-shadow: inset 0 0 0 2px rgba(255, 244, 224, .8), 0 0 18px 4px rgba(245, 213, 118, .8);
+  animation: doorbell-ring 180ms ease-in-out infinite alternate;
+}
+
+@keyframes doorbell-ring {
+  from { transform: rotate(-3deg) scale(1.03); }
+  to { transform: rotate(3deg) scale(1.08); }
+}
+
+.doorbell-panic-banner {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 46%, rgba(211, 91, 45, .72), rgba(21, 15, 48, .88) 72%);
+  animation: panic-screen-shake 150ms ease-in-out infinite alternate;
+}
+
+.doorbell-panic-bell {
+  width: 74px;
+  height: 74px;
+  animation: panic-bell-pop 460ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+.doorbell-panic-title {
+  max-width: 94vw;
+  padding: 6px 14px;
+  border: 2px solid #fff4e0;
+  border-radius: 999px;
+  background: #d35b2d;
+  color: #fff4e0;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(22px, 7vw, 38px);
+  font-weight: 900;
+  letter-spacing: .04em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 2px 0 #7a2f16, 0 0 16px rgba(245, 213, 118, .8);
+  transform: rotate(-2deg);
+  animation: panic-title-pop 520ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+.doorbell-panic-sub {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 244, 224, .95);
+  color: #2d1f4c;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
+@keyframes panic-screen-shake {
+  from { transform: translateX(-2px) rotate(-.25deg); }
+  to { transform: translateX(2px) rotate(.25deg); }
+}
+@keyframes panic-bell-pop {
+  0% { transform: scale(.2) rotate(-20deg); opacity: 0; }
+  70% { transform: scale(1.18) rotate(12deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes panic-title-pop {
+  0% { transform: scale(.35) rotate(-10deg); opacity: 0; }
+  65% { transform: scale(1.08) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+}
+
+.panic-grid .cell[data-symbol="wild_joey"],
+.panic-grid .cell[data-symbol="wild_phoebe"] {
+  animation: panic-wild-land 420ms cubic-bezier(.34, 1.56, .64, 1) both;
+  box-shadow: inset 0 0 0 2px rgba(159, 232, 197, .7), 0 0 16px 3px rgba(232, 165, 184, .62);
+}
+
+@keyframes panic-wild-land {
+  0% { transform: translateY(-90%) rotate(-15deg) scale(.45); opacity: .15; }
+  70% { transform: translateY(8%) rotate(8deg) scale(1.1); opacity: 1; }
+  100% { transform: translateY(0) rotate(0) scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doorbell-ringing,
+  .doorbell-panic-banner,
+  .doorbell-panic-bell,
+  .doorbell-panic-title,
+  .panic-grid .cell[data-symbol="wild_joey"],
+  .panic-grid .cell[data-symbol="wild_phoebe"] {
+    animation: none;
+  }
+}
