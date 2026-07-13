@@ -198,7 +198,9 @@ export function spin({ rng, betPerLine, treatJar, spinsSincePopIn, startingGrid 
 
   return {
     steps,
-    totalWin,
+    // Payout tuning may use fractional internal values; awards remain whole
+    // Glee-coins at the player-facing settlement boundary.
+    totalWin: Math.round(totalWin),
     cascades,
     freeSpinsAwarded,
     doubleSparkleApplied,

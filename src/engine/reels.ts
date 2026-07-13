@@ -12,14 +12,13 @@
  */
 import type { Cell, Grid, SymbolId } from "./types";
 import type { Rng } from "./rng";
-import { PAYLINES } from "./paylines";
 
 export const REELS = 5;
 export const ROWS = 4;
 
-/** Doorbell events are rare, but frequent enough to be discoverable in a normal session. */
-export const DOORBELL_PAIR_RATE = 1 / 300;
-export const DOORBELL_SINGLE_RATE = 1 / 150;
+/** Doorbells use independent reel-specific appearance rates. */
+export const DOORBELL_REEL_ONE_RATE = 1 / 13;
+export const DOORBELL_REEL_TWO_RATE = 1 / 23;
 
 function repeat(symbol: SymbolId, count: number): SymbolId[] {
   return new Array(count).fill(symbol) as SymbolId[];
@@ -126,19 +125,19 @@ export function spinGrid(rng: Rng): Grid {
     grid.push(windowFrom(reel, stop));
   }
 
-  // Doorbell Panic is deliberately a rare landing event rather than a strip
+  // Doorbell Panic is deliberately a landing event rather than a strip
   // weight: this preserves the validated paytable/RTP while keeping the two
-  // doorbells visible as true blockers once they land. One or two may appear;
-  // the pair is aligned to a real payline so the gag is discoverable.
-  const eventRoll = rng();
-  if (eventRoll < DOORBELL_PAIR_RATE) {
-    const line = PAYLINES[Math.floor(rng() * PAYLINES.length)];
-    grid[0][line[0]] = { symbol: "doorbell" };
-    grid[1][line[1]] = { symbol: "doorbell" };
-  } else if (eventRoll < DOORBELL_PAIR_RATE + DOORBELL_SINGLE_RATE) {
-    const reel = rng() < 0.5 ? 0 : 1;
+  // doorbells visible as true blockers once they land. The independent
+  // 1-in-13 and 1-in-23 rolls produce a paired trigger about once per 299
+  // spins, while allowing each reel to show its own blocker on its requested
+  // cadence.
+  if (rng() < DOORBELL_REEL_ONE_RATE) {
     const row = Math.floor(rng() * ROWS);
-    grid[reel][row] = { symbol: "doorbell" };
+    grid[0][row] = { symbol: "doorbell" };
+  }
+  if (rng() < DOORBELL_REEL_TWO_RATE) {
+    const row = Math.floor(rng() * ROWS);
+    grid[1][row] = { symbol: "doorbell" };
   }
   return grid;
 }

@@ -14,7 +14,7 @@ describe("evaluateLines", () => {
     const wins = evaluateLines(grid, 1);
     const topLine = wins.find((w) => w.lineIndex === 0)!;
     expect(topLine.count).toBe(5);
-    expect(topLine.payout).toBe(1112);
+    expect(topLine.payout).toBeCloseTo(1170.78, 2);
   });
 
   it("does not pay treats or UniGlee as line symbols", () => {
@@ -36,7 +36,7 @@ describe("evaluateLines", () => {
     const topLine = wins.find((w) => w.lineIndex === 0)!;
     expect(topLine.symbol).toBe("tumbler");
     expect(topLine.count).toBe(3);
-    expect(topLine.payout).toBe(56);
+    expect(topLine.payout).toBeCloseTo(58.96, 2);
   });
 
   it("stops counting at the first non-matching, non-wild symbol", () => {
