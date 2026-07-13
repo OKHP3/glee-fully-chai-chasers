@@ -35,6 +35,7 @@ import {
   playBonusFanfare,
   playCascadeArpeggio,
   playCascadeTick,
+  playDoorbellRing,
   playJoeyCue,
   playPhoebeCue,
   playUniGleeSting,
@@ -369,6 +370,7 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
   return new Promise((resolve) => {
     const grid = root.querySelector<HTMLDivElement>("#reel-grid")!;
     let i = 0;
+    let doorbellRang = false;
 
     const next = () => {
       if (i >= steps.length) {
@@ -377,6 +379,10 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
       }
       const step = steps[i];
       grid.innerHTML = renderGridHtml(step.grid);
+      if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
+        playDoorbellRing();
+        doorbellRang = true;
+      }
       grid.querySelectorAll<HTMLElement>(".cell").forEach((cell, index) => {
         if (i === 0) {
           cell.classList.add("symbol-pop");
@@ -666,15 +672,22 @@ async function playFreeSpinSession(
   const totalEl = overlay.querySelector<HTMLSpanElement>("#fs-total")!;
   const roundWinEl = overlay.querySelector<HTMLSpanElement>("#fs-round-win")!;
   const statusEl = overlay.querySelector<HTMLDivElement>("#fs-status")!;
+  const panicBellTimer = wedge === "doorbell_panic" ? window.setInterval(playDoorbellRing, 3000) : undefined;
+  if (panicBellTimer !== undefined) playDoorbellRing();
 
   for (let r = 0; r < rounds.length; r++) {
     const round = rounds[r];
+    let doorbellRang = false;
     indexEl.textContent = String(r + 1);
     totalEl.textContent = String(rounds.length);
     roundWinEl.textContent = round.totalWin.toLocaleString();
 
     for (const step of round.steps) {
       grid.innerHTML = renderGridHtml(step.grid);
+      if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
+        playDoorbellRing();
+        doorbellRang = true;
+      }
       grid.classList.toggle("panic-grid", wedge === "doorbell_panic");
       grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
       if (step.wins.length > 0) {
@@ -710,6 +723,7 @@ async function playFreeSpinSession(
     }
   }
 
+  if (panicBellTimer !== undefined) window.clearInterval(panicBellTimer);
   overlay.remove();
   bgLayer?.classList.remove("aurora");
   document.body.classList.remove("aurora-mode");
