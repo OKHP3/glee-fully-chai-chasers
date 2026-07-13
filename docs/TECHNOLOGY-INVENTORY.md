@@ -1,6 +1,6 @@
 # Technology Inventory and Maintenance Plan
 
-**Checked:** 2026-07-12  
+**Checked:** 2026-07-13
 **Scope:** technologies declared in the repository, used by the shipped app, used by CI/deployment, or used by the repository-only image-conversion skill.
 
 This inventory distinguishes declared versions from the versions actually resolved in `package-lock.json`. Transitive npm packages are intentionally not repeated one-by-one here; `package-lock.json` is their complete source of truth and Dependabot/npm will update them when their parent dependency allows it.
@@ -26,7 +26,7 @@ This inventory distinguishes declared versions from the versions actually resolv
 | Web Audio API | Original synthesized sound in `src/audio/synth.ts` | Browser API; no npm version | W3C Web Audio API 1.0 Recommendation; Web Audio 1.1 is a draft | Browser-provided API; verify on iPhone after browser changes. |
 | Web Storage / `localStorage` | Versioned local saves in `src/state.ts` | Browser API; app key namespace `ccv1.*` | HTML Storage / Web Storage living standard | Browser-provided API; no dependency update applies. |
 | PWA Web App Manifest | Install metadata and icons in `public/manifest.webmanifest` | Web App Manifest; no service worker is currently present | Web App Manifest living standard | The manifest is present, but true offline caching still needs a service worker. |
-| GitHub Actions | Build, test, privacy/brand gates, Pages deployment | `checkout@v6`, `setup-node@v6`, `upload-pages-artifact@v3`, `deploy-pages@v4` before this maintenance pass | `checkout@v7`, `setup-node@v6.4.0` (major `v6`), `upload-pages-artifact@v5`, `deploy-pages@v5` | Workflow references are updated to current major tags and Dependabot monitors them. |
+| GitHub Actions | Build, test, privacy/brand gates, Pages deployment | `checkout@v7`, `setup-node@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5` | `checkout@v7`, `setup-node@v6.4.0` (major `v6`), `upload-pages-artifact@v5`, `deploy-pages@v5` | Workflow references are pinned to current major tags and Dependabot monitors them. |
 | GitHub Pages | Static production hosting | Repository Pages deployment via `.github/workflows/deploy.yml` | Hosted service; no app version | Deployment remains push-to-`main`. |
 | Replit | Preview/development configuration in `.replit` | Static deployment; `nodejs-24`, `python-3.14`, Nix `stable-25_05` | Hosted service; no project version | Replit is a preview/worker environment, not the production source of truth. |
 
@@ -41,7 +41,7 @@ This inventory distinguishes declared versions from the versions actually resolv
 ## Maintenance plan now in place
 
 1. `.github/dependabot.yml` watches npm, pip, and GitHub Actions dependencies on recurring schedules.
-2. `.github/workflows/ci.yml` runs `npm ci`, the full test suite, and the production build on pushes and pull requests. Dependabot pull requests therefore receive the same build/test gate before review.
+2. `.github/workflows/ci.yml` runs the platform-safe `npm install`, the full test suite, and the production build on pushes and pull requests. Dependabot pull requests therefore receive the same build/test gate before review.
 3. `.github/workflows/dependabot-automerge.yml` enables squash auto-merge only for Dependabot semver-patch updates. Minor and major upgrades remain reviewable pull requests. Repository auto-merge and the `Continuous integration / verify` required status check must be enabled in GitHub before this automation can merge a pull request.
 4. The Pages workflow uses `node-version: lts/*` with `check-latest: true`, so the build follows the latest supported Node LTS line without waiting for a hand-edited number.
 5. Major upgrades must pass the engine simulation oracle, build, and a mobile browser smoke test before merge.
