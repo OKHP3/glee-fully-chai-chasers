@@ -5,15 +5,22 @@
  * spin() with the modifier's effect layered on top — modifier math lives here,
  * not in the UI.
  */
-import type { Grid, SpinResult } from "./types";
+import type { Grid, SpinResult, TreatTimeMode, TreatTimeWild } from "./types";
 import { spin } from "./cascade";
 import { isWild } from "./paylines";
 import { PAYLINES } from "./paylines";
 import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
+import { castTreatTimeWilds } from "./treattime";
 
-export type WheelWedge = "multiplying" | "giant_gnome" | "chai_back" | "doorbell_panic";
+export type WheelWedge =
+  | "multiplying"
+  | "giant_gnome"
+  | "chai_back"
+  | "doorbell_panic"
+  | "treat_time_morning"
+  | "treat_time_nighttime";
 
 const WHEEL_WEIGHTS: Array<[WheelWedge, number]> = [
   ["multiplying", 40],
@@ -46,6 +53,8 @@ export interface FreeSpinRoundResult extends SpinResult {
   twelvePumps: boolean; // true if any wild landed the 12x jackpot this round
   extraWildsAdded: number; // We Want Our Chai Back
   panicWildsAdded: number;
+  treatTimeWilds?: TreatTimeWild[];
+  treatTimeMode?: TreatTimeMode;
 }
 
 function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
@@ -75,16 +84,32 @@ function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
 /** Runs one free-spin round with the chosen wedge's modifier applied. */
 export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): FreeSpinRoundResult {
   const panic = wedge === "doorbell_panic" ? panicStartingGrid(rng) : undefined;
+  const treatTimeMode: TreatTimeMode | undefined = wedge === "treat_time_morning"
+    ? "morning"
+    : wedge === "treat_time_nighttime"
+      ? "nighttime"
+      : undefined;
+  const treatTime = treatTimeMode
+    ? castTreatTimeWilds(rng, spinGrid(rng), treatTimeMode)
+    : undefined;
   const base = spin({
     rng,
     betPerLine,
     treatJar: emptyTreatJar(),
     spinsSincePopIn: 999,
-    startingGrid: panic?.grid,
+    startingGrid: panic?.grid ?? treatTime?.grid,
+    allowTreatTimeBonus: false,
   });
+  const treatTimeMeta = treatTime
+    ? { treatTimeWilds: treatTime.wilds, treatTimeMode }
+    : {};
 
   if (wedge === "doorbell_panic") {
-    return { ...base, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: panic?.wildsAdded ?? 0 };
+    return { ...base, ...treatTimeMeta, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: panic?.wildsAdded ?? 0 };
+  }
+
+  if (treatTime) {
+    return { ...base, ...treatTimeMeta, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: 0 };
   }
 
   if (wedge === "multiplying") {
@@ -108,7 +133,7 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
       const avg = wildMultipliers.reduce((s, [, , m]) => s + m, 0) / wildMultipliers.length;
       bonusWin = Math.round(base.totalWin * (avg - 1));
     }
-    return { ...base, totalWin: base.totalWin + bonusWin, wildMultipliers, twelvePumps, extraWildsAdded: 0, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, wildMultipliers, twelvePumps, extraWildsAdded: 0, panicWildsAdded: 0 };
   }
 
   if (wedge === "chai_back") {
@@ -116,13 +141,13 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     // landed, since the visual "extra wilds" effect is UI-layer (docs §7).
     const extra = 1 + Math.floor(rng() * 3);
     const bonusWin = Math.round(base.totalWin * (0.08 * extra));
-    return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: extra, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: extra, panicWildsAdded: 0 };
   }
 
   // Legacy giant_gnome ID: 2x2 mega-keepsakes on reels 2-3/4-5 — modeled as
   // a flat uplift. The ID stays stable until Claude performs a math-safe migration.
   const bonusWin = Math.round(base.totalWin * 0.15);
-  return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: 0 };
+  return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: 0 };
 }
 
 export interface FreeSpinSessionResult {
@@ -171,6 +196,10 @@ export function wheelWedgeLabel(wedge: WheelWedge): string {
       return "Iced Chai Wild Rain";
     case "doorbell_panic":
       return "Stranger Danger Panic";
+    case "treat_time_morning":
+      return "Morning Treat Time";
+    case "treat_time_nighttime":
+      return "Nighttime Treat Time";
   }
 }
 

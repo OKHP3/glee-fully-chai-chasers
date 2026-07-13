@@ -20,6 +20,19 @@ export type SymbolId =
 
 export type TreatKind = "chicken" | "salmon" | "boogie";
 
+export type TreatTimeMode = "morning" | "nighttime";
+
+export interface TreatTimeWild {
+  position: [reel: number, row: number];
+  treat: TreatKind;
+  wild: "joey" | "phoebe";
+}
+
+export interface TreatTimeTrigger {
+  mode: TreatTimeMode;
+  freeSpinsAwarded: number;
+}
+
 export interface Cell { symbol: SymbolId; }
 
 /** 5 reels x 4 rows; grid[reel][row], row 0 = top. */
@@ -71,6 +84,7 @@ export interface SpinResult {
   unigleeTriggered: boolean;
   treatsCollected: TreatKind[];
   doorbellPanic?: DoorbellTrigger;
+  treatTimeBonus?: TreatTimeTrigger;
 }
 
 export interface EngineConfig {
