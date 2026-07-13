@@ -60,6 +60,7 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - 5×4, 25-line cascade engine and validated fictional Glee-coin economy
 - event-frequency simulation oracle
 - free-spin ladder, modifier selection, and free-spin session flow
+- We're Multiplying opening-spin math: one reel-bound wild at most, line-specific awards, and no multiplier creation during cascades
 - persistent balance, XP, settings, Treat Jar, and cat-visit state
 - original Web Audio one-shot SFX
 - production symbol, Joey, Phoebe, wild, and wheel art
@@ -72,7 +73,7 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 
 - Birthday Reveal
 - Bold Chai Bonus keepsake pick shelf
-- Claude-owned removal of legacy system-wide twelve mechanics (level unlock, Treat Jar cap, and 12× free-spin event) with simulation-backed RTP retuning
+- Claude-owned removal of legacy system-wide twelve mechanics (level unlock and Treat Jar cap) with simulation-backed RTP retuning
 - Daily Bonus Wheel
 - milestone scenes and collection shelf
 - a replacement for the legacy 2×2 Toolbox modifier, expressed as an approved keepsake/chapter effect

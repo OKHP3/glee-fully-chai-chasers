@@ -44,7 +44,6 @@ import {
   playUniGleeSting,
   playWinPluck,
   playWheelTick,
-  playFullFlavorFrenzy,
   playStrangerDangerPanic,
   setMusicEnabled,
   setSfxEnabled,
@@ -224,13 +223,17 @@ function treatJarHtml(state: GameState): string {
   `;
 }
 
-function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): string {
+export function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): string {
   let html = "";
   for (let reel = 0; reel < REELS; reel++) {
     html += `<div class="reel-col" data-reel="${reel}">`;
     for (let row = 0; row < ROWS; row++) {
-      const symbol = grid[reel][row].symbol;
-      html += `<div class="cell" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}</div>`;
+      const cell = grid[reel][row];
+      const symbol = cell.symbol;
+      const badge = cell.multiplier
+        ? `<span class="multiplier-badge" aria-label="${cell.multiplier} times wild">×${cell.multiplier}</span>`
+        : "";
+      html += `<div class="cell ${cell.multiplier ? "multiplier-wild" : ""}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
     }
     html += "</div>";
   }
@@ -920,6 +923,9 @@ async function playFreeSpinSession(
     indexEl.textContent = String(r + 1);
     totalEl.textContent = String(rounds.length);
     roundWinEl.textContent = round.totalWin.toLocaleString();
+    if (round.multiplierWild) {
+      statusEl.textContent = `×${round.multiplierWild.multiplier} wild on reel ${round.multiplierWild.position[0] + 1}!`;
+    }
 
     for (const [stepIndex, step] of round.steps.entries()) {
       grid.innerHTML = renderGridHtml(step.grid);
@@ -950,9 +956,6 @@ async function playFreeSpinSession(
       playJoeyCue();
       playPhoebeCue();
       await sleep(520);
-    } else if (round.twelvePumps) {
-      await showFullFlavorFrenzy(overlay);
-      playFullFlavorFrenzy();
     } else if (round.extraWildsAdded > 0) {
       statusEl.textContent = "We Want Our Chai Back — extra wilds landed!";
       await sleep(500);
@@ -1029,19 +1032,6 @@ function treatTimeHandSvg(): string {
     <path d="M28 101c-7-7-9-19-6-31l6-24c1-5 8-5 9 0l1 14 2-34c0-6 8-6 9 0l1 31 2-39c0-6 8-6 9 0l1 38 3-28c1-6 9-5 9 1l-2 38c-1 16-7 26-18 34z" fill="#f5d576" stroke="#2d1f4c" stroke-width="4" stroke-linejoin="round"/>
     <path d="M24 69c-7-7-13-9-17-4-4 5 1 12 10 17" fill="none" stroke="#2d1f4c" stroke-width="4" stroke-linecap="round"/>
   </svg>`;
-}
-
-function showFullFlavorFrenzy(overlay: HTMLElement): Promise<void> {
-  return new Promise((resolve) => {
-    const callout = document.createElement("div");
-    callout.className = "full-flavor-frenzy";
-    callout.innerHTML = `<div class="full-flavor-frenzy-ring">${burstDots(20)}</div><div class="full-flavor-frenzy-text">FULL-FLAVOR FRENZY!<span>A bold wild multiplier</span></div>`;
-    overlay.appendChild(callout);
-    window.setTimeout(() => {
-      callout.remove();
-      resolve();
-    }, 1300);
-  });
 }
 
 function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number): Promise<void> {

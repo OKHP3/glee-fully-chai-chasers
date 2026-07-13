@@ -22,6 +22,9 @@ export type TreatKind = "chicken" | "salmon" | "boogie";
 
 export type TreatTimeMode = "morning" | "nighttime";
 
+/** A single marked wild used by the We're Multiplying free-spin bonus. */
+export type WildMultiplier = 2 | 3 | 5 | 10;
+
 export interface TreatTimeWild {
   position: [reel: number, row: number];
   treat: TreatKind;
@@ -33,7 +36,11 @@ export interface TreatTimeTrigger {
   freeSpinsAwarded: number;
 }
 
-export interface Cell { symbol: SymbolId; }
+export interface Cell {
+  symbol: SymbolId;
+  /** Present only on the one marked wild that opened a multiplying free spin. */
+  multiplier?: WildMultiplier;
+}
 
 /** 5 reels x 4 rows; grid[reel][row], row 0 = top. */
 export type Grid = Cell[][];
@@ -44,6 +51,8 @@ export interface LineWin {
   count: number;           // consecutive from reel 0
   payout: number;          // in Sparks, bet-scaled
   positions: Array<[reel: number, row: number]>;
+  /** Applied only when this winning line uses the marked multiplier wild. */
+  multiplier?: WildMultiplier;
 }
 
 export interface DoorbellTrigger {
