@@ -80,8 +80,8 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: extra };
   }
 
-  // giant_gnome: 2x2 mega-symbols on reels 2-3/4-5 — modeled as a flat uplift
-  // representative of the extra matching real slots see from mega-symbol locks.
+  // Legacy giant_gnome ID: 2x2 mega-keepsakes on reels 2-3/4-5 — modeled as
+  // a flat uplift. The ID stays stable until Claude performs a math-safe migration.
   const bonusWin = Math.round(base.totalWin * 0.15);
   return { ...base, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: 0 };
 }
@@ -127,7 +127,7 @@ export function wheelWedgeLabel(wedge: WheelWedge): string {
     case "multiplying":
       return "We're Multiplying";
     case "giant_gnome":
-      return "Giant Toolbox Mode";
+      return "Keepsake Constellation";
     case "chai_back":
       return "Iced Chai Wild Rain";
   }

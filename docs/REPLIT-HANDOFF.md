@@ -1,5 +1,23 @@
 # REPLIT-HANDOFF.md
 
+## v3 — CONSOLIDATED PRODUCTION BASELINE — 2026-07-12
+
+**Current authority:** `docs/IMPLEMENTATION-BASELINE.md`, `docs/GAME-REALIGNMENT-2026-07-12.md`, and decisions S19-S23. This v3 section supersedes every older presentation/UI instruction below. The v1/v2 sections remain historical evidence only.
+
+Before Replit performs any work:
+
+1. Stop every checkpoint created before S18.
+2. Import or pull GitHub `main` from `https://github.com/OKHP3/glee-fully-chai-chasers`.
+3. Verify the checkout contains commit `58970e7` or a later descendant and includes both current handoff documents. Do not restore the deleted `attached_assets/` synchronization-prompt dump from commit `e34e855`.
+4. Run `npm ci`, `npm test`, and `npm run build` without changing code.
+5. Accept one bounded additive task only. Do not regenerate the app, restore the v2 SVG/gnome presentation, or reintroduce GPT-Toolbox vocabulary.
+
+Protected from rollback: `src/ui/board.ts`, `src/ui/symbols.ts`, `src/style.css`, the production files in `public/assets/`, and decisions S17-S23. Replit must show Jamie a narrow diff and an iPhone-size preview before syncing anything back to GitHub.
+
+Replit's prior engine, free-spin, and validation work remains part of the integrated product. Its older presentation instructions do not. GitHub is the source of truth and GitHub Pages is production; a Replit preview is not an alternate canonical version.
+
+Best additive assignments are listed in `docs/IMPLEMENTATION-BASELINE.md` §4 and §6.
+
 ## v2 — "REPLIT ROUND 2" — 2026-07-10
 
 Scope: fix broken math (Workstream A), implement free spins + AskJamie wheel
