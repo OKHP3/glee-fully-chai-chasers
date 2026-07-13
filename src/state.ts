@@ -45,10 +45,17 @@ export interface GameState {
   bestCascade: number;
   spinsSincePopIn: number;
   soundOn: boolean;
+  /** Independent, persisted mix controls. `soundOn` remains the master mute. */
+  musicVolume: number;
+  sfxVolume: number;
+  theme: ThemeMode;
   reducedMotion: boolean;
 }
 
+export type ThemeMode = "system" | "dark" | "light";
+
 export function loadGameState(): GameState {
+  const soundOn = load("soundOn", true);
   return {
     balance: load("balance", STARTING_BALANCE),
     bet: load("bet", 25),
@@ -57,7 +64,10 @@ export function loadGameState(): GameState {
     fireflyMeter: load("fireflyMeter", 0),
     bestCascade: load("bestCascade", 0),
     spinsSincePopIn: load("spinsSincePopIn", 0),
-    soundOn: load("soundOn", true),
+    soundOn,
+    musicVolume: load("musicVolume", soundOn ? 0.72 : 0),
+    sfxVolume: load("sfxVolume", soundOn ? 0.82 : 0),
+    theme: load<ThemeMode>("theme", "system"),
     reducedMotion: load(
       "reducedMotion",
       typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)").matches : false,
@@ -74,5 +84,8 @@ export function saveGameState(state: GameState): void {
   save("bestCascade", state.bestCascade);
   save("spinsSincePopIn", state.spinsSincePopIn);
   save("soundOn", state.soundOn);
+  save("musicVolume", state.musicVolume);
+  save("sfxVolume", state.sfxVolume);
+  save("theme", state.theme);
   save("reducedMotion", state.reducedMotion);
 }

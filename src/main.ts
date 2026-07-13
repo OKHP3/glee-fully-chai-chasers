@@ -3,8 +3,8 @@
  * Spec: docs/DESIGN-SPEC.md §3. Real UI now lives in src/ui/board.ts.
  */
 import "./style.css";
-import { unlock, setMusicEnabled, setSfxEnabled, playChaiChaseStart } from "./audio/synth";
-import { startBaseMusic } from "./audio/music";
+import { unlock, setMusicEnabled, setSfxEnabled, setSfxVolume, playChaiChaseStart } from "./audio/synth";
+import { setMusicVolume, startBaseMusic } from "./audio/music";
 import { loadGameState } from "./state";
 import { renderBoard } from "./ui/board";
 
@@ -35,6 +35,8 @@ function renderSplash(): void {
     const state = loadGameState();
     setSfxEnabled(state.soundOn);
     setMusicEnabled(state.soundOn);
+    setSfxVolume(state.sfxVolume);
+    setMusicVolume(state.musicVolume);
     unlock();
     playChaiChaseStart();
     startBaseMusic();
@@ -49,6 +51,8 @@ if (location.hash === "#board") {
   const state = loadGameState();
   setSfxEnabled(state.soundOn);
   setMusicEnabled(state.soundOn);
+  setSfxVolume(state.sfxVolume);
+  setMusicVolume(state.musicVolume);
   renderBoard(app, state);
 } else {
   renderSplash();

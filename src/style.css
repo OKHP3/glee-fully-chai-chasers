@@ -29,13 +29,17 @@ body {
 .cc-root {
   font-variant-numeric: tabular-nums;
   min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   background:
     radial-gradient(circle at 50% 8%, rgba(82, 180, 168, 0.16), transparent 32%),
     linear-gradient(180deg, #080e21, #101734 58%, #19122f);
 }
 
 .cc-shell {
-  width: min(100%, 500px);
+  width: min(100%, 560px);
+  min-width: 0;
   min-height: 100dvh;
   margin: 0 auto;
   padding-top: env(safe-area-inset-top, 0px);
@@ -66,7 +70,7 @@ body {
   position: absolute;
   z-index: 0;
   inset: 0 auto auto 50%;
-  width: min(100%, 500px);
+  width: min(100%, 560px);
   height: 100%;
   object-fit: cover;
   object-position: center top;
@@ -79,7 +83,7 @@ body {
 .chai-splash-copy {
   position: relative;
   z-index: 2;
-  width: min(100%, 500px);
+  width: min(100%, 560px);
   min-height: 100dvh;
   margin: 0 auto;
   padding:
@@ -340,6 +344,7 @@ body {
 
 .marquee-title {
   flex: 1;
+  min-width: 0;
   text-align: center;
   font-family: "Baloo Display", "Arial Black", sans-serif;
   font-weight: 800;
@@ -601,6 +606,134 @@ body {
   font-size: 11px;
   opacity: 0.85;
 }
+
+/* ------------------------------------------------------------------ */
+/* Symbol guide + settings pages                                       */
+/* ------------------------------------------------------------------ */
+
+.game-page {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(100%, 500px);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  color: #fff4e0;
+  background:
+    radial-gradient(circle at 80% 5%, rgba(159, 232, 197, .17), transparent 32%),
+    radial-gradient(circle at 10% 28%, rgba(232, 165, 184, .13), transparent 30%),
+    linear-gradient(180deg, #15112f, #251844 56%, #181432);
+  box-shadow: 0 0 80px rgba(0, 0, 0, .46);
+  animation: page-arrive 180ms ease-out both;
+}
+@keyframes page-arrive { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+.game-page-topbar {
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  gap: 10px;
+  padding: max(10px, env(safe-area-inset-top)) 12px 10px;
+  border-bottom: 1px solid rgba(245, 213, 118, .25);
+  background: rgba(13, 10, 30, .45);
+}
+.page-close { font-size: 25px; color: var(--cc-butter); }
+.game-page h2, .game-page h3, .game-page p { margin: 0; }
+.game-page h2 { font-family: "Baloo Display", "Arial Black", sans-serif; font-size: 26px; line-height: 1; color: var(--cc-butter); }
+.page-eyebrow { color: var(--cc-mint); font-size: 10px; font-weight: 800; letter-spacing: .11em; }
+.page-top-spacer { width: 48px; height: 48px; }
+.game-page-scroll { overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px max(26px, env(safe-area-inset-bottom)); scrollbar-width: none; }
+.game-page-scroll::-webkit-scrollbar { display: none; }
+
+.settings-card, .paytable-intro {
+  margin-bottom: 12px;
+  padding: 15px;
+  border: 1px solid rgba(245, 213, 118, .26);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(67, 52, 104, .86), rgba(26, 19, 55, .9));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 18px rgba(0,0,0,.2);
+}
+.settings-card h3, .page-section-title { font-family: "Baloo Display", "Arial Black", sans-serif; color: #fff4e0; font-size: 17px; line-height: 1.05; }
+.settings-help, .about-card p, .feature-symbol-card p, .paytable-footnote { color: rgba(255,244,224,.72); font-size: 12px; line-height: 1.35; }
+.settings-help { margin-top: 4px !important; }
+.settings-heading-row, .settings-card--compact { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+
+.theme-choice { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 13px; }
+.theme-option {
+  min-height: 66px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 1px solid rgba(255,244,224,.18);
+  border-radius: 13px;
+  color: rgba(255,244,224,.82);
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(8, 8, 25, .3);
+}
+.theme-option.is-selected { border-color: var(--cc-butter); color: var(--cc-butter); box-shadow: inset 0 0 0 1px rgba(245,213,118,.34), 0 0 12px rgba(245,213,118,.16); }
+.theme-swatch { width: 29px; height: 18px; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; }
+.theme-swatch--dark { background: linear-gradient(135deg, #101733, #3a2456); }
+.theme-swatch--light { background: linear-gradient(135deg, #fff3dc, #c4ebe0); }
+.theme-swatch--system { background: linear-gradient(90deg, #101733 0 50%, #fff3dc 50%); }
+
+.sound-switch { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; }
+.sound-switch input { position: absolute; opacity: 0; pointer-events: none; }
+.sound-switch span { position: relative; width: 44px; height: 26px; border-radius: 999px; background: rgba(255,244,224,.22); box-shadow: inset 0 1px 3px rgba(0,0,0,.35); transition: background 150ms ease; }
+.sound-switch span::after { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; border-radius: 50%; background: #fff4e0; box-shadow: 0 1px 4px rgba(0,0,0,.4); transition: transform 150ms ease; }
+.sound-switch input:checked + span { background: var(--cc-orange); }
+.sound-switch input:checked + span::after { transform: translateX(18px); }
+.sound-switch input:focus-visible + span { outline: 3px solid var(--cc-mint); outline-offset: 3px; }
+
+.volume-control { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; margin-top: 16px; }
+.volume-control b, .volume-control small { display: block; }
+.volume-control b { font-size: 13px; }
+.volume-control small { margin-top: 2px; color: rgba(255,244,224,.62); font-size: 11px; }
+.volume-control output { align-self: start; color: var(--cc-butter); font-size: 12px; font-weight: 800; }
+.volume-control input { grid-column: 1 / -1; width: 100%; accent-color: var(--cc-orange); }
+.about-card { border-color: rgba(159,232,197,.25); background: linear-gradient(145deg, rgba(30,85,89,.52), rgba(26,19,55,.92)); }
+.reset-progress-btn { width: 100%; min-height: 48px; border: 1px solid rgba(232,165,184,.6); border-radius: 13px; color: #ffd6e5; background: rgba(115, 40, 76, .38); font-weight: 800; }
+
+.paytable-intro { display: grid; gap: 4px; border-color: rgba(159,232,197,.36); background: linear-gradient(145deg, rgba(30,85,89,.62), rgba(26,19,55,.9)); }
+.paytable-intro strong { color: var(--cc-butter); font-family: "Baloo Display", "Arial Black", sans-serif; font-size: 18px; }
+.paytable-intro span { color: rgba(255,244,224,.78); font-size: 12px; line-height: 1.3; }
+.paytable-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pay-symbol-card { min-width: 0; padding: 9px; border: 1px solid rgba(245,213,118,.2); border-radius: 14px; background: linear-gradient(145deg, rgba(69,53,111,.86), rgba(29,21,61,.94)); }
+.pay-symbol-art { width: 64px; height: 64px; margin: -3px auto 2px; }
+.pay-symbol-card h3 { overflow: hidden; color: #fff4e0; font-size: 11px; font-weight: 800; line-height: 1.15; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.pay-symbol-card dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 8px 0 0; text-align: center; }
+.pay-symbol-card dl div { padding: 3px 1px; border-radius: 7px; background: rgba(0,0,0,.18); }
+.pay-symbol-card dt { color: rgba(255,244,224,.57); font-size: 9px; font-weight: 800; }
+.pay-symbol-card dd { margin: 1px 0 0; color: var(--cc-butter); font-size: 10px; font-weight: 800; }
+.page-section-title { margin: 18px 2px 9px !important; color: var(--cc-butter); }
+.feature-symbol-grid { display: grid; gap: 8px; }
+.feature-symbol-card { display: grid; grid-template-columns: 50px 1fr; align-items: center; gap: 10px; padding: 9px; border: 1px solid rgba(159,232,197,.2); border-radius: 14px; background: rgba(25,20,57,.76); }
+.feature-symbol-art { width: 48px; height: 48px; }
+.feature-symbol-card h3 { margin-bottom: 2px !important; color: #fff4e0; font-size: 13px; }
+.paytable-footnote { margin: 15px 3px 0 !important; text-align: center; }
+
+.cc-root[data-reduced-motion="true"] *, .cc-root[data-reduced-motion="true"] *::before, .cc-root[data-reduced-motion="true"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+
+/* A warm daylight version keeps the illustration and controls recognizable,
+   while avoiding a sterile white screen. */
+.cc-root[data-theme="light"] { color: #2d1f4c; background: linear-gradient(180deg, #fff1d7, #d8f4ea 58%, #dfc9ef); }
+.cc-root[data-theme="light"] .night-garden { opacity: .5; filter: saturate(.84) brightness(1.55); }
+.cc-root[data-theme="light"] .cc-shell { background: linear-gradient(180deg, rgba(255,253,245,.36), rgba(255,243,221,.42)); border-color: rgba(80,50,90,.16); box-shadow: 0 0 80px rgba(88,52,113,.15); }
+.cc-root[data-theme="light"] .marquee, .cc-root[data-theme="light"] .jar-meter, .cc-root[data-theme="light"] .bet-console { color: #2d1f4c; background: linear-gradient(180deg, rgba(255,253,246,.95), rgba(238,222,247,.92)); border-color: rgba(87,55,112,.28); }
+.cc-root[data-theme="light"] .marquee-title, .cc-root[data-theme="light"] .jar-meter-count, .cc-root[data-theme="light"] .bet-display { color: #2d1f4c; text-shadow: none; }
+.cc-root[data-theme="light"] .jar-meter-copy small, .cc-root[data-theme="light"] .level-chip, .cc-root[data-theme="light"] .coin-chip { color: #443051; }
+.cc-root[data-theme="light"] .cabinet-frame { border-color: rgba(87,55,112,.58); box-shadow: inset 0 0 0 2px rgba(255,255,255,.42), 0 8px 20px rgba(69,34,90,.24); }
+.cc-root[data-theme="light"] .game-page { color: #2d1f4c; background: linear-gradient(180deg, #fff7e8, #dff4ec 55%, #eadcf5); }
+.cc-root[data-theme="light"] .game-page-topbar { background: rgba(255,255,255,.66); border-color: rgba(87,55,112,.2); }
+.cc-root[data-theme="light"] .game-page h2, .cc-root[data-theme="light"] .settings-card h3, .cc-root[data-theme="light"] .page-section-title, .cc-root[data-theme="light"] .pay-symbol-card h3, .cc-root[data-theme="light"] .feature-symbol-card h3 { color: #352047; }
+.cc-root[data-theme="light"] .settings-card, .cc-root[data-theme="light"] .paytable-intro, .cc-root[data-theme="light"] .pay-symbol-card, .cc-root[data-theme="light"] .feature-symbol-card { background: rgba(255,255,255,.76); border-color: rgba(87,55,112,.2); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 5px 14px rgba(69,34,90,.1); }
+.cc-root[data-theme="light"] .settings-help, .cc-root[data-theme="light"] .about-card p, .cc-root[data-theme="light"] .feature-symbol-card p, .cc-root[data-theme="light"] .paytable-footnote, .cc-root[data-theme="light"] .paytable-intro span, .cc-root[data-theme="light"] .volume-control small { color: rgba(45,31,76,.72); }
+.cc-root[data-theme="light"] .theme-option { color: #352047; background: rgba(234,220,245,.55); border-color: rgba(87,55,112,.18); }
+.cc-root[data-theme="light"] .pay-symbol-card dl div { background: rgba(87,55,112,.08); }
+.cc-root[data-theme="light"] .pay-symbol-card dt { color: rgba(45,31,76,.55); }
 
 /* ------------------------------------------------------------------ */
 /* Symbols & pop animation                                             */
@@ -995,6 +1128,83 @@ body {
 
 @keyframes shatter-out {
   to { transform: scale(0.2) rotate(25deg); opacity: 0; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive cabinet — preserve the iPhone-first hierarchy while     */
+/* making every control reachable on compact, wide, and desktop views. */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 380px) {
+  .cc-shell { border-inline: 0; }
+  .marquee { margin-inline: 5px; padding-inline: 7px; }
+  .marquee-row { gap: 4px; }
+  .marquee-title { font-size: 13px; line-height: 1.05; }
+  .level-chip { padding-inline: 6px; font-size: 10px; }
+  .level-chip em { font-size: 8px; }
+  .chrome-btn { min-width: 44px; min-height: 44px; }
+
+  .jar-meter { margin-inline: 7px; gap: 7px; padding-inline: 8px; }
+  .jar-meter-icon { width: 50px; height: 46px; }
+  .jar-meter-kicker { font-size: 12px; }
+  .jar-meter-count { font-size: 19px; }
+
+  .cabinet-frame { width: calc(100% - 12px); margin-top: 6px; padding: 5px; border-radius: 16px; }
+  .reel-grid { gap: 2px; padding: 4px; }
+  .reel-col { gap: 2px; }
+  .cell { border-radius: 7px; padding: 1px; }
+  .ornament { width: 14px; height: 14px; }
+
+  .companion-row { min-height: 48px; margin-inline: 7px; }
+  .treat-jar-housing { gap: 3px; padding-inline: 5px; }
+  .treat-jar-title { font-size: 9px; }
+  .treat-icon { width: 22px; height: 22px; }
+  .askjamie-icon { width: 34px; height: 34px; }
+  .status-line { padding-inline: 8px; font-size: 12px; }
+
+  .bet-console {
+    display: grid;
+    grid-template-columns: 44px 30px 44px minmax(106px, 1fr);
+    grid-template-rows: auto 64px;
+    gap: 6px;
+    margin-inline: 5px;
+    padding: 7px;
+  }
+  .bet-console > .coin-chip { grid-column: 1 / -1; grid-row: 1; }
+  .bet-console > .flex-1 { display: none; }
+  .bet-console > #bet-down { grid-column: 1; grid-row: 2; }
+  .bet-console > .bet-display { grid-column: 2; grid-row: 2; }
+  .bet-console > #bet-up { grid-column: 3; grid-row: 2; }
+  .bet-console > .sparkle-btn { grid-column: 4; grid-row: 2; min-width: 0; min-height: 64px; margin-left: 0; padding-inline: 8px; font-size: 16px; }
+}
+
+@media (max-height: 720px) {
+  .cc-shell { min-height: 100%; }
+  .marquee { margin-top: 5px; }
+  .jar-meter { min-height: 60px; margin-top: 5px; }
+  .jar-meter-icon { width: 50px; height: 46px; }
+  .cabinet-frame { margin-top: 5px; }
+  .companion-row { min-height: 46px; margin-top: 4px; }
+  .bet-console { margin-top: 2px; }
+}
+
+@media (min-width: 600px) {
+  .cc-root { padding: 16px; }
+  .cc-shell {
+    min-height: calc(100dvh - 32px);
+    border: 1px solid rgba(245, 213, 118, 0.16);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .chai-splash { min-height: calc(100dvh - 32px); border-radius: 24px; }
+  .chai-splash-copy { min-height: calc(100dvh - 32px); }
+}
+
+@media (min-width: 900px) {
+  .cc-root { padding: clamp(24px, 4vw, 56px); }
+  .cc-shell { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
+  .chai-splash { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
+  .chai-splash-copy { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
 }
 
 /* ------------------------------------------------------------------ */
