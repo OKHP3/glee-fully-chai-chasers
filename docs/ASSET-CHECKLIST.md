@@ -17,21 +17,25 @@ Status: ☐ todo · ◐ in progress · ☑ done
 | Tier | Assets | Status |
 |---|---|---|
 | High | mermaid tumbler (iced, straw), midnight butterfly, Glee Mix Tape, crystal cluster | ☑ `public/assets/glee-symbol-atlas.png` |
-| Mid | iced chai cup, unlit cinnamon candle, Glee cardigan, Glee Toolbox | ☑ same atlas |
-| Low | butterfly hair clip, VHS tape, aurora keepsake, sacred Twelve charm | ☑ same atlas |
+| Mid | iced chai cup, unlit cinnamon candle, Glee cardigan, Moonlit Book Stack | ☑ same atlas |
+| Low | butterfly hair clip, VHS tape, aurora keepsake, shared-life keepsake locket | ☑ same atlas |
 | Treats | Chicken Comets (yellow), Salmon Stars (blue), Boogie Bites (navy) | ☑ same atlas |
 | Wilds | Joey-saucer and Phoebe-saucer | ☑ `public/assets/joey-phoebe-wilds.png` |
 | Legend | UniGlee rainbow butterfly | ☑ symbol atlas |
 
-Generated source prompts were constrained to original, unbranded illustration; no reference photo was uploaded or transformed. Engine IDs for five replaced prototype symbols remain temporarily stable so this art-only pass cannot perturb tested reel weights or payout math.
+Generated source prompts were constrained to original, unbranded illustration; no private reference photo was uploaded or transformed. Engine IDs for five replaced prototype symbols remain temporarily stable so this art-only pass cannot perturb tested reel weights or payout math. The 2026-07-12 atlas revision replaced only the former Toolbox and Twelve-medallion cells.
 
 ## UI / scenes
 
-Cascade meter, wheel, Chai Bonus shelf (12 tumblers), Treat Jar, daily wheel, birthday reveal screen, app icon + PWA icon set (192/512/maskable), splash "Tap to open the Toolbox 🧰".
+| Asset | Owner | Provenance | Status |
+|---|---|---|---|
+| Chai Chase splash background — Joey, Phoebe, iced mermaid tumbler, PNW night, music/books/cardigan/aurora keepsakes | ChatGPT imagegen, 2026-07-12 | original; derived only from existing original game art | ☑ `public/assets/chai-chase-splash.png` |
+| Cascade meter, wheel, Treat Jar, app icon + PWA icon set | mixed project implementation | original | ☑ current baseline |
+| Chai Bonus shelf, daily wheel, birthday reveal screen | assigned when implemented | original required | ☐ |
 
 ## Audio (all original, Web Audio synth or bundled OGG)
 
-Saucer theremin, cascade arpeggio tiers 1-8, win plucks, fanfare, cat pop-in chirps (Joey boogie riff, Phoebe purr-trill), base loop (dreamy 70s soft-rock progression), free-spin loop (90s-grunge-tinged), UniGlee storm sting. Sound toggle default ON, must be perfect muted.
+Chai Chase launch, saucer theremin, cascade arpeggio tiers 1-8, win plucks, fanfare, distinct Joey boogie cue, Phoebe purr/trill cue, and UniGlee shimmer sting. Base loop, chapter stems, and final sound mix remain in progress. Sound toggle default ON, must be perfect muted.
 
 ## Image-generation brief (for ChatGPT workflow — Route 2)
 

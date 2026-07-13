@@ -1,4 +1,6 @@
 # DESIGN AGENT — Visual Overhaul Directive
+
+> **OBSOLETE PROMPT — DO NOT RUN.** It predates the 2026-07-12 Chai Chase realignment. Use the current canonical reading order in `AGENTS.md`.
 *(Authored by Claude/PM for a dedicated, narrow-scope design agent. Paste everything below the line into the new agent thread. The agent needs repo access, the ability to run `npm run dev`, and screenshot capability; if it lacks screenshots, it must still follow the rubric and deliver, flagging self-review as "unverified visually.")*
 
 ---

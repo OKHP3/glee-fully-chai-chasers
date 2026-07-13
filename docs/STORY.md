@@ -8,7 +8,7 @@ Glee loves cascading-reels games, especially the Planet Moolah mechanical family
 
 So the idea was simple: what if she had her own? Not a licensed copy or a knockoff, but the same satisfying rhythm rebuilt entirely from scratch and aimed at exactly one person. Real paylines, real cascades, real variance, a free-spin wheel, and a legendary symbol you tell people about when it lands, all running on fictional Glee-coins inside an original world made for her.
 
-That's Glee-fully Chai Chasers. Her favorite kind of game, plus everything she actually loves: two real cats playing themselves, an iced chai ritual (never hot, she'd never forgive us), butterflies, the number twelve treated as sacred, and a warm absurdist voice lifted straight from the Glee-fully universe she and Jamie already built together.
+That's Glee-fully Chai Chasers. Her favorite kind of game, plus everything she actually loves: two real cats playing themselves, an iced chai ritual (never hot, she'd never forgive us), butterflies, music-night keepsakes, books, PNW aurora, and a warm absurdist voice drawn from Glee's personality.
 
 ## The canon, explained
 
@@ -16,7 +16,7 @@ A few details in the game aren't random. They're specific on purpose, because sp
 
 **Iced chai, always.** Glee does not drink hot chai. The game's beverage symbol is an iced-only to-go cup and a jewel-toned mermaid-pattern tumbler with a straw, and there is no steam, kettle, or mug anywhere in the art. This is a hard rule, not a style choice: a hot-chai image anywhere in this product would be a canon violation.
 
-**The number twelve.** Her old chai order called for twelve pumps of syrup. The game reuses that number everywhere it can: the maximum wild multiplier is 12x, celebrated on-screen as "TWELVE PUMPS!"; the Chai Tea Bonus is a twelve-tumbler pick shelf; hitting player level twelve unlocks the game's biggest cosmetic celebration.
+**The chai.** Her old order's twelve pumps mattered because Glee wanted an unmistakably bold chai flavor, not because twelve was mystical. The aligned game keeps at most one chai-specific wink to that history and lets the intensely flavored iced drink—not numerology—drive the quest.
 
 **Boogie Bites, for Joey only.** Joey and Phoebe are Glee's real cats, playing themselves as the game's wild symbols and occasional pop-in visitors. Phoebe is enthusiastic about literally any treat and shows up to help whenever the in-game Treat Jar holds anything at all. Joey is pickier: he's Glee's favorite boy, and in the game (as in life) he only responds to his specific treat, rendered here as "Boogie Bites." If the jar's empty or lacks his treat, he still shows up, judges the board, and leaves with a quip instead of a bonus. That asymmetry isn't a bug; it's the joke, and it's true to the actual cat.
 
@@ -32,7 +32,7 @@ Rather than patch around it, the fix was structural: a seeded 200,000-spin simul
 
 ## The reveal
 
-The game ships quietly ahead of time so it can be tested, but nothing about it is meant to be seen before July 17, Glee's birthday. On first launch on or after that date, it opens with a short scene: two saucers carry a "Happy Birthday, Glee" banner across a night sky, Joey and Phoebe pop out, a chai tumbler descends into a silhouette of her hand, and then one line from Jamie, in his own words, plays before the Toolbox opens and the actual game begins. After that, it's just hers: a game that looks and sounds like the one she already loves, built entirely around the things and creatures she loves most, made for no reason other than that she'd have a great time playing it.
+The game ships quietly ahead of time so it can be tested, but nothing about it is meant to be seen before July 17, Glee's birthday. On first launch on or after that date, it opens with a short scene: two saucers carry a "Happy Birthday, Glee" banner across a night sky, Joey and Phoebe pop out, a chai tumbler descends into a silhouette of her hand, and then one line from Jamie, in his own words, plays before the Chai Chase begins. After that, it's just hers: a game that looks and sounds like the one she already loves, built entirely around the things and creatures she loves most, made for no reason other than that she'd have a great time playing it.
 
 ---
 
@@ -40,7 +40,7 @@ The game ships quietly ahead of time so it can be tested, but nothing about it i
 
 **Cycle 1**
 
-Fact-check pass: every feature claim in README.md and this document cross-checked against `docs/DESIGN-SPEC.md` §§3-12 and the actual `src/engine/` and `src/ui/` file tree. Confirmed shipped: cascades, cascade meter/ladder, saucer-cat wilds, Treat Jar, cat pop-ins, AskJamie wheel and free spins, Chai Tea Bonus, UniGlee, birthday reveal gate, PWA/offline, reduced-motion and sound settings. No unshipped features (milestone scenes, daily bonus wheel, XP/level cosmetics) were claimed as live; where referenced, language stays general ("the biggest cosmetic celebration") rather than asserting a specific unshipped scene exists. Play link (`https://okhp3.github.io/glee-fully-chai-chasers/`) fetched and confirmed live, so it ships as a direct link rather than a placeholder.
+Fact-check pass: feature claims are split between the implemented baseline and the approved roadmap in `docs/IMPLEMENTATION-BASELINE.md` and `docs/GAME-REALIGNMENT-2026-07-12.md`. Confirmed in the current code: cascades, cascade meter/ladder, saucer-cat wilds, Treat Jar, illustrated cat pop-ins, AskJamie wheel/free-spin flow, UniGlee takeover, reduced motion, sound setting, manifest, and icons. The Chai Quest chapters, 100–500-spin UniGlee marathon, Birthday Reveal, Daily Bonus Wheel, milestone scenes, service-worker offline proof, and final music loops remain explicit future work until code and QA evidence exist.
 
 Voice pass: README checked against warm-and-clear intent; STORY.md checked as narrative, including the honest "1987" presentation beat and the quantified math failure, both drawn verbatim from `docs/ASSESSMENT-REPLIT-SLICE-1.md` and `docs/REPLIT-VALIDATION-LOG.md` rather than invented. Both files reviewed for Jamie's standing no-em-dash rule; all em dashes replaced with periods, colons, semicolons, or parentheses.
 

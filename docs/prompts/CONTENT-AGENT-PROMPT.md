@@ -1,4 +1,6 @@
 # CONTENT AGENT — Repo Presentation & Launch Story Directive
+
+> **OBSOLETE PROMPT — DO NOT RUN.** It predates the 2026-07-12 Chai Chase realignment. Use the current canonical reading order in `AGENTS.md`.
 *(Authored by Claude/PM for a narrow-scope content agent. Paste everything below the line into the new agent thread. Agent needs repo read/write access. It does NOT touch game code.)*
 
 ---
