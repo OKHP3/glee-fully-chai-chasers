@@ -120,6 +120,20 @@ export function playPhoebeCue(): void {
   tone(783.99, 0.25, 0.2, 0.12, "triangle");
 }
 
+/** Treat Time entrance: bright Phoebe morning, fuller Joey/Phoebe nighttime. */
+export function playTreatTimeCue(mode: "morning" | "nighttime"): void {
+  const notes = mode === "morning"
+    ? [392, 523.25, 659.25, 783.99]
+    : [293.66, 392, 523.25, 659.25, 783.99];
+  notes.forEach((freq, i) => tone(freq, i * 0.075, 0.28, mode === "nighttime" ? 0.18 : 0.16, i % 2 ? "triangle" : "sine"));
+}
+
+/** A short, per-cast landing flourish; count stays capped to avoid fatigue. */
+export function playTreatLand(count: number): void {
+  const landings = Math.min(Math.max(count, 2), 10);
+  [523.25, 659.25, 783.99].forEach((freq, i) => tone(freq, i * 0.045, 0.16, 0.08 + landings * 0.006, "triangle"));
+}
+
 /** Original house-doorbell ding-dong, played whenever a doorbell lands. */
 export function playDoorbellRing(): void {
   tone(880, 0, 0.18, 0.18, "sine");

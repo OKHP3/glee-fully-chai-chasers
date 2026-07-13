@@ -7,11 +7,12 @@
  * Drop-In Saucer / Double Sparkle / Facts-on-Facts) queued off wild line wins
  * with exactly one firing per dead board, per docs §5.
  */
-import type { CascadeStep, Grid, SpecialtyWild, SpinResult, SymbolId, TreatKind } from "./types";
+import type { CascadeStep, Grid, SpecialtyWild, SpinResult, SymbolId, TreatKind, TreatTimeMode } from "./types";
 import { FREE_SPIN_LADDER } from "./types";
 import { REELS, ROWS, cascadeColumn, spinGrid, stripFor } from "./reels";
 import { evaluateLines, findDoorbellTrigger, isWild } from "./paylines";
 import { rollCatVisit, type TreatJar } from "./features";
+import { rollTreatTimeTrigger } from "./treattime";
 import type { Rng } from "./rng";
 
 const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
@@ -101,6 +102,11 @@ export interface SpinInput {
   spinsSincePopIn: number;
   /** Optional preloaded board used by free-spin modifiers. */
   startingGrid?: Grid;
+  /** Free-spin rounds opt out; base spins use the either-mode cadence. */
+  allowTreatTimeBonus?: boolean;
+  treatTimeMode?: TreatTimeMode | "either";
+  /** Separate stream keeps the established cascade/RTP stream stable. */
+  treatTimeRng?: Rng;
 }
 
 export function rollDoorbellFreeSpins(rng: Rng): number {
@@ -108,7 +114,16 @@ export function rollDoorbellFreeSpins(rng: Rng): number {
 }
 
 /** Runs one full spin -> cascade-to-dead-board sequence. */
-export function spin({ rng, betPerLine, treatJar, spinsSincePopIn, startingGrid }: SpinInput): SpinResult {
+export function spin({
+  rng,
+  betPerLine,
+  treatJar,
+  spinsSincePopIn,
+  startingGrid,
+  allowTreatTimeBonus = true,
+  treatTimeMode = "either",
+  treatTimeRng,
+}: SpinInput): SpinResult {
   let grid = startingGrid
     ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
     : spinGrid(rng);
@@ -189,6 +204,11 @@ export function spin({ rng, betPerLine, treatJar, spinsSincePopIn, startingGrid 
 
   const catVisit = rollCatVisit(rng, treatJar, spinsSincePopIn);
   const ladderAward = freeSpinsForCascades(cascades);
+  // Keep this draw at the end of the spin so adding Treat Time does not
+  // perturb the established cascade/RTP simulation stream.
+  const treatTimeBonus = allowTreatTimeBonus && treatTimeRng
+    ? rollTreatTimeTrigger(treatTimeRng, treatTimeMode)
+    : undefined;
   const doubleSparkleApplied = doubleSparkleActive && ladderAward > 0;
   const freeSpinsAwarded = doorbellPanic
     ? doorbellPanic.freeSpinsAwarded
@@ -208,6 +228,7 @@ export function spin({ rng, betPerLine, treatJar, spinsSincePopIn, startingGrid 
     unigleeTriggered,
     treatsCollected,
     doorbellPanic,
+    treatTimeBonus,
   };
 }
 

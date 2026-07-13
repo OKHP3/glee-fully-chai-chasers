@@ -10,7 +10,7 @@
  * illustrated firefly-jar meter, a console-style bet bar, and a layered
  * night-garden scene behind it all (CSS + SVG, no canvas/WebGL).
  */
-import type { CascadeStep, SpinResult, SymbolId } from "../engine/types";
+import type { CascadeStep, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
@@ -38,6 +38,8 @@ import {
   playDoorbellRing,
   playJoeyCue,
   playPhoebeCue,
+  playTreatLand,
+  playTreatTimeCue,
   playUniGleeSting,
   playWinPluck,
   playWheelTick,
@@ -84,10 +86,10 @@ export function renderBoard(
         </header>
 
         <div class="jar-meter" aria-live="polite" aria-label="Firefly cascade meter">
-          <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(0)}</div>
+          <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(state.fireflyMeter)}</div>
           <div class="jar-meter-copy">
             <span class="jar-meter-kicker">Firefly Cascade</span>
-            <strong id="meter-count" class="jar-meter-count">0 / 4</strong>
+            <strong id="meter-count" class="jar-meter-count">${state.fireflyMeter} / 4</strong>
             <small>Reach 4 to unlock 7 free spins</small>
           </div>
         </div>
@@ -296,8 +298,11 @@ async function runSpin(
   sparkleBtn.disabled = true;
   sparkleBtn.classList.add("is-spinning");
 
+  const seed = productionSeed();
   const result = spin({
-    rng: mulberry32(productionSeed()),
+    rng: mulberry32(seed),
+    treatTimeRng: mulberry32(seed ^ 0x9e3779b9),
+    allowTreatTimeBonus: true,
     betPerLine: betPerLine(state.bet),
     treatJar: state.treatJar,
     spinsSincePopIn: state.spinsSincePopIn,
@@ -307,6 +312,7 @@ async function runSpin(
 
   state.balance += result.totalWin;
   state.xp += sparksForSpin(state.bet);
+  state.fireflyMeter = result.cascades;
   state.bestCascade = Math.max(state.bestCascade, result.cascades);
 
   for (const treat of result.treatsCollected) {
@@ -340,8 +346,14 @@ async function runSpin(
   btnAgain?.classList.remove("is-spinning");
 
   if (result.freeSpinsAwarded > 0) {
-    if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
+    if (result.treatTimeBonus) await runTreatTimeBonus(root, state, result.treatTimeBonus.mode, result.treatTimeBonus.freeSpinsAwarded);
+    else if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
     else await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
+    return;
+  }
+
+  if (result.treatTimeBonus) {
+    await runTreatTimeBonus(root, state, result.treatTimeBonus.mode, result.treatTimeBonus.freeSpinsAwarded);
     return;
   }
 
@@ -568,6 +580,51 @@ function showUnigleeTakeover(root: HTMLElement): Promise<void> {
   });
 }
 
+async function runTreatTimeBonus(
+  root: HTMLElement,
+  state: GameState,
+  mode: TreatTimeMode,
+  spinsAwarded: number,
+): Promise<void> {
+  const wedge: WheelWedge = mode === "morning" ? "treat_time_morning" : "treat_time_nighttime";
+  await showTreatTimeEntry(root, mode, spinsAwarded);
+
+  const rng = mulberry32(productionSeed());
+  const session = runFreeSpinSession(rng, wedge, betPerLine(state.bet), spinsAwarded);
+  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+
+  state.balance += session.totalWin;
+  state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
+  saveGameState(state);
+
+  await showBonusSummary(root, session.totalWin, session.retriggers);
+  const lastRound = session.rounds[session.rounds.length - 1];
+  const lastStep = lastRound?.steps[lastRound.steps.length - 1];
+  renderBoard(root, state, lastStep?.grid);
+}
+
+function showTreatTimeEntry(root: HTMLElement, mode: TreatTimeMode, spinsAwarded: number): Promise<void> {
+  return new Promise((resolve) => {
+    const nighttime = mode === "nighttime";
+    const overlay = document.createElement("div");
+    overlay.className = `treat-time-entry ${nighttime ? "treat-time-entry--night" : "treat-time-entry--morning"}`;
+    overlay.innerHTML = `
+      <div class="treat-time-entry-hand">${treatTimeHandSvg()}</div>
+      <div class="treat-time-entry-copy">
+        <div class="treat-time-entry-title">IT'S TREAT TIME!</div>
+        <div class="treat-time-entry-sub">${nighttime ? "Phoebe found the nighttime spread — Joey is awake too!" : "Phoebe's morning Chicken Comets are READY!"}</div>
+        <div class="treat-time-entry-spins">${spinsAwarded} free spins · every spin gets a treat toss</div>
+      </div>
+    `;
+    root.querySelector(".cc-root")?.appendChild(overlay);
+    playTreatTimeCue(mode);
+    window.setTimeout(() => {
+      overlay.remove();
+      resolve();
+    }, 1350);
+  });
+}
+
 /** AskJamie Wheel + the free-spin bonus session it unlocks — docs §7. */
 async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
   const rng = mulberry32(productionSeed());
@@ -605,7 +662,7 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
 function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWedge> {
   return new Promise((resolve) => {
     const wedge = spinWheel(rng);
-    const finalDeg = 1080 + { multiplying: 30, giant_gnome: 150, chai_back: 270, doorbell_panic: 0 }[wedge];
+    const finalDeg = 1080 + (({ multiplying: 30, giant_gnome: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
 
     const overlay = document.createElement("div");
     overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
@@ -652,20 +709,21 @@ async function playFreeSpinSession(
   document.body.classList.add("aurora-mode");
 
   const overlay = document.createElement("div");
-  overlay.className = `free-spins-overlay text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""}`;
+  const treatTime = wedge === "treat_time_morning" || wedge === "treat_time_nighttime";
+  overlay.className = `free-spins-overlay text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins" : ""}`;
   overlay.innerHTML = `
     <div class="night-garden aurora">${gardenDecor()}</div>
     <div class="relative z-10 h-full w-full flex flex-col">
       <header class="marquee">
         <div class="marquee-row">
           <span class="level-chip">${wheelWedgeLabel(wedge)}</span>
-          <h1 class="marquee-title">${wedge === "doorbell_panic" ? "Panic Spins" : "Free Spins"}</h1>
+          <h1 class="marquee-title">${treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : "Free Spins"}</h1>
         </div>
       </header>
       <div class="jar-meter">
         <div class="jar-meter-text">Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span> · Round win: <span id="fs-round-win">0</span></div>
       </div>
-      <main class="cabinet-frame">
+      <main class="cabinet-frame ${treatTime ? "treat-time-cabinet" : ""}">
         <div id="fs-grid" class="reel-grid"></div>
       </main>
       <div id="fs-status" class="status-line"></div>
@@ -688,8 +746,15 @@ async function playFreeSpinSession(
     totalEl.textContent = String(rounds.length);
     roundWinEl.textContent = round.totalWin.toLocaleString();
 
-    for (const step of round.steps) {
+    for (const [stepIndex, step] of round.steps.entries()) {
       grid.innerHTML = renderGridHtml(step.grid);
+      if (stepIndex === 0 && round.treatTimeWilds?.length) {
+        await animateTreatTimeCast(
+          overlay.querySelector<HTMLElement>(".treat-time-cabinet")!,
+          grid,
+          round.treatTimeWilds,
+        );
+      }
       if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
         playDoorbellRing();
         doorbellRang = true;
@@ -734,6 +799,61 @@ async function playFreeSpinSession(
   bgLayer?.classList.remove("aurora");
   document.body.classList.remove("aurora-mode");
   void state; // state saved by caller after totals are tallied
+}
+
+function animateTreatTimeCast(stage: HTMLElement, grid: HTMLElement, wilds: TreatTimeWild[]): Promise<void> {
+  return new Promise((resolve) => {
+    const layer = document.createElement("div");
+    layer.className = "treat-time-cast-layer";
+    layer.innerHTML = `<div class="treat-time-hand">${treatTimeHandSvg()}</div>`;
+    stage.appendChild(layer);
+
+    const stageRect = stage.getBoundingClientRect();
+    const treatSymbols: Record<TreatTimeWild["treat"], SymbolId> = {
+      chicken: "treat_chicken",
+      salmon: "treat_salmon",
+      boogie: "treat_boogie",
+    };
+    const targets: HTMLElement[] = [];
+    const startX = 8;
+    const startY = Math.max(8, stageRect.height - 76);
+
+    wilds.forEach((wild, index) => {
+      const [reel, row] = wild.position;
+      const cell = grid.querySelector<HTMLElement>(`[data-reel="${reel}"] [data-row="${row}"]`);
+      if (!cell) return;
+      const cellRect = cell.getBoundingClientRect();
+      const token = document.createElement("div");
+      token.className = "treat-time-token";
+      token.innerHTML = symbolSvg(treatSymbols[wild.treat]);
+      token.style.width = `${cellRect.width}px`;
+      token.style.height = `${cellRect.height}px`;
+      token.style.left = `${startX}px`;
+      token.style.top = `${startY}px`;
+      token.style.setProperty("--target-x", `${cellRect.left - stageRect.left - startX}px`);
+      token.style.setProperty("--target-y", `${cellRect.top - stageRect.top - startY}px`);
+      token.style.setProperty("--treat-delay", `${index * 38}ms`);
+      token.dataset.treat = wild.treat;
+      layer.appendChild(token);
+      targets.push(cell);
+    });
+
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    window.requestAnimationFrame(() => layer.classList.add("is-casting"));
+    window.setTimeout(() => {
+      targets.forEach((cell) => cell.classList.add("treat-time-wild-land"));
+      playTreatLand(wilds.length);
+      layer.remove();
+      resolve();
+    }, reduced ? 90 : 980);
+  });
+}
+
+function treatTimeHandSvg(): string {
+  return `<svg viewBox="0 0 88 110" aria-hidden="true">
+    <path d="M28 101c-7-7-9-19-6-31l6-24c1-5 8-5 9 0l1 14 2-34c0-6 8-6 9 0l1 31 2-39c0-6 8-6 9 0l1 38 3-28c1-6 9-5 9 1l-2 38c-1 16-7 26-18 34z" fill="#f5d576" stroke="#2d1f4c" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M24 69c-7-7-13-9-17-4-4 5 1 12 10 17" fill="none" stroke="#2d1f4c" stroke-width="4" stroke-linecap="round"/>
+  </svg>`;
 }
 
 function showFullFlavorFrenzy(overlay: HTMLElement): Promise<void> {
