@@ -50,6 +50,13 @@ export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: numbe
   yarn: { 3: 8, 4: 21, 5: 69 },
 };
 
+/**
+ * Doorbell visibility adds intentional dead-space blockers to reels 1–2.
+ * This small global tuning factor preserves the established ~96% RTP target
+ * without making the doorbell itself a paying symbol.
+ */
+export const PAYOUT_SCALE = 1.052864;
+
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */
 const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_boogie", "uniglee", "doorbell"];
@@ -95,7 +102,7 @@ export function evaluateLines(grid: Grid, betPerLine: number): LineWin[] {
     const payoutTable = PAYTABLE[matchSymbol];
     if (!payoutTable) return;
     const tier = (count >= 5 ? 5 : count) as 3 | 4 | 5;
-    const payout = payoutTable[tier] * betPerLine;
+    const payout = payoutTable[tier] * betPerLine * PAYOUT_SCALE;
 
     wins.push({ lineIndex, symbol: matchSymbol, count, payout, positions });
   });
