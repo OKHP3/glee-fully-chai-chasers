@@ -48,11 +48,16 @@ describe("game state persistence", () => {
       bestCascade: 3,
       spinsSincePopIn: 2,
       soundOn: true,
+      musicVolume: 0.72,
+      sfxVolume: 0.82,
+      theme: "dark",
       reducedMotion: false,
     };
 
     saveGameState(state);
 
     expect(loadGameState().fireflyMeter).toBe(3);
+    expect(loadGameState().theme).toBe("dark");
+    expect(loadGameState().musicVolume).toBe(0.72);
   });
 });

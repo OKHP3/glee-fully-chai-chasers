@@ -30,7 +30,8 @@ Generated source prompts were constrained to original, unbranded illustration; n
 | Asset | Owner | Provenance | Status |
 |---|---|---|---|
 | Chai Chase splash background — Joey, Phoebe, iced mermaid tumbler, PNW night, music/books/cardigan/aurora keepsakes | ChatGPT imagegen, 2026-07-12 | original; derived only from existing original game art | ☑ `public/assets/chai-chase-splash.png` |
-| Cascade meter, wheel, Treat Jar, app icon + PWA icon set | mixed project implementation | original | ☑ current baseline |
+| Cascade meter, wheel, Treat Jar, app icon + PWA icon set | mixed project implementation | original | ☑ `public/icons/` (including iPhone touch and browser favicon sizes) |
+| GitHub + web social preview — Joey, Phoebe, jewel-toned iced chai, rainbow butterfly, and keepsakes | ChatGPT imagegen, 2026-07-13 | original | ☑ `public/assets/social-preview.jpg` |
 | Chai Bonus shelf, daily wheel, birthday reveal screen | assigned when implemented | original required | ☐ |
 
 ## Audio (all original, Web Audio synth or bundled OGG)

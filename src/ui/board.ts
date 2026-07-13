@@ -14,10 +14,11 @@ import type { CascadeStep, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } 
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
+import { PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
 import { addTreat, consumeForVisit } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
 import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinRoundResult, type WheelWedge } from "../engine/freespins";
-import type { GameState } from "../state";
+import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState } from "../state";
 import {
   symbolSvg,
@@ -47,17 +48,35 @@ import {
   playStrangerDangerPanic,
   setMusicEnabled,
   setSfxEnabled,
+  setSfxVolume,
   unlock,
 } from "../audio/synth";
-import { startBaseMusic, stopBaseMusic } from "../audio/music";
+import { setMusicVolume, startBaseMusic, stopBaseMusic } from "../audio/music";
 
 let statusTimeout: number | undefined;
+
+const PAYTABLE_SYMBOLS: ReadonlyArray<{ id: SymbolId; name: string }> = [
+  { id: "tumbler", name: "Mermaid Tumbler" },
+  { id: "butterfly", name: "Midnight Butterfly" },
+  { id: "mixtape", name: "Glee Mix Tape" },
+  { id: "crystal", name: "Crystal Cluster" },
+  { id: "chai", name: "Iced Chai To-Go" },
+  { id: "candle", name: "Cinnamon Candle" },
+  { id: "cassette", name: "Glee Cardigan" },
+  { id: "gnome", name: "Moonlit Book Stack" },
+  { id: "mailbox", name: "Butterfly Hair Clip" },
+  { id: "vhs", name: "VHS Tape" },
+  { id: "teapot", name: "Aurora Keepsake" },
+  { id: "yarn", name: "Shared-Life Locket" },
+];
 
 export function renderBoard(
   root: HTMLElement,
   state: GameState,
   visibleGrid?: CascadeStep["grid"],
 ): void {
+  const resolvedTheme = resolveTheme(state.theme);
+  document.documentElement.dataset.theme = resolvedTheme;
   const level = xpIntoLevel(state.xp);
   const bets = availableBetLevels(level.level);
   const settledGrid = visibleGrid ?? spin({
@@ -68,7 +87,7 @@ export function renderBoard(
   }).steps[0].grid;
 
   root.innerHTML = `
-    <div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden cc-root">
+    <div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden cc-root" data-theme="${resolvedTheme}" data-reduced-motion="${state.reducedMotion}">
       <div class="night-garden" id="bg-layer">${gardenDecor()}</div>
       <div class="relative z-10 h-full w-full flex flex-col cc-shell">
         <header class="marquee">
@@ -76,6 +95,12 @@ export function renderBoard(
           <div class="marquee-row">
             <span class="level-chip" aria-label="Player level">Lvl ${level.level}<em>${level.into}/${level.span} Sparks</em></span>
             <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+            <button id="paytable-btn" class="chrome-btn" aria-label="Open symbol guide and game rules" title="Symbol guide">
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#f5d576" stroke-width="1.8" aria-hidden="true">
+                <path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/>
+                <path d="M5 4.5v15M9 8h6M9 12h6"/>
+              </svg>
+            </button>
             <button id="settings-btn" class="chrome-btn" aria-label="Settings">
               <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#f5d576" stroke-width="1.8" aria-hidden="true">
                 <circle cx="12" cy="12" r="3.2"/>
@@ -128,13 +153,6 @@ export function renderBoard(
           </button>
         </footer>
 
-        <div class="settings-row">
-          <label class="inline-flex items-center gap-2">
-            <input type="checkbox" id="sound-toggle" ${state.soundOn ? "checked" : ""} class="min-w-[24px] min-h-[24px]" />
-            Sound
-          </label>
-          <button id="reset-btn" class="ml-4 underline">Reset progress</button>
-        </div>
       </div>
     </div>
   `;
@@ -240,8 +258,8 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
   const betDisplay = root.querySelector<HTMLSpanElement>("#bet-display")!;
   const betUp = root.querySelector<HTMLButtonElement>("#bet-up")!;
   const betDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
-  const soundToggle = root.querySelector<HTMLInputElement>("#sound-toggle")!;
-  const resetBtn = root.querySelector<HTMLButtonElement>("#reset-btn")!;
+  const settingsBtn = root.querySelector<HTMLButtonElement>("#settings-btn")!;
+  const paytableBtn = root.querySelector<HTMLButtonElement>("#paytable-btn")!;
 
   betUp.addEventListener("click", () => {
     const idx = bets.indexOf(state.bet);
@@ -261,21 +279,8 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
     }
   });
 
-  soundToggle.addEventListener("change", () => {
-    state.soundOn = soundToggle.checked;
-    setSfxEnabled(state.soundOn);
-    setMusicEnabled(state.soundOn);
-    if (state.soundOn) startBaseMusic();
-    else stopBaseMusic();
-    saveGameState(state);
-  });
-
-  resetBtn.addEventListener("click", () => {
-    if (confirm("Reset all progress and start fresh?")) {
-      resetAll();
-      location.reload();
-    }
-  });
+  settingsBtn.addEventListener("click", () => openSettingsPage(root, state));
+  paytableBtn.addEventListener("click", () => openPaytablePage(root));
 
   sparkleBtn.addEventListener("click", () => {
     if (!isUnlocked()) unlock();
@@ -283,6 +288,176 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
     if (sparkleBtn.disabled) return;
     void runSpin(root, state, sparkleBtn);
   });
+}
+
+function resolveTheme(theme: ThemeMode): "dark" | "light" {
+  if (theme === "light" || theme === "dark") return theme;
+  return typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
+function openSettingsPage(root: HTMLElement, state: GameState): void {
+  const page = document.createElement("section");
+  page.className = "game-page settings-page";
+  page.setAttribute("role", "dialog");
+  page.setAttribute("aria-modal", "true");
+  page.setAttribute("aria-labelledby", "settings-title");
+  page.innerHTML = `
+    <div class="game-page-topbar">
+      <button class="page-close chrome-btn" aria-label="Close settings">←</button>
+      <div><p class="page-eyebrow">YOUR CHAI CHASE</p><h2 id="settings-title">Settings</h2></div>
+      <span class="page-top-spacer" aria-hidden="true"></span>
+    </div>
+    <div class="game-page-scroll">
+      <section class="settings-card">
+        <h3>Look &amp; feel</h3>
+        <p class="settings-help">Choose how the night garden appears on this device.</p>
+        <div class="theme-choice" role="radiogroup" aria-label="Appearance">
+          ${(["system", "dark", "light"] as ThemeMode[]).map((theme) => `
+            <button type="button" class="theme-option ${state.theme === theme ? "is-selected" : ""}" data-theme-option="${theme}" role="radio" aria-checked="${state.theme === theme}">
+              <span class="theme-swatch theme-swatch--${theme}" aria-hidden="true"></span>${theme[0].toUpperCase() + theme.slice(1)}
+            </button>`).join("")}
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-heading-row"><div><h3>Sound</h3><p class="settings-help">A warm mix, tuned your way.</p></div>
+          <label class="sound-switch"><input id="settings-sound-toggle" type="checkbox" ${state.soundOn ? "checked" : ""}/><span aria-hidden="true"></span><b id="sound-status">${state.soundOn ? "On" : "Off"}</b></label>
+        </div>
+        ${volumeControl("music", "Music", state.musicVolume, "The Chai Chase score")}
+        ${volumeControl("sfx", "Sound effects", state.sfxVolume, "Cascades, cats, and celebrations")}
+      </section>
+
+      <section class="settings-card settings-card--compact">
+        <div><h3>Reduce motion</h3><p class="settings-help">Use gentle fades instead of movement.</p></div>
+        <label class="sound-switch"><input id="reduced-motion-toggle" type="checkbox" ${state.reducedMotion ? "checked" : ""}/><span aria-hidden="true"></span><b>${state.reducedMotion ? "On" : "Off"}</b></label>
+      </section>
+
+      <section class="settings-card about-card">
+        <h3>About this gift</h3>
+        <p>A cozy, original Chai Chase for Glee — fictional Glee-coins only, with no purchases, ads, or tracking.</p>
+      </section>
+
+      <button id="settings-reset" class="reset-progress-btn">Start fresh</button>
+    </div>`;
+  root.querySelector(".cc-root")?.appendChild(page);
+
+  const close = () => page.remove();
+  page.querySelector<HTMLButtonElement>(".page-close")?.addEventListener("click", close);
+  page.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+  page.querySelectorAll<HTMLButtonElement>("[data-theme-option]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.theme = button.dataset.themeOption as ThemeMode;
+      const resolved = resolveTheme(state.theme);
+      root.querySelector<HTMLElement>(".cc-root")?.setAttribute("data-theme", resolved);
+      document.documentElement.dataset.theme = resolved;
+      page.querySelectorAll<HTMLButtonElement>("[data-theme-option]").forEach((option) => {
+        const selected = option === button;
+        option.classList.toggle("is-selected", selected);
+        option.setAttribute("aria-checked", String(selected));
+      });
+      saveGameState(state);
+    });
+  });
+
+  const soundToggle = page.querySelector<HTMLInputElement>("#settings-sound-toggle")!;
+  soundToggle.addEventListener("change", () => {
+    state.soundOn = soundToggle.checked;
+    setSfxEnabled(state.soundOn);
+    setMusicEnabled(state.soundOn);
+    if (state.soundOn) startBaseMusic(); else stopBaseMusic();
+    page.querySelector("#sound-status")!.textContent = state.soundOn ? "On" : "Off";
+    saveGameState(state);
+  });
+
+  wireVolume(page, "music", (value) => { state.musicVolume = value; setMusicVolume(value); }, () => saveGameState(state));
+  wireVolume(page, "sfx", (value) => { state.sfxVolume = value; setSfxVolume(value); }, () => saveGameState(state));
+
+  const reducedMotion = page.querySelector<HTMLInputElement>("#reduced-motion-toggle")!;
+  reducedMotion.addEventListener("change", () => {
+    state.reducedMotion = reducedMotion.checked;
+    root.querySelector<HTMLElement>(".cc-root")?.setAttribute("data-reduced-motion", String(state.reducedMotion));
+    const motionStatus = reducedMotion.parentElement?.querySelector("b");
+    if (motionStatus) motionStatus.textContent = state.reducedMotion ? "On" : "Off";
+    saveGameState(state);
+  });
+
+  page.querySelector<HTMLButtonElement>("#settings-reset")?.addEventListener("click", () => {
+    if (confirm("Start fresh? This clears your Chai Chase progress and settings on this device.")) {
+      resetAll();
+      location.reload();
+    }
+  });
+  page.querySelector<HTMLButtonElement>(".page-close")?.focus();
+}
+
+function volumeControl(id: "music" | "sfx", label: string, value: number, help: string): string {
+  const percent = Math.round(value * 100);
+  return `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">${percent}%</output><input id="${id}-volume" type="range" min="0" max="100" value="${percent}" aria-label="${label} volume"/></label>`;
+}
+
+function wireVolume(
+  page: HTMLElement,
+  id: "music" | "sfx",
+  apply: (value: number) => void,
+  persist: () => void,
+): void {
+  const input = page.querySelector<HTMLInputElement>(`#${id}-volume`)!;
+  const output = page.querySelector<HTMLOutputElement>(`#${id}-volume-value`)!;
+  input.addEventListener("input", () => {
+    const value = Number(input.value) / 100;
+    output.value = `${input.value}%`;
+    output.textContent = output.value;
+    apply(value);
+  });
+  input.addEventListener("change", persist);
+}
+
+function openPaytablePage(root: HTMLElement): void {
+  const page = document.createElement("section");
+  page.className = "game-page paytable-page";
+  page.setAttribute("role", "dialog");
+  page.setAttribute("aria-modal", "true");
+  page.setAttribute("aria-labelledby", "paytable-title");
+  page.innerHTML = `
+    <div class="game-page-topbar">
+      <button class="page-close chrome-btn" aria-label="Close symbol guide">←</button>
+      <div><p class="page-eyebrow">HOW THE CHAI CHASE PAYS</p><h2 id="paytable-title">Symbol guide</h2></div>
+      <span class="page-top-spacer" aria-hidden="true"></span>
+    </div>
+    <div class="game-page-scroll">
+      <section class="paytable-intro"><strong>25 fixed lines</strong><span>Match 3, 4, or 5 symbols from the left. Values are × your line bet.</span></section>
+      <section class="paytable-grid" aria-label="Paying symbols">${PAYTABLE_SYMBOLS.map(paytableCard).join("")}</section>
+      <h3 class="page-section-title">Special symbols</h3>
+      <section class="feature-symbol-grid">
+        ${featureCard("wild_joey", "Joey Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
+        ${featureCard("wild_phoebe", "Phoebe Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
+        ${featureCard("treat_chicken", "Chicken Comets", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
+        ${featureCard("treat_salmon", "Salmon Stars", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
+        ${featureCard("treat_boogie", "Boogie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
+        ${featureCard("doorbell", "Doorbell", "A pair on the first two positions of any line begins Doorbell Panic free spins.")}
+        ${featureCard("uniglee", "UniGlee", "The rare rainbow-butterfly legend begins a special Chai Chase celebration.")}
+      </section>
+      <p class="paytable-footnote">Line values are shown with the game’s live tuning applied, so this guide always matches what the board awards.</p>
+    </div>`;
+  root.querySelector(".cc-root")?.appendChild(page);
+  const close = () => page.remove();
+  page.querySelector<HTMLButtonElement>(".page-close")?.addEventListener("click", close);
+  page.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+  page.querySelector<HTMLButtonElement>(".page-close")?.focus();
+}
+
+function paytableCard({ id, name }: { id: SymbolId; name: string }): string {
+  const values = PAYTABLE[id]!;
+  return `<article class="pay-symbol-card"><div class="pay-symbol-art">${symbolSvg(id)}</div><h3>${name}</h3><dl><div><dt>3</dt><dd>${formatMultiplier(values[3])}</dd></div><div><dt>4</dt><dd>${formatMultiplier(values[4])}</dd></div><div><dt>5</dt><dd>${formatMultiplier(values[5])}</dd></div></dl></article>`;
+}
+
+function featureCard(id: SymbolId, name: string, description: string): string {
+  return `<article class="feature-symbol-card"><div class="feature-symbol-art">${symbolSvg(id)}</div><div><h3>${name}</h3><p>${description}</p></div></article>`;
+}
+
+function formatMultiplier(value: number): string {
+  const tuned = value * PAYOUT_SCALE;
+  return `${Number.isInteger(tuned) ? tuned : tuned.toFixed(1)}×`;
 }
 
 async function runSpin(

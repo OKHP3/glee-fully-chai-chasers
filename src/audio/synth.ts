@@ -13,6 +13,8 @@
 let ctx: AudioContext | null = null;
 let musicEnabled = true;
 let sfxEnabled = true;
+let sfxVolume = 0.82;
+let sfxBus: GainNode | null = null;
 
 export function setMusicEnabled(enabled: boolean): void {
   musicEnabled = enabled;
@@ -20,6 +22,13 @@ export function setMusicEnabled(enabled: boolean): void {
 
 export function setSfxEnabled(enabled: boolean): void {
   sfxEnabled = enabled;
+  updateSfxGain();
+}
+
+/** Set the effects mix (0–1) without changing the master sound preference. */
+export function setSfxVolume(volume: number): void {
+  sfxVolume = Math.min(1, Math.max(0, volume));
+  updateSfxGain();
 }
 
 export function isUnlocked(): boolean {
@@ -38,6 +47,9 @@ export function unlock(): void {
   try {
     if (!ctx) {
       ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      sfxBus = ctx.createGain();
+      sfxBus.connect(ctx.destination);
+      updateSfxGain();
     }
     void resume();
   } catch {
@@ -58,6 +70,11 @@ export async function resume(): Promise<void> {
   }
 }
 
+function updateSfxGain(): void {
+  if (!ctx || !sfxBus) return;
+  sfxBus.gain.setTargetAtTime(sfxEnabled ? sfxVolume : 0.0001, ctx.currentTime, 0.025);
+}
+
 function tone(freq: number, startOffset: number, duration: number, gainPeak: number, type: OscillatorType): void {
   if (!ctx || !sfxEnabled) return;
   const osc = ctx.createOscillator();
@@ -68,7 +85,7 @@ function tone(freq: number, startOffset: number, duration: number, gainPeak: num
   gain.gain.setValueAtTime(0, start);
   gain.gain.linearRampToValueAtTime(gainPeak, start + 0.015);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-  osc.connect(gain).connect(ctx.destination);
+  osc.connect(gain).connect(sfxBus ?? ctx.destination);
   osc.start(start);
   osc.stop(start + duration + 0.05);
 }

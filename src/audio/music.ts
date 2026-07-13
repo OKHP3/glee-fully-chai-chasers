@@ -75,6 +75,7 @@ type ScheduledSource = OscillatorNode | AudioBufferSourceNode;
 
 let musicBus: GainNode | undefined;
 let running = false;
+let musicVolume = 0.72;
 let cycleStart = 0;
 let loopTimer: number | undefined;
 const scheduledSources = new Set<ScheduledSource>();
@@ -190,12 +191,19 @@ export function startBaseMusic(): void {
 
   musicBus = audio.createGain();
   musicBus.gain.setValueAtTime(0.0001, audio.currentTime);
-  musicBus.gain.linearRampToValueAtTime(0.1, audio.currentTime + 0.45);
+  musicBus.gain.linearRampToValueAtTime(musicVolume * 0.14, audio.currentTime + 0.45);
   musicBus.connect(audio.destination);
   running = true;
   cycleStart = audio.currentTime + 0.06;
   scheduleCycle(cycleStart);
   loopTimer = window.setTimeout(scheduleFollowingCycle, Math.max(30, (BASE_SCORE_DURATION_SECONDS - 0.5) * 1_000));
+}
+
+/** Set the music mix (0–1); changes take effect immediately while playing. */
+export function setMusicVolume(volume: number): void {
+  musicVolume = Math.min(1, Math.max(0, volume));
+  const audio = getAudioContext();
+  if (musicBus && audio) musicBus.gain.setTargetAtTime(musicVolume * 0.14, audio.currentTime, 0.025);
 }
 
 /** Stop all scheduled score voices immediately when the shared Sound toggle is off. */
