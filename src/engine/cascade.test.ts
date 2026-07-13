@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
 import { freeSpinsForCascades, spin } from "./cascade";
 import { emptyTreatJar } from "./features";
+import type { Grid } from "./types";
 
 describe("spin", () => {
   it("is deterministic for a given seed", () => {
@@ -43,7 +44,31 @@ describe("spin", () => {
         spinsSincePopIn: 0,
       });
       const expected = freeSpinsForCascades(result.cascades);
-      expect(result.freeSpinsAwarded).toBe(result.doubleSparkleApplied ? expected * 2 : expected);
+      const expectedAward = result.doorbellPanic
+        ? result.doorbellPanic.freeSpinsAwarded
+        : result.doubleSparkleApplied
+          ? expected * 2
+          : expected;
+      expect(result.freeSpinsAwarded).toBe(expectedAward);
     }
+  });
+
+  it("awards 5–20 spins when a first/second-reel doorbell pair lands", () => {
+    const grid: Grid = Array.from({ length: 5 }, (_, reel) =>
+      Array.from({ length: 4 }, (_, row) => ({
+        symbol: reel < 2 && row === 0 ? "doorbell" as const : "treat_chicken" as const,
+      })),
+    );
+    const result = spin({
+      rng: mulberry32(20260712),
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+      startingGrid: grid,
+    });
+
+    expect(result.doorbellPanic?.freeSpinsAwarded).toBeGreaterThanOrEqual(5);
+    expect(result.doorbellPanic?.freeSpinsAwarded).toBeLessThanOrEqual(20);
+    expect(result.freeSpinsAwarded).toBe(result.doorbellPanic?.freeSpinsAwarded);
   });
 });

@@ -3,7 +3,7 @@
  * Spec: docs/DESIGN-SPEC.md §4. Left-to-right evaluation, wilds substitute
  * for all paying symbols (and pay as the top symbol when forming their own line).
  */
-import type { Grid, LineWin, SymbolId } from "./types";
+import type { DoorbellTrigger, Grid, LineWin, SymbolId } from "./types";
 
 /** Each line is a row index (0-3) per reel (5 entries). */
 export const PAYLINES: number[][] = [
@@ -52,10 +52,22 @@ export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: numbe
 
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */
-const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_boogie", "uniglee"];
+const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_boogie", "uniglee", "doorbell"];
 
 export function isWild(symbol: SymbolId): boolean {
   return WILDS.includes(symbol);
+}
+
+/** A matched first/second-reel doorbell pair triggers the panic bonus. */
+export function findDoorbellTrigger(grid: Grid, freeSpinsAwarded: number): DoorbellTrigger | undefined {
+  for (const [lineIndex, line] of PAYLINES.entries()) {
+    const first = [0, line[0]] as [number, number];
+    const second = [1, line[1]] as [number, number];
+    if (grid[0][line[0]].symbol === "doorbell" && grid[1][line[1]].symbol === "doorbell") {
+      return { lineIndex, positions: [first, second], freeSpinsAwarded };
+    }
+  }
+  return undefined;
 }
 
 /** Evaluates all 25 lines against a grid for a given per-line bet. Pure — no RNG. */

@@ -20,6 +20,15 @@ describe("spinGrid", () => {
       }
     });
   });
+
+  it("keeps rare doorbell blockers on reels 1 and 2 only", () => {
+    for (let seed = 0; seed < 5000; seed++) {
+      const grid = spinGrid(mulberry32(seed));
+      for (const reel of [2, 3, 4]) {
+        expect(grid[reel].some((cell) => cell.symbol === "doorbell")).toBe(false);
+      }
+    }
+  });
 });
 
 describe("cascadeColumn", () => {
