@@ -181,10 +181,4 @@ export function playWheelTick(): void {
   }
 }
 
-/** Full-flavor jackpot flourish; the number is an internal legacy math detail only. */
-export function playFullFlavorFrenzy(): void {
-  const notes = [261.63, 329.63, 392, 523.25, 659.25, 783.99];
-  notes.forEach((freq, i) => tone(freq, i * 0.07, 0.4, 0.25, "sawtooth"));
-}
-
 export { musicEnabled };

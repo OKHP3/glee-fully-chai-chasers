@@ -150,7 +150,14 @@ export function spin({
       const trigger = findDoorbellTrigger(grid, 0);
       if (trigger) doorbellPanic = { ...trigger, freeSpinsAwarded: rollDoorbellFreeSpins(rng) };
     }
-    const wins = evaluateLines(grid, betPerLine);
+    const wins = evaluateLines(grid, betPerLine).map((win) => {
+      const multiplier = win.positions
+        .map(([reel, row]) => grid[reel][row].multiplier)
+        .find((value): value is NonNullable<typeof value> => value !== undefined);
+      return multiplier
+        ? { ...win, multiplier, payout: win.payout * multiplier }
+        : win;
+    });
 
     if (wins.length === 0) {
       if (queue.length > 0) {
