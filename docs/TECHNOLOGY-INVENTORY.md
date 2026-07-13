@@ -42,9 +42,10 @@ This inventory distinguishes declared versions from the versions actually resolv
 
 1. `.github/dependabot.yml` watches npm, pip, and GitHub Actions dependencies on recurring schedules.
 2. `.github/workflows/ci.yml` runs `npm ci`, the full test suite, and the production build on pushes and pull requests. Dependabot pull requests therefore receive the same build/test gate before review.
-3. The Pages workflow uses `node-version: lts/*` with `check-latest: true`, so the build follows the latest supported Node LTS line without waiting for a hand-edited number.
-4. Major upgrades remain reviewable pull requests. Merge them only after the engine simulation oracle, build, and a mobile browser smoke test are green.
-5. Re-run this inventory quarterly, or immediately after a major dependency PR, and update the checked date and rows that changed.
+3. `.github/workflows/dependabot-automerge.yml` enables squash auto-merge only for Dependabot semver-patch updates. Minor and major upgrades remain reviewable pull requests. Repository auto-merge and the `Continuous integration / verify` required status check must be enabled in GitHub before this automation can merge a pull request.
+4. The Pages workflow uses `node-version: lts/*` with `check-latest: true`, so the build follows the latest supported Node LTS line without waiting for a hand-edited number.
+5. Major upgrades must pass the engine simulation oracle, build, and a mobile browser smoke test before merge.
+6. Re-run this inventory quarterly, or immediately after a major dependency PR, and update the checked date and rows that changed.
 
 ## Sources checked
 
