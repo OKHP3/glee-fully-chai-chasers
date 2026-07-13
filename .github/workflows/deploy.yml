@@ -32,7 +32,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      - run: npm install
       # Unit tests must pass to deploy; the spec oracle runs in its own
       # visible-but-non-blocking job below so iterative builds can ship
       # while Round-2 math tuning is in progress.
@@ -63,7 +63,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm install
       - run: npx vitest run src/engine/simulation.test.ts
 
   deploy:
