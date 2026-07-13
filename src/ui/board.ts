@@ -620,7 +620,7 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
         <div class="wheel-pointer"></div>
       </div>
       <div class="wheel-legends" aria-hidden="true">
-        <span><b>Growing wilds</b> Extra sparkle</span>
+        <span><b>We're Multiplying</b> Extra sparkle</span>
         <span><b>Keepsake Constellation</b> mega-keepsakes</span>
         <span><b>Iced Chai</b> wild rain</span>
       </div>
