@@ -6,7 +6,7 @@ Approved bounded bonus amendment from Jamie. This document complements the canon
 
 - An original illustrated house doorbell may land on reels 1 or 2 only.
 - One doorbell alone is a blocker: it pays nothing, cannot be part of a winning line, and remains in place through cascades.
-- Two doorbells on the first two positions of any fixed payline trigger **Stranger Danger Panic**.
+- Two doorbells on the first two positions of any fixed payline trigger **Doorbell Panic**.
 - The trigger awards a random 5–20 free spins and bypasses the normal free-spin wheel.
 - The trigger banner remains visible while Joey and Phoebe begin fleeing; the triggering doorbells are highlighted as the board's dead space.
 - Each panic spin preloads 3–6 Joey/Phoebe wilds onto randomly selected payline coordinates before ordinary cascade evaluation. They remain ordinary wilds for payout purposes, but receive the panic landing animation.
