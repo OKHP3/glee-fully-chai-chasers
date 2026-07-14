@@ -12,6 +12,7 @@ import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
 import { castTreatTimeWilds } from "./treattime";
+import { applyKeepsakeZone, rollKeepsakeZone } from "./keepsake-constellation";
 
 export type WheelWedge =
   | "multiplying"
@@ -121,12 +122,15 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
   const treatTime = treatTimeMode
     ? castTreatTimeWilds(rng, spinGrid(rng), treatTimeMode)
     : undefined;
+  const keepsakeZone = wedge === "giant_gnome" ? rollKeepsakeZone(rng) : undefined;
+  const keepsakeGrid = keepsakeZone ? applyKeepsakeZone(spinGrid(rng), keepsakeZone) : undefined;
   const base = spin({
     rng,
     betPerLine,
     treatJar: emptyTreatJar(),
     spinsSincePopIn: 999,
-    startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid,
+    startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? keepsakeGrid,
+    keepsakeZone,
     allowTreatTimeBonus: false,
   });
   const treatTimeMeta = treatTime
@@ -153,10 +157,7 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, extraWildsAdded: extra, panicWildsAdded: 0 };
   }
 
-  // Legacy giant_gnome ID: 2x2 mega-keepsakes on reels 2-3/4-5 — modeled as
-  // a flat uplift. The ID stays stable until Claude performs a math-safe migration.
-  const bonusWin = Math.round(base.totalWin * 0.15);
-  return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, extraWildsAdded: 0, panicWildsAdded: 0 };
+  return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0 };
 }
 
 export interface FreeSpinSessionResult {
