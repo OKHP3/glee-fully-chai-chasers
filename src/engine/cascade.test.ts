@@ -4,6 +4,7 @@ import { freeSpinsForCascades, spin } from "./cascade";
 import { emptyTreatJar } from "./features";
 import type { Grid } from "./types";
 import { PAYOUT_SCALE, PAYTABLE } from "./paylines";
+import type { KeepsakeZone } from "./types";
 
 describe("spin", () => {
   it("is deterministic for a given seed", () => {
@@ -92,5 +93,29 @@ describe("spin", () => {
     expect(result.steps[0].wins).toHaveLength(1);
     expect(firstWin.multiplier).toBe(3);
     expect(firstWin.payout).toBe(PAYTABLE.tumbler![5] * PAYOUT_SCALE * 3);
+  });
+
+  it("locks a giant footprint but changes its icon after it participates in a win", () => {
+    const grid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),
+    );
+    // A top-row tumbler line passes through the 2×2 giant rectangle on reels 2–3.
+    for (let reel = 0; reel < 5; reel++) grid[reel][0] = { symbol: "tumbler" };
+    const zone: KeepsakeZone = { leftReel: 1, topRow: 0, width: 2, height: 2, symbol: "tumbler" };
+    const result = spin({
+      rng: () => 0.5,
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+      startingGrid: grid,
+      keepsakeZone: zone,
+    });
+
+    expect(result.steps[0].wins).not.toHaveLength(0);
+    expect(result.steps[0].keepsakeZone).toEqual(zone);
+    expect(result.steps[1].keepsakeZone).toMatchObject({ leftReel: 1, topRow: 0, width: 2, height: 2 });
+    expect(result.steps[1].keepsakeZone?.symbol).not.toBe("tumbler");
+    expect(result.steps[1].grid[1][0].symbol).toBe(result.steps[1].keepsakeZone?.symbol);
+    expect(result.steps[1].grid[2][1].symbol).toBe(result.steps[1].keepsakeZone?.symbol);
   });
 });

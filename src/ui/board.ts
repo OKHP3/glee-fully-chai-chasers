@@ -223,7 +223,10 @@ function treatJarHtml(state: GameState): string {
   `;
 }
 
-export function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): string {
+export function renderGridHtml(
+  grid: SpinResult["steps"][number]["grid"],
+  keepsakeZone?: SpinResult["steps"][number]["keepsakeZone"],
+): string {
   let html = "";
   for (let reel = 0; reel < REELS; reel++) {
     html += `<div class="reel-col" data-reel="${reel}">`;
@@ -236,6 +239,13 @@ export function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): strin
       html += `<div class="cell ${cell.multiplier ? "multiplier-wild" : ""}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
     }
     html += "</div>";
+  }
+  if (keepsakeZone) {
+    html += `<div class="keepsake-constellation" aria-label="${keepsakeZone.width} by ${keepsakeZone.height} giant keepsake" aria-live="polite">
+      <div class="keepsake-constellation-symbol" style="grid-column:${keepsakeZone.leftReel + 1} / span ${keepsakeZone.width};grid-row:${keepsakeZone.topRow + 1} / span ${keepsakeZone.height}">
+        ${symbolSvg(keepsakeZone.symbol)}
+      </div>
+    </div>`;
   }
   return html;
 }
@@ -574,7 +584,7 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
         return;
       }
       const step = steps[i];
-      grid.innerHTML = renderGridHtml(step.grid);
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
       if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
         playDoorbellRing();
         doorbellRang = true;
@@ -928,7 +938,7 @@ async function playFreeSpinSession(
     }
 
     for (const [stepIndex, step] of round.steps.entries()) {
-      grid.innerHTML = renderGridHtml(step.grid);
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
       if (stepIndex === 0 && round.treatTimeWilds?.length) {
         await animateTreatTimeCast(
           overlay.querySelector<HTMLElement>(".treat-time-cabinet")!,

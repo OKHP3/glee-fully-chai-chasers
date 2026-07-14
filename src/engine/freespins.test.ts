@@ -50,6 +50,21 @@ describe("free spin rounds", () => {
     }
   });
 
+  it("rolls a real Keepsake Constellation zone rather than applying a flat win uplift", () => {
+    const rng = mulberry32(8675309);
+    let zones = 0;
+    for (let i = 0; i < 1_000; i++) {
+      const round = spinFreeRound(rng, "giant_gnome", 1);
+      const zone = round.steps[0].keepsakeZone;
+      if (zone) {
+        zones++;
+        expect(round.steps[0].grid[zone.leftReel][zone.topRow].symbol).toBe(zone.symbol);
+      }
+    }
+    expect(zones).toBeGreaterThan(650);
+    expect(zones).toBeLessThan(800);
+  });
+
   it("doorbell panic rounds preload several Joey/Phoebe wilds", () => {
     const round = spinFreeRound(mulberry32(1234), "doorbell_panic", 1);
     const firstGrid = round.steps[0].grid;
