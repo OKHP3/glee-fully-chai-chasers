@@ -28,7 +28,7 @@ function simulate(): SimStats {
   const betPerLine = 1;
   let totalBet = 0, totalWin = 0, wins = 0, fs = 0, mega = 0, uni = 0, cats = 0;
   for (let i = 0; i < SPINS; i++) {
-    const jar = { chicken: 6, salmon: 6, boogie: 6 }; // stocked jar, steady-state assumption
+    const jar = { chicken: 6, salmon: 6, bougie: 6 }; // stocked jar, steady-state assumption
     const r = spin({ rng, betPerLine, treatJar: jar, spinsSincePopIn: 10 });
     totalBet += betPerLine * 25;
     totalWin += r.totalWin;

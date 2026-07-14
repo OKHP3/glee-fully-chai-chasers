@@ -16,7 +16,7 @@ The main game is a five-reel, four-row cascade board with 25 fixed paylines. Tap
 
 - **Firefly Cascade meter:** reach four cascades in a spin to start free spins.
 - **Joey & Phoebe's Sparkle Wheel:** free-spin sessions add a wheel-selected twist to the chase.
-- **Treat Jar and cat pop-ins:** Chicken Comets and Salmon Stars can call in Phoebe; Joey saves his stronger assist for Boogie Bites.
+- **Treat Jar and cat pop-ins:** Chicken Comets and Salmon Stars can call in Phoebe; Joey saves his stronger assist for Bougie Bites.
 - **Doorbell Panic:** a matching pair of doorbells opens a cat-powered free-spin bonus.
 - **UniGlee:** the rare rainbow butterfly makes a mythic appearance; its larger multi-chapter marathon is still being tuned and tested.
 

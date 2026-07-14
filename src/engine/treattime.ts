@@ -2,7 +2,7 @@
  * Treat Time bonus math. Pure TypeScript, zero DOM.
  *
  * Morning is Phoebe's Chicken Comet warm-up. Nighttime is the rarer,
- * more valuable spread: Chicken Comets, Salmon Stars, and Joey's Boogie Bites.
+ * more valuable spread: Chicken Comets, Salmon Stars, and Joey's Bougie Bites.
  */
 import type { Grid, SymbolId, TreatKind, TreatTimeMode, TreatTimeTrigger, TreatTimeWild } from "./types";
 import { REELS, ROWS } from "./reels";
@@ -55,11 +55,11 @@ function treatForMode(rng: Rng, mode: TreatTimeMode): TreatKind {
   const roll = rng();
   if (roll < 0.45) return "chicken";
   if (roll < 0.8) return "salmon";
-  return "boogie";
+  return "bougie";
 }
 
 function wildForTreat(treat: TreatKind): Extract<SymbolId, "wild_joey" | "wild_phoebe"> {
-  return treat === "boogie" ? "wild_joey" : "wild_phoebe";
+  return treat === "bougie" ? "wild_joey" : "wild_phoebe";
 }
 
 /**

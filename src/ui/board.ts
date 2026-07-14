@@ -219,7 +219,7 @@ function treatJarHtml(state: GameState): string {
   return `
     <span title="Chicken Comets" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_chicken")}</span>${jar.chicken}</span>
     <span title="Salmon Stars" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_salmon")}</span>${jar.salmon}</span>
-    <span title="Boogie Bites" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_boogie")}</span>${jar.boogie}</span>
+    <span title="Bougie Bites" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_bougie")}</span>${jar.bougie}</span>
   `;
 }
 
@@ -446,7 +446,7 @@ function openPaytablePage(root: HTMLElement): void {
         ${featureCard("wild_phoebe", "Phoebe Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
         ${featureCard("treat_chicken", "Chicken Comets", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
         ${featureCard("treat_salmon", "Salmon Stars", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
-        ${featureCard("treat_boogie", "Boogie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
+        ${featureCard("treat_bougie", "Bougie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
         ${featureCard("doorbell", "Doorbell", "A pair on the first two positions of any line begins Doorbell Panic free spins.")}
         ${featureCard("uniglee", "UniGlee", "The rare rainbow-butterfly legend begins a special Chai Chase celebration.")}
       </section>
@@ -1000,7 +1000,7 @@ function animateTreatTimeCast(stage: HTMLElement, grid: HTMLElement, wilds: Trea
     const treatSymbols: Record<TreatTimeWild["treat"], SymbolId> = {
       chicken: "treat_chicken",
       salmon: "treat_salmon",
-      boogie: "treat_boogie",
+      bougie: "treat_bougie",
     };
     const targets: HTMLElement[] = [];
     const startX = 8;
