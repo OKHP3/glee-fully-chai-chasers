@@ -28,7 +28,7 @@ describe("Keepsake Constellation zone roll", () => {
 
   it("never selects a treat, trigger, or legend icon and keeps giant wilds rare", () => {
     const rng = mulberry32(7);
-    const forbidden: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_boogie", "doorbell", "uniglee"];
+    const forbidden: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_bougie", "doorbell", "uniglee"];
     let wilds = 0;
     const total = 50_000;
     for (let i = 0; i < total; i++) {
