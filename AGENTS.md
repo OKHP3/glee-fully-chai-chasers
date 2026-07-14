@@ -65,3 +65,5 @@ reference-photos/   LOCAL ONLY — visual brief; being purged from git history
 ## Quality bar
 
 Glee opens it on her iPhone and understands what to tap with zero instructions. Every spin resolves legibly at 60fps. It feels like *her* game — cats, iced chai, butterflies, retro-bright warmth — not like a casino and not like anyone else's IP.
+
+## Imported Claude Cowork project instructions
