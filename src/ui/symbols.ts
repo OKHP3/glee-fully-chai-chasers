@@ -254,20 +254,36 @@ const SYMBOL_SVG: Record<SymbolId, string> = {
   doorbell: wrap(
     `
     <defs>
-      <linearGradient id="doorbellGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#f5d576"/><stop offset="100%" stop-color="#d35b2d"/>
+      <linearGradient id="doorbellBody" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#f6c977"/><stop offset="48%" stop-color="#bd5b4d"/><stop offset="100%" stop-color="#522b67"/>
       </linearGradient>
+      <linearGradient id="doorbellEdge" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffdf9a"/><stop offset="100%" stop-color="#e66f88"/>
+      </linearGradient>
+      <radialGradient id="doorbellLens" cx="35%" cy="28%" r="75%">
+        <stop offset="0%" stop-color="#8b5fc4"/><stop offset="45%" stop-color="#30204e"/><stop offset="100%" stop-color="#120d29"/>
+      </radialGradient>
     </defs>
-    ${grounding("doorbellGr", 24, 41, 13, 4)}
-    <rect x="12" y="7" width="24" height="34" rx="6" fill="url(#doorbellGrad)" stroke="${INK}" stroke-width="1.6"/>
-    <rect x="16" y="11" width="16" height="9" rx="3" fill="#20163a" opacity=".9"/>
-    <circle cx="24" cy="29" r="6" fill="#fff4e0" stroke="${INK}" stroke-width="1.3"/>
-    <circle cx="24" cy="29" r="2.1" fill="#d35b2d"/>
-    <path d="M18 43h12" stroke="#fff4e0" stroke-width="1.4" stroke-linecap="round" opacity=".75"/>
-    <path d="M9 24c-3-2-3-5 0-7M39 24c3-2 3-5 0-7" fill="none" stroke="#9fe8c5" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
-    ${sheen("doorbellSheen", 18, 13, 7, 8)}
+    ${grounding("doorbellGr", 24, 43, 15, 3.5)}
+    <rect x="9.5" y="3.5" width="29" height="40" rx="8" fill="url(#doorbellBody)" stroke="${INK}" stroke-width="1.7"/>
+    <rect x="11.5" y="5.5" width="25" height="17" rx="6" fill="#17112f" stroke="url(#doorbellEdge)" stroke-width="1.15"/>
+    <circle cx="24" cy="14" r="7.1" fill="url(#doorbellLens)" stroke="#e77e9d" stroke-width="1"/>
+    <circle cx="24" cy="14" r="5" fill="none" stroke="#6d4c93" stroke-width=".9" opacity=".9"/>
+    <circle cx="24" cy="14" r="2.4" fill="#120d29" stroke="#f6c977" stroke-width=".7"/>
+    <circle cx="22.9" cy="12.8" r=".9" fill="#fff4e0" opacity=".85"/>
+    <circle cx="32.2" cy="18.7" r="1.1" fill="#9fe8c5" stroke="${INK}" stroke-width=".55"/>
+    <path d="M15 25.5h18" stroke="#f6c977" stroke-width="1.1" opacity=".6"/>
+    <circle cx="24" cy="33" r="8.2" fill="#4a2866" stroke="${INK}" stroke-width="1.3"/>
+    <circle cx="24" cy="33" r="6.7" fill="none" stroke="#9fe8c5" stroke-width="2.1"/>
+    <circle cx="24" cy="33" r="5.2" fill="#e28a58" stroke="#f8d58c" stroke-width=".9"/>
+    <path d="M20.6 33.8c2.3-2.8 5.4-2.8 7.1-.1-2.1-.5-4.2.4-5.5 2.1" fill="none" stroke="#fff4e0" stroke-width=".8" stroke-linecap="round" opacity=".75"/>
+    <path d="M8 31c-2-1.8-2-4.6.3-6.2M40 31c2-1.8 2-4.6-.3-6.2" fill="none" stroke="#e77e9d" stroke-width="1.35" stroke-linecap="round"/>
+    <path d="M13.3 39.5c2.6 1.4 5.2 2 7.7 2M34.7 39.5c-2.6 1.4-5.2 2-7.7 2" fill="none" stroke="#9fe8c5" stroke-width=".8" stroke-linecap="round" opacity=".8"/>
+    <path d="M14.4 27.3c-1.5-2.2-.1-4.4 2.1-4.7 1.4-.2 2.5.5 3.2 1.5-1.3-.3-2.4.1-3.1 1.1-.7 1-.9 1.8-2.2 2.1zM16.4 25.3c1.1-1.4 2.8-1.8 4.3-.8" fill="#f28bab" stroke="${INK}" stroke-width=".55"/>
+    <path d="M32 27.2l.7 1.4 1.4.7-1.4.7-.7 1.4-.7-1.4-1.4-.7 1.4-.7zM18 9.1l.5 1 .9.5-.9.5-.5 1-.5-1-.9-.5.9-.5z" fill="#fff4e0" opacity=".9"/>
+    ${sheen("doorbellSheen", 16, 9, 8, 10)}
   `,
-    { glow: "245, 213, 118" },
+    { glow: "231, 126, 157" },
   ),
   // --- treats (feature symbols) ------------------------------------------
   treat_chicken: wrap(
