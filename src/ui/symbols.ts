@@ -298,7 +298,7 @@ const SYMBOL_SVG: Record<SymbolId, string> = {
   `,
     { glow: "142, 201, 255" },
   ),
-  treat_boogie: wrap(
+  treat_bougie: wrap(
     `
     <defs>
       <radialGradient id="tbGrad" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#e6cbff"/><stop offset="100%" stop-color="#7a4fc9"/></radialGradient>
@@ -391,7 +391,7 @@ export function symbolSvg(id: SymbolId): string {
     yarn: "100% 66.667%", // shared-life keepsake locket
     treat_chicken: "0% 100%",
     treat_salmon: "33.333% 100%",
-    treat_boogie: "66.667% 100%",
+    treat_bougie: "66.667% 100%",
     uniglee: "100% 100%",
   };
 

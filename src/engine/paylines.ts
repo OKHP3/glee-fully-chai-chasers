@@ -59,7 +59,7 @@ export const PAYOUT_SCALE = 1.052864;
 
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */
-const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_boogie", "uniglee", "doorbell"];
+const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_bougie", "uniglee", "doorbell"];
 
 export function isWild(symbol: SymbolId): boolean {
   return WILDS.includes(symbol);

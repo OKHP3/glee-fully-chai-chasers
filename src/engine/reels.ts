@@ -57,7 +57,7 @@ function baseSegments(reelIndex: number): SymbolId[][] {
 
 /** Treats only appear on reels 1/3/5 (index 0, 2, 4) — docs §6. */
 function treatSegments(): SymbolId[][] {
-  return [repeat("treat_chicken", 5), repeat("treat_salmon", 4), repeat("treat_boogie", 2)];
+  return [repeat("treat_chicken", 5), repeat("treat_salmon", 4), repeat("treat_bougie", 2)];
 }
 
 /**

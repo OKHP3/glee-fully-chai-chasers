@@ -54,13 +54,30 @@ export interface GameState {
 
 export type ThemeMode = "system" | "dark" | "light";
 
+/**
+ * Converts the pre-correction save shape without dropping Joey's treats.
+ * `boogie` was the misspelled key shipped before Bougie Bites was corrected.
+ */
+function loadTreatJar(): TreatJar {
+  const jar = load<Partial<TreatJar> & { boogie?: number }>("treatJar", emptyTreatJar());
+  return {
+    chicken: Number.isFinite(jar.chicken) ? Math.max(0, jar.chicken as number) : 0,
+    salmon: Number.isFinite(jar.salmon) ? Math.max(0, jar.salmon as number) : 0,
+    bougie: Number.isFinite(jar.bougie)
+      ? Math.max(0, jar.bougie as number)
+      : Number.isFinite(jar.boogie)
+        ? Math.max(0, jar.boogie as number)
+        : 0,
+  };
+}
+
 export function loadGameState(): GameState {
   const soundOn = load("soundOn", true);
   return {
     balance: load("balance", STARTING_BALANCE),
     bet: load("bet", 25),
     xp: load("xp", 0),
-    treatJar: load("treatJar", emptyTreatJar()),
+    treatJar: loadTreatJar(),
     fireflyMeter: load("fireflyMeter", 0),
     bestCascade: load("bestCascade", 0),
     spinsSincePopIn: load("spinsSincePopIn", 0),

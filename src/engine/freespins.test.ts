@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
-import { runFreeSpinSession, spinFreeRound, spinWheel, wheelWedgeLabel } from "./freespins";
+import { rollWildMultiplier, runFreeSpinSession, spinFreeRound, spinWheel, wheelWedgeLabel } from "./freespins";
 
 describe("AskJamie wheel", () => {
   it("always lands on one of the three wedges", () => {
@@ -14,6 +14,25 @@ describe("AskJamie wheel", () => {
 });
 
 describe("free spin rounds", () => {
+  it("uses the approved no / 2x / 3x / 5x / 10x multiplier boundaries", () => {
+    const roll = (value: number) => rollWildMultiplier(() => value);
+    expect(roll(0)).toBeUndefined();
+    expect(roll(0.1499)).toBeUndefined();
+    expect(roll(0.15)).toBe(2);
+    expect(roll(0.4999)).toBe(2);
+    expect(roll(0.50)).toBe(3);
+    expect(roll(0.7999)).toBe(3);
+    expect(roll(0.80)).toBe(5);
+    expect(roll(0.9499)).toBe(5);
+    expect(roll(0.95)).toBe(10);
+  });
+
+  it("places exactly one opening-result multiplier wild on its matching reel", () => {
+    const round = spinFreeRound(() => 0.2, "multiplying", 1);
+    expect(round.multiplierWild).toEqual({ multiplier: 2, position: [1, 0] });
+    expect(round.steps[0].grid.flat().filter((cell) => cell.multiplier !== undefined)).toHaveLength(1);
+  });
+
   it("never produces a negative or NaN win", () => {
     const rng = mulberry32(42);
     for (let i = 0; i < 200; i++) {
@@ -31,6 +50,21 @@ describe("free spin rounds", () => {
     }
   });
 
+  it("rolls a real Keepsake Constellation zone rather than applying a flat win uplift", () => {
+    const rng = mulberry32(8675309);
+    let zones = 0;
+    for (let i = 0; i < 1_000; i++) {
+      const round = spinFreeRound(rng, "giant_gnome", 1);
+      const zone = round.steps[0].keepsakeZone;
+      if (zone) {
+        zones++;
+        expect(round.steps[0].grid[zone.leftReel][zone.topRow].symbol).toBe(zone.symbol);
+      }
+    }
+    expect(zones).toBeGreaterThan(650);
+    expect(zones).toBeLessThan(800);
+  });
+
   it("doorbell panic rounds preload several Joey/Phoebe wilds", () => {
     const round = spinFreeRound(mulberry32(1234), "doorbell_panic", 1);
     const firstGrid = round.steps[0].grid;
@@ -38,7 +72,7 @@ describe("free spin rounds", () => {
     expect(round.panicWildsAdded).toBeGreaterThanOrEqual(3);
     expect(round.panicWildsAdded).toBeLessThanOrEqual(6);
     expect(wildCount).toBeGreaterThanOrEqual(round.panicWildsAdded);
-    expect(round.twelvePumps).toBe(false);
+    expect(round.multiplierWild).toBeUndefined();
   });
 });
 
