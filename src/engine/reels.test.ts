@@ -35,6 +35,14 @@ describe("spinGrid", () => {
     expect(DOORBELL_REEL_TWO_RATE).toBeCloseTo(1 / 23);
     expect(DOORBELL_REEL_ONE_RATE * DOORBELL_REEL_TWO_RATE).toBeCloseTo(1 / 299);
   });
+
+  it("suppresses doorbell events for bonus grids", () => {
+    for (let seed = 0; seed < 5000; seed++) {
+      const grid = spinGrid(mulberry32(seed), false);
+      expect(grid[0].some((cell) => cell.symbol === "doorbell")).toBe(false);
+      expect(grid[1].some((cell) => cell.symbol === "doorbell")).toBe(false);
+    }
+  });
 });
 
 describe("cascadeColumn", () => {

@@ -66,7 +66,7 @@ export interface MultiplierWild {
  * fresh cascade drops never receive a marker.
  */
 function multiplyingStartingGrid(rng: Rng, multiplier: WildMultiplier): { grid: Grid; multiplierWild: MultiplierWild } {
-  const grid = spinGrid(rng);
+  const grid = spinGrid(rng, false);
   const reel = MULTIPLIER_REEL[multiplier];
   const row = Math.floor(rng() * grid[reel].length);
   grid[reel][row] = {
@@ -86,7 +86,7 @@ export interface FreeSpinRoundResult extends SpinResult {
 }
 
 function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
-  const grid = spinGrid(rng);
+  const grid = spinGrid(rng, false);
   const occupied = new Set<string>();
   const count = 3 + Math.floor(rng() * 4); // 3-6 cats, every round feels berserk
 
@@ -120,10 +120,10 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
       ? "nighttime"
       : undefined;
   const treatTime = treatTimeMode
-    ? castTreatTimeWilds(rng, spinGrid(rng), treatTimeMode)
+    ? castTreatTimeWilds(rng, spinGrid(rng, false), treatTimeMode)
     : undefined;
   const keepsakeZone = wedge === "giant_gnome" ? rollKeepsakeZone(rng) : undefined;
-  const keepsakeGrid = keepsakeZone ? applyKeepsakeZone(spinGrid(rng), keepsakeZone) : undefined;
+  const keepsakeGrid = keepsakeZone ? applyKeepsakeZone(spinGrid(rng, false), keepsakeZone) : undefined;
   const base = spin({
     rng,
     betPerLine,
@@ -131,6 +131,7 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     spinsSincePopIn: 999,
     startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? keepsakeGrid,
     keepsakeZone,
+    allowDoorbells: false,
     allowTreatTimeBonus: false,
   });
   const treatTimeMeta = treatTime
