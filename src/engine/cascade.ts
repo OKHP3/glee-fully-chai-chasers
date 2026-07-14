@@ -19,7 +19,7 @@ import { applyKeepsakeZone, cloneKeepsakeZone, isKeepsakePosition, rollKeepsakeS
 const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
   treat_chicken: "chicken",
   treat_salmon: "salmon",
-  treat_boogie: "boogie",
+  treat_bougie: "bougie",
 };
 
 /** ~1/400 per spin (docs §5) — a legend, not a line symbol. */

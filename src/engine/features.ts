@@ -4,7 +4,7 @@
  *
  * Vertical-slice note: this covers the pop-in decision + treat-consumption
  * rule (the part that's canon-load-bearing and testable). The richer
- * assist animations (Sparkle Sort blast, Drop-In Saucer, Boogie Boost) are
+ * assist animations (Sparkle Sort blast, Drop-In Saucer, Bougie Boost) are
  * UI-layer follow-up work — see docs/REPLIT-HANDOFF.md.
  */
 import type { CatVisit, TreatKind } from "./types";
@@ -13,13 +13,13 @@ import type { Rng } from "./rng";
 export interface TreatJar {
   chicken: number;
   salmon: number;
-  boogie: number;
+  bougie: number;
 }
 
 export const TREAT_JAR_CAP = 12;
 
 export function emptyTreatJar(): TreatJar {
-  return { chicken: 0, salmon: 0, boogie: 0 };
+  return { chicken: 0, salmon: 0, bougie: 0 };
 }
 
 export function addTreat(jar: TreatJar, treat: TreatKind): TreatJar {
@@ -44,7 +44,7 @@ export function rollCatVisit(
 
   const isPhoebe = rng() < 0.6; // 60/40 split — docs §6
   if (isPhoebe) {
-    const hasAnyTreat = jar.chicken > 0 || jar.salmon > 0 || jar.boogie > 0;
+    const hasAnyTreat = jar.chicken > 0 || jar.salmon > 0 || jar.bougie > 0;
     return hasAnyTreat
       ? { cat: "phoebe", fed: true, assist: "sparkle_sort", quip: "Freak'n facts on facts — Phoebe approves." }
       : {
@@ -55,10 +55,10 @@ export function rollCatVisit(
         };
   }
 
-  // Joey — CANON S7: only assists when Boogie Bites are stocked.
-  return jar.boogie > 0
-    ? { cat: "joey", fed: true, assist: "drop_in", quip: "Joey requires Boogie Bites. Joey approves of this jar." }
-    : { cat: "joey", fed: false, assist: "shuffle_consolation", quip: "Joey requires Boogie Bites. Joey is a professional." };
+  // Joey — CANON S7: only assists when Bougie Bites are stocked.
+  return jar.bougie > 0
+    ? { cat: "joey", fed: true, assist: "drop_in", quip: "Joey requires Bougie Bites. Joey approves of this jar." }
+    : { cat: "joey", fed: false, assist: "shuffle_consolation", quip: "Joey requires Bougie Bites. Joey is a professional." };
 }
 
 /** Consumes the treat a fed cat's visit used up (jar rules per canon S7). */
@@ -66,10 +66,10 @@ export function consumeForVisit(jar: TreatJar, visit: CatVisit): TreatJar {
   if (!visit.fed) return jar;
   const next = { ...jar };
   if (visit.cat === "joey") {
-    next.boogie = Math.max(0, next.boogie - 1);
+    next.bougie = Math.max(0, next.bougie - 1);
   } else {
     // Phoebe eats whichever treat is available, preferring the rarest first.
-    if (next.boogie > 0) next.boogie -= 1;
+    if (next.bougie > 0) next.bougie -= 1;
     else if (next.salmon > 0) next.salmon -= 1;
     else if (next.chicken > 0) next.chicken -= 1;
   }

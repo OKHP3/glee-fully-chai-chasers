@@ -14,11 +14,11 @@ export type SymbolId =
   // blocker / bonus trigger
   | "doorbell"
   // treats (feature symbols, reels 1/3/5 only)
-  | "treat_chicken" | "treat_salmon" | "treat_boogie"
+  | "treat_chicken" | "treat_salmon" | "treat_bougie"
   // wilds & legend
   | "wild_joey" | "wild_phoebe" | "uniglee";
 
-export type TreatKind = "chicken" | "salmon" | "boogie";
+export type TreatKind = "chicken" | "salmon" | "bougie";
 
 export type TreatTimeMode = "morning" | "nighttime";
 
@@ -93,7 +93,7 @@ export const FREE_SPIN_LADDER: Record<number, number> = {
 
 export interface CatVisit {
   cat: "joey" | "phoebe";
-  fed: boolean;            // jar had a qualifying treat (Phoebe: any; Joey: boogie only — CANON S7)
+  fed: boolean;            // jar had a qualifying treat (Phoebe: any; Joey: bougie only — CANON S7)
   assist?: "sparkle_sort" | "drop_in" | "meter_nudge" | "shuffle_consolation";
   quip: string;
 }

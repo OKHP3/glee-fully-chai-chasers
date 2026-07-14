@@ -16,7 +16,7 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 | S4 | 2026-07-10 | No photos of Glee in repo or game; abstract "Chai Captain" presence only | Glee's stated preference + vision doc §6 |
 | S5 | 2026-07-10 | `reference-photos/` purged from git history and gitignored | Glee photos were publicly pushed; remediation in `private-work/photo-triage.md` |
 | S6 | 2026-07-10 | No copyrighted audio/clips; no brand names/logos (IP-GUARDRAILS.md) | Public repo, zero-risk posture |
-| S7 | 2026-07-10 | Treat rules: **Phoebe helps for any treat; Joey only for Boogie Bites** | Canon from Jamie |
+| S7 | 2026-07-10 | Treat rules: **Phoebe helps for any treat; Joey only for Bougie Bites** | Canon from Jamie; spelling corrected 2026-07-13 |
 | S8 (was D1) | 2026-07-10 | **Slot framing.** Real paylines, RNG, variance, free-spin ladder, a generous fictional economy, and honest meters | Jamie ruled: Claude vision superimposed on the Codex foundation. Preserve the play rhythm Glee enjoys inside an original game made for her |
 | S9 (was D2) | 2026-07-10 | **Vanilla TypeScript** (no React) | Jamie ruled. One animation-heavy screen; pure-TS engine either way |
 | S10 (was D3) | 2026-07-10 | **Hybrid cats:** illustrated saucer-cat wilds on reels; real-photo sticker-cutouts for pop-ins and scenes | Legibility at symbol size + photographic charm where the surprise lands |

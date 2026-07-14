@@ -8,7 +8,7 @@ Every tool and every commit follows these. Not legal advice; a conservative zero
 | Friends / Schitt's Creek | Zero audio/video clips; zero verbatim script quotes | Homage-style original lines; cat names Joey & Phoebe are the real cats' names (names alone unprotectable) |
 | Stevie Nicks / Fleetwood Mac / any music | No samples; no melodies close enough to hum-match | Original chiptune in the *style* of 70s soft-rock / 90s grunge. Style isn't copyrightable; recordings and compositions are |
 | Starbucks / Tazo / Swig Life | No brand names, logos, siren imagery, or product trade dress | "Jewel-toned mermaid-pattern 24oz tumbler" as original art; "12 pumps" as a number, not an order quote |
-| Cat Man Doo / Orijen / Chewy | No brand names, logos, or traced packaging | Generic pouches echoing silhouette/color: Chicken Comets (yellow), Salmon Stars (blue), Boogie Bites (navy) |
+| Cat Man Doo / Orijen / Chewy | No brand names, logos, or traced packaging | Generic pouches echoing silhouette/color: Chicken Comets (yellow), Salmon Stars (blue), Bougie Bites (navy) |
 | Glee's likeness | No photos of Glee in repo, game, history, or derived assets | Abstract Chai Captain presence; original illustrated avatar only if she approves the design |
 | Gambling optics | No real money, purchases, ads, cash-out, or odds claims; no "casino" in name/store text | README states: free fan-made birthday gift, fictional currency, no wagering, not affiliated with any casino, game studio, or brand |
 | Reach measurement | One constrained Google Analytics tag may measure aggregate site reach | No advertising, personalization, accounts, custom identifiers, or game-state telemetry; follow `docs/ANALYTICS-PRIVACY.md` |

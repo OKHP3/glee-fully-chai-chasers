@@ -19,7 +19,7 @@ Status: ☐ todo · ◐ in progress · ☑ done
 | High | mermaid tumbler (iced, straw), midnight butterfly, Glee Mix Tape, crystal cluster | ☑ `public/assets/glee-symbol-atlas.png` |
 | Mid | iced chai cup, unlit cinnamon candle, Glee cardigan, Moonlit Book Stack | ☑ same atlas |
 | Low | butterfly hair clip, VHS tape, aurora keepsake, shared-life keepsake locket | ☑ same atlas |
-| Treats | Chicken Comets (yellow), Salmon Stars (blue), Boogie Bites (navy) | ☑ same atlas |
+| Treats | Chicken Comets (yellow), Salmon Stars (blue), Bougie Bites (navy) | ☑ same atlas |
 | Wilds | Joey-saucer and Phoebe-saucer | ☑ `public/assets/joey-phoebe-wilds.png` |
 | Legend | UniGlee rainbow butterfly | ☑ symbol atlas |
 
