@@ -118,7 +118,7 @@ function windowFrom(reelIndex: number, stop: number): Cell[] {
 }
 
 /** Draws a fresh REELS x ROWS grid. grid[reel][row], row 0 = top. */
-export function spinGrid(rng: Rng): Grid {
+export function spinGrid(rng: Rng, includeDoorbells = true): Grid {
   const grid: Grid = [];
   for (let reel = 0; reel < REELS; reel++) {
     const stop = randomStop(rng, STRIPS[reel].length);
@@ -131,13 +131,15 @@ export function spinGrid(rng: Rng): Grid {
   // 1-in-13 and 1-in-23 rolls produce a paired trigger about once per 299
   // spins, while allowing each reel to show its own blocker on its requested
   // cadence.
-  if (rng() < DOORBELL_REEL_ONE_RATE) {
-    const row = Math.floor(rng() * ROWS);
-    grid[0][row] = { symbol: "doorbell" };
-  }
-  if (rng() < DOORBELL_REEL_TWO_RATE) {
-    const row = Math.floor(rng() * ROWS);
-    grid[1][row] = { symbol: "doorbell" };
+  if (includeDoorbells) {
+    if (rng() < DOORBELL_REEL_ONE_RATE) {
+      const row = Math.floor(rng() * ROWS);
+      grid[0][row] = { symbol: "doorbell" };
+    }
+    if (rng() < DOORBELL_REEL_TWO_RATE) {
+      const row = Math.floor(rng() * ROWS);
+      grid[1][row] = { symbol: "doorbell" };
+    }
   }
   return grid;
 }

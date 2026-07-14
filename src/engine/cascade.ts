@@ -154,6 +154,8 @@ export interface SpinInput {
   startingGrid?: Grid;
   /** Locked giant footprint for a single Keepsake Constellation free spin. */
   keepsakeZone?: KeepsakeZone;
+  /** Bonus rounds suppress standard-spin-only doorbell events. */
+  allowDoorbells?: boolean;
   /** Free-spin rounds opt out; base spins use the either-mode cadence. */
   allowTreatTimeBonus?: boolean;
   treatTimeMode?: TreatTimeMode | "either";
@@ -173,13 +175,14 @@ export function spin({
   spinsSincePopIn,
   startingGrid,
   keepsakeZone: inputKeepsakeZone,
+  allowDoorbells = true,
   allowTreatTimeBonus = true,
   treatTimeMode = "either",
   treatTimeRng,
 }: SpinInput): SpinResult {
   let grid = startingGrid
     ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
-    : spinGrid(rng);
+    : spinGrid(rng, allowDoorbells);
   const steps: CascadeStep[] = [];
   let keepsakeZone = cloneKeepsakeZone(inputKeepsakeZone);
   if (keepsakeZone) grid = applyKeepsakeZone(grid, keepsakeZone);

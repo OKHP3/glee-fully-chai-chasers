@@ -74,6 +74,16 @@ describe("free spin rounds", () => {
     expect(wildCount).toBeGreaterThanOrEqual(round.panicWildsAdded);
     expect(round.multiplierWild).toBeUndefined();
   });
+
+  it("never introduces doorbells inside any bonus round", () => {
+    const wedges = ["multiplying", "giant_gnome", "chai_back", "doorbell_panic", "treat_time_morning", "treat_time_nighttime"] as const;
+    for (const [wedgeIndex, wedge] of wedges.entries()) {
+      for (let seed = 0; seed < 100; seed++) {
+        const round = spinFreeRound(mulberry32(seed + wedgeIndex * 1000), wedge, 1);
+        expect(round.steps.flatMap((step) => step.grid.flat()).some((cell) => cell.symbol === "doorbell")).toBe(false);
+      }
+    }
+  });
 });
 
 describe("free spin session", () => {
