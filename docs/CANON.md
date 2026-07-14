@@ -15,14 +15,14 @@ The gift succeeds on specificity. These facts are load-bearing. Source: Jamie (2
 | | Phoebe | Joey |
 |---|---|---|
 | Look | Curvy black-and-white **tuxedo**; white chest and paws | **Slender gray**, striking **yellow eyes** |
-| Personality | Enthusiastic food motivation — will show up for **any treat**, delivers an affectionate, chaotic assist | Glee's spoiled favorite boy, "**the boogie cat**"; more selective; Jamie jokes Joey is his competition |
-| Treats | Anything and everything (lovingly, not fat-shamed — she's a queen) | Only his special treat: freeze-dried raw morsels ("**Boogie Bites**" in-game; Orijen-inspired, unbranded) |
-| Game role | Helps whenever ANY treat is in the jar | Helps ONLY when Boogie Bites are stocked — rarer, stronger assist |
+| Personality | Enthusiastic food motivation — will show up for **any treat**, delivers an affectionate, chaotic assist | Glee's spoiled favorite boy, "**the bougie cat**"; more selective; Jamie jokes Joey is his competition |
+| Treats | Anything and everything (lovingly, not fat-shamed — she's a queen) | Only his special treat: freeze-dried raw morsels ("**Bougie Bites**" in-game; Orijen-inspired, unbranded) |
+| Game role | Helps whenever ANY treat is in the jar | Helps ONLY when Bougie Bites are stocked — rarer, stronger assist |
 | Named after | Phoebe Buffay | Joey Tribbiani |
 
 ## In-game treat canon
 
-- **Boogie Bites** (Joey): small dark-navy pouch, scatter of freeze-dried morsels. No brand text.
+- **Bougie Bites** (Joey): small dark-navy pouch, scatter of freeze-dried morsels. No brand text.
 - **Chicken Comets** and **Salmon Stars** (Phoebe-tier treats, per vision doc naming): yellow pouch / blue pouch, echoing the real treats' colors by silhouette only. No "Cat Man Doo," no "Chicken Littles," no logos.
 
 ## Voice (from the persona page — use as seasoning, never smothering)

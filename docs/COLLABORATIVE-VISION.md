@@ -29,7 +29,7 @@ The reference slot family is an *emotional/mechanical study* only: a cascade can
 Glee is the unseen **Chai Captain**: the person whose joy powers the universe, without using a portrait. Joey and Phoebe are the on-screen heart of the game.
 
 - **Phoebe:** curvy black-and-white tuxedo cat; appears for any treat and delivers an enthusiastic, affectionate assist.
-- **Joey:** slender gray cat with yellow eyes; Glee's extra-special “boogie cat” gets a distinct, celebratory assist.
+- **Joey:** slender gray cat with yellow eyes; Glee's extra-special “bougie cat” gets a distinct, celebratory assist.
 - **Iced chai ritual:** a tall, straw-forward, original jewel-toned tumbler; never hot chai and no copied cup or beverage branding.
 - **AskJamie co-pilot:** an original, consented companion character inspired by the existing friendly robot language; he provides gentle prompts, not a competing protagonist.
 
@@ -48,7 +48,7 @@ The board should feel like a tiny midnight garden/constellation: iced chai tumbl
 
 - One polished board, reliable cascade animation, and one-tap play.
 - Deterministic or deliberately generous matching rules; no concealed payout math.
-- Three cat assists: Phoebe treat party, Joey boogie-cat boost, and a shared cat celebration.
+- Three cat assists: Phoebe treat party, Joey bougie-cat boost, and a shared cat celebration.
 - Four milestone scenes selected by clear progress, not paid/random access.
 - Local-only persistence for settings, unlocked scenes, and best cascade.
 - Sound toggle, reduced-motion behavior, accessible labels, and restart/reset controls.

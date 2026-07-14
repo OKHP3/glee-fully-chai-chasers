@@ -5,14 +5,14 @@
  * spin() with the modifier's effect layered on top — modifier math lives here,
  * not in the UI.
  */
-import type { Grid, SpinResult, TreatTimeMode, TreatTimeWild } from "./types";
+import type { Grid, SpinResult, TreatTimeMode, TreatTimeWild, WildMultiplier } from "./types";
 import { spin } from "./cascade";
-import { isWild } from "./paylines";
 import { PAYLINES } from "./paylines";
 import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
 import { castTreatTimeWilds } from "./treattime";
+import { applyKeepsakeZone, rollKeepsakeZone } from "./keepsake-constellation";
 
 export type WheelWedge =
   | "multiplying"
@@ -39,18 +39,46 @@ export function spinWheel(rng: Rng): WheelWedge {
   return WHEEL_WEIGHTS[0][0];
 }
 
-/** We're Multiplying: 2-5x common, 8x uncommon, 12x jackpot ("TWELVE PUMPS!"). */
-export function rollWildMultiplier(rng: Rng): number {
+/**
+ * We're Multiplying is rolled once for each counted free spin. A cascade is
+ * part of that spin, so it never rolls or creates an additional marked wild.
+ */
+export function rollWildMultiplier(rng: Rng): WildMultiplier | undefined {
   const r = rng();
-  if (r < 0.02) return 12; // the jackpot callout — docs §7, canon "12 pumps"
-  if (r < 0.14) return 8;
-  const common = [2, 3, 4, 5];
-  return common[Math.floor(rng() * common.length)];
+  if (r < 0.15) return undefined;
+  if (r < 0.50) return 2;
+  if (r < 0.80) return 3;
+  if (r < 0.95) return 5;
+  return 10;
+}
+
+/** Multiplier values are tied to their original reel positions (zero-based). */
+const MULTIPLIER_REEL: Record<WildMultiplier, number> = { 2: 1, 3: 2, 5: 3, 10: 4 };
+
+export interface MultiplierWild {
+  multiplier: WildMultiplier;
+  position: [reel: number, row: number];
+}
+
+/**
+ * Guarantees the single visible multiplier wild on a qualifying opening
+ * result. The cell carries its marker through gravity if it survives, but
+ * fresh cascade drops never receive a marker.
+ */
+function multiplyingStartingGrid(rng: Rng, multiplier: WildMultiplier): { grid: Grid; multiplierWild: MultiplierWild } {
+  const grid = spinGrid(rng);
+  const reel = MULTIPLIER_REEL[multiplier];
+  const row = Math.floor(rng() * grid[reel].length);
+  grid[reel][row] = {
+    symbol: rng() < 0.5 ? "wild_joey" : "wild_phoebe",
+    multiplier,
+  };
+  return { grid, multiplierWild: { multiplier, position: [reel, row] } };
 }
 
 export interface FreeSpinRoundResult extends SpinResult {
-  wildMultipliers?: Array<[number, number, number]>; // [reel, row, multiplier] for We're Multiplying
-  twelvePumps: boolean; // true if any wild landed the 12x jackpot this round
+  /** The one opening-result multiplier wild, if this counted spin rolled one. */
+  multiplierWild?: MultiplierWild;
   extraWildsAdded: number; // We Want Our Chai Back
   panicWildsAdded: number;
   treatTimeWilds?: TreatTimeWild[];
@@ -84,6 +112,8 @@ function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
 /** Runs one free-spin round with the chosen wedge's modifier applied. */
 export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): FreeSpinRoundResult {
   const panic = wedge === "doorbell_panic" ? panicStartingGrid(rng) : undefined;
+  const multiplier = wedge === "multiplying" ? rollWildMultiplier(rng) : undefined;
+  const multiplying = multiplier ? multiplyingStartingGrid(rng, multiplier) : undefined;
   const treatTimeMode: TreatTimeMode | undefined = wedge === "treat_time_morning"
     ? "morning"
     : wedge === "treat_time_nighttime"
@@ -92,12 +122,15 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
   const treatTime = treatTimeMode
     ? castTreatTimeWilds(rng, spinGrid(rng), treatTimeMode)
     : undefined;
+  const keepsakeZone = wedge === "giant_gnome" ? rollKeepsakeZone(rng) : undefined;
+  const keepsakeGrid = keepsakeZone ? applyKeepsakeZone(spinGrid(rng), keepsakeZone) : undefined;
   const base = spin({
     rng,
     betPerLine,
     treatJar: emptyTreatJar(),
     spinsSincePopIn: 999,
-    startingGrid: panic?.grid ?? treatTime?.grid,
+    startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? keepsakeGrid,
+    keepsakeZone,
     allowTreatTimeBonus: false,
   });
   const treatTimeMeta = treatTime
@@ -105,35 +138,15 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     : {};
 
   if (wedge === "doorbell_panic") {
-    return { ...base, ...treatTimeMeta, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: panic?.wildsAdded ?? 0 };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: panic?.wildsAdded ?? 0 };
   }
 
   if (treatTime) {
-    return { ...base, ...treatTimeMeta, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0 };
   }
 
   if (wedge === "multiplying") {
-    const finalGrid = base.steps[base.steps.length - 1].grid;
-    const wildMultipliers: Array<[number, number, number]> = [];
-    let twelvePumps = false;
-    let bonusWin = 0;
-    finalGrid.forEach((column, reel) => {
-      column.forEach((cell, row) => {
-        if (isWild(cell.symbol)) {
-          const mult = rollWildMultiplier(rng);
-          wildMultipliers.push([reel, row, mult]);
-          if (mult === 12) twelvePumps = true;
-        }
-      });
-    });
-    // Multiplier applies to the total win this round (simplified: average of
-    // wild multipliers found, min 1x if no wilds landed) — keeps math testable
-    // without re-deriving per-line wild contribution.
-    if (wildMultipliers.length > 0) {
-      const avg = wildMultipliers.reduce((s, [, , m]) => s + m, 0) / wildMultipliers.length;
-      bonusWin = Math.round(base.totalWin * (avg - 1));
-    }
-    return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, wildMultipliers, twelvePumps, extraWildsAdded: 0, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, multiplierWild: multiplying?.multiplierWild, extraWildsAdded: 0, panicWildsAdded: 0 };
   }
 
   if (wedge === "chai_back") {
@@ -141,13 +154,10 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     // landed, since the visual "extra wilds" effect is UI-layer (docs §7).
     const extra = 1 + Math.floor(rng() * 3);
     const bonusWin = Math.round(base.totalWin * (0.08 * extra));
-    return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: extra, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, extraWildsAdded: extra, panicWildsAdded: 0 };
   }
 
-  // Legacy giant_gnome ID: 2x2 mega-keepsakes on reels 2-3/4-5 — modeled as
-  // a flat uplift. The ID stays stable until Claude performs a math-safe migration.
-  const bonusWin = Math.round(base.totalWin * 0.15);
-  return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, twelvePumps: false, extraWildsAdded: 0, panicWildsAdded: 0 };
+  return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0 };
 }
 
 export interface FreeSpinSessionResult {

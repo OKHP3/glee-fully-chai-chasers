@@ -44,7 +44,6 @@ import {
   playUniGleeSting,
   playWinPluck,
   playWheelTick,
-  playFullFlavorFrenzy,
   playStrangerDangerPanic,
   setMusicEnabled,
   setSfxEnabled,
@@ -220,19 +219,33 @@ function treatJarHtml(state: GameState): string {
   return `
     <span title="Chicken Comets" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_chicken")}</span>${jar.chicken}</span>
     <span title="Salmon Stars" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_salmon")}</span>${jar.salmon}</span>
-    <span title="Boogie Bites" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_boogie")}</span>${jar.boogie}</span>
+    <span title="Bougie Bites" class="treat-chip"><span class="treat-icon">${symbolSvg("treat_bougie")}</span>${jar.bougie}</span>
   `;
 }
 
-function renderGridHtml(grid: SpinResult["steps"][number]["grid"]): string {
+export function renderGridHtml(
+  grid: SpinResult["steps"][number]["grid"],
+  keepsakeZone?: SpinResult["steps"][number]["keepsakeZone"],
+): string {
   let html = "";
   for (let reel = 0; reel < REELS; reel++) {
     html += `<div class="reel-col" data-reel="${reel}">`;
     for (let row = 0; row < ROWS; row++) {
-      const symbol = grid[reel][row].symbol;
-      html += `<div class="cell" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}</div>`;
+      const cell = grid[reel][row];
+      const symbol = cell.symbol;
+      const badge = cell.multiplier
+        ? `<span class="multiplier-badge" aria-label="${cell.multiplier} times wild">×${cell.multiplier}</span>`
+        : "";
+      html += `<div class="cell ${cell.multiplier ? "multiplier-wild" : ""}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
     }
     html += "</div>";
+  }
+  if (keepsakeZone) {
+    html += `<div class="keepsake-constellation" aria-label="${keepsakeZone.width} by ${keepsakeZone.height} giant keepsake" aria-live="polite">
+      <div class="keepsake-constellation-symbol" style="grid-column:${keepsakeZone.leftReel + 1} / span ${keepsakeZone.width};grid-row:${keepsakeZone.topRow + 1} / span ${keepsakeZone.height}">
+        ${symbolSvg(keepsakeZone.symbol)}
+      </div>
+    </div>`;
   }
   return html;
 }
@@ -433,7 +446,7 @@ function openPaytablePage(root: HTMLElement): void {
         ${featureCard("wild_phoebe", "Phoebe Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
         ${featureCard("treat_chicken", "Chicken Comets", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
         ${featureCard("treat_salmon", "Salmon Stars", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
-        ${featureCard("treat_boogie", "Boogie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
+        ${featureCard("treat_bougie", "Bougie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
         ${featureCard("doorbell", "Doorbell", "A pair on the first two positions of any line begins Doorbell Panic free spins.")}
         ${featureCard("uniglee", "UniGlee", "The rare rainbow-butterfly legend begins a special Chai Chase celebration.")}
       </section>
@@ -571,7 +584,7 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
         return;
       }
       const step = steps[i];
-      grid.innerHTML = renderGridHtml(step.grid);
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
       if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
         playDoorbellRing();
         doorbellRang = true;
@@ -920,9 +933,12 @@ async function playFreeSpinSession(
     indexEl.textContent = String(r + 1);
     totalEl.textContent = String(rounds.length);
     roundWinEl.textContent = round.totalWin.toLocaleString();
+    if (round.multiplierWild) {
+      statusEl.textContent = `×${round.multiplierWild.multiplier} wild on reel ${round.multiplierWild.position[0] + 1}!`;
+    }
 
     for (const [stepIndex, step] of round.steps.entries()) {
-      grid.innerHTML = renderGridHtml(step.grid);
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
       if (stepIndex === 0 && round.treatTimeWilds?.length) {
         await animateTreatTimeCast(
           overlay.querySelector<HTMLElement>(".treat-time-cabinet")!,
@@ -950,9 +966,6 @@ async function playFreeSpinSession(
       playJoeyCue();
       playPhoebeCue();
       await sleep(520);
-    } else if (round.twelvePumps) {
-      await showFullFlavorFrenzy(overlay);
-      playFullFlavorFrenzy();
     } else if (round.extraWildsAdded > 0) {
       statusEl.textContent = "We Want Our Chai Back — extra wilds landed!";
       await sleep(500);
@@ -987,7 +1000,7 @@ function animateTreatTimeCast(stage: HTMLElement, grid: HTMLElement, wilds: Trea
     const treatSymbols: Record<TreatTimeWild["treat"], SymbolId> = {
       chicken: "treat_chicken",
       salmon: "treat_salmon",
-      boogie: "treat_boogie",
+      bougie: "treat_bougie",
     };
     const targets: HTMLElement[] = [];
     const startX = 8;
@@ -1029,19 +1042,6 @@ function treatTimeHandSvg(): string {
     <path d="M28 101c-7-7-9-19-6-31l6-24c1-5 8-5 9 0l1 14 2-34c0-6 8-6 9 0l1 31 2-39c0-6 8-6 9 0l1 38 3-28c1-6 9-5 9 1l-2 38c-1 16-7 26-18 34z" fill="#f5d576" stroke="#2d1f4c" stroke-width="4" stroke-linejoin="round"/>
     <path d="M24 69c-7-7-13-9-17-4-4 5 1 12 10 17" fill="none" stroke="#2d1f4c" stroke-width="4" stroke-linecap="round"/>
   </svg>`;
-}
-
-function showFullFlavorFrenzy(overlay: HTMLElement): Promise<void> {
-  return new Promise((resolve) => {
-    const callout = document.createElement("div");
-    callout.className = "full-flavor-frenzy";
-    callout.innerHTML = `<div class="full-flavor-frenzy-ring">${burstDots(20)}</div><div class="full-flavor-frenzy-text">FULL-FLAVOR FRENZY!<span>A bold wild multiplier</span></div>`;
-    overlay.appendChild(callout);
-    window.setTimeout(() => {
-      callout.remove();
-      resolve();
-    }, 1300);
-  });
 }
 
 function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number): Promise<void> {

@@ -14,13 +14,16 @@ export type SymbolId =
   // blocker / bonus trigger
   | "doorbell"
   // treats (feature symbols, reels 1/3/5 only)
-  | "treat_chicken" | "treat_salmon" | "treat_boogie"
+  | "treat_chicken" | "treat_salmon" | "treat_bougie"
   // wilds & legend
   | "wild_joey" | "wild_phoebe" | "uniglee";
 
-export type TreatKind = "chicken" | "salmon" | "boogie";
+export type TreatKind = "chicken" | "salmon" | "bougie";
 
 export type TreatTimeMode = "morning" | "nighttime";
+
+/** A single marked wild used by the We're Multiplying free-spin bonus. */
+export type WildMultiplier = 2 | 3 | 5 | 10;
 
 export interface TreatTimeWild {
   position: [reel: number, row: number];
@@ -33,10 +36,27 @@ export interface TreatTimeTrigger {
   freeSpinsAwarded: number;
 }
 
-export interface Cell { symbol: SymbolId; }
+export interface Cell {
+  symbol: SymbolId;
+  /** Present only on the one marked wild that opened a multiplying free spin. */
+  multiplier?: WildMultiplier;
+}
 
 /** 5 reels x 4 rows; grid[reel][row], row 0 = top. */
 export type Grid = Cell[][];
+
+/**
+ * A locked giant Keepsake footprint used by the Keepsake Constellation
+ * free-spin modifier. Its icon may re-roll after a winning cascade, but its
+ * rectangle never changes during that spin.
+ */
+export interface KeepsakeZone {
+  leftReel: 1 | 2;
+  topRow: 0 | 1 | 2;
+  width: 2 | 3;
+  height: 2 | 3 | 4;
+  symbol: SymbolId;
+}
 
 export interface LineWin {
   lineIndex: number;       // 0..24 (25 fixed paylines)
@@ -44,6 +64,8 @@ export interface LineWin {
   count: number;           // consecutive from reel 0
   payout: number;          // in Sparks, bet-scaled
   positions: Array<[reel: number, row: number]>;
+  /** Applied only when this winning line uses the marked multiplier wild. */
+  multiplier?: WildMultiplier;
 }
 
 export interface DoorbellTrigger {
@@ -58,6 +80,8 @@ export interface CascadeStep {
   meterAfter: number;      // consecutive-cascade count after this step
   specialtyAwarded: SpecialtyWild[];
   blastPositions?: Array<[number, number]>; // when a Sparkle Sort fired
+  /** Present for each step of a Keepsake Constellation spin. */
+  keepsakeZone?: KeepsakeZone;
 }
 
 export type SpecialtyWild = "sparkle_sort" | "drop_in" | "double_sparkle" | "facts_on_facts";
@@ -69,7 +93,7 @@ export const FREE_SPIN_LADDER: Record<number, number> = {
 
 export interface CatVisit {
   cat: "joey" | "phoebe";
-  fed: boolean;            // jar had a qualifying treat (Phoebe: any; Joey: boogie only — CANON S7)
+  fed: boolean;            // jar had a qualifying treat (Phoebe: any; Joey: bougie only — CANON S7)
   assist?: "sparkle_sort" | "drop_in" | "meter_nudge" | "shuffle_consolation";
   quip: string;
 }

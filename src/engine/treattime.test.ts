@@ -54,7 +54,7 @@ describe("Treat Time wild casting", () => {
     const result = castTreatTimeWilds(() => 0.999999, blankGrid(), "nighttime");
     expect(result.wilds.length).toBe(TREAT_TIME_WILD_RANGE.max);
     expect(new Set(result.wilds.map((wild) => wild.position.join(":"))).size).toBe(result.wilds.length);
-    expect(result.wilds.every((wild) => wild.treat === "boogie" && wild.wild === "joey")).toBe(true);
+    expect(result.wilds.every((wild) => wild.treat === "bougie" && wild.wild === "joey")).toBe(true);
     result.wilds.forEach(({ position }) => {
       expect(result.grid[position[0]][position[1]].symbol).toBe("wild_joey");
     });

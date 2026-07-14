@@ -60,4 +60,10 @@ describe("game state persistence", () => {
     expect(loadGameState().theme).toBe("dark");
     expect(loadGameState().musicVolume).toBe(0.72);
   });
+
+  it("migrates the old Boogie Bites save key without losing treats", () => {
+    storage.setItem("ccv1.treatJar", JSON.stringify({ chicken: 2, salmon: 1, boogie: 4 }));
+
+    expect(loadGameState().treatJar).toEqual({ chicken: 2, salmon: 1, bougie: 4 });
+  });
 });

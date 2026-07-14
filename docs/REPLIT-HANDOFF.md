@@ -167,7 +167,7 @@ Scope: playable vertical slice per the Replit Implementation Brief, built on `do
 - Portrait-first 5×4 reel board, cascade meter, Glee-coin balance, bet stepper (25/50/125/250/625, 1250 unlocking at player level 12), Treat Jar readout, AskJamie perch, ≥64px SPARKLE! button.
 - Tap SPARKLE! → real spin → cascade-to-dead-board loop animates step by step (win-flash cells, meter climbs, synthesized tick/arpeggio/pluck per step).
 - 25 fixed paylines, full paytable from spec §4, wild substitution, wilds pay as `tumbler`.
-- Treat Jar collection (Chicken Comets / Salmon Stars / Boogie Bites, cap 12 each) and cat pop-ins: Phoebe assists with any treat, **Joey only assists when Boogie Bites are stocked** (canon S7, unit-tested).
+- Treat Jar collection (Chicken Comets / Salmon Stars / Bougie Bites, cap 12 each) and cat pop-ins: Phoebe assists with any treat, **Joey only assists when Bougie Bites are stocked** (canon S7, unit-tested).
 - UniGlee detection surfaces a status line; free-spin ladder award is computed and reported (actual free-spin *gameplay* is stubbed — see below).
 - Automatic-refill economy: balance never strands below the current bet (AskJamie "finds coins under the couch," tested).
 - Chai Sparks XP accrual and level display; balance, bet, XP, Treat Jar, best cascade, and settings persist through `src/state.ts` (`ccv1.*`), verified by refresh.

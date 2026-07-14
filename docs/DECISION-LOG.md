@@ -16,7 +16,7 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 | S4 | 2026-07-10 | No photos of Glee in repo or game; abstract "Chai Captain" presence only | Glee's stated preference + vision doc §6 |
 | S5 | 2026-07-10 | `reference-photos/` purged from git history and gitignored | Glee photos were publicly pushed; remediation in `private-work/photo-triage.md` |
 | S6 | 2026-07-10 | No copyrighted audio/clips; no brand names/logos (IP-GUARDRAILS.md) | Public repo, zero-risk posture |
-| S7 | 2026-07-10 | Treat rules: **Phoebe helps for any treat; Joey only for Boogie Bites** | Canon from Jamie |
+| S7 | 2026-07-10 | Treat rules: **Phoebe helps for any treat; Joey only for Bougie Bites** | Canon from Jamie; spelling corrected 2026-07-13 |
 | S8 (was D1) | 2026-07-10 | **Slot framing.** Real paylines, RNG, variance, free-spin ladder, a generous fictional economy, and honest meters | Jamie ruled: Claude vision superimposed on the Codex foundation. Preserve the play rhythm Glee enjoys inside an original game made for her |
 | S9 (was D2) | 2026-07-10 | **Vanilla TypeScript** (no React) | Jamie ruled. One animation-heavy screen; pure-TS engine either way |
 | S10 (was D3) | 2026-07-10 | **Hybrid cats:** illustrated saucer-cat wilds on reels; real-photo sticker-cutouts for pop-ins and scenes | Legibility at symbol size + photographic charm where the surprise lands |
@@ -35,6 +35,7 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 | S23 | 2026-07-12 | **Character and bonus audio must be distinct.** Base play, free-spin chapters, UniGlee, Joey, Phoebe, treat types, and chapter transitions receive recognizable original motifs; no copyrighted samples or melodies | Jamie requested deeper soundtrack variety and character-specific sound identity |
 | S24 | 2026-07-12 | **Doorbell Panic bonus (formerly Stranger Danger Panic).** An original house-doorbell blocker may appear on reels 1–2; a pair on the first two positions of any payline triggers a direct 5–20-spin bonus where Joey and Phoebe land as randomly placed wilds on payline coordinates each round. No real-product name, logo, or trade dress is used | Jamie's requested Joey/Phoebe stranger-at-the-door gag; mechanic is documented in `docs/DOORBELL-PANIC-2026-07-12.md` |
 | S25 | 2026-07-13 | **Limited aggregate reach measurement is permitted.** The game may use one Google Analytics tag (`G-89W66VMGPB`) to understand how people discover and reach Glee-fully Chai Chasers. It must not add advertising, personalization, accounts, custom user identifiers, or game-state telemetry. | Jamie's direction: understand the gift's reach while retaining the project's no-purchase, no-ad, no-product-backend posture. Scope and review rules live in `docs/ANALYTICS-PRIVACY.md`. |
+| S26 | 2026-07-13 | **We're Multiplying is an opening-spin, single-wild modifier.** Each counted free spin independently rolls no multiplier 15%, ×2 35%, ×3 30%, ×5 15%, or ×10 5%. A qualifying spin has exactly one marked wild, bound to reels 2/3/4/5 respectively; it applies only to paylines that use it. Cascades never create, replace, or stack multiplier wilds, and repeated ×10 spins are permitted across the same bonus. | Jamie's approved detail ruling; implementation contract: `docs/WE-RE-MULTIPLYING-2026-07-13.md`. |
 
 ## Workstream owners
 
