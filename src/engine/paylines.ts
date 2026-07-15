@@ -1,5 +1,5 @@
 /**
- * 25 fixed paylines + paytable evaluation. Pure TS, zero DOM.
+ * 40 fixed paylines + paytable evaluation. Pure TS, zero DOM.
  * Spec: docs/DESIGN-SPEC.md §4. Left-to-right evaluation, wilds substitute
  * for all paying symbols (and pay as the top symbol when forming their own line).
  */
@@ -32,6 +32,21 @@ export const PAYLINES: number[][] = [
   [0, 3, 0, 3, 0],
   [3, 0, 3, 0, 3],
   [1, 2, 0, 2, 1],
+  [0, 1, 2, 3, 3],
+  [3, 2, 1, 0, 0],
+  [0, 1, 2, 2, 1],
+  [3, 2, 1, 1, 2],
+  [0, 0, 1, 2, 3],
+  [3, 3, 2, 1, 0],
+  [1, 0, 0, 1, 2],
+  [2, 3, 3, 2, 1],
+  [1, 2, 2, 1, 0],
+  [2, 1, 1, 2, 3],
+  [0, 2, 1, 2, 3],
+  [3, 1, 2, 1, 0],
+  [1, 3, 2, 1, 1],
+  [2, 0, 1, 2, 2],
+  [0, 1, 3, 2, 1],
 ];
 
 /** × line-bet multipliers. Wilds pay as `tumbler` when forming their own line. */
@@ -55,7 +70,7 @@ export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: numbe
  * This small global tuning factor preserves the established ~96% RTP target
  * without making the doorbell itself a paying symbol.
  */
-export const PAYOUT_SCALE = 1.039055;
+export const PAYOUT_SCALE = 1.206;
 
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */

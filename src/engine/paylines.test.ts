@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateLines, findDoorbellTrigger } from "./paylines";
+import { evaluateLines, findDoorbellTrigger, PAYLINES } from "./paylines";
 import type { Grid } from "./types";
 
 function flatGrid(symbol: Grid[number][number]["symbol"]): Grid {
@@ -9,12 +9,21 @@ function flatGrid(symbol: Grid[number][number]["symbol"]): Grid {
 }
 
 describe("evaluateLines", () => {
+  it("defines 40 unique valid five-reel paylines", () => {
+    expect(PAYLINES).toHaveLength(40);
+    expect(new Set(PAYLINES.map((line) => line.join(","))).size).toBe(40);
+    for (const line of PAYLINES) {
+      expect(line).toHaveLength(5);
+      expect(line.every((row) => row >= 0 && row < 4)).toBe(true);
+    }
+  });
+
   it("pays 5-of-a-kind on the top row line", () => {
     const grid = flatGrid("tumbler");
     const wins = evaluateLines(grid, 1);
     const topLine = wins.find((w) => w.lineIndex === 0)!;
     expect(topLine.count).toBe(5);
-    expect(topLine.payout).toBeCloseTo(1155.43, 2);
+    expect(topLine.payout).toBeCloseTo(1341.07, 2);
   });
 
   it("does not pay treats or UniGlee as line symbols", () => {
@@ -36,7 +45,7 @@ describe("evaluateLines", () => {
     const topLine = wins.find((w) => w.lineIndex === 0)!;
     expect(topLine.symbol).toBe("tumbler");
     expect(topLine.count).toBe(3);
-    expect(topLine.payout).toBeCloseTo(58.19, 2);
+    expect(topLine.payout).toBeCloseTo(67.54, 2);
   });
 
   it("stops counting at the first non-matching, non-wild symbol", () => {

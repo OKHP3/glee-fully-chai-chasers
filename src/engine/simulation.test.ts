@@ -9,6 +9,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { spin } from "./cascade";
+import { LINES } from "./economy";
 import { mulberry32 } from "./rng";
 
 const SPINS = 200_000;
@@ -30,7 +31,7 @@ function simulate(): SimStats {
   for (let i = 0; i < SPINS; i++) {
     const jar = { chicken: 6, salmon: 6, bougie: 6 }; // stocked jar, steady-state assumption
     const r = spin({ rng, betPerLine, treatJar: jar, spinsSincePopIn: 10 });
-    totalBet += betPerLine * 25;
+    totalBet += betPerLine * LINES;
     totalWin += r.totalWin;
     if (r.cascades > 0) wins++;
     if (r.freeSpinsAwarded > 0) fs++;

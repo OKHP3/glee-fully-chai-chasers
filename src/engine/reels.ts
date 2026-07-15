@@ -61,7 +61,8 @@ function treatSegments(): SymbolId[][] {
 }
 
 /**
- * Saucer-cat wild stacks — placed as contiguous 5-6 runs on reels 2-5
+ * Saucer-cat wild stacks — placed as contiguous 5-6 runs on reels 2-4
+ * and 6-high on reel 5
  * (index 1-4), per docs §5. Two stacks per wild per reel keeps them rare
  * enough to feel special while making cascade chains/free-spin ladder
  * reachable (a single stack landing fully in view spans most of the window).
@@ -69,10 +70,10 @@ function treatSegments(): SymbolId[][] {
 function wildStackSegments(reelIndex: number): SymbolId[][] {
   if (reelIndex < 1) return [];
   const sizes: Record<number, [number, number]> = {
-    1: [6, 6],
-    2: [6, 7],
-    3: [6, 7],
-    4: [7, 7],
+    1: [5, 6],
+    2: [5, 6],
+    3: [5, 6],
+    4: [6, 6],
   };
   const [a, b] = sizes[reelIndex] ?? [6, 6];
   return [repeat("wild_joey", a), repeat("wild_phoebe", b)];
