@@ -1113,7 +1113,7 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
     const finalDeg = 1080 + (({ multiplying: 30, giant_gnome: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
 
     const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
+    overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="wheel-heading"><span>Free Spins!</span> Joey &amp; Phoebe's Sparkle Wheel</h2>
       <div class="wheel-stage">
@@ -1131,7 +1131,8 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
       </div>
       <p id="wheel-result" class="min-h-[1.5rem] text-center font-semibold"></p>
     `;
-    root.appendChild(overlay);
+    const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;
+    host.appendChild(overlay);
 
     playWheelTick();
     window.setTimeout(() => {
@@ -1152,110 +1153,107 @@ async function playFreeSpinSession(
   wedge: WheelWedge,
   rounds: FreeSpinRoundResult[],
 ): Promise<void> {
+  const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
+  const standardGrid = root.querySelector<HTMLDivElement>("#reel-grid");
+  if (!cabinet || !standardGrid) return;
+
   const bgLayer = root.querySelector<HTMLDivElement>("#bg-layer");
   bgLayer?.classList.add("aurora");
   document.body.classList.add("aurora-mode");
 
-  const overlay = document.createElement("div");
   const treatTime = wedge === "treat_time_morning" || wedge === "treat_time_nighttime";
   const chaiStormSession = wedge === "chai_back" && rounds.some((round) => round.chaiRain !== undefined);
   const displayWedgeLabel = wedge === "chai_back" && !chaiStormSession ? "Bold Chai" : wheelWedgeLabel(wedge);
-  overlay.className = `free-spins-overlay text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins" : ""}`;
-  overlay.innerHTML = `
-    <div class="night-garden aurora">${gardenDecor()}</div>
-    <div class="relative z-10 h-full w-full flex flex-col cc-shell free-spins-shell">
-      <header class="marquee">
-        <div class="marquee-row">
-          <span class="level-chip">${displayWedgeLabel}</span>
-          <h1 class="marquee-title">${treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : displayWedgeLabel === "Bold Chai" ? "BOLD CHAI!" : "Free Spins"}</h1>
-        </div>
-      </header>
-      <div class="jar-meter">
-        <div class="jar-meter-text">Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span> · Round win: <span id="fs-round-win">0</span></div>
-      </div>
-      <main class="cabinet-frame ${treatTime ? "treat-time-cabinet" : ""}">
-        <div id="fs-grid" class="reel-grid"></div>
-      </main>
-      <div id="fs-status" class="status-line"></div>
+  const title = treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : displayWedgeLabel === "Bold Chai" ? "BOLD CHAI!" : "Free Spins";
+  const panel = document.createElement("section");
+  panel.className = `free-spins-panel text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins treat-time-cabinet" : ""}`;
+  panel.setAttribute("aria-label", `${displayWedgeLabel} bonus spins`);
+  panel.innerHTML = `
+    <div class="free-spins-panel-heading">
+      <span class="free-spins-panel-kicker">${displayWedgeLabel}</span>
+      <strong>${title}</strong>
     </div>
+    <div class="free-spins-panel-stats" aria-live="polite">Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span> · Round win: <span id="fs-round-win">0</span></div>
+    <div id="fs-grid" class="reel-grid"></div>
+    <div id="fs-status" class="status-line" aria-live="polite"></div>
   `;
-  root.appendChild(overlay);
+  standardGrid.hidden = true;
+  cabinet.appendChild(panel);
 
-  const grid = overlay.querySelector<HTMLDivElement>("#fs-grid")!;
-  const indexEl = overlay.querySelector<HTMLSpanElement>("#fs-index")!;
-  const totalEl = overlay.querySelector<HTMLSpanElement>("#fs-total")!;
-  const roundWinEl = overlay.querySelector<HTMLSpanElement>("#fs-round-win")!;
-  const statusEl = overlay.querySelector<HTMLDivElement>("#fs-status")!;
+  const grid = panel.querySelector<HTMLDivElement>("#fs-grid")!;
+  const indexEl = panel.querySelector<HTMLSpanElement>("#fs-index")!;
+  const totalEl = panel.querySelector<HTMLSpanElement>("#fs-total")!;
+  const roundWinEl = panel.querySelector<HTMLSpanElement>("#fs-round-win")!;
+  const statusEl = panel.querySelector<HTMLDivElement>("#fs-status")!;
   const panicBellTimer = wedge === "doorbell_panic" ? window.setInterval(playDoorbellRing, 3000) : undefined;
   if (panicBellTimer !== undefined) playDoorbellRing();
 
   const chaiStorm = wedge === "chai_back" ? rounds.find((round) => round.chaiRain)?.chaiRain : undefined;
-  if (chaiStorm) await showChaiStormSplash(overlay, chaiStorm.wilds.length);
+  try {
+    if (chaiStorm) await showChaiStormSplash(panel, chaiStorm.wilds.length);
 
-  for (let r = 0; r < rounds.length; r++) {
-    const round = rounds[r];
-    let doorbellRang = false;
-    indexEl.textContent = String(r + 1);
-    totalEl.textContent = String(rounds.length);
-    roundWinEl.textContent = round.totalWin.toLocaleString();
-    if (round.multiplierWild) {
-      statusEl.textContent = `×${round.multiplierWild.multiplier} wild on reel ${round.multiplierWild.position[0] + 1}!`;
-    }
+    for (let r = 0; r < rounds.length; r++) {
+      const round = rounds[r];
+      let doorbellRang = false;
+      indexEl.textContent = String(r + 1);
+      totalEl.textContent = String(rounds.length);
+      roundWinEl.textContent = round.totalWin.toLocaleString();
+      if (round.multiplierWild) {
+        statusEl.textContent = `×${round.multiplierWild.multiplier} wild on reel ${round.multiplierWild.position[0] + 1}!`;
+      }
 
-    for (const [stepIndex, step] of round.steps.entries()) {
-      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
-      if (stepIndex === 0 && round.treatTimeWilds?.length) {
-        await animateTreatTimeCast(
-          overlay.querySelector<HTMLElement>(".treat-time-cabinet")!,
-          grid,
-          round.treatTimeWilds,
-        );
+      for (const [stepIndex, step] of round.steps.entries()) {
+        grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
+        if (stepIndex === 0 && round.treatTimeWilds?.length) {
+          await animateTreatTimeCast(panel, grid, round.treatTimeWilds);
+        }
+        if (r === 0 && stepIndex === 0 && round.chaiRain) {
+          await animateChaiStormConversions(grid, round.chaiRain.wilds);
+        }
+        if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
+          playDoorbellRing();
+          doorbellRang = true;
+        }
+        grid.classList.toggle("panic-grid", wedge === "doorbell_panic");
+        grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
+        if (step.wins.length > 0) {
+          playCascadeArpeggio(step.meterAfter);
+          playWinPluck();
+        } else {
+          playCascadeTick();
+        }
+        await sleep(360);
       }
-      if (r === 0 && stepIndex === 0 && round.chaiRain) {
-        await animateChaiStormConversions(grid, round.chaiRain.wilds);
-      }
-      if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
-        playDoorbellRing();
-        doorbellRang = true;
-      }
-      grid.classList.toggle("panic-grid", wedge === "doorbell_panic");
-      grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
-      if (step.wins.length > 0) {
-        playCascadeArpeggio(step.meterAfter);
-        playWinPluck();
+
+      if (round.panicWildsAdded > 0) {
+        statusEl.textContent = `DOORBELL PANIC! ${round.panicWildsAdded} flying wild cats!`;
+        playJoeyCue();
+        playPhoebeCue();
+        await sleep(520);
+      } else if (round.chaiRain) {
+        statusEl.textContent = round.chaiRain.wilds.length > 0
+          ? `WILD CHAI STORM! ${round.chaiRain.wilds.length} mermaid-cup wild chai!`
+          : "WILD CHAI STORM! The chai sky is charged!";
+        await sleep(520);
+      } else if (round.totalWin > 0) {
+        statusEl.textContent = `+${round.totalWin.toLocaleString()} coins`;
+        await sleep(400);
       } else {
-        playCascadeTick();
+        statusEl.textContent = "";
       }
-      await sleep(360);
+      if (round.freeSpinsAwarded > 0) {
+        statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins!`;
+        playBonusFanfare();
+        await sleep(800);
+      }
     }
-
-    if (round.panicWildsAdded > 0) {
-      statusEl.textContent = `DOORBELL PANIC! ${round.panicWildsAdded} flying wild cats!`;
-      playJoeyCue();
-      playPhoebeCue();
-      await sleep(520);
-    } else if (round.chaiRain) {
-      statusEl.textContent = round.chaiRain.wilds.length > 0
-        ? `WILD CHAI STORM! ${round.chaiRain.wilds.length} mermaid-cup wild chai!`
-        : "WILD CHAI STORM! The chai sky is charged!";
-      await sleep(520);
-    } else if (round.totalWin > 0) {
-      statusEl.textContent = `+${round.totalWin.toLocaleString()} coins`;
-      await sleep(400);
-    } else {
-      statusEl.textContent = "";
-    }
-    if (round.freeSpinsAwarded > 0) {
-      statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins!`;
-      playBonusFanfare();
-      await sleep(800);
-    }
+  } finally {
+    if (panicBellTimer !== undefined) window.clearInterval(panicBellTimer);
+    panel.remove();
+    standardGrid.hidden = false;
+    bgLayer?.classList.remove("aurora");
+    document.body.classList.remove("aurora-mode");
   }
-
-  if (panicBellTimer !== undefined) window.clearInterval(panicBellTimer);
-  overlay.remove();
-  bgLayer?.classList.remove("aurora");
-  document.body.classList.remove("aurora-mode");
   void state; // state saved by caller after totals are tallied
 }
 
@@ -1361,13 +1359,14 @@ function treatTimeHandSvg(): string {
 function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number): Promise<void> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
+    overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="text-2xl font-bold">Free Spins Complete!</h2>
       <p class="text-lg">You won ${totalWin.toLocaleString()} coins${retriggers > 0 ? ` (with ${retriggers} retrigger${retriggers > 1 ? "s" : ""}!)` : ""}</p>
       <button id="bonus-continue" class="sparkle-btn mt-4">Continue</button>
     `;
-    root.appendChild(overlay);
+    const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;
+    host.appendChild(overlay);
     playBonusFanfare();
     overlay.querySelector("#bonus-continue")?.addEventListener("click", () => {
       overlay.remove();
