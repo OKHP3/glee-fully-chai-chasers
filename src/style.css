@@ -470,6 +470,35 @@ body {
   min-height: 0;
 }
 
+.payline-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.payline-path {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  vector-effect: non-scaling-stroke;
+}
+.payline-path.is-guide { stroke: rgba(245, 213, 118, .28); opacity: 1; }
+.payline-path.is-winning {
+  stroke: #ffe9a3;
+  stroke-width: 2.2;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px rgba(255, 226, 122, .95));
+  animation: payline-win-flash 700ms ease-out both;
+}
+@keyframes payline-win-flash { 0%, 100% { opacity: 0; } 18%, 72% { opacity: 1; } }
+.cc-root[data-reduced-motion="true"] .payline-path.is-winning { animation: none; opacity: 1; }
+
 .reel-col {
   display: flex;
   flex-direction: column;

@@ -3,7 +3,7 @@
  * so a future save-format change can migrate or reset cleanly.
  * Persisted: Sparks balance, bet level, XP/level, Treat Jar contents,
  * firefly cascade meter, unlocked scenes, best cascade, daily-bonus date,
- * settings (sound, reduced motion).
+ * settings (sound, payline guide, reduced motion).
  * A visible "start fresh" reset action is required (vision doc §5).
  */
 import type { TreatJar } from "./engine/features";
@@ -45,6 +45,8 @@ export interface GameState {
   bestCascade: number;
   spinsSincePopIn: number;
   soundOn: boolean;
+  /** Optional payline guide; disabled by default for a clean board. */
+  paylineGuideOn: boolean;
   /** Independent, persisted mix controls. `soundOn` remains the master mute. */
   musicVolume: number;
   sfxVolume: number;
@@ -82,6 +84,7 @@ export function loadGameState(): GameState {
     bestCascade: load("bestCascade", 0),
     spinsSincePopIn: load("spinsSincePopIn", 0),
     soundOn,
+    paylineGuideOn: load("paylineGuideOn", false),
     musicVolume: load("musicVolume", soundOn ? 0.72 : 0),
     sfxVolume: load("sfxVolume", soundOn ? 0.82 : 0),
     theme: load<ThemeMode>("theme", "system"),
@@ -101,6 +104,7 @@ export function saveGameState(state: GameState): void {
   save("bestCascade", state.bestCascade);
   save("spinsSincePopIn", state.spinsSincePopIn);
   save("soundOn", state.soundOn);
+  save("paylineGuideOn", state.paylineGuideOn);
   save("musicVolume", state.musicVolume);
   save("sfxVolume", state.sfxVolume);
   save("theme", state.theme);

@@ -57,7 +57,7 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 
 ### Implemented and integrated
 
-- 5×4, 25-line cascade engine and validated fictional Glee-coin economy
+- 5×4, 40-line cascade engine and simulation-validated fictional Glee-coin economy
 - event-frequency simulation oracle
 - free-spin ladder, modifier selection, and free-spin session flow
 - We're Multiplying opening-spin math: one reel-bound wild at most, line-specific awards, and no multiplier creation during cascades
