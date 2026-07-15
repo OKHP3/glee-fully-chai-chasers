@@ -12,16 +12,18 @@ Status: ☐ todo · ◐ in progress · ☑ done
 | AskJamie avatar | Official illustrated human avatar used at the board perch | Jamie-provided asset, 2026-07-14 | Jamie-owned | ☑ `public/assets/askjamie-avatar.jpg` |
 | Chai Captain motifs | Tumbler, butterfly clip, cardigan palette — silhouette/mood only, no likeness | Claude SVG | original | ☐ |
 
-## Symbols (production sprite atlas; equal 4×4 cells)
+## Symbols (production sprite atlases; fixed 320px cells with gutters)
 
 | Tier | Assets | Status |
 |---|---|---|
-| High | mermaid tumbler (iced, straw), midnight butterfly, Glee Mix Tape, crystal cluster | ☑ `public/assets/glee-symbol-atlas.png` |
+| High | mermaid tumbler (iced, straw), midnight butterfly, Glee Mix Tape, crystal cluster | ☑ `public/assets/atlases/standard-symbol-atlas.{png,webp}`; source `asset-source/glee-symbol-atlas.png` |
 | Mid | iced chai cup, unlit cinnamon candle, Glee cardigan, Moonlit Book Stack | ☑ same atlas |
 | Low | butterfly hair clip, VHS tape, aurora keepsake, shared-life keepsake locket | ☑ same atlas |
 | Treats | Chicken Comets (yellow), Salmon Stars (blue), Bougie Bites (navy) | ☑ same atlas |
-| Wilds | Joey-saucer and Phoebe-saucer | ☑ `public/assets/joey-phoebe-wilds.png` |
-| Legend | UniGlee rainbow butterfly | ☑ symbol atlas |
+| Wilds | Joey-saucer and Phoebe-saucer | ☑ `public/assets/atlases/special-symbol-atlas.{png,webp}`; pop-in fallback `public/assets/joey-phoebe-wilds.png` |
+| Handbag Wild | Generic compact crossbody satchel; rare non-cat high-value wild | ☑ source `asset-source/handbag-wild.png`; runtime `public/assets/atlases/special-symbol-atlas.{png,webp}` |
+| Legend | UniGlee rainbow butterfly | ☑ `public/assets/atlases/special-symbol-atlas.{png,webp}` |
+| Wild Chai | Mermaid iced-chai cup wild | ☑ `public/assets/atlases/special-symbol-atlas.{png,webp}` |
 
 Generated source prompts were constrained to original, unbranded illustration; no private reference photo was uploaded or transformed. Engine IDs for five replaced prototype symbols remain temporarily stable so this art-only pass cannot perturb tested reel weights or payout math. The 2026-07-12 atlas revision replaced only the former Toolbox and Twelve-medallion cells.
 
@@ -32,6 +34,8 @@ Generated source prompts were constrained to original, unbranded illustration; n
 | Chai Chase splash background — Joey, Phoebe, iced mermaid tumbler, PNW night, music/books/cardigan/aurora keepsakes | ChatGPT imagegen, 2026-07-12 | original; derived only from existing original game art | ☑ `public/assets/chai-chase-splash.png` |
 | Cascade meter, wheel, Treat Jar, app icon + PWA icon set | mixed project implementation | original | ☑ `public/icons/` (including iPhone touch and browser favicon sizes) |
 | GitHub + web social preview — Joey, Phoebe, jewel-toned iced chai, rainbow butterfly, and keepsakes | ChatGPT imagegen, 2026-07-13 | original | ☑ `public/assets/social-preview.jpg` |
+| Keepsake Trail memory card back — deep-purple/gold card with original butterfly-and-crystal-ball motif | ChatGPT imagegen, 2026-07-15 | original; chroma-key removed locally; no private references | ☑ `public/assets/keepsake-memory-card-back.png` |
+| Keepsake Trail mismatch overlay — red circular strike-through for two mismatched cards | ChatGPT imagegen, 2026-07-15 | original; chroma-key removed locally; no private references | ☑ `public/assets/keepsake-memory-mismatch-overlay.png` |
 | Chai Bonus shelf, daily wheel, birthday reveal screen | assigned when implemented | original required | ☐ |
 
 ## Audio (all original, Web Audio synth or bundled OGG)

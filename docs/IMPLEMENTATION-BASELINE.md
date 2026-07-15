@@ -45,7 +45,8 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - `src/ui/board.ts`
 - `src/ui/symbols.ts`
 - `src/style.css`
-- `public/assets/glee-symbol-atlas.png`
+- `public/assets/atlases/standard-symbol-atlas.{png,webp}` and `public/assets/atlases/special-symbol-atlas.{png,webp}`
+- `asset-source/glee-symbol-atlas.png` (source master for reproducible atlas generation)
 - `public/assets/joey-phoebe-wheel.png`
 - `public/assets/joey-phoebe-wilds.png`
 - `docs/DECISION-LOG.md` decisions S17-S23
@@ -61,9 +62,11 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - event-frequency simulation oracle
 - free-spin ladder, modifier selection, and free-spin session flow
 - We're Multiplying opening-spin math: one reel-bound wild at most, line-specific awards, and no multiplier creation during cascades
+- one-shot Wild Chai Storm: opening-board iced-chai symbols convert to mermaid-cup wild chai once per session
 - persistent balance, XP, settings, Treat Jar, and cat-visit state
 - original Web Audio one-shot SFX
 - Treat Time direct primary-board bonus with Morning/Nighttime modes and typed wild-cast payload
+- Moonlit Keepsake Trail memory bonus: dedicated reel-stage 12-card/6-pair screen, two-strike state machine, 40-spin standard handoff, original card/mismatch assets, and audio cues
 - production symbol, Joey, Phoebe, wild, and wheel art
 - mobile-first board, Firefly Cascade meter, Treat Jar, AskJamie perch, and controls
 - real post-spin resting grid and cascade beam/drop motion
@@ -77,8 +80,7 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - Claude-owned removal of legacy system-wide twelve mechanics (level unlock and Treat Jar cap) with simulation-backed RTP retuning
 - Daily Bonus Wheel
 - milestone scenes and collection shelf
-- a replacement for the legacy 2×2 Toolbox modifier, expressed as an approved keepsake/chapter effect
-- literal iced-chai wild-rain board behavior
+- one-shot literal iced-chai Wild Chai Storm board behavior (implementation now present; RTP release gate remains pending)
 - production music loops and final mix
 - approved production AskJamie avatar integration
 - service-worker/offline verification

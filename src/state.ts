@@ -7,7 +7,7 @@
  * A visible "start fresh" reset action is required (vision doc §5).
  */
 import type { TreatJar } from "./engine/features";
-import { emptyTreatJar } from "./engine/features";
+import { emptyTreatJar, settleTreatJar } from "./engine/features";
 import { STARTING_BALANCE } from "./engine/economy";
 
 const PREFIX = "ccv1.";
@@ -41,6 +41,8 @@ export interface GameState {
   bet: number;
   xp: number;
   treatJar: TreatJar;
+  /** Treat Jar completions waiting to enter the bonus flow on the next spin. */
+  pendingTreatJarSpins: number;
   fireflyMeter: number;
   bestCascade: number;
   spinsSincePopIn: number;
@@ -75,11 +77,18 @@ function loadTreatJar(): TreatJar {
 
 export function loadGameState(): GameState {
   const soundOn = load("soundOn", true);
+  const settledTreatJar = settleTreatJar(loadTreatJar());
+  const pendingTreatJarSpins = load("pendingTreatJarSpins", 0) + settledTreatJar.freeSpinsAwarded;
+  if (settledTreatJar.freeSpinsAwarded > 0) {
+    save("treatJar", settledTreatJar.jar);
+    save("pendingTreatJarSpins", pendingTreatJarSpins);
+  }
   return {
     balance: load("balance", STARTING_BALANCE),
     bet: load("bet", 1),
     xp: load("xp", 0),
-    treatJar: loadTreatJar(),
+    treatJar: settledTreatJar.jar,
+    pendingTreatJarSpins,
     fireflyMeter: load("fireflyMeter", 0),
     bestCascade: load("bestCascade", 0),
     spinsSincePopIn: load("spinsSincePopIn", 0),
@@ -100,6 +109,7 @@ export function saveGameState(state: GameState): void {
   save("bet", state.bet);
   save("xp", state.xp);
   save("treatJar", state.treatJar);
+  save("pendingTreatJarSpins", state.pendingTreatJarSpins);
   save("fireflyMeter", state.fireflyMeter);
   save("bestCascade", state.bestCascade);
   save("spinsSincePopIn", state.spinsSincePopIn);

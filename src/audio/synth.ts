@@ -201,6 +201,17 @@ export function playTreatLand(count: number): void {
   [523.25, 659.25, 783.99].forEach((freq, i) => tone(freq, i * 0.045, 0.16, 0.08 + landings * 0.006, "triangle"));
 }
 
+/** One-shot Wild Chai Storm: warm amber lift, cool tumbler drops, bright settle. */
+export function playChaiStorm(convertedCount: number): void {
+  const intensity = Math.min(Math.max(convertedCount, 0), 20);
+  [261.63, 329.63, 415.3, 523.25].forEach((freq, index) => {
+    tone(freq, index * 0.075, 0.3, 0.12 + intensity * 0.002, index % 2 ? "triangle" : "sine");
+  });
+  [659.25, 783.99, 987.77].forEach((freq, index) => {
+    tone(freq, 0.34 + index * 0.055, 0.2, 0.08, "triangle");
+  });
+}
+
 /** Original house-doorbell ding-dong, played whenever a doorbell lands. */
 export function playDoorbellRing(): void {
   tone(880, 0, 0.18, 0.18, "sine");
@@ -228,6 +239,37 @@ export function playBoldChaiTimerBuzzer(): void {
   tone(110, 0, 0.42, 0.2, "square");
   tone(123.47, 0.015, 0.42, 0.12, "sawtooth");
   tone(82.41, 0.08, 0.34, 0.14, "square");
+}
+
+/** Moonlit Keepsake Trail card turn — a tiny original page-turn sparkle. */
+export function playKeepsakeCardFlip(): void {
+  tone(523.25, 0, 0.07, 0.07, "triangle");
+  tone(783.99, 0.045, 0.12, 0.06, "sine");
+}
+
+/** Moonlit Keepsake Trail match — warm, quiet resolution for a found pair. */
+export function playKeepsakeMatch(): void {
+  tone(523.25, 0, 0.18, 0.08, "sine");
+  tone(659.25, 0.08, 0.24, 0.1, "triangle");
+}
+
+/** Moonlit Keepsake Trail mismatch — gentle information, never a buzzer. */
+export function playKeepsakeMismatch(): void {
+  tone(196, 0, 0.2, 0.08, "sine");
+  tone(164.81, 0.07, 0.28, 0.06, "triangle");
+}
+
+/** Moonlit Keepsake Trail success — a restrained keepsake shimmer. */
+export function playKeepsakeSuccess(): void {
+  [523.25, 659.25, 783.99, 1046.5].forEach((freq, index) => {
+    tone(freq, index * 0.075, 0.28, 0.1, index % 2 ? "triangle" : "sine");
+  });
+}
+
+/** Moonlit Keepsake Trail failure — soft unresolved-to-warm return cue. */
+export function playKeepsakeFailure(): void {
+  tone(220, 0, 0.22, 0.08, "sine");
+  tone(261.63, 0.16, 0.34, 0.08, "triangle");
 }
 
 /** Doorbell Panic: a bright, original two-note chime followed by a cat-flight burst. */

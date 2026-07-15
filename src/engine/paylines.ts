@@ -72,7 +72,7 @@ export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: numbe
  */
 export const PAYOUT_SCALE = 1.206;
 
-const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
+const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe", "wild_handbag", "wild_chai"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */
 const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_bougie", "uniglee", "doorbell", "chai_pump"];
 

@@ -70,6 +70,7 @@ Paytable (× line bet; tuned by simulation, these are the starting values):
 | 🦋 Butterfly clip / 📼 VHS / 🌌 Aurora keepsake / 12 charm | 3 | 8 | 25 | Personally meaningful low tier |
 | Treat pouches | — | — | — | Non-paying feature symbols, reels 1/3/5 (§6) |
 | Saucer-Cat Wilds | pay as top symbol | | | Stacked 6-7 high (§5) |
+| Handbag Wild | — | — | — | Rare non-cat wild; multiplies a winning line by ×3, ×5, or ×10 |
 | UniGlee 🦋🌈 | — | — | — | Legend, not a line symbol (§5) |
 
 Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%):
@@ -124,7 +125,7 @@ Meter hits 4+ → celebration → **AskJamie spins Joey & Phoebe's Sparkle Wheel
 |---|---|
 | **We're Multiplying** (40%) | Each counted free spin rolls independently for no multiplier (15%), ×2 (35%), ×3 (30%), ×5 (15%), or ×10 (5%). A qualifying opening result contains exactly one marked wild: ×2 on reel 2, ×3 on reel 3, ×5 on reel 4, or ×10 on reel 5. It multiplies only winning lines that use it; cascade drops never create or stack multiplier wilds. See `docs/WE-RE-MULTIPLYING-2026-07-13.md`. |
 | **Giant Toolbox Mode** (35%) | 2x2 mega-keepsakes land on reels 2-3/4-5, with Phoebe supervising from the open Toolbox |
-| **Iced Chai Wild Rain** (25%) | AskJamie lobs iced chai tumblers onto the board — 1-3 extra wilds rain in per spin |
+| **Iced Chai Wild Rain** (25%) | One-shot Wild Chai Storm at bonus entry: every standard iced-chai symbol on the opening board becomes a mermaid-cup `wild_chai`; it does not repeat on cascades or retriggered spins. See `docs/ICED-CHAI-WILD-RAIN-2026-07-14.md`. |
 
 Free spins play on an aurora-shifted board (navy → violet-green), same cascade rules, retriggers live. Double Sparkle doubles the entry award. Exit screen always ends warm: total, best cascade, and a Glee-ism sized to the result (Glee-Lite for modest, Bleeds Glee for monsters).
 
