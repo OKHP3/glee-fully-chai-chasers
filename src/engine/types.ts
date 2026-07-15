@@ -70,6 +70,15 @@ export type TreatKind = "chicken" | "salmon" | "bougie";
 
 export type TreatTimeMode = "morning" | "nighttime";
 
+export type LapQuestSpot = "window_perch" | "blanket_nest" | "moonlit_cushion";
+
+/** A Phoebe wild that remains fixed for one complete cascade chain. */
+export interface StickyWild {
+  position: [reel: number, row: number];
+  symbol: "wild_phoebe";
+  sticky: "lap_quest";
+}
+
 /** Whether a spin is resolving on the primary board or a secondary bonus board. */
 export type SpinArea = "main" | "secondary";
 
@@ -103,6 +112,8 @@ export interface Cell {
   symbol: SymbolId;
   /** Present only on the one marked wild that opened a multiplying free spin. */
   multiplier?: WildMultiplier;
+  /** Present only on a fixed Phoebe comfort-wild in Lap Quest. */
+  sticky?: "lap_quest";
   /** Present on a Handbag Wild; scales a winning line that uses this symbol. */
   handbagMultiplier?: HandbagWildMultiplier;
 }
@@ -187,6 +198,8 @@ export interface CascadeStep {
   blastPositions?: Array<[number, number]>; // when a Sparkle Sort fired
   /** Present for each step of a Keepsake Constellation spin. */
   keepsakeZone?: KeepsakeZone;
+  /** Present for a Lap Quest round; positions remain fixed through cascades. */
+  stickyWilds?: StickyWild[];
 }
 
 export type SpecialtyWild = "sparkle_sort" | "drop_in" | "double_sparkle" | "facts_on_facts";
@@ -215,6 +228,7 @@ export interface SpinResult {
   doorbellPanic?: DoorbellTrigger;
   boldChaiPump?: BoldChaiTrigger;
   treatTimeBonus?: TreatTimeTrigger;
+  stickyWilds?: StickyWild[];
 }
 
 export interface EngineConfig {

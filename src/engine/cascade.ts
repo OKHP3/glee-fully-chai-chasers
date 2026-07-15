@@ -7,7 +7,7 @@
  * Drop-In Saucer / Double Sparkle / Facts-on-Facts) queued off wild line wins
  * with exactly one firing per dead board, per docs §5.
  */
-import type { CascadeStep, Grid, KeepsakeZone, SpecialtyWild, SpinArea, SpinResult, SymbolId, TreatKind, TreatTimeMode } from "./types";
+import type { CascadeStep, Grid, KeepsakeZone, SpecialtyWild, SpinArea, SpinResult, StickyWild, SymbolId, TreatKind, TreatTimeMode } from "./types";
 import { FREE_SPIN_LADDER } from "./types";
 import { REELS, ROWS, cascadeColumn, drawSingle, spinGrid, stripFor } from "./reels";
 import { evaluateLines, findBoldChaiTrigger, findDoorbellTrigger, isWild } from "./paylines";
@@ -95,6 +95,8 @@ function applyDropIn(rng: Rng, grid: Grid, keepsakeZone?: KeepsakeZone): Grid {
   const strip = stripFor(reel);
   const column = grid[reel].map((cell) => PERSISTENT_BLOCKERS.includes(cell.symbol)
     ? { ...cell }
+    : cell.sticky
+      ? { ...cell }
     : { symbol: strip.length ? wild : cell.symbol });
   const next = grid.map((col, i) => (i === reel ? column : col));
   return keepsakeZone ? applyKeepsakeZone(next, keepsakeZone) : next;
@@ -137,15 +139,69 @@ function cascadeColumnAroundKeepsake(
   return next;
 }
 
+function cascadeColumnAroundStickyWilds(
+  rng: Rng,
+  reel: number,
+  column: Grid[number],
+  removedRows: Set<number>,
+  stickyRows: Set<number>,
+): Grid[number] {
+  if (stickyRows.size === 0) return cascadeColumn(rng, reel, column, removedRows);
+
+  const next: Grid[number] = Array.from({ length: ROWS }, () => ({ symbol: "tumbler" }));
+  stickyRows.forEach((row) => {
+    next[row] = { ...column[row], sticky: "lap_quest" };
+  });
+
+  const fillSegment = (start: number, end: number): void => {
+    const rows = Array.from({ length: end - start }, (_, index) => start + index);
+    const survivors = rows.filter((row) => !removedRows.has(row)).map((row) => ({ ...column[row] }));
+    const fresh = Array.from({ length: rows.length - survivors.length }, () => ({ symbol: drawSingle(rng, reel) }));
+    [...fresh, ...survivors].forEach((cell, index) => { next[start + index] = cell; });
+  };
+
+  let segmentStart = 0;
+  while (segmentStart < ROWS) {
+    while (segmentStart < ROWS && stickyRows.has(segmentStart)) segmentStart++;
+    const segmentEnd = segmentStart;
+    while (segmentStart < ROWS && !stickyRows.has(segmentStart)) segmentStart++;
+    if (segmentEnd < segmentStart) fillSegment(segmentEnd, segmentStart);
+  }
+
+  return next;
+}
+
+function cloneStickyWilds(stickyWilds: StickyWild[] | undefined): StickyWild[] | undefined {
+  return stickyWilds?.map((wild) => ({ ...wild, position: [...wild.position] as [number, number] }));
+}
+
+function applyStickyWilds(grid: Grid, stickyWilds: StickyWild[] | undefined): Grid {
+  if (!stickyWilds?.length) return grid;
+  const next = grid.map((column) => column.map((cell) => ({ ...cell })));
+  for (const wild of stickyWilds) {
+    const [reel, row] = wild.position;
+    next[reel][row] = { symbol: wild.symbol, sticky: wild.sticky };
+  }
+  return next;
+}
+
 function cascadeGrid(
   rng: Rng,
   grid: Grid,
   removedByReel: Set<number>[],
   keepsakeZone?: KeepsakeZone,
+  stickyWilds?: StickyWild[],
 ): Grid {
   return grid.map((column, reel) => keepsakeZone
     ? cascadeColumnAroundKeepsake(rng, reel, column, removedByReel[reel], keepsakeZone)
-    : cascadeColumn(rng, reel, column, removedByReel[reel]));
+    : cascadeColumnAroundStickyWilds(
+      rng,
+      reel,
+      column,
+      removedByReel[reel],
+      new Set((stickyWilds ?? []).filter((wild) => wild.position[0] === reel).map((wild) => wild.position[1])),
+    )
+  );
 }
 
 export interface SpinInput {
@@ -168,6 +224,10 @@ export interface SpinInput {
   treatTimeMode?: TreatTimeMode | "either";
   /** Separate stream keeps the established cascade/RTP stream stable. */
   treatTimeRng?: Rng;
+  /** Secondary chapter rounds suppress recursive UniGlee triggers. */
+  allowUniGlee?: boolean;
+  /** Fixed chapter wilds that survive the complete cascade chain. */
+  stickyWilds?: StickyWild[];
 }
 
 export function rollDoorbellFreeSpins(rng: Rng): number {
@@ -188,15 +248,19 @@ export function spin({
   allowTreatTimeBonus = true,
   treatTimeMode = "either",
   treatTimeRng,
+  allowUniGlee = true,
+  stickyWilds: inputStickyWilds,
 }: SpinInput): SpinResult {
   let grid = startingGrid
     ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
     : spinGrid(rng, { includeDoorbells: allowDoorbells, includeBoldChaiPump });
+  const stickyWilds = cloneStickyWilds(inputStickyWilds);
+  grid = applyStickyWilds(grid, stickyWilds);
   const steps: CascadeStep[] = [];
   let keepsakeZone = cloneKeepsakeZone(inputKeepsakeZone);
   if (keepsakeZone) grid = applyKeepsakeZone(grid, keepsakeZone);
   const treatsCollected = collectTreats(grid);
-  const unigleeTriggered = rng() < UNIGLEE_RATE;
+  const unigleeTriggered = allowUniGlee && spinArea === "main" && rng() < UNIGLEE_RATE;
 
   let totalWin = 0;
   let cascades = 0;
@@ -240,21 +304,21 @@ export function spin({
         if (specialty === "sparkle_sort") {
           const { grid: shattered, positions } = applySparkleSort(rng, grid, keepsakeZone);
           cascades++;
-          steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [specialty], blastPositions: positions, keepsakeZone: cloneKeepsakeZone(keepsakeZone) });
+          steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [specialty], blastPositions: positions, keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
           grid = shattered;
           continue;
         }
         if (specialty === "drop_in") {
           const dropped = applyDropIn(rng, grid, keepsakeZone);
-          steps.push({ grid: dropped, wins: [], meterAfter: cascades, specialtyAwarded: [specialty], keepsakeZone: cloneKeepsakeZone(keepsakeZone) });
+          steps.push({ grid: dropped, wins: [], meterAfter: cascades, specialtyAwarded: [specialty], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
           grid = dropped;
           continue;
         }
         // double_sparkle / facts_on_facts are ladder/coin modifiers, not board mutations — record and move on.
-        steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [specialty], keepsakeZone: cloneKeepsakeZone(keepsakeZone) });
+        steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [specialty], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
         continue;
       }
-      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone) });
+      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
       break;
     }
 
@@ -279,9 +343,9 @@ export function spin({
     }
 
     const giantWon = !!keepsakeZone && wins.some((win) => win.positions.some(([reel, row]) => isKeepsakePosition(keepsakeZone, reel, row)));
-    const nextGrid = cascadeGrid(rng, grid, removedByReel, keepsakeZone);
+    const nextGrid = cascadeGrid(rng, grid, removedByReel, keepsakeZone, stickyWilds);
 
-    steps.push({ grid, wins, meterAfter: cascades, specialtyAwarded, keepsakeZone: cloneKeepsakeZone(keepsakeZone) });
+    steps.push({ grid, wins, meterAfter: cascades, specialtyAwarded, keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
     if (giantWon && keepsakeZone) {
       keepsakeZone = { ...keepsakeZone, symbol: rollKeepsakeSymbol(rng, keepsakeZone.symbol) };
     }
@@ -316,6 +380,7 @@ export function spin({
     doorbellPanic,
     boldChaiPump,
     treatTimeBonus,
+    stickyWilds: cloneStickyWilds(stickyWilds),
   };
 }
 

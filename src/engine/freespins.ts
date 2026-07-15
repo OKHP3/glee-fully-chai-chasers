@@ -12,6 +12,15 @@ import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
 import { castTreatTimeWilds } from "./treattime";
+import {
+  applyJoeyLaundryEffect,
+  baseLaundryAllocation,
+  rollJoeyLaundryEffect,
+  type JoeyLaundryEffect,
+  type LaundryRollConfig,
+  type UniGleeAwardSpins,
+  type UniGleeSubBonusBudget,
+} from "./laundry";
 
 export type WheelWedge =
   | "multiplying"
@@ -101,10 +110,18 @@ export interface FreeSpinRoundResult extends SpinResult {
   panicWildsAdded: number;
   treatTimeWilds?: TreatTimeWild[];
   treatTimeMode?: TreatTimeMode;
+  /** Opening-grid Joey Laundry Helper effect, when this round belongs to Joey's chapter. */
+  laundryEffect?: JoeyLaundryEffect;
   /** Present only on the first round of the actual Wild Chai Storm session. */
   chaiRain?: ChaiRainResult;
   /** Remaining spins after this round, including any retrigger just awarded. */
   spinsRemaining?: number;
+}
+
+export interface JoeyLaundryRoundInput {
+  blockIndex: number;
+  roundOrdinal: number;
+  config: LaundryRollConfig;
 }
 
 function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
@@ -186,6 +203,45 @@ export function spinFreeRound(
   return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0 };
 }
 
+/**
+ * Resolves one Joey Laundry Helper counted round.
+ *
+ * Laundry is a chapter-local modifier: it preloads the opening grid, then
+ * delegates payout, cascades, and ordinary retriggers to the shared cascade
+ * engine. All other bonus triggers are suppressed so this round cannot nest
+ * another bonus or leak a retrigger into a later chapter.
+ */
+export function spinJoeyLaundryRound(
+  rng: Rng,
+  betPerLine: number,
+  input: JoeyLaundryRoundInput,
+): FreeSpinRoundResult {
+  const laundryEffect = rollJoeyLaundryEffect(rng, input.blockIndex, input.roundOrdinal, input.config);
+  const startingGrid = applyJoeyLaundryEffect(
+    spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }),
+    laundryEffect,
+  );
+  const base = spin({
+    rng,
+    betPerLine,
+    treatJar: emptyTreatJar(),
+    spinsSincePopIn: 999,
+    startingGrid,
+    allowDoorbells: false,
+    includeBoldChaiPump: false,
+    spinArea: "secondary",
+    allowTreatTimeBonus: false,
+    allowUniGlee: false,
+  });
+
+  return {
+    ...base,
+    extraWildsAdded: 0,
+    panicWildsAdded: 0,
+    laundryEffect,
+  };
+}
+
 export interface FreeSpinSessionResult {
   wedge: FreeSpinMode;
   mode: FreeSpinMode;
@@ -196,6 +252,69 @@ export interface FreeSpinSessionResult {
   totalWin: number;
   bestCascade: number;
   retriggers: number;
+}
+
+export interface JoeyLaundrySessionResult {
+  chapter: "joey_laundry_helper";
+  budget: UniGleeSubBonusBudget;
+  rounds: FreeSpinRoundResult[];
+  totalWin: number;
+  bestCascade: number;
+  retriggers: number;
+}
+
+/**
+ * Runs Joey's 25% UniGlee allocation as a chapter-local queue.
+ *
+ * This is intentionally not a UniGlee marathon runner. The parent owns the
+ * global chapter order; this function only guarantees that Joey's allocation
+ * and any spins earned by Joey are exhausted before it returns.
+ */
+export function runJoeyLaundrySession(
+  rng: Rng,
+  betPerLine: number,
+  awardedSpins: UniGleeAwardSpins,
+  config: LaundryRollConfig,
+  blockIndex = 0,
+): JoeyLaundrySessionResult {
+  const initialAllocation = baseLaundryAllocation(awardedSpins);
+  const budget: UniGleeSubBonusBudget = {
+    initialAllocation,
+    retriggerSpins: 0,
+    remainingSpins: initialAllocation,
+  };
+  const rounds: FreeSpinRoundResult[] = [];
+  let retriggers = 0;
+  let totalWin = 0;
+  let bestCascade = 0;
+  let roundOrdinal = 0;
+
+  while (budget.remainingSpins > 0) {
+    budget.remainingSpins--;
+    const round = spinJoeyLaundryRound(rng, betPerLine, {
+      blockIndex,
+      roundOrdinal,
+      config,
+    });
+    roundOrdinal++;
+    rounds.push(round);
+    totalWin += round.totalWin;
+    bestCascade = Math.max(bestCascade, round.cascades);
+    if (round.freeSpinsAwarded > 0) {
+      budget.retriggerSpins += round.freeSpinsAwarded;
+      budget.remainingSpins += round.freeSpinsAwarded;
+      retriggers++;
+    }
+  }
+
+  return {
+    chapter: "joey_laundry_helper",
+    budget,
+    rounds,
+    totalWin,
+    bestCascade,
+    retriggers,
+  };
 }
 
 export interface FreeSpinSessionOptions {
