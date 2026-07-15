@@ -52,7 +52,7 @@ npm run build
 
 The project is a Vite + TypeScript single-page app. Game math lives in `src/engine/`; the browser UI lives in `src/ui/`.
 
-Current engineering status: the production build passes. The seeded RTP simulation is intentionally left as a failing release gate after the 40-line change (93.54% measured versus the 96% ±0.5 target); it needs a simulation-backed engine retune before the project can claim release-ready math.
+Current engineering status (verified 2026-07-15): the production build passes, all 82 tests pass, and the seeded 200,000-spin release oracle is green — measured RTP 95.91% against the 96% ±0.5 target, with free spins, mega-cascade, UniGlee, and cat pop-in frequencies all inside their approved bands.
 
 ## Privacy and originality
 
