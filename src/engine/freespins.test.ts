@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
-import { rollWildMultiplier, runFreeSpinSession, spinFreeRound, spinWheel, wheelWedgeLabel } from "./freespins";
+import {
+  rollWildMultiplier,
+  runFreeSpinSession,
+  runJoeyLaundrySession,
+  spinFreeRound,
+  spinJoeyLaundryRound,
+  spinWheel,
+  wheelWedgeLabel,
+} from "./freespins";
+
+const NO_LAUNDRY_EFFECTS = {
+  sockDropRate: 0,
+  pawStrikeRate: 0,
+  multiplierWeights: { 2: 1, 3: 1, 5: 1 },
+} as const;
 
 describe("AskJamie wheel", () => {
   it("always lands on one of the three wedges", () => {
@@ -94,6 +108,21 @@ describe("free spin rounds", () => {
       }
     }
   });
+
+  it("plumbs Joey Laundry effects through a secondary round without nesting bonuses", () => {
+    const round = spinJoeyLaundryRound(mulberry32(20260715), 1, {
+      blockIndex: 0,
+      roundOrdinal: 0,
+      config: { ...NO_LAUNDRY_EFFECTS, sockDropRate: 1 },
+    });
+
+    expect(round.laundryEffect?.chapter).toBe("joey_laundry_helper");
+    expect(round.laundryEffect?.sockDrop?.wildPositions).toHaveLength(4);
+    expect(round.unigleeTriggered).toBe(false);
+    expect(round.doorbellPanic).toBeUndefined();
+    expect(round.boldChaiPump).toBeUndefined();
+    expect(round.treatTimeBonus).toBeUndefined();
+  });
 });
 
 describe("free spin session", () => {
@@ -109,5 +138,17 @@ describe("free spin session", () => {
     const session = runFreeSpinSession(mulberry32(1), "chai_back", 1, 0);
     expect(session.rounds.length).toBe(0);
     expect(session.totalWin).toBe(0);
+  });
+
+  it("keeps Joey's 25% allocation and retriggers inside Joey's queue", () => {
+    const session = runJoeyLaundrySession(mulberry32(20260715), 1, 300, NO_LAUNDRY_EFFECTS);
+
+    expect(session.chapter).toBe("joey_laundry_helper");
+    expect(session.budget.initialAllocation).toBe(75);
+    expect(session.budget.remainingSpins).toBe(0);
+    expect(session.rounds.length).toBe(75 + session.budget.retriggerSpins);
+    expect(session.rounds.length).toBe(75 + session.rounds.reduce((sum, round) => sum + round.freeSpinsAwarded, 0));
+    expect(session.rounds.every((round) => round.laundryEffect?.chapter === "joey_laundry_helper")).toBe(true);
+    expect(session.rounds.every((round) => round.unigleeTriggered === false)).toBe(true);
   });
 });
