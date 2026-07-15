@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
-import { addTreat, collectTreat, consumeForVisit, emptyTreatJar, rollCatVisit, settleTreatJar } from "./features";
+import { addTreat, CAT_QUIP_POOLS, collectTreat, consumeForVisit, emptyTreatJar, rollCatVisit, settleTreatJar } from "./features";
 
 describe("treat jar", () => {
   it("pays five Chicken Comet spins and resets only that bag at twelve", () => {
@@ -42,6 +42,25 @@ describe("treat jar", () => {
 });
 
 describe("rollCatVisit — canon S7", () => {
+  it("rotates through distinct Phoebe and Joey vernacular pools", () => {
+    const phoebeQuips = new Set<string>();
+    const joeyQuips = new Set<string>();
+    const jar = { chicken: 1, salmon: 0, bougie: 1 };
+
+    for (let seed = 0; seed < 2000; seed++) {
+      const visit = rollCatVisit(mulberry32(seed), jar, 20);
+      if (visit?.cat === "phoebe") phoebeQuips.add(visit.quip);
+      if (visit?.cat === "joey") joeyQuips.add(visit.quip);
+    }
+
+    expect(phoebeQuips.size).toBeGreaterThan(1);
+    expect(joeyQuips.size).toBeGreaterThan(1);
+    const phoebePool = new Set<string>([...CAT_QUIP_POOLS.phoebe.fed, ...CAT_QUIP_POOLS.phoebe.unfed]);
+    const joeyPool = new Set<string>([...CAT_QUIP_POOLS.joey.fed, ...CAT_QUIP_POOLS.joey.unfed]);
+    expect([...phoebeQuips].every((quip) => phoebePool.has(quip))).toBe(true);
+    expect([...joeyQuips].every((quip) => joeyPool.has(quip))).toBe(true);
+  });
+
   it("never lets Joey assist without Bougie Bites in the jar", () => {
     const jar = { chicken: 5, salmon: 5, bougie: 0 };
     for (let seed = 0; seed < 500; seed++) {
