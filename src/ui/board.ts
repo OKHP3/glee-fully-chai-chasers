@@ -65,10 +65,12 @@ import { setBoldChaiUrgency, setMusicVolume, startBaseMusic, stopBaseMusic } fro
 
 let statusTimeout: number | undefined;
 
-const BOLD_CHAI_ASSET_ROOT = "/assets/bold-chai";
+function publicAsset(fileName: string): string {
+  return `${import.meta.env.BASE_URL}assets/${fileName}`;
+}
 
 function boldChaiAsset(fileName: string): string {
-  return `${BOLD_CHAI_ASSET_ROOT}/${fileName}`;
+  return publicAsset(`bold-chai/${fileName}`);
 }
 
 const PAYTABLE_SYMBOLS: ReadonlyArray<{ id: SymbolId; name: string }> = [
@@ -151,7 +153,7 @@ export function renderBoard(
             ${treatJarHtml(state)}
           </div>
           <div id="askjamie-perch" aria-label="AskJamie" class="askjamie-housing">
-            <div class="askjamie-icon"><img src="/assets/askjamie-avatar.jpg" alt="" /></div>
+            <div class="askjamie-icon"><img src="${publicAsset("askjamie-avatar.jpg")}" alt="" /></div>
             <span>AskJamie</span>
           </div>
         </div>
