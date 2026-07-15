@@ -25,7 +25,14 @@ import {
 import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
 import { addTreat, consumeForVisit } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
-import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinRoundResult, type WheelWedge } from "../engine/freespins";
+import {
+  runFreeSpinSession,
+  spinWheel,
+  wheelWedgeLabel,
+  type FreeSpinRoundResult,
+  type JoeyLaundrySessionResult,
+  type WheelWedge,
+} from "../engine/freespins";
 import {
   createLapQuestChallenge,
   LAP_QUEST_SPOT_LABELS,
@@ -56,6 +63,8 @@ import {
   playBoldChaiPumpPress,
   playBoldChaiTimerBuzzer,
   playJoeyCue,
+  playLaundryPawStrike,
+  playLaundrySockDrop,
   playPhoebeCue,
   playLapQuestReveal,
   playLapQuestWildLand,
@@ -1401,6 +1410,197 @@ async function playFreeSpinSession(
   bgLayer?.classList.remove("aurora");
   document.body.classList.remove("aurora-mode");
   void state; // state saved by caller after totals are tallied
+}
+
+/**
+ * Presents the already-resolved Joey Laundry chapter. The parent UniGlee
+ * controller supplies the typed session; this layer only owns timing, art,
+ * audio, and accessibility announcements.
+ */
+export async function playJoeyLaundryChapter(
+  root: HTMLElement,
+  session: JoeyLaundrySessionResult,
+): Promise<void> {
+  const overlay = document.createElement("div");
+  overlay.className = "joey-laundry-overlay";
+  overlay.setAttribute("role", "region");
+  overlay.setAttribute("aria-label", "Joey's Laundry Helper sub-bonus");
+  overlay.innerHTML = `
+    <div class="night-garden aurora">${gardenDecor()}</div>
+    <div class="relative z-10 h-full w-full flex flex-col cc-shell free-spins-shell joey-laundry-shell">
+      <header class="marquee joey-laundry-header">
+        <div class="marquee-row">
+          <span class="level-chip">UniGlee · Chapter 1</span>
+          <h1 class="marquee-title">Joey’s Laundry Helper</h1>
+        </div>
+      </header>
+      <div class="jar-meter joey-laundry-meter">
+        <div class="jar-meter-text">Laundry spin <span id="laundry-index">1</span> of <span id="laundry-total">${session.rounds.length}</span> · Round win: <span id="laundry-round-win">0</span></div>
+      </div>
+      <main class="cabinet-frame joey-laundry-cabinet">
+        <div class="joey-laundry-perch" aria-hidden="true">${catSprite("joey", "assist")}</div>
+        <div id="laundry-grid" class="reel-grid"></div>
+      </main>
+      <div id="laundry-status" class="status-line" aria-live="polite"></div>
+    </div>
+  `;
+  root.appendChild(overlay);
+
+  const grid = overlay.querySelector<HTMLDivElement>("#laundry-grid")!;
+  const indexEl = overlay.querySelector<HTMLSpanElement>("#laundry-index")!;
+  const totalEl = overlay.querySelector<HTMLSpanElement>("#laundry-total")!;
+  const roundWinEl = overlay.querySelector<HTMLSpanElement>("#laundry-round-win")!;
+  const statusEl = overlay.querySelector<HTMLDivElement>("#laundry-status")!;
+  const cabinet = overlay.querySelector<HTMLElement>(".joey-laundry-cabinet")!;
+  const reduced = (root.querySelector(".cc-root")?.getAttribute("data-reduced-motion") === "true")
+    || (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
+
+  playJoeyCue();
+  await sleep(reduced ? 80 : 520);
+
+  for (const [roundIndex, round] of session.rounds.entries()) {
+    indexEl.textContent = String(roundIndex + 1);
+    totalEl.textContent = String(session.rounds.length);
+    roundWinEl.textContent = round.totalWin.toLocaleString();
+    const effect = round.laundryEffect;
+
+    for (const [stepIndex, step] of round.steps.entries()) {
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
+      grid.querySelectorAll<HTMLElement>(".cell").forEach((cell, cellIndex) => {
+        cell.style.setProperty("--drop-delay", `${(cellIndex % ROWS) * 16 + Math.floor(cellIndex / ROWS) * 10}ms`);
+        cell.classList.add(stepIndex === 0 ? "symbol-pop" : "beam-drop");
+      });
+
+      if (stepIndex === 0 && effect) {
+        await animateLaundryEffects(cabinet, grid, effect, statusEl, reduced);
+      }
+
+      updateJar(root, step.meterAfter);
+      if (step.wins.length > 0) {
+        playCascadeArpeggio(step.meterAfter);
+        playWinPluck();
+        step.wins.forEach((win) => win.positions.forEach(([reel, row]) => {
+          grid.querySelector<HTMLElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+        }));
+      } else {
+        playCascadeTick();
+      }
+      await sleep(reduced ? 28 : 170);
+    }
+
+    if (round.freeSpinsAwarded > 0) {
+      statusEl.textContent = `Joey caught a bonus sock — +${round.freeSpinsAwarded} Laundry spin${round.freeSpinsAwarded === 1 ? "" : "s"}.`;
+      playBonusFanfare();
+      await sleep(reduced ? 40 : 360);
+    } else if (round.totalWin > 0) {
+      statusEl.textContent = `Joey’s Laundry Helper · +${round.totalWin.toLocaleString()} coins`;
+      await sleep(reduced ? 30 : 120);
+    }
+  }
+
+  statusEl.textContent = `Joey’s Laundry Helper complete · ${session.rounds.length} spins · +${session.totalWin.toLocaleString()} coins`;
+  playBonusFanfare();
+  await sleep(reduced ? 80 : 560);
+  overlay.remove();
+}
+
+/** Resolves the chapter UI and persists its already-accounted session total. */
+export async function runJoeyLaundryChapter(
+  root: HTMLElement,
+  state: GameState,
+  session: JoeyLaundrySessionResult,
+): Promise<void> {
+  await playJoeyLaundryChapter(root, session);
+  state.balance += session.totalWin;
+  state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
+  saveGameState(state);
+  const lastRound = session.rounds[session.rounds.length - 1];
+  renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
+}
+
+function animateLaundryEffects(
+  cabinet: HTMLElement,
+  grid: HTMLElement,
+  effect: NonNullable<FreeSpinRoundResult["laundryEffect"]>,
+  statusEl: HTMLElement,
+  reduced: boolean,
+): Promise<void> {
+  const layer = document.createElement("div");
+  layer.className = "joey-laundry-effect-layer";
+  cabinet.appendChild(layer);
+  const messages: string[] = [];
+  const timers: number[] = [];
+
+  if (effect.sockDrop) {
+    const firstCell = grid.querySelector<HTMLElement>(`[data-reel="${effect.sockDrop.reel}"] [data-row="0"]`);
+    const lastCell = grid.querySelector<HTMLElement>(`[data-reel="${effect.sockDrop.reel}"] [data-row="${ROWS - 1}"]`);
+    if (firstCell && lastCell) {
+      const stageRect = cabinet.getBoundingClientRect();
+      const firstRect = firstCell.getBoundingClientRect();
+      const lastRect = lastCell.getBoundingClientRect();
+      const column = document.createElement("div");
+      column.className = "joey-laundry-sock-column";
+      column.style.left = `${firstRect.left - stageRect.left}px`;
+      column.style.top = `${firstRect.top - stageRect.top}px`;
+      column.style.width = `${firstRect.width}px`;
+      column.style.height = `${lastRect.bottom - firstRect.top}px`;
+      layer.appendChild(column);
+
+      const sock = document.createElement("div");
+      sock.className = "joey-laundry-sock";
+      sock.innerHTML = laundrySockSvg();
+      sock.style.left = `${firstRect.left - stageRect.left + firstRect.width * 0.18}px`;
+      sock.style.top = `${Math.max(4, firstRect.top - stageRect.top - firstRect.height * 1.5)}px`;
+      sock.style.setProperty("--sock-drop-distance", `${lastRect.bottom - firstRect.top + firstRect.height}px`);
+      layer.appendChild(sock);
+      messages.push(`Sock on reel ${effect.sockDrop.reel + 1}: full column wild.`);
+      playLaundrySockDrop();
+    }
+  }
+
+  if (effect.pawStrike) {
+    const [reel, row] = effect.pawStrike.position;
+    const cell = grid.querySelector<HTMLElement>(`[data-reel="${reel}"] [data-row="${row}"]`);
+    if (cell) {
+      const stageRect = cabinet.getBoundingClientRect();
+      const cellRect = cell.getBoundingClientRect();
+      const paw = document.createElement("div");
+      paw.className = "joey-laundry-paw";
+      paw.innerHTML = laundryPawSvg();
+      paw.style.left = `${cellRect.left - stageRect.left}px`;
+      paw.style.top = `${cellRect.top - stageRect.top - cellRect.height * 0.5}px`;
+      paw.style.width = `${cellRect.width}px`;
+      paw.style.height = `${cellRect.height * 1.5}px`;
+      layer.appendChild(paw);
+      messages.push(`Joey’s paw strike: ${effect.pawStrike.multiplier} times wild on reel ${reel + 1}, row ${row + 1}.`);
+      playLaundryPawStrike(effect.pawStrike.multiplier);
+    }
+  }
+
+  const sharedReel = effect.sockDrop && effect.pawStrike && effect.sockDrop.reel === effect.pawStrike.position[0];
+  statusEl.textContent = messages.length === 2 && sharedReel
+    ? `Joey caught a sock and enhanced reel ${effect.sockDrop!.reel + 1} with a ${effect.pawStrike!.multiplier} times wild.`
+    : messages.join(" ");
+
+  const duration = reduced ? 80 : 720;
+  timers.push(window.setTimeout(() => {
+    layer.querySelectorAll<HTMLElement>(".joey-laundry-sock-column").forEach((column) => column.classList.add("is-landed"));
+  }, reduced ? 0 : 560));
+  return new Promise((resolve) => {
+    window.setTimeout(() => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+      layer.remove();
+      resolve();
+    }, duration);
+  });
+}
+
+function laundrySockSvg(): string {
+  return `<svg viewBox="0 0 58 78" aria-hidden="true"><path d="M17 5h24v32c0 8 4 13 12 19-3 12-14 17-28 13C11 66 7 57 14 47l3-6z" fill="#f5d576" stroke="#2d1f4c" stroke-width="4" stroke-linejoin="round"/><path d="M17 15h24M17 26h24" stroke="#e8a5b8" stroke-width="5" stroke-linecap="round"/></svg>`;
+}
+
+function laundryPawSvg(): string {
+  return `<svg viewBox="0 0 88 110" aria-hidden="true"><path d="M22 82c-7-5-8-14-3-20 4-4 9-4 14-1-4-12-3-22 3-24 6-2 9 4 11 14 0-16 4-23 10-22 6 1 7 8 6 21 4-10 9-13 14-10 5 4 2 13-1 22 6-5 12-3 14 2 3 7-4 16-12 23-9 8-18 12-31 9z" fill="#9fe8c5" stroke="#2d1f4c" stroke-width="4" stroke-linejoin="round"/></svg>`;
 }
 
 function animateTreatTimeCast(stage: HTMLElement, grid: HTMLElement, wilds: TreatTimeWild[]): Promise<void> {

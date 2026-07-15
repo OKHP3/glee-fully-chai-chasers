@@ -129,6 +129,18 @@ export function playJoeyCue(): void {
   tone(293.66, 0.19, 0.22, 0.17, "triangle");
 }
 
+/** Joey's Laundry Helper sock flutter — a soft, original fabric flick. */
+export function playLaundrySockDrop(): void {
+  tone(392, 0, 0.12, 0.08, "sine");
+  tone(523.25, 0.07, 0.16, 0.07, "triangle");
+}
+
+/** Joey's Laundry Helper paw strike — a compact boogie impact with a bright edge. */
+export function playLaundryPawStrike(multiplier: 2 | 3 | 5): void {
+  tone(98, 0, 0.12, 0.14, "square");
+  tone(multiplier === 5 ? 659.25 : multiplier === 3 ? 523.25 : 392, 0.045, 0.2, 0.12, "triangle");
+}
+
 /** Phoebe's purr-and-discovery signature — warm low pulse plus delighted trill. */
 export function playPhoebeCue(): void {
   tone(110, 0, 0.34, 0.1, "sine");
