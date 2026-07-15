@@ -32,8 +32,9 @@ This is one Git repository and one Vite SPA; no nested project was found in scop
 Implemented and integrated in the current tree:
 
 - splash/audio-unlock flow and the main five-reel × four-row, 40-payline cascade board;
-- pure-TypeScript reel, payline, cascade, specialty-wild, economy, cat-visit, Treat Jar, Doorbell Panic, Treat Time, Bold Chai, free-spin, wheel, Keepsake Constellation, and one-shot Wild Chai Storm logic;
+- pure-TypeScript reel, payline, cascade, specialty-wild, economy, cat-visit, Treat Jar, Doorbell Panic, Treat Time, Bold Chai, free-spin, wheel, Moonlit Keepsake Trail memory-bonus, and one-shot Wild Chai Storm logic;
 - illustrated Joey/Phoebe presentation, cat pop-ins, Firefly Cascade meter, real post-spin resting grids, and cascade beam/drop motion;
+- Moonlit Keepsake Trail 12-card memory staging, mismatch strike indicators, dedicated card-turn presentation, and original bonus audio/assets;
 - UniGlee rare-event takeover presentation (the approved 100–500-spin marathon is not implemented yet);
 - original Web Audio SFX plus a 60-second synthesized base score; music chapter stems remain future work;
 - versioned browser-local persistence for balance, bet, XP, Treat Jar, meter, progress, settings, and reset; and
@@ -68,14 +69,14 @@ The engine/UI boundary is mandatory: engine code stays browser-DOM-free and test
 ```bash
 npm ci
 npm run dev       # Vite dev server, port 5000
-npm test          # Vitest; 14 files / 82 tests, all passing including the RTP release oracle (verified 2026-07-15)
+npm test          # Vitest; full suite, including the 89-step validation set and RTP release oracle
 npm run build     # tsc --noEmit, then Vite production build; currently passes
 npm run preview   # preview the production build on port 5000
 ```
 
 CI uses Node 22, `npm ci`, tests, and the production build. The Pages workflow also checks that private folders are absent and rejects configured brand strings from `dist/`; its spec-oracle job is visible but non-blocking while the approved UniGlee math work remains incomplete.
 
-Validation status (Claude-verified 2026-07-15): the seeded 200,000-spin oracle in `src/engine/simulation.test.ts` is **green** — RTP 95.91% (target 96% ±0.5), any-win 1-in-3.16, free spins 1-in-32, 8+ cascade 1-in-621, UniGlee 1-in-417, cat pop-in 1-in-32.3. The earlier post-40-payline regression (93.54%) was corrected by the `fix: restore and tune 40-payline engine` retune. The oracle remains unweakened; do not modify its thresholds. Any future engine change (UniGlee marathon, twelve-migration) ships only with all six gates green.
+Validation status (Claude-verified 2026-07-15): the seeded 200,000-spin oracle in `src/engine/simulation.test.ts` is **green** — RTP 95.91% (target 96% ±0.5), any-win 1-in-3.16, free spins 1-in-32, 8+ cascade 1-in-621, UniGlee 1-in-417, cat pop-in 1-in-32.3. The Moonlit Keepsake Trail feature is covered by the full suite; its human-success-dependent 40-spin handoff remains documented as a combined-RTP consideration. The oracle remains unweakened; do not modify its thresholds. Any future engine change (UniGlee marathon, twelve-migration) ships only with all six gates green.
 
 ## Safe collaboration rules
 

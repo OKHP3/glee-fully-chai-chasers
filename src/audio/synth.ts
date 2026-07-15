@@ -191,6 +191,37 @@ export function playBoldChaiTimerBuzzer(): void {
   tone(82.41, 0.08, 0.34, 0.14, "square");
 }
 
+/** Moonlit Keepsake Trail card turn — a tiny original page-turn sparkle. */
+export function playKeepsakeCardFlip(): void {
+  tone(523.25, 0, 0.07, 0.07, "triangle");
+  tone(783.99, 0.045, 0.12, 0.06, "sine");
+}
+
+/** Moonlit Keepsake Trail match — warm, quiet resolution for a found pair. */
+export function playKeepsakeMatch(): void {
+  tone(523.25, 0, 0.18, 0.08, "sine");
+  tone(659.25, 0.08, 0.24, 0.1, "triangle");
+}
+
+/** Moonlit Keepsake Trail mismatch — gentle information, never a buzzer. */
+export function playKeepsakeMismatch(): void {
+  tone(196, 0, 0.2, 0.08, "sine");
+  tone(164.81, 0.07, 0.28, 0.06, "triangle");
+}
+
+/** Moonlit Keepsake Trail success — a restrained keepsake shimmer. */
+export function playKeepsakeSuccess(): void {
+  [523.25, 659.25, 783.99, 1046.5].forEach((freq, index) => {
+    tone(freq, index * 0.075, 0.28, 0.1, index % 2 ? "triangle" : "sine");
+  });
+}
+
+/** Moonlit Keepsake Trail failure — soft unresolved-to-warm return cue. */
+export function playKeepsakeFailure(): void {
+  tone(220, 0, 0.22, 0.08, "sine");
+  tone(261.63, 0.16, 0.34, 0.08, "triangle");
+}
+
 /** Doorbell Panic: a bright, original two-note chime followed by a cat-flight burst. */
 export function playStrangerDangerPanic(): void {
   tone(988, 0, 0.18, 0.2, "square");

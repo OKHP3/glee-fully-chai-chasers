@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { Grid } from "../engine/types";
-import { renderGridHtml } from "./board";
+import { createKeepsakeMemory } from "../engine/keepsake-memory";
+import { mulberry32 } from "../engine/rng";
+import { createKeepsakeMemoryController, renderGridHtml } from "./board";
 
 describe("free-spin multiplier overlay", () => {
   it("renders the one marked wild with its visible multiplier badge", () => {
@@ -28,5 +30,20 @@ describe("free-spin multiplier overlay", () => {
     expect(html).toContain('aria-label="Mermaid cup wild chai"');
     expect(html).toContain("WILD CHAI");
     expect(html).toContain("symbol-sprite--chai-wild");
+  });
+});
+
+describe("Moonlit Keepsake Trail presentation boundary", () => {
+  it("forwards typed engine state and card indexes without deciding matches in UI", () => {
+    const controller = createKeepsakeMemoryController(createKeepsakeMemory(mulberry32(20260715)));
+    expect(controller.state.phase).toBe("preview");
+
+    const ready = controller.begin();
+    expect(ready.phase).toBe("choosing_first");
+    const action = controller.pick(ready.cards[0].index);
+
+    expect(action.accepted).toBe(true);
+    expect(action.event).toEqual({ kind: "card_revealed", index: ready.cards[0].index });
+    expect(controller.state).toBe(action.state);
   });
 });

@@ -12,11 +12,10 @@ import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
 import { castTreatTimeWilds } from "./treattime";
-import { applyKeepsakeZone, rollKeepsakeZone } from "./keepsake-constellation";
 
 export type WheelWedge =
   | "multiplying"
-  | "giant_gnome"
+  | "keepsake_memory"
   | "chai_back"
   | "doorbell_panic"
   | "treat_time_morning"
@@ -24,9 +23,12 @@ export type WheelWedge =
 
 const WHEEL_WEIGHTS: Array<[WheelWedge, number]> = [
   ["multiplying", 40],
-  ["giant_gnome", 35],
+  ["keepsake_memory", 35],
   ["chai_back", 25],
 ];
+
+/** A successful memory bonus hands off to ordinary free spins without a wedge modifier. */
+export type FreeSpinMode = "standard" | WheelWedge;
 
 /** Spins the AskJamie wheel — one modifier per bonus (docs §7). */
 export function spinWheel(rng: Rng): WheelWedge {
@@ -95,6 +97,7 @@ function multiplyingStartingGrid(rng: Rng, multiplier: WildMultiplier): { grid: 
 export interface FreeSpinRoundResult extends SpinResult {
   /** The one opening-result multiplier wild, if this counted spin rolled one. */
   multiplierWild?: MultiplierWild;
+  extraWildsAdded: number;
   panicWildsAdded: number;
   treatTimeWilds?: TreatTimeWild[];
   treatTimeMode?: TreatTimeMode;
@@ -131,7 +134,7 @@ function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
 /** Runs one free-spin round with the chosen wedge's modifier applied. */
 export function spinFreeRound(
   rng: Rng,
-  wedge: WheelWedge,
+  wedge: FreeSpinMode,
   betPerLine: number,
   options: { activateChaiStorm?: boolean } = {},
 ): FreeSpinRoundResult {
@@ -146,10 +149,6 @@ export function spinFreeRound(
   const treatTime = treatTimeMode
     ? castTreatTimeWilds(rng, spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }), treatTimeMode)
     : undefined;
-  const keepsakeZone = wedge === "giant_gnome" ? rollKeepsakeZone(rng) : undefined;
-  const keepsakeGrid = keepsakeZone
-    ? applyKeepsakeZone(spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }), keepsakeZone)
-    : undefined;
   const chaiStorm = wedge === "chai_back" && options.activateChaiStorm !== false
     ? convertChaiToWilds(spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }))
     : undefined;
@@ -158,8 +157,7 @@ export function spinFreeRound(
     betPerLine,
     treatJar: emptyTreatJar(),
     spinsSincePopIn: 999,
-    startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? keepsakeGrid ?? chaiStorm?.grid,
-    keepsakeZone,
+    startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? chaiStorm?.grid,
     allowDoorbells: false,
     includeBoldChaiPump: false,
     spinArea: "secondary",
@@ -170,26 +168,27 @@ export function spinFreeRound(
     : {};
 
   if (wedge === "doorbell_panic") {
-    return { ...base, ...treatTimeMeta, panicWildsAdded: panic?.wildsAdded ?? 0 };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: panic?.wildsAdded ?? 0 };
   }
 
   if (treatTime) {
-    return { ...base, ...treatTimeMeta, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0 };
   }
 
   if (wedge === "multiplying") {
-    return { ...base, ...treatTimeMeta, multiplierWild: multiplying?.multiplierWild, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, multiplierWild: multiplying?.multiplierWild, panicWildsAdded: 0 };
   }
 
   if (wedge === "chai_back") {
-    return { ...base, ...treatTimeMeta, panicWildsAdded: 0, chaiRain: chaiStorm?.chaiRain };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0, chaiRain: chaiStorm?.chaiRain };
   }
 
-  return { ...base, ...treatTimeMeta, panicWildsAdded: 0 };
+  return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0 };
 }
 
 export interface FreeSpinSessionResult {
-  wedge: WheelWedge;
+  wedge: FreeSpinMode;
+  mode: FreeSpinMode;
   rounds: FreeSpinRoundResult[];
   initialSpins: number;
   retriggerSpins: number;
@@ -207,13 +206,33 @@ export interface FreeSpinSessionOptions {
 }
 
 /** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
+export interface StandardFreeSpinSessionResult extends Omit<FreeSpinSessionResult, "wedge" | "mode"> {
+  wedge: "standard";
+  mode: "standard";
+}
 export function runFreeSpinSession(
   rng: Rng,
   wedge: WheelWedge,
   betPerLine: number,
   spinsAwarded: number,
+  options?: FreeSpinSessionOptions,
+): FreeSpinSessionResult;
+export function runFreeSpinSession(
+  rng: Rng,
+  wedge: "standard",
+  betPerLine: number,
+  spinsAwarded: number,
+  options?: FreeSpinSessionOptions,
+): StandardFreeSpinSessionResult;
+
+/** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
+export function runFreeSpinSession(
+  rng: Rng,
+  wedge: FreeSpinMode,
+  betPerLine: number,
+  spinsAwarded: number,
   options: FreeSpinSessionOptions = {},
-): FreeSpinSessionResult {
+): FreeSpinSessionResult | StandardFreeSpinSessionResult {
   const initialSpins = Math.max(0, spinsAwarded);
   let remaining = initialSpins;
   const rounds: FreeSpinRoundResult[] = [];
@@ -239,15 +258,15 @@ export function runFreeSpinSession(
     rounds[rounds.length - 1] = { ...round, freeSpinsAwarded: retriggerAward, spinsRemaining: remaining };
   }
 
-  return { wedge, rounds, initialSpins, retriggerSpins, totalSpins: initialSpins + retriggerSpins, totalWin, bestCascade, retriggers };
+  return { wedge, mode: wedge, rounds, initialSpins, retriggerSpins, totalSpins: initialSpins + retriggerSpins, totalWin, bestCascade, retriggers };
 }
 
 export function wheelWedgeLabel(wedge: WheelWedge): string {
   switch (wedge) {
     case "multiplying":
       return "We're Multiplying";
-    case "giant_gnome":
-      return "Keepsake Constellation";
+    case "keepsake_memory":
+      return "Moonlit Keepsake Trail";
     case "chai_back":
       return "Iced Chai Wild Rain";
     case "doorbell_panic":
