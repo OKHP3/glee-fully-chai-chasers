@@ -60,9 +60,15 @@ import {
   setSfxVolume,
   unlock,
 } from "../audio/synth";
-import { setMusicVolume, startBaseMusic, stopBaseMusic } from "../audio/music";
+import { setBoldChaiUrgency, setMusicVolume, startBaseMusic, stopBaseMusic } from "../audio/music";
 
 let statusTimeout: number | undefined;
+
+const BOLD_CHAI_ASSET_ROOT = "/assets/bold-chai";
+
+function boldChaiAsset(fileName: string): string {
+  return `${BOLD_CHAI_ASSET_ROOT}/${fileName}`;
+}
 
 const PAYTABLE_SYMBOLS: ReadonlyArray<{ id: SymbolId; name: string }> = [
   { id: "tumbler", name: "Mermaid Tumbler" },
@@ -605,10 +611,12 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
       <div class="bold-chai-headline"><strong>BOLD CHAI!</strong><span>Barista mode · 12 pumps per strong chai</span></div>
       <div class="bold-chai-timer" aria-live="polite"><span id="bold-chai-seconds">30.0</span><small>seconds</small></div>
       <div class="bold-chai-workbench">
-        <div class="bold-chai-pump-wrap">${symbolSvg("chai_pump")}</div>
-        <div class="bold-chai-cup" aria-label="Iced chai cup">
-          <div class="bold-chai-liquid" id="bold-chai-liquid"></div>
-          <div class="bold-chai-ice" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="bold-chai-layered-art" aria-hidden="true">
+          <img class="bold-chai-layer" src="${boldChaiAsset("pump-body.svg")}" alt="" />
+          <img class="bold-chai-layer" id="bold-chai-plunger" src="${boldChaiAsset("plunger-up.svg")}" alt="" />
+          <img class="bold-chai-layer" src="${boldChaiAsset("spout.svg")}" alt="" />
+          <img class="bold-chai-layer bold-chai-fill" id="bold-chai-fill" src="${boldChaiAsset("fill-01.svg")}" alt="" hidden />
+          <img class="bold-chai-layer bold-chai-cup" id="bold-chai-cup" src="${boldChaiAsset("cup-empty.svg")}" alt="" />
         </div>
       </div>
       <button type="button" class="bold-chai-pump-button" id="bold-chai-pump-button" aria-label="Press the chai pump">
@@ -621,18 +629,48 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
     const button = scene.querySelector<HTMLButtonElement>("#bold-chai-pump-button")!;
     const seconds = scene.querySelector<HTMLSpanElement>("#bold-chai-seconds")!;
     const count = scene.querySelector<HTMLSpanElement>("#bold-chai-count")!;
-    const liquid = scene.querySelector<HTMLDivElement>("#bold-chai-liquid")!;
+    const plunger = scene.querySelector<HTMLImageElement>("#bold-chai-plunger")!;
+    const fill = scene.querySelector<HTMLImageElement>("#bold-chai-fill")!;
+    const cup = scene.querySelector<HTMLImageElement>("#bold-chai-cup")!;
     const status = scene.querySelector<HTMLDivElement>("#bold-chai-status")!;
     let settled = false;
+    let plungerTimers: number[] = [];
+
+    const setPlungerState = (next: "up" | "mid" | "down") => {
+      plunger.src = boldChaiAsset(`plunger-${next}.svg`);
+      scene.dataset.plungerState = next;
+    };
+
+    const animatePlungerPress = () => {
+      plungerTimers.forEach((timer) => window.clearTimeout(timer));
+      plungerTimers = [];
+      setPlungerState("down");
+      plungerTimers.push(window.setTimeout(() => setPlungerState("mid"), 68));
+      plungerTimers.push(window.setTimeout(() => setPlungerState("up"), 150));
+    };
 
     const paint = (now: number) => {
       pumpState = settleBoldChaiPump(pumpState, now);
       const elapsed = pumpState.startedAtMs === undefined ? 0 : Math.max(0, now - pumpState.startedAtMs);
       seconds.textContent = (Math.max(0, BOLD_CHAI_DURATION_MS - elapsed) / 1000).toFixed(1);
       count.textContent = `${pumpState.pumpsInCurrentCup} / ${BOLD_CHAI_PUMPS_PER_CUP}`;
-      liquid.style.height = `${(pumpState.pumpsInCurrentCup / BOLD_CHAI_PUMPS_PER_CUP) * 100}%`;
       scene.classList.toggle("is-resetting", pumpState.phase === "resetting");
-      if (pumpState.phase === "resetting") status.textContent = "Swap the cup — keep moving!";
+      scene.dataset.fillLevel = String(pumpState.pumpsInCurrentCup);
+      if (pumpState.phase === "resetting") {
+        cup.src = boldChaiAsset("cup-swap.svg");
+        cup.alt = "Barista swapping the full iced chai cup";
+        fill.hidden = true;
+        status.textContent = "Swap the cup — keep moving!";
+      } else {
+        cup.src = boldChaiAsset("cup-empty.svg");
+        cup.alt = "Clear iced chai cup with ice";
+        if (pumpState.pumpsInCurrentCup > 0) {
+          fill.src = boldChaiAsset(`fill-${String(pumpState.pumpsInCurrentCup).padStart(2, "0")}.svg`);
+          fill.hidden = false;
+        } else {
+          fill.hidden = true;
+        }
+      }
     };
 
     const finish = (now: number) => {
@@ -641,9 +679,17 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
       pumpState = settleBoldChaiPump(pumpState, now);
       playBoldChaiTimerBuzzer();
       button.disabled = true;
+      plungerTimers.forEach((timer) => window.clearTimeout(timer));
+      plungerTimers = [];
+      setPlungerState("up");
       status.textContent = "Time! Counting your strong chais…";
       const outcome = completeBoldChaiPump(pumpState, now);
-      window.setTimeout(() => { scene.remove(); reelGrid.hidden = false; resolve(outcome.freeSpinsAwarded); }, 750);
+      window.setTimeout(() => {
+        setBoldChaiUrgency(false);
+        scene.remove();
+        reelGrid.hidden = false;
+        resolve(outcome.freeSpinsAwarded);
+      }, 750);
     };
 
     const frame = (now: number) => {
@@ -653,21 +699,35 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
       requestAnimationFrame(frame);
     };
 
-    button.addEventListener("pointerdown", (event) => {
-      event.preventDefault();
+    const registerPump = (now: number) => {
       if (settled) return;
-      const action = pumpBoldChai(pumpState, performance.now());
+      const action = pumpBoldChai(pumpState, now);
       pumpState = action.state;
-      if (!action.accepted) return;
+      if (!action.accepted) {
+        paint(now);
+        return;
+      }
+      animatePlungerPress();
       const completed = action.event?.kind === "chai_completed";
       playBoldChaiPumpPress(completed);
-      paint(performance.now());
+      paint(now);
       if (completed) {
         playBoldChaiCupSwap();
         status.textContent = "Strong chai! Empty cup coming in…";
       }
+    };
+
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      registerPump(performance.now());
+    });
+    button.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      registerPump(performance.now());
     });
     paint(performance.now());
+    setBoldChaiUrgency(true);
     requestAnimationFrame(frame);
   });
 }
