@@ -43,7 +43,7 @@ Splash ("Tap to open the Toolbox 🧰", unlocks audio)
   └─ Birthday Reveal (first launch on/after 07/17 only — §12)
        └─ MAIN BOARD (the game; 95% of time lives here)
             ├─ Free Spins (wheel → modifier → spins; same board, night-shifts to aurora)
-            ├─ Chai Tea Bonus (12-tumbler pick shelf)
+            ├─ Bold Chai Bonus (12-pump barista scene)
             ├─ Milestone Scene interludes (~20s, skippable)
             ├─ Daily Bonus Wheel (once per calendar day)
             └─ Settings (sound, motion, reset, "About this gift")
@@ -128,9 +128,13 @@ Meter hits 4+ → celebration → **AskJamie spins Joey & Phoebe's Sparkle Wheel
 
 Free spins play on an aurora-shifted board (navy → violet-green), same cascade rules, retriggers live. Double Sparkle doubles the entry award. Exit screen always ends warm: total, best cascade, and a Glee-ism sized to the result (Glee-Lite for modest, Bleeds Glee for monsters).
 
-## 8. Chai Tea Bonus (pick game)
+## 8. Bold Chai Bonus (rapid-pump scene)
 
-3+ iced-chai scatters anywhere → the board flips to a café shelf holding **12 to-go tumblers**. Pick tumblers; each holds coin awards (bet-scaled), +1 extra pick, or the **Mermaid Cup** — mini-jackpot (50× bet) plus a toast animation: *"To Glee. Freak'n facts on facts."* One tumbler holds the **spill** (ends picking) — but the spill is never the first pick, and the exit line is kind: *"Even a spilled chai waters the garden. Take your winnings, gorgeous."*
+The main screen may trigger a dedicated Bold Chai feature scene within the existing reel-area dimensions. The player has **30 seconds** to tap the oversized pump as quickly as possible. Each registered pump advances the visible iced cup by one of **12 fill steps**; the 12th pump completes one strong chai and awards **10 free spins**. The cup then swaps to an empty iced cup over **3 seconds** while the clock continues running; taps during the swap or after timeout do nothing. Incomplete cups award no free spins.
+
+Chai pump symbol should appear: 1/17 on reel 1 and 1/30 on reel 2 for a same-payline "Bold Chai" bonus trigger: approximately 1/510-spins
+
+The pump blocker is main-screen-only and is suppressed in all secondary bonus screens, including Keepsake Collection and We're Multiplying. Bold Chai audio is one-shot per accepted pump, with an original iced-cube rattle during each cup swap and an original low shot-clock buzzer when the 30-second timer expires. The normal soundtrack continues during the scene, with urgency tempo handled by the music layer.
 
 ## 9. Economy & progression
 

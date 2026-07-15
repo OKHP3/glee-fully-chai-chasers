@@ -12,7 +12,7 @@ export type SymbolId =
   // low
   | "mailbox" | "vhs" | "teapot" | "yarn"
   // blocker / bonus trigger
-  | "doorbell"
+  | "doorbell" | "chai_pump"
   // treats (feature symbols, reels 1/3/5 only)
   | "treat_chicken" | "treat_salmon" | "treat_bougie"
   // wilds & legend
@@ -77,6 +77,46 @@ export interface DoorbellTrigger {
   freeSpinsAwarded: number;
 }
 
+/** A same-payline Bold Chai Pump pair captured during a base-game spin. */
+export interface BoldChaiTrigger {
+  lineIndex: number;
+  positions: Array<[number, number]>;
+}
+
+export type BoldChaiPumpPhase = "ready" | "pumping" | "resetting" | "ended";
+
+/** Pure state for the 30-second rapid-tap Bold Chai Pump bonus. */
+export interface BoldChaiPumpState {
+  phase: BoldChaiPumpPhase;
+  startedAtMs?: number;
+  resetUntilMs?: number;
+  totalPumps: number;
+  pumpsInCurrentCup: number;
+  completedChais: number;
+  freeSpinsAwarded: number;
+}
+
+export type BoldChaiPumpEvent =
+  | { kind: "pump"; elapsedMs: number; fillLevel: number; freeSpinsAwarded: number }
+  | { kind: "chai_completed"; elapsedMs: number; fillLevel: 12; freeSpinsAwarded: number; resetUntilMs: number }
+  | { kind: "expired"; elapsedMs: number };
+
+export interface BoldChaiPumpActionResult {
+  state: BoldChaiPumpState;
+  accepted: boolean;
+  reason?: "ended" | "expired" | "resetting";
+  event?: BoldChaiPumpEvent;
+}
+
+export interface BoldChaiPumpBonusResult {
+  kind: "bold_chai_pump_result";
+  totalPumps: number;
+  completedChais: number;
+  partialPumps: number;
+  freeSpinsAwarded: number;
+  endedBecause: "timeout";
+}
+
 export interface CascadeStep {
   grid: Grid;
   wins: LineWin[];
@@ -111,6 +151,7 @@ export interface SpinResult {
   unigleeTriggered: boolean;
   treatsCollected: TreatKind[];
   doorbellPanic?: DoorbellTrigger;
+  boldChaiPump?: BoldChaiTrigger;
   treatTimeBonus?: TreatTimeTrigger;
 }
 

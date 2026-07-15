@@ -14,6 +14,14 @@ import type { CascadeStep, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } 
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
+import {
+  BOLD_CHAI_DURATION_MS,
+  BOLD_CHAI_PUMPS_PER_CUP,
+  completeBoldChaiPump,
+  createBoldChaiPumpState,
+  pumpBoldChai,
+  settleBoldChaiPump,
+} from "../engine/bold-chai-pump";
 import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
 import { addTreat, consumeForVisit } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
@@ -36,6 +44,9 @@ import {
   playCascadeArpeggio,
   playCascadeTick,
   playDoorbellRing,
+  playBoldChaiCupSwap,
+  playBoldChaiPumpPress,
+  playBoldChaiTimerBuzzer,
   playJoeyCue,
   playPhoebeCue,
   playTreatLand,
@@ -471,6 +482,7 @@ function openPaytablePage(root: HTMLElement): void {
         ${featureCard("treat_salmon", "Salmon Stars", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
         ${featureCard("treat_bougie", "Bougie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
         ${featureCard("doorbell", "Doorbell", "A pair on the first two positions of any line begins Doorbell Panic free spins.")}
+        ${featureCard("chai_pump", "Bold Chai Pump", "A same-payline pair opens the 30-second barista pump scene. Main spins only.")}
         ${featureCard("uniglee", "UniGlee", "The rare rainbow-butterfly legend begins a special Chai Chase celebration.")}
       </section>
       <p class="paytable-footnote">Line values are shown with the game’s live tuning applied, so this guide always matches what the board awards.</p>
@@ -521,6 +533,8 @@ async function runSpin(
 
   await animateSteps(root, result.steps);
 
+  let boldChaiSpinsAwarded = 0;
+
   state.balance += result.totalWin;
   state.xp += sparksForSpin(state.bet);
   state.fireflyMeter = result.cascades;
@@ -533,6 +547,8 @@ async function runSpin(
   if (result.doorbellPanic) {
     playStrangerDangerPanic();
     await showDoorbellPanic(root, result.doorbellPanic.freeSpinsAwarded, result.doorbellPanic.positions);
+  } else if (result.boldChaiPump) {
+    boldChaiSpinsAwarded = await runBoldChaiBonus(root);
   } else if (result.unigleeTriggered) {
     playUniGleeSting();
     await showUnigleeTakeover(root);
@@ -566,7 +582,106 @@ async function runSpin(
     return;
   }
 
+  if (boldChaiSpinsAwarded > 0) {
+    await runBoldChaiFreeSpins(root, state, boldChaiSpinsAwarded);
+    return;
+  }
+
   if (!result.treatTimeBonus) renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
+}
+
+/** Runs the dedicated Bold Chai scene inside the existing cabinet footprint. */
+function runBoldChaiBonus(root: HTMLElement): Promise<number> {
+  return new Promise((resolve) => {
+    const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
+    const reelGrid = root.querySelector<HTMLElement>("#reel-grid");
+    if (!cabinet || !reelGrid) { resolve(0); return; }
+
+    reelGrid.hidden = true;
+    const scene = document.createElement("section");
+    scene.className = "bold-chai-scene";
+    scene.setAttribute("aria-label", "Bold Chai rapid pump bonus");
+    scene.innerHTML = `
+      <div class="bold-chai-headline"><strong>BOLD CHAI!</strong><span>Barista mode · 12 pumps per strong chai</span></div>
+      <div class="bold-chai-timer" aria-live="polite"><span id="bold-chai-seconds">30.0</span><small>seconds</small></div>
+      <div class="bold-chai-workbench">
+        <div class="bold-chai-pump-wrap">${symbolSvg("chai_pump")}</div>
+        <div class="bold-chai-cup" aria-label="Iced chai cup">
+          <div class="bold-chai-liquid" id="bold-chai-liquid"></div>
+          <div class="bold-chai-ice" aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+      </div>
+      <button type="button" class="bold-chai-pump-button" id="bold-chai-pump-button" aria-label="Press the chai pump">
+        PRESS PUMP <span id="bold-chai-count">0 / ${BOLD_CHAI_PUMPS_PER_CUP}</span>
+      </button>
+      <div class="bold-chai-status" id="bold-chai-status" aria-live="polite">Tap fast — make it strong!</div>`;
+    cabinet.appendChild(scene);
+
+    let pumpState = createBoldChaiPumpState();
+    const button = scene.querySelector<HTMLButtonElement>("#bold-chai-pump-button")!;
+    const seconds = scene.querySelector<HTMLSpanElement>("#bold-chai-seconds")!;
+    const count = scene.querySelector<HTMLSpanElement>("#bold-chai-count")!;
+    const liquid = scene.querySelector<HTMLDivElement>("#bold-chai-liquid")!;
+    const status = scene.querySelector<HTMLDivElement>("#bold-chai-status")!;
+    let settled = false;
+
+    const paint = (now: number) => {
+      pumpState = settleBoldChaiPump(pumpState, now);
+      const elapsed = pumpState.startedAtMs === undefined ? 0 : Math.max(0, now - pumpState.startedAtMs);
+      seconds.textContent = (Math.max(0, BOLD_CHAI_DURATION_MS - elapsed) / 1000).toFixed(1);
+      count.textContent = `${pumpState.pumpsInCurrentCup} / ${BOLD_CHAI_PUMPS_PER_CUP}`;
+      liquid.style.height = `${(pumpState.pumpsInCurrentCup / BOLD_CHAI_PUMPS_PER_CUP) * 100}%`;
+      scene.classList.toggle("is-resetting", pumpState.phase === "resetting");
+      if (pumpState.phase === "resetting") status.textContent = "Swap the cup — keep moving!";
+    };
+
+    const finish = (now: number) => {
+      if (settled) return;
+      settled = true;
+      pumpState = settleBoldChaiPump(pumpState, now);
+      playBoldChaiTimerBuzzer();
+      button.disabled = true;
+      status.textContent = "Time! Counting your strong chais…";
+      const outcome = completeBoldChaiPump(pumpState, now);
+      window.setTimeout(() => { scene.remove(); reelGrid.hidden = false; resolve(outcome.freeSpinsAwarded); }, 750);
+    };
+
+    const frame = (now: number) => {
+      if (settled) return;
+      paint(now);
+      if (pumpState.startedAtMs !== undefined && now - pumpState.startedAtMs >= BOLD_CHAI_DURATION_MS) { finish(now); return; }
+      requestAnimationFrame(frame);
+    };
+
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      if (settled) return;
+      const action = pumpBoldChai(pumpState, performance.now());
+      pumpState = action.state;
+      if (!action.accepted) return;
+      const completed = action.event?.kind === "chai_completed";
+      playBoldChaiPumpPress(completed);
+      paint(performance.now());
+      if (completed) {
+        playBoldChaiCupSwap();
+        status.textContent = "Strong chai! Empty cup coming in…";
+      }
+    });
+    paint(performance.now());
+    requestAnimationFrame(frame);
+  });
+}
+
+/** Bold Chai awards enter the existing free-spin session without the wheel. */
+async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
+  const session = runFreeSpinSession(mulberry32(productionSeed()), "chai_back", betPerLine(state.bet), spinsAwarded);
+  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  state.balance += session.totalWin;
+  state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
+  saveGameState(state);
+  await showBonusSummary(root, session.totalWin, session.retriggers);
+  const lastRound = session.rounds[session.rounds.length - 1];
+  renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
 }
 
 function showDoorbellPanic(

@@ -3,7 +3,7 @@
  * Spec: docs/DESIGN-SPEC.md §4. Left-to-right evaluation, wilds substitute
  * for all paying symbols (and pay as the top symbol when forming their own line).
  */
-import type { DoorbellTrigger, Grid, LineWin, SymbolId } from "./types";
+import type { BoldChaiTrigger, DoorbellTrigger, Grid, LineWin, SymbolId } from "./types";
 
 /** Each line is a row index (0-3) per reel (5 entries). */
 export const PAYLINES: number[][] = [
@@ -74,22 +74,32 @@ export const PAYOUT_SCALE = 1.206;
 
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */
-const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_bougie", "uniglee", "doorbell"];
+const NON_PAYING: SymbolId[] = ["treat_chicken", "treat_salmon", "treat_bougie", "uniglee", "doorbell", "chai_pump"];
 
 export function isWild(symbol: SymbolId): boolean {
   return WILDS.includes(symbol);
 }
 
-/** A matched first/second-reel doorbell pair triggers the panic bonus. */
-export function findDoorbellTrigger(grid: Grid, freeSpinsAwarded: number): DoorbellTrigger | undefined {
+function findBlockerTrigger(grid: Grid, symbol: "doorbell" | "chai_pump"): BoldChaiTrigger | undefined {
   for (const [lineIndex, line] of PAYLINES.entries()) {
     const first = [0, line[0]] as [number, number];
     const second = [1, line[1]] as [number, number];
-    if (grid[0][line[0]].symbol === "doorbell" && grid[1][line[1]].symbol === "doorbell") {
-      return { lineIndex, positions: [first, second], freeSpinsAwarded };
+    if (grid[0][line[0]].symbol === symbol && grid[1][line[1]].symbol === symbol) {
+      return { lineIndex, positions: [first, second] };
     }
   }
   return undefined;
+}
+
+/** A matched first/second-reel doorbell pair triggers the panic bonus. */
+export function findDoorbellTrigger(grid: Grid, freeSpinsAwarded: number): DoorbellTrigger | undefined {
+  const trigger = findBlockerTrigger(grid, "doorbell");
+  return trigger ? { ...trigger, freeSpinsAwarded } : undefined;
+}
+
+/** A matched first/second-reel pump pair triggers the Bold Chai bonus. */
+export function findBoldChaiTrigger(grid: Grid): BoldChaiTrigger | undefined {
+  return findBlockerTrigger(grid, "chai_pump");
 }
 
 /** Evaluates all 25 lines against a grid for a given per-line bet. Pure — no RNG. */

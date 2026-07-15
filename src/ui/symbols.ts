@@ -285,6 +285,37 @@ const SYMBOL_SVG: Record<SymbolId, string> = {
   `,
     { glow: "231, 126, 157" },
   ),
+  chai_pump: wrap(
+    `
+    <defs>
+      <linearGradient id="chaiPumpReservoir" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f5d576"/><stop offset="100%" stop-color="#b66b2c"/>
+      </linearGradient>
+      <linearGradient id="chaiPumpPlunger" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#d6fff0"/><stop offset="100%" stop-color="#3ba296"/>
+      </linearGradient>
+      <linearGradient id="chaiPumpCup" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#fff4e0" stop-opacity="0.55"/><stop offset="100%" stop-color="#8ec9ff" stop-opacity="0.24"/>
+      </linearGradient>
+    </defs>
+    ${grounding("chaiPumpGr", 24, 44, 16, 3)}
+    <rect x="10" y="17" width="28" height="25" rx="5" fill="url(#chaiPumpReservoir)" stroke="${INK}" stroke-width="1.5"/>
+    <rect x="8" y="14" width="32" height="7" rx="3" fill="#d35b2d" stroke="${INK}" stroke-width="1.5"/>
+    <rect x="15" y="11" width="18" height="5" rx="2.5" fill="#f5d576" stroke="${INK}" stroke-width="1.3"/>
+    <circle cx="24" cy="8" r="6" fill="url(#chaiPumpPlunger)" stroke="${INK}" stroke-width="1.5"/>
+    <ellipse cx="21" cy="6" rx="2.4" ry="1.4" fill="#ffffff" opacity="0.55"/>
+    <path d="M24 14v12" stroke="#fff4e0" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M24 24v7" stroke="#d35b2d" stroke-width="3" stroke-linecap="round"/>
+    <path d="M20 27h8" stroke="#fff4e0" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+    <path d="M14 31h20l-2 11H16z" fill="url(#chaiPumpCup)" stroke="${INK}" stroke-width="1.3"/>
+    <path d="M16 35h16v7H16z" fill="#b66b2c" opacity="0.72"/>
+    <path d="M17 32l4 3 3-3 3 3 3-3" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+    <circle cx="20" cy="34" r="1.8" fill="#d6f5ef" stroke="${INK}" stroke-width="0.7"/>
+    <circle cx="28" cy="36" r="1.8" fill="#d6f5ef" stroke="${INK}" stroke-width="0.7"/>
+    ${sheen("chaiPumpSheen", 17, 20, 7, 8)}
+  `,
+    { glow: "245, 213, 118" },
+  ),
   // --- treats (feature symbols) ------------------------------------------
   treat_chicken: wrap(
     `
