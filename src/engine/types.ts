@@ -16,7 +16,55 @@ export type SymbolId =
   // treats (feature symbols, reels 1/3/5 only)
   | "treat_chicken" | "treat_salmon" | "treat_bougie"
   // wilds & legend
-  | "wild_joey" | "wild_phoebe" | "uniglee";
+  | "wild_joey" | "wild_phoebe" | "wild_handbag" | "wild_chai" | "uniglee";
+
+/** The paying-symbol subset used by the Moonlit Keepsake Trail cards. */
+export type KeepsakeSymbolId =
+  | "tumbler" | "butterfly" | "mixtape" | "crystal"
+  | "chai" | "candle" | "cassette" | "gnome"
+  | "mailbox" | "vhs" | "teapot" | "yarn";
+
+export type KeepsakeMemoryPhase =
+  | "preview"
+  | "choosing_first"
+  | "choosing_second"
+  | "resolving_match"
+  | "resolving_mismatch"
+  | "complete"
+  | "failed";
+
+export interface KeepsakeMemoryCard {
+  index: number;
+  symbol: KeepsakeSymbolId;
+  revealed: boolean;
+  matched: boolean;
+}
+
+export interface KeepsakeMemoryState {
+  kind: "keepsake_memory";
+  phase: KeepsakeMemoryPhase;
+  cards: KeepsakeMemoryCard[];
+  firstPick?: number;
+  pairsFound: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  fails: 0 | 1 | 2;
+  maxFails: 2;
+  freeSpinsAwarded: 0 | 40;
+}
+
+export type KeepsakeMemoryEvent =
+  | { kind: "preview_complete" }
+  | { kind: "card_revealed"; index: number }
+  | { kind: "match"; indices: [number, number]; pairsFound: number }
+  | { kind: "mismatch"; indices: [number, number]; fails: 1 | 2 }
+  | { kind: "completed"; freeSpinsAwarded: 40 }
+  | { kind: "failed"; freeSpinsAwarded: 0 };
+
+export interface KeepsakeMemoryActionResult {
+  state: KeepsakeMemoryState;
+  accepted: boolean;
+  event?: KeepsakeMemoryEvent;
+  reason?: "preview" | "invalid_index" | "matched_card" | "same_card" | "resolving" | "ended";
+}
 
 export type TreatKind = "chicken" | "salmon" | "bougie";
 
@@ -36,6 +84,7 @@ export type SpinArea = "main" | "secondary";
 
 /** A single marked wild used by the We're Multiplying free-spin bonus. */
 export type WildMultiplier = 2 | 3 | 5 | 10;
+export type HandbagWildMultiplier = 3 | 5 | 10;
 
 export interface TreatTimeWild {
   position: [reel: number, row: number];
@@ -48,12 +97,25 @@ export interface TreatTimeTrigger {
   freeSpinsAwarded: number;
 }
 
+/** Opening-board conversion performed once by the Iced Chai Wild Rain wheel wedge. */
+export interface ChaiRainWild {
+  position: [reel: number, row: number];
+  symbol: "wild_chai";
+}
+
+export interface ChaiRainResult {
+  /** Every standard iced-chai cell converted by the one-shot storm. */
+  wilds: ChaiRainWild[];
+}
+
 export interface Cell {
   symbol: SymbolId;
   /** Present only on the one marked wild that opened a multiplying free spin. */
   multiplier?: WildMultiplier;
   /** Present only on a fixed Phoebe comfort-wild in Lap Quest. */
   sticky?: "lap_quest";
+  /** Present on a Handbag Wild; scales a winning line that uses this symbol. */
+  handbagMultiplier?: HandbagWildMultiplier;
 }
 
 /** 5 reels x 4 rows; grid[reel][row], row 0 = top. */

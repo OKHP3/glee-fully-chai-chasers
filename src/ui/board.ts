@@ -10,7 +10,19 @@
  * illustrated firefly-jar meter, a console-style bet bar, and a layered
  * night-garden scene behind it all (CSS + SVG, no canvas/WebGL).
  */
-import type { CascadeStep, LapQuestSpot, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } from "../engine/types";
+import type {
+  CascadeStep,
+  ChaiRainWild,
+  KeepsakeMemoryActionResult,
+  KeepsakeMemoryCard,
+  KeepsakeMemoryState,
+  SpinResult,
+  SymbolId,
+  TreatKind,
+  TreatTimeMode,
+  TreatTimeWild,
+} from "../engine/types";
+import type { LapQuestSpot } from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
@@ -23,13 +35,14 @@ import {
   settleBoldChaiPump,
 } from "../engine/bold-chai-pump";
 import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
-import { addTreat, consumeForVisit } from "../engine/features";
+import { collectTreat, consumeForVisit, settleTreatJar, TREAT_JAR_FREE_SPINS } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
 import {
   runFreeSpinSession,
   spinWheel,
   wheelWedgeLabel,
   type FreeSpinRoundResult,
+  type FreeSpinSessionResult,
   type JoeyLaundrySessionResult,
   type WheelWedge,
 } from "../engine/freespins";
@@ -41,6 +54,7 @@ import {
   type LapQuestRoundResult,
 } from "../engine/lap-quest";
 import { mountLapQuestLedge } from "./lap-quest-ledge";
+import { beginKeepsakeMemory, createKeepsakeMemory, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
 import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState } from "../state";
 import {
@@ -56,12 +70,18 @@ import {
 import {
   isUnlocked,
   playBonusFanfare,
+  playChaiStorm,
   playCascadeArpeggio,
   playCascadeTick,
   playDoorbellRing,
   playBoldChaiCupSwap,
   playBoldChaiPumpPress,
   playBoldChaiTimerBuzzer,
+  playKeepsakeCardFlip,
+  playKeepsakeFailure,
+  playKeepsakeMatch,
+  playKeepsakeMismatch,
+  playKeepsakeSuccess,
   playJoeyCue,
   playLaundryPawStrike,
   playLaundrySockDrop,
@@ -83,10 +103,20 @@ import { setBoldChaiUrgency, setMusicVolume, startBaseMusic, stopBaseMusic } fro
 
 let statusTimeout: number | undefined;
 
-const BOLD_CHAI_ASSET_ROOT = "/assets/bold-chai";
+function publicAsset(fileName: string): string {
+  return `${import.meta.env.BASE_URL}assets/${fileName}`;
+}
+
+function optimizedAsset(fileName: string): string {
+  return publicAsset(`optimized/${fileName.replace(/\.(png|jpe?g)$/i, ".webp")}`);
+}
+
+function publicPicture(fileName: string, className: string, alt = ""): string {
+  return `<picture class="${className}"><source type="image/webp" srcset="${optimizedAsset(fileName)}" /><img src="${publicAsset(fileName)}" alt="${alt}" /></picture>`;
+}
 
 function boldChaiAsset(fileName: string): string {
-  return `${BOLD_CHAI_ASSET_ROOT}/${fileName}`;
+  return publicAsset(`bold-chai/${fileName}`);
 }
 
 const PAYTABLE_SYMBOLS: ReadonlyArray<{ id: SymbolId; name: string }> = [
@@ -103,6 +133,45 @@ const PAYTABLE_SYMBOLS: ReadonlyArray<{ id: SymbolId; name: string }> = [
   { id: "teapot", name: "Aurora Keepsake" },
   { id: "yarn", name: "Shared-Life Locket" },
 ];
+
+/**
+ * Presentation boundary for the engine-owned Moonlit Keepsake Trail state.
+ * The controller is intentionally supplied by the engine workstream: this
+ * file renders typed state and forwards card indexes, but never compares
+ * symbols, counts strikes, or awards spins.
+ */
+export type KeepsakeMemoryViewCard = KeepsakeMemoryCard;
+export type KeepsakeMemoryViewState = KeepsakeMemoryState;
+export type KeepsakeMemoryViewActionResult = KeepsakeMemoryActionResult;
+
+export interface KeepsakeMemoryController {
+  state: KeepsakeMemoryViewState;
+  begin(): KeepsakeMemoryViewState;
+  pick(index: number): KeepsakeMemoryViewActionResult;
+  resolveMismatch(): KeepsakeMemoryViewActionResult;
+}
+
+/** Adapts the pure engine state machine to the UI's typed presentation port. */
+export function createKeepsakeMemoryController(initialState: KeepsakeMemoryState): KeepsakeMemoryController {
+  let state = initialState;
+  return {
+    get state() { return state; },
+    begin() {
+      state = beginKeepsakeMemory(state);
+      return state;
+    },
+    pick(index) {
+      const action = pickKeepsakeMemoryCard(state, index);
+      state = action.state;
+      return action;
+    },
+    resolveMismatch() {
+      const action = resolveKeepsakeMemoryMismatchResult(state);
+      state = action.state;
+      return action;
+    },
+  };
+}
 
 export function renderBoard(
   root: HTMLElement,
@@ -169,7 +238,7 @@ export function renderBoard(
             ${treatJarHtml(state)}
           </div>
           <div id="askjamie-perch" aria-label="AskJamie" class="askjamie-housing">
-            <div class="askjamie-icon"><img src="/assets/askjamie-avatar.jpg" alt="" /></div>
+            <div class="askjamie-icon">${publicPicture("askjamie-avatar.jpg", "askjamie-picture")}</div>
             <span>AskJamie</span>
           </div>
         </div>
@@ -270,14 +339,20 @@ export function renderGridHtml(
     for (let row = 0; row < ROWS; row++) {
       const cell = grid[reel][row];
       const symbol = cell.symbol;
-      const badge = cell.multiplier
-        ? `<span class="multiplier-badge" aria-label="${cell.multiplier} times wild">×${cell.multiplier}</span>`
+      const visibleMultiplier = cell.multiplier ?? cell.handbagMultiplier;
+      const badge = visibleMultiplier
+        ? `<span class="multiplier-badge" aria-label="${visibleMultiplier} times wild">×${visibleMultiplier}</span>`
         : "";
-      const cellClasses = [
-        cell.multiplier ? "multiplier-wild" : "",
+      const chaiWild = symbol === "wild_chai";
+      const chaiWildBadge = chaiWild ? `<span class="chai-wild-badge" aria-hidden="true">WILD CHAI</span>` : "";
+      const classes = [
+        "cell",
+        visibleMultiplier ? "multiplier-wild" : "",
+        chaiWild ? "chai-wild-cell" : "",
         cell.sticky === "lap_quest" ? "lap-quest-wild" : "",
       ].filter(Boolean).join(" ");
-      html += `<div class="cell ${cellClasses}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
+      const accessibility = chaiWild ? ` role="img" aria-label="Mermaid cup wild chai"` : "";
+      html += `<div class="${classes}" data-row="${row}" data-symbol="${symbol}"${accessibility}>${symbolSvg(symbol as SymbolId)}${badge}${chaiWildBadge}</div>`;
     }
     html += "</div>";
   }
@@ -507,12 +582,14 @@ function openPaytablePage(root: HTMLElement): void {
       <section class="feature-symbol-grid">
         ${featureCard("wild_joey", "Joey Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
         ${featureCard("wild_phoebe", "Phoebe Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
+        ${featureCard("wild_handbag", "Handbag Wild", "A rare high-value wild. Each one carries a randomized ×3, ×5, or ×10 line multiplier, including bonus boards.")}
         ${featureCard("treat_chicken", "Chicken Comets", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
         ${featureCard("treat_salmon", "Salmon Stars", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
         ${featureCard("treat_bougie", "Bougie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
         ${featureCard("doorbell", "Doorbell", "A pair on the first two positions of any line begins Doorbell Panic free spins.")}
         ${featureCard("chai_pump", "Bold Chai Pump", "A same-payline pair opens the 30-second barista pump scene. Main spins only.")}
         ${featureCard("uniglee", "UniGlee", "The rare rainbow-butterfly legend begins a special Chai Chase celebration.")}
+        ${featureCard("wild_chai", "Wild Chai", "The mermaid iced-chai cup substitutes for every paying symbol and can carry a bonus multiplier.")}
       </section>
       <p class="paytable-footnote">Line values are shown with the game’s live tuning applied, so this guide always matches what the board awards.</p>
     </div>`;
@@ -551,6 +628,12 @@ async function runSpin(
   sparkleBtn.classList.add("is-spinning");
 
   const seed = productionSeed();
+  let treatJarSpinsAwarded = state.pendingTreatJarSpins;
+  state.pendingTreatJarSpins = 0;
+  const settledTreatJar = settleTreatJar(state.treatJar);
+  state.treatJar = settledTreatJar.jar;
+  treatJarSpinsAwarded += settledTreatJar.freeSpinsAwarded;
+  const treatJarAwards: TreatKind[] = [...settledTreatJar.completed];
   const result = spin({
     rng: mulberry32(seed),
     treatTimeRng: mulberry32(seed ^ 0x9e3779b9),
@@ -570,7 +653,12 @@ async function runSpin(
   state.bestCascade = Math.max(state.bestCascade, result.cascades);
 
   for (const treat of result.treatsCollected) {
-    state.treatJar = addTreat(state.treatJar, treat);
+    const collected = collectTreat(state.treatJar, treat);
+    state.treatJar = collected.jar;
+    if (collected.freeSpinsAwarded > 0) {
+      treatJarSpinsAwarded += collected.freeSpinsAwarded;
+      treatJarAwards.push(treat);
+    }
   }
 
   if (result.doorbellPanic) {
@@ -609,11 +697,18 @@ async function runSpin(
   if (result.freeSpinsAwarded > 0) {
     if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
     else await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
+    if (treatJarSpinsAwarded > 0) await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
     return;
   }
 
   if (boldChaiSpinsAwarded > 0) {
     await runBoldChaiFreeSpins(root, state, boldChaiSpinsAwarded);
+    if (treatJarSpinsAwarded > 0) await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
+    return;
+  }
+
+  if (treatJarSpinsAwarded > 0) {
+    await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
     return;
   }
 
@@ -756,16 +851,238 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
   });
 }
 
+/**
+ * Runs the memory-match presentation inside the existing reel-stage box.
+ * Engine ownership stays explicit: this adapter forwards indexes and renders
+ * only the returned state/event payloads.
+ */
+export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMemoryController): Promise<number> {
+  return new Promise((resolve) => {
+    const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
+    const reelGrid = root.querySelector<HTMLElement>("#reel-grid");
+    if (!cabinet || !reelGrid) { resolve(0); return; }
+
+    reelGrid.hidden = true;
+    const scene = document.createElement("section");
+    scene.className = "keepsake-memory-scene";
+    scene.setAttribute("aria-label", "Moonlit Keepsake Trail memory bonus");
+    scene.innerHTML = `
+      <div class="keepsake-trail-backdrop" aria-hidden="true">${keepsakeMemoryTrailSvg()}</div>
+      <div class="keepsake-memory-header">
+        <strong>MOONLIT KEEPSAKE TRAIL</strong>
+        <span>Six keepsakes. Twelve stops. One path to follow.</span>
+      </div>
+      <div class="keepsake-memory-status" id="keepsake-memory-status" aria-live="polite">The trail is laid out. Memorize the keepsakes…</div>
+      <div class="keepsake-memory-grid" id="keepsake-memory-grid" role="group" aria-label="Twelve keepsake memory cards"></div>
+      <div class="keepsake-memory-footer">
+        <span id="keepsake-memory-pairs">Pairs 0 / 6</span>
+        <span class="keepsake-mismatch-track" id="keepsake-memory-fails" aria-label="Mismatches 0 of 2">
+          <b>Mismatches</b>
+          <i data-strike="0" aria-label="First mismatch unused"></i>
+          <i data-strike="1" aria-label="Second mismatch unused"></i>
+          <em>0 / 2</em>
+        </span>
+      </div>
+      <div class="keepsake-memory-result" id="keepsake-memory-result" hidden role="status" aria-live="assertive"></div>`;
+    cabinet.appendChild(scene);
+
+    const grid = scene.querySelector<HTMLDivElement>("#keepsake-memory-grid")!;
+    const status = scene.querySelector<HTMLDivElement>("#keepsake-memory-status")!;
+    const pairs = scene.querySelector<HTMLSpanElement>("#keepsake-memory-pairs")!;
+    const fails = scene.querySelector<HTMLSpanElement>("#keepsake-memory-fails")!;
+    const result = scene.querySelector<HTMLDivElement>("#keepsake-memory-result")!;
+    let view = controller.state;
+    let activeCompare: number[] = [];
+    let settled = false;
+    let previewTimer: number | undefined;
+    let mismatchTimer: number | undefined;
+
+    grid.innerHTML = view.cards.map(renderKeepsakeMemoryCard).join("");
+
+    const updateCardButtons = (next: KeepsakeMemoryViewState, animate: boolean): void => {
+      const previous = view;
+      view = next;
+      next.cards.forEach((card) => {
+        const button = grid.querySelector<HTMLButtonElement>(`[data-card-index="${card.index}"]`);
+        if (!button) return;
+        const face = button.querySelector<HTMLElement>(".keepsake-memory-card");
+        if (!face) return;
+        const before = previous.cards.find((candidate) => candidate.index === card.index);
+        const changedFace = animate && before !== undefined && before.revealed !== card.revealed;
+        button.classList.toggle("is-active", activeCompare.includes(card.index));
+        button.classList.toggle("is-matched", card.matched);
+        button.classList.toggle("is-mismatch", activeCompare.includes(card.index) && next.phase === "resolving_mismatch");
+        button.setAttribute("aria-label", keepsakeMemoryCardLabel(card));
+        if (changedFace) animateKeepsakeCard(face, card.revealed);
+        else face.classList.toggle("is-revealed", card.revealed);
+      });
+      pairs.textContent = `Pairs ${next.pairsFound} / 6`;
+      const usedFails = Math.min(next.fails, next.maxFails);
+      fails.setAttribute("aria-label", `Mismatches ${usedFails} of ${next.maxFails}`);
+      fails.querySelector("em")!.textContent = `${usedFails} / ${next.maxFails}`;
+      fails.querySelectorAll<HTMLElement>("[data-strike]").forEach((marker, index) => {
+        marker.classList.toggle("is-filled", index < usedFails);
+        marker.setAttribute("aria-label", `${index < usedFails ? "Used" : "Unused"} ${index === 0 ? "first" : "second"} mismatch`);
+      });
+    };
+
+    const showOutcome = (outcome: "success" | "failure"): void => {
+      if (settled) return;
+      settled = true;
+      result.hidden = false;
+      result.className = `keepsake-memory-result is-${outcome}`;
+      result.textContent = outcome === "success"
+        ? "All six pairs found! You win 40 free spins!"
+        : "Trail over — no free spins this time. The night is still lovely.";
+      if (outcome === "success") playKeepsakeSuccess();
+      else playKeepsakeFailure();
+      window.setTimeout(() => {
+        window.clearTimeout(previewTimer);
+        window.clearTimeout(mismatchTimer);
+        scene.remove();
+        reelGrid.hidden = false;
+        resolve(view.freeSpinsAwarded);
+      }, 1500);
+    };
+
+    const handlePick = (index: number): void => {
+      if (settled) return;
+      const action = controller.pick(index);
+      if (!action.accepted) return;
+      const event = action.event;
+      activeCompare = event?.kind === "card_revealed" ? [event.index] : event && "indices" in event ? [...event.indices] : activeCompare;
+      updateCardButtons(action.state, true);
+      if (!event) return;
+
+      if (event.kind === "card_revealed") {
+        playKeepsakeCardFlip();
+        status.textContent = "A keepsake is glowing. Find its match.";
+        return;
+      }
+
+      if (event.kind === "match" || event.kind === "completed") {
+        playKeepsakeCardFlip();
+        playKeepsakeMatch();
+        activeCompare = [];
+        grid.querySelectorAll<HTMLButtonElement>(".is-active").forEach((card) => card.classList.remove("is-active"));
+        status.textContent = event.kind === "completed" ? "The whole trail is glowing!" : "Pair found. Keep following the trail.";
+        if (event.kind === "completed") window.setTimeout(() => showOutcome("success"), 450);
+        return;
+      }
+
+      if (event.kind === "mismatch" || event.kind === "failed") {
+        playKeepsakeCardFlip();
+        playKeepsakeMismatch();
+        status.textContent = event.kind === "failed" || ("fails" in event && event.fails === 2)
+          ? "The keepsakes are taking a little night walk."
+          : "A near-match. The trail is still glowing.";
+        mismatchTimer = window.setTimeout(() => {
+          const resolved = controller.resolveMismatch();
+          activeCompare = [];
+          updateCardButtons(resolved.state, true);
+          if (resolved.event?.kind === "failed" || resolved.state.phase === "failed") {
+            showOutcome("failure");
+            return;
+          }
+          status.textContent = "Choose the next keepsake pair.";
+        }, 900);
+      }
+    };
+
+    grid.querySelectorAll<HTMLButtonElement>("[data-card-index]").forEach((button) => {
+      button.addEventListener("click", () => handlePick(Number(button.dataset.cardIndex)));
+    });
+
+    updateCardButtons(view, false);
+    previewTimer = window.setTimeout(() => {
+      const next = controller.begin();
+      status.textContent = "The trail is ready. Choose a keepsake.";
+      activeCompare = [];
+      updateCardButtons(next, true);
+    }, 2500);
+  });
+}
+
+function keepsakeMemoryCardLabel(card: KeepsakeMemoryViewCard): string {
+  if (!card.revealed) return `Hidden keepsake card ${card.index + 1}`;
+  const name = PAYTABLE_SYMBOLS.find((symbol) => symbol.id === card.symbol)?.name ?? "Keepsake";
+  return `${name} memory card${card.matched ? ", matched" : ", revealed"}`;
+}
+
+function renderKeepsakeMemoryCard(card: KeepsakeMemoryViewCard): string {
+  return `<button type="button" class="keepsake-memory-card-button" data-card-index="${card.index}" aria-label="${keepsakeMemoryCardLabel(card)}">
+    <span class="keepsake-memory-card${card.revealed ? " is-revealed" : ""}">
+      <span class="keepsake-card-face keepsake-card-back" aria-hidden="true">${publicPicture("keepsake-memory-card-back.png", "keepsake-card-image")}</span>
+      <span class="keepsake-card-face keepsake-card-front">${symbolSvg(card.symbol)}</span>
+      <span class="keepsake-mismatch-mark" aria-hidden="true">${publicPicture("keepsake-memory-mismatch-overlay.png", "keepsake-card-image")}</span>
+    </span>
+  </button>`;
+}
+
+function animateKeepsakeCard(face: HTMLElement, revealed: boolean): void {
+  face.classList.remove("is-flipping-front", "is-flipping-back");
+  void face.offsetWidth;
+  if (revealed) face.classList.add("is-revealed");
+  face.classList.add(revealed ? "is-flipping-front" : "is-flipping-back");
+  window.setTimeout(() => {
+    face.classList.toggle("is-revealed", revealed);
+    face.classList.remove("is-flipping-front", "is-flipping-back");
+  }, 470);
+}
+
+function keepsakeMemoryTrailSvg(): string {
+  return `<svg viewBox="0 0 500 320" preserveAspectRatio="none">
+    <defs><linearGradient id="keepsake-trail-fill" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#573c78"/><stop offset=".55" stop-color="#29204f"/><stop offset="1" stop-color="#171335"/></linearGradient></defs>
+    <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="#11102b" stroke-width="92" opacity=".58"/>
+    <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="url(#keepsake-trail-fill)" stroke-width="76" opacity=".9"/>
+    <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="#f5d576" stroke-width="2" stroke-dasharray="2 13" opacity=".36"/>
+    <circle cx="70" cy="268" r="4" fill="#9fe8c5"/><circle cx="228" cy="194" r="3" fill="#f5d576"/><circle cx="390" cy="205" r="4" fill="#9fe8c5"/>
+  </svg>`;
+}
+
 /** Bold Chai awards enter the existing free-spin session without the wheel. */
 async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
-  const session = runFreeSpinSession(mulberry32(productionSeed()), "chai_back", betPerLine(state.bet), spinsAwarded);
-  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  const session = runFreeSpinSession(mulberry32(productionSeed()), "chai_back", betPerLine(state.bet), spinsAwarded, { allowChaiStorm: false });
+  await playFreeSpinSession(root, state, session);
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
-  await showBonusSummary(root, session.totalWin, session.retriggers);
+  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
+}
+
+/** Treat Jar rewards are additive free spins that never retrigger or touch Firefly progress. */
+async function runTreatJarFreeSpins(
+  root: HTMLElement,
+  state: GameState,
+  spinsAwarded: number,
+  awards: TreatKind[],
+): Promise<void> {
+  const awardLabels = awards.map((treat) => `${treatJarLabel(treat)} +${TREAT_JAR_FREE_SPINS[treat]}`).join(", ");
+  setStatus(root, `Treat Jar complete: ${awardLabels} free spins · no retriggers`);
+  const session = runFreeSpinSession(
+    mulberry32(productionSeed()),
+    "chai_back",
+    betPerLine(state.bet),
+    spinsAwarded,
+    { allowChaiStorm: false, allowRetriggers: false },
+  );
+  await playFreeSpinSession(root, state, session, { label: "Treat Jar Bonus", title: "TREAT JAR BONUS!" });
+  state.balance += session.totalWin;
+  state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
+  saveGameState(state);
+  await showBonusSummary(root, session.totalWin, 0, session.totalSpins);
+  const lastRound = session.rounds[session.rounds.length - 1];
+  renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
+}
+
+function treatJarLabel(treat: TreatKind): string {
+  switch (treat) {
+    case "chicken": return "Chicken Comets";
+    case "salmon": return "Salmon Stars";
+    case "bougie": return "Bougie Bites";
+  }
 }
 
 function showDoorbellPanic(
@@ -1147,7 +1464,7 @@ async function runTreatTimeBonus(
 
   const rng = mulberry32(productionSeed());
   const session = runFreeSpinSession(rng, wedge, betPerLine(state.bet), spinsAwarded);
-  await playTreatTimeOnMainBoard(root, state, mode, session.rounds);
+  await playTreatTimeOnMainBoard(root, state, mode, session);
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
@@ -1156,7 +1473,7 @@ async function runTreatTimeBonus(
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
-  setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins${session.retriggers > 0 ? ` · ${session.retriggers} retrigger${session.retriggers > 1 ? "s" : ""}` : ""}`);
+  setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins · ${session.totalSpins} spins${session.retriggers > 0 ? ` · ${session.retriggers} retrigger${session.retriggers > 1 ? "s" : ""}` : ""}`);
 }
 
 function showTreatTimeEntry(root: HTMLElement, mode: TreatTimeMode, spinsAwarded: number): Promise<void> {
@@ -1186,7 +1503,7 @@ async function playTreatTimeOnMainBoard(
   root: HTMLElement,
   state: GameState,
   mode: TreatTimeMode,
-  rounds: FreeSpinRoundResult[],
+  session: FreeSpinSessionResult,
 ): Promise<void> {
   const grid = root.querySelector<HTMLDivElement>("#reel-grid");
   const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
@@ -1196,8 +1513,11 @@ async function playTreatTimeOnMainBoard(
 
   shell?.classList.add("treat-time-main-mode");
   try {
-    for (const [roundIndex, round] of rounds.entries()) {
-      status.textContent = `${mode === "nighttime" ? "Nighttime" : "Morning"} Treat Time · Spin ${roundIndex + 1} of ${rounds.length}`;
+    for (const [roundIndex, round] of session.rounds.entries()) {
+      const totalBeforeRound = roundIndex === 0
+        ? session.initialSpins
+        : roundIndex + (session.rounds[roundIndex - 1].spinsRemaining ?? session.rounds.length - roundIndex);
+      status.textContent = `${mode === "nighttime" ? "Nighttime" : "Morning"} Treat Time · Spin ${roundIndex + 1} of ${totalBeforeRound}`;
 
       for (const [stepIndex, step] of round.steps.entries()) {
         grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
@@ -1223,7 +1543,8 @@ async function playTreatTimeOnMainBoard(
       }
 
       if (round.freeSpinsAwarded > 0) {
-        status.textContent = `Treat Time retrigger! +${round.freeSpinsAwarded} more spins!`;
+        const totalAfterRound = roundIndex + 1 + (round.spinsRemaining ?? 0);
+        status.textContent = `Treat Time retrigger! +${round.freeSpinsAwarded} more spins! · ${totalAfterRound} total spins`;
         playBonusFanfare();
       } else if (round.totalWin > 0) {
         status.textContent = `Treat Time · +${round.totalWin.toLocaleString()} coins`;
@@ -1240,15 +1561,34 @@ async function playTreatTimeOnMainBoard(
 async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
   const rng = mulberry32(productionSeed());
   const wedge = await showWheelScreen(root, rng);
+
+  if (wedge === "keepsake_memory") {
+    const memory = createKeepsakeMemory(mulberry32(productionSeed()));
+    const earnedSpins = await runKeepsakeMemoryBonus(root, createKeepsakeMemoryController(memory));
+    if (earnedSpins === 0) {
+      renderBoard(root, state);
+      return;
+    }
+    const standardSession = runFreeSpinSession(rng, "standard", betPerLine(state.bet), earnedSpins);
+    await playFreeSpinSession(root, state, standardSession);
+    state.balance += standardSession.totalWin;
+    state.bestCascade = Math.max(state.bestCascade, standardSession.bestCascade);
+    saveGameState(state);
+    await showBonusSummary(root, standardSession.totalWin, standardSession.retriggers, standardSession.totalSpins);
+    const lastRound = standardSession.rounds[standardSession.rounds.length - 1];
+    renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
+    return;
+  }
+
   const session = runFreeSpinSession(rng, wedge, betPerLine(state.bet), spinsAwarded);
 
-  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  await playFreeSpinSession(root, state, session);
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
 
-  await showBonusSummary(root, session.totalWin, session.retriggers);
+  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
@@ -1258,13 +1598,13 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
   const rng = mulberry32(productionSeed());
   const session = runFreeSpinSession(rng, "doorbell_panic", betPerLine(state.bet), spinsAwarded);
 
-  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  await playFreeSpinSession(root, state, session);
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
 
-  await showBonusSummary(root, session.totalWin, session.retriggers);
+  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
@@ -1273,10 +1613,10 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
 function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWedge> {
   return new Promise((resolve) => {
     const wedge = spinWheel(rng);
-    const finalDeg = 1080 + (({ multiplying: 30, giant_gnome: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
+    const finalDeg = 1080 + (({ multiplying: 30, keepsake_memory: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
 
     const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
+    overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="wheel-heading"><span>Free Spins!</span> Joey &amp; Phoebe's Sparkle Wheel</h2>
       <div class="wheel-stage">
@@ -1289,12 +1629,13 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
       </div>
       <div class="wheel-legends" aria-hidden="true">
         <span><b>We're Multiplying</b> Extra sparkle</span>
-        <span><b>Keepsake Constellation</b> mega-keepsakes</span>
+        <span><b>Moonlit Keepsake Trail</b> memory match</span>
         <span><b>Iced Chai</b> wild rain</span>
       </div>
       <p id="wheel-result" class="min-h-[1.5rem] text-center font-semibold"></p>
     `;
-    root.appendChild(overlay);
+    const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;
+    host.appendChild(overlay);
 
     playWheelTick();
     window.setTimeout(() => {
@@ -1312,103 +1653,116 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
 async function playFreeSpinSession(
   root: HTMLElement,
   state: GameState,
-  wedge: WheelWedge,
-  rounds: FreeSpinRoundResult[],
+  session: FreeSpinSessionResult,
+  presentation: { label?: string; title?: string } = {},
 ): Promise<void> {
+  const { wedge, rounds } = session;
+  const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
+  const standardGrid = root.querySelector<HTMLDivElement>("#reel-grid");
+  if (!cabinet || !standardGrid) return;
+
   const bgLayer = root.querySelector<HTMLDivElement>("#bg-layer");
   bgLayer?.classList.add("aurora");
   document.body.classList.add("aurora-mode");
 
-  const overlay = document.createElement("div");
   const treatTime = wedge === "treat_time_morning" || wedge === "treat_time_nighttime";
-  overlay.className = `free-spins-overlay text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins" : ""}`;
-  overlay.innerHTML = `
-    <div class="night-garden aurora">${gardenDecor()}</div>
-    <div class="relative z-10 h-full w-full flex flex-col cc-shell free-spins-shell">
-      <header class="marquee">
-        <div class="marquee-row">
-          <span class="level-chip">${wheelWedgeLabel(wedge)}</span>
-          <h1 class="marquee-title">${treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : "Free Spins"}</h1>
-        </div>
-      </header>
-      <div class="jar-meter">
-        <div class="jar-meter-text">Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span> · Round win: <span id="fs-round-win">0</span></div>
-      </div>
-      <main class="cabinet-frame ${treatTime ? "treat-time-cabinet" : ""}">
-        <div id="fs-grid" class="reel-grid"></div>
-      </main>
-      <div id="fs-status" class="status-line"></div>
+  const chaiStormSession = wedge === "chai_back" && rounds.some((round) => round.chaiRain !== undefined);
+  const displayWedgeLabel = presentation.label ?? (wedge === "standard" ? "Standard Chai Chase" : wedge === "chai_back" && !chaiStormSession ? "Bold Chai" : wheelWedgeLabel(wedge));
+  const title = presentation.title ?? (treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : displayWedgeLabel === "Bold Chai" ? "BOLD CHAI!" : "Free Spins");
+  const panel = document.createElement("section");
+  panel.className = `free-spins-panel text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins treat-time-cabinet" : ""}`;
+  panel.setAttribute("aria-label", `${displayWedgeLabel} bonus spins`);
+  panel.innerHTML = `
+    <div class="free-spins-panel-heading">
+      <span class="free-spins-panel-kicker">${displayWedgeLabel}</span>
+      <strong>${title}</strong>
     </div>
+    <div class="free-spins-panel-stats" aria-live="polite">Spin <span id="fs-index">1</span> of <span id="fs-total">${session.initialSpins}</span> · Round win: <span id="fs-round-win">0</span></div>
+    <div id="fs-grid" class="reel-grid"></div>
+    <div id="fs-status" class="status-line" aria-live="polite"></div>
   `;
-  root.appendChild(overlay);
+  standardGrid.hidden = true;
+  cabinet.appendChild(panel);
 
-  const grid = overlay.querySelector<HTMLDivElement>("#fs-grid")!;
-  const indexEl = overlay.querySelector<HTMLSpanElement>("#fs-index")!;
-  const totalEl = overlay.querySelector<HTMLSpanElement>("#fs-total")!;
-  const roundWinEl = overlay.querySelector<HTMLSpanElement>("#fs-round-win")!;
-  const statusEl = overlay.querySelector<HTMLDivElement>("#fs-status")!;
+  const grid = panel.querySelector<HTMLDivElement>("#fs-grid")!;
+  const indexEl = panel.querySelector<HTMLSpanElement>("#fs-index")!;
+  const totalEl = panel.querySelector<HTMLSpanElement>("#fs-total")!;
+  const roundWinEl = panel.querySelector<HTMLSpanElement>("#fs-round-win")!;
+  const statusEl = panel.querySelector<HTMLDivElement>("#fs-status")!;
   const panicBellTimer = wedge === "doorbell_panic" ? window.setInterval(playDoorbellRing, 3000) : undefined;
   if (panicBellTimer !== undefined) playDoorbellRing();
 
-  for (let r = 0; r < rounds.length; r++) {
-    const round = rounds[r];
-    let doorbellRang = false;
-    indexEl.textContent = String(r + 1);
-    totalEl.textContent = String(rounds.length);
-    roundWinEl.textContent = round.totalWin.toLocaleString();
-    if (round.multiplierWild) {
-      statusEl.textContent = `×${round.multiplierWild.multiplier} wild on reel ${round.multiplierWild.position[0] + 1}!`;
-    }
+  const chaiStorm = wedge === "chai_back" ? rounds.find((round) => round.chaiRain)?.chaiRain : undefined;
+  try {
+    if (chaiStorm) await showChaiStormSplash(panel, chaiStorm.wilds.length);
 
-    for (const [stepIndex, step] of round.steps.entries()) {
-      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
-      if (stepIndex === 0 && round.treatTimeWilds?.length) {
-        await animateTreatTimeCast(
-          overlay.querySelector<HTMLElement>(".treat-time-cabinet")!,
-          grid,
-          round.treatTimeWilds,
-        );
+    for (let r = 0; r < rounds.length; r++) {
+      const round = rounds[r];
+      let doorbellRang = false;
+      indexEl.textContent = String(r + 1);
+      const totalBeforeRound = r === 0
+        ? session.initialSpins
+        : r + (rounds[r - 1].spinsRemaining ?? rounds.length - r);
+      totalEl.textContent = String(totalBeforeRound);
+      roundWinEl.textContent = round.totalWin.toLocaleString();
+      if (round.multiplierWild) {
+        statusEl.textContent = `×${round.multiplierWild.multiplier} wild on reel ${round.multiplierWild.position[0] + 1}!`;
       }
-      if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
-        playDoorbellRing();
-        doorbellRang = true;
+
+      for (const [stepIndex, step] of round.steps.entries()) {
+        grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
+        if (stepIndex === 0 && round.treatTimeWilds?.length) {
+          await animateTreatTimeCast(panel, grid, round.treatTimeWilds);
+        }
+        if (r === 0 && stepIndex === 0 && round.chaiRain) {
+          await animateChaiStormConversions(grid, round.chaiRain.wilds);
+        }
+        if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
+          playDoorbellRing();
+          doorbellRang = true;
+        }
+        grid.classList.toggle("panic-grid", wedge === "doorbell_panic");
+        grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
+        if (step.wins.length > 0) {
+          playCascadeArpeggio(step.meterAfter);
+          playWinPluck();
+        } else {
+          playCascadeTick();
+        }
+        await sleep(360);
       }
-      grid.classList.toggle("panic-grid", wedge === "doorbell_panic");
-      grid.querySelectorAll(".cell").forEach((cell) => cell.classList.add("beam-drop"));
-      if (step.wins.length > 0) {
-        playCascadeArpeggio(step.meterAfter);
-        playWinPluck();
+
+      if (round.panicWildsAdded > 0) {
+        statusEl.textContent = `DOORBELL PANIC! ${round.panicWildsAdded} flying wild cats!`;
+        playJoeyCue();
+        playPhoebeCue();
+        await sleep(520);
+      } else if (round.chaiRain) {
+        statusEl.textContent = round.chaiRain.wilds.length > 0
+          ? `WILD CHAI STORM! ${round.chaiRain.wilds.length} mermaid-cup wild chai!`
+          : "WILD CHAI STORM! The chai sky is charged!";
+        await sleep(520);
+      } else if (round.totalWin > 0) {
+        statusEl.textContent = `+${round.totalWin.toLocaleString()} coins`;
+        await sleep(400);
       } else {
-        playCascadeTick();
+        statusEl.textContent = "";
       }
-      await sleep(360);
+      if (round.freeSpinsAwarded > 0) {
+        const totalAfterRound = r + 1 + (round.spinsRemaining ?? 0);
+        totalEl.textContent = String(totalAfterRound);
+        statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins! · ${totalAfterRound} total spins`;
+        playBonusFanfare();
+        await sleep(800);
+      }
     }
-
-    if (round.panicWildsAdded > 0) {
-      statusEl.textContent = `DOORBELL PANIC! ${round.panicWildsAdded} flying wild cats!`;
-      playJoeyCue();
-      playPhoebeCue();
-      await sleep(520);
-    } else if (round.extraWildsAdded > 0) {
-      statusEl.textContent = "We Want Our Chai Back — extra wilds landed!";
-      await sleep(500);
-    } else if (round.totalWin > 0) {
-      statusEl.textContent = `+${round.totalWin.toLocaleString()} coins`;
-      await sleep(400);
-    } else {
-      statusEl.textContent = "";
-    }
-    if (round.freeSpinsAwarded > 0) {
-      statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins!`;
-      playBonusFanfare();
-      await sleep(800);
-    }
+  } finally {
+    if (panicBellTimer !== undefined) window.clearInterval(panicBellTimer);
+    panel.remove();
+    standardGrid.hidden = false;
+    bgLayer?.classList.remove("aurora");
+    document.body.classList.remove("aurora-mode");
   }
-
-  if (panicBellTimer !== undefined) window.clearInterval(panicBellTimer);
-  overlay.remove();
-  bgLayer?.classList.remove("aurora");
-  document.body.classList.remove("aurora-mode");
   void state; // state saved by caller after totals are tallied
 }
 
@@ -1603,6 +1957,50 @@ function laundryPawSvg(): string {
   return `<svg viewBox="0 0 88 110" aria-hidden="true"><path d="M22 82c-7-5-8-14-3-20 4-4 9-4 14-1-4-12-3-22 3-24 6-2 9 4 11 14 0-16 4-23 10-22 6 1 7 8 6 21 4-10 9-13 14-10 5 4 2 13-1 22 6-5 12-3 14 2 3 7-4 16-12 23-9 8-18 12-31 9z" fill="#9fe8c5" stroke="#2d1f4c" stroke-width="4" stroke-linejoin="round"/></svg>`;
 }
 
+function showChaiStormSplash(parent: HTMLElement, convertedCount: number): Promise<void> {
+  return new Promise((resolve) => {
+    const splash = document.createElement("div");
+    splash.className = "chai-storm-splash";
+    const droplets = Array.from({ length: 28 }, (_, index) => {
+      const left = (index * 37) % 100;
+      const delay = ((index * 0.071) % 0.8).toFixed(2);
+      const duration = (0.8 + (index % 5) * 0.12).toFixed(2);
+      const size = 5 + (index % 4) * 2;
+      return `<span class="chai-storm-drop" style="--drop-left:${left}%;--drop-delay:${delay}s;--drop-duration:${duration}s;--drop-size:${size}px"></span>`;
+    }).join("");
+    splash.innerHTML = `
+      <div class="chai-storm-drops" aria-hidden="true">${droplets}</div>
+      <div class="chai-storm-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="chai-storm-copy" role="status" aria-live="assertive">
+        <div class="chai-storm-kicker">AskJamie pours the sky open</div>
+        <h2>WILD CHAI STORM</h2>
+        <p>Chai storm! Chai storm!</p>
+        <small>${convertedCount > 0 ? `${convertedCount} mermaid cups are becoming wild chai.` : "The mermaid cups are listening."}</small>
+      </div>
+    `;
+    parent.appendChild(splash);
+    playChaiStorm(convertedCount);
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    window.setTimeout(() => {
+      splash.remove();
+      resolve();
+    }, reduced ? 720 : 1320);
+  });
+}
+
+function animateChaiStormConversions(grid: HTMLElement, wilds: ChaiRainWild[]): Promise<void> {
+  return new Promise((resolve) => {
+    const targets = wilds
+      .map(({ position: [reel, row] }) => grid.querySelector<HTMLElement>(`[data-reel="${reel}"] [data-row="${row}"]`))
+      .filter((cell): cell is HTMLElement => Boolean(cell));
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    targets.forEach((cell, index) => {
+      window.setTimeout(() => cell.classList.add("chai-wild-conversion"), reduced ? 0 : index * 70);
+    });
+    window.setTimeout(() => resolve(), reduced ? 100 : 560 + targets.length * 70);
+  });
+}
+
 function animateTreatTimeCast(stage: HTMLElement, grid: HTMLElement, wilds: TreatTimeWild[]): Promise<void> {
   return new Promise((resolve) => {
     const layer = document.createElement("div");
@@ -1658,16 +2056,17 @@ function treatTimeHandSvg(): string {
   </svg>`;
 }
 
-function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number): Promise<void> {
+function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number, totalSpins: number): Promise<void> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
-    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 wheel-scrim text-amber-100";
+    overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="text-2xl font-bold">Free Spins Complete!</h2>
-      <p class="text-lg">You won ${totalWin.toLocaleString()} coins${retriggers > 0 ? ` (with ${retriggers} retrigger${retriggers > 1 ? "s" : ""}!)` : ""}</p>
+      <p class="text-lg">You won ${totalWin.toLocaleString()} coins across ${totalSpins} free spins${retriggers > 0 ? ` (with ${retriggers} retrigger${retriggers > 1 ? "s" : ""}!)` : ""}</p>
       <button id="bonus-continue" class="sparkle-btn mt-4">Continue</button>
     `;
-    root.appendChild(overlay);
+    const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;
+    host.appendChild(overlay);
     playBonusFanfare();
     overlay.querySelector("#bonus-continue")?.addEventListener("click", () => {
       overlay.remove();

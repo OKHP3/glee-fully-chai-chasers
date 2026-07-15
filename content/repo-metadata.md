@@ -35,4 +35,4 @@ Design brief for whoever builds this (ChatGPT image workflow or equivalent; not 
 - No brand names, logos, or trade dress from any casino, beverage, or pet-food brand, per `docs/IP-GUARDRAILS.md`.
 - Keep the palette inside the documented spec palette (`docs/DESIGN-SPEC.md` §11): midnight navy `#1a1f3c`, violet `#2d1f4c`, mint `#9fe8c5`, burnt orange `#d35b2d`, butter `#f5d576`, dusty pink `#e8a5b8`.
 
-**File target:** `public/social-preview.png`, 1280x640, PNG. Set via repo Settings → General → Social preview once approved.
+**File target:** `public/assets/social-preview.jpg`, 1280x640, JPEG. Set via repo Settings → General → Social preview once approved.

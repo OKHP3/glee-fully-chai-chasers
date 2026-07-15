@@ -64,7 +64,7 @@ Remaining soft spots, logged rather than hidden:
 | 18 board symbols, cat sprites (4 poses × 2 cats), wheel face, saucer (5 colorways), garden-foreground silhouette, firefly jar, Glee avatar, AskJamie avatar | `src/ui/symbols.ts` | Hand-authored inline SVG, shared gradient/sheen/shadow recipe |
 | Cabinet, marquee, jar meter, bet console, celebration kit, uniglee takeover, wheel chrome, aurora/star/saucer scene CSS | `src/style.css` | CSS transforms/opacity + gradients only; `prefers-reduced-motion` zeroes all animation/transition durations |
 | `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` | `public/icons/` | Rendered from an original SVG (Mermaid Tumbler + butterfly on the night-garden gradient) via headless-browser screenshot, then palette-quantized for size |
-| `splash.png` | `public/icons/` | Same technique; title lockup + tumbler, not currently wired into `index.html` (out of scope — head/meta edits were reserved for font loading, which ended up not needing any `<link>` since `@font-face` + `url()` needs none) |
+| `splash.png` | retired | Legacy title-lockup export; production uses the optimized `public/assets/chai-chase-splash.{png,webp}` pair. |
 | `baloo2-800.woff2` | `public/fonts/` | Baloo 2, weight 800, SIL Open Font License 1.1 (Google Fonts), self-hosted — no runtime CDN dependency |
 
 No brand marks, no traced art, no photos, no hot-chai imagery anywhere in the above (checked by eye against `docs/IP-GUARDRAILS.md` and `docs/CANON.md` while authoring each asset).
@@ -76,7 +76,7 @@ No brand marks, no traced art, no photos, no hot-chai imagery anywhere in the ab
 | `public/icons/icon-192.png` | 12.3 KB |
 | `public/icons/icon-512.png` | 63.2 KB |
 | `public/icons/icon-maskable-512.png` | 62.3 KB |
-| `public/icons/splash.png` | 187.5 KB |
+| retired `public/icons/splash.png` | removed from runtime |
 | `public/fonts/baloo2-800.woff2` | 18.2 KB |
 | **Total new binary assets** | **~343 KB / 400 KB budget** |
 

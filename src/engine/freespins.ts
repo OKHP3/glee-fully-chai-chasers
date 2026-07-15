@@ -5,14 +5,13 @@
  * spin() with the modifier's effect layered on top — modifier math lives here,
  * not in the UI.
  */
-import type { Grid, SpinResult, TreatTimeMode, TreatTimeWild, WildMultiplier } from "./types";
+import type { ChaiRainResult, Grid, SpinResult, TreatTimeMode, TreatTimeWild, WildMultiplier } from "./types";
 import { spin } from "./cascade";
 import { PAYLINES } from "./paylines";
 import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
 import { castTreatTimeWilds } from "./treattime";
-import { applyKeepsakeZone, rollKeepsakeZone } from "./keepsake-constellation";
 import {
   applyJoeyLaundryEffect,
   baseLaundryAllocation,
@@ -25,7 +24,7 @@ import {
 
 export type WheelWedge =
   | "multiplying"
-  | "giant_gnome"
+  | "keepsake_memory"
   | "chai_back"
   | "doorbell_panic"
   | "treat_time_morning"
@@ -33,9 +32,12 @@ export type WheelWedge =
 
 const WHEEL_WEIGHTS: Array<[WheelWedge, number]> = [
   ["multiplying", 40],
-  ["giant_gnome", 35],
+  ["keepsake_memory", 35],
   ["chai_back", 25],
 ];
+
+/** A successful memory bonus hands off to ordinary free spins without a wedge modifier. */
+export type FreeSpinMode = "standard" | WheelWedge;
 
 /** Spins the AskJamie wheel — one modifier per bonus (docs §7). */
 export function spinWheel(rng: Rng): WheelWedge {
@@ -69,6 +71,22 @@ export interface MultiplierWild {
   position: [reel: number, row: number];
 }
 
+/** Converts every standard iced-chai cell on one opening board into a wild. */
+export function convertChaiToWilds(grid: Grid): { grid: Grid; chaiRain: ChaiRainResult } {
+  const nextGrid = grid.map((column) => column.map((cell) => ({ ...cell })));
+  const wilds: ChaiRainResult["wilds"] = [];
+
+  nextGrid.forEach((column, reel) => {
+    column.forEach((cell, row) => {
+      if (cell.symbol !== "chai") return;
+      nextGrid[reel][row] = { symbol: "wild_chai" };
+      wilds.push({ position: [reel, row], symbol: "wild_chai" });
+    });
+  });
+
+  return { grid: nextGrid, chaiRain: { wilds } };
+}
+
 /**
  * Guarantees the single visible multiplier wild on a qualifying opening
  * result. The cell carries its marker through gravity if it survives, but
@@ -88,12 +106,16 @@ function multiplyingStartingGrid(rng: Rng, multiplier: WildMultiplier): { grid: 
 export interface FreeSpinRoundResult extends SpinResult {
   /** The one opening-result multiplier wild, if this counted spin rolled one. */
   multiplierWild?: MultiplierWild;
-  extraWildsAdded: number; // We Want Our Chai Back
+  extraWildsAdded: number;
   panicWildsAdded: number;
   treatTimeWilds?: TreatTimeWild[];
   treatTimeMode?: TreatTimeMode;
   /** Opening-grid Joey Laundry Helper effect, when this round belongs to Joey's chapter. */
   laundryEffect?: JoeyLaundryEffect;
+  /** Present only on the first round of the actual Wild Chai Storm session. */
+  chaiRain?: ChaiRainResult;
+  /** Remaining spins after this round, including any retrigger just awarded. */
+  spinsRemaining?: number;
 }
 
 export interface JoeyLaundryRoundInput {
@@ -127,7 +149,12 @@ function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
 }
 
 /** Runs one free-spin round with the chosen wedge's modifier applied. */
-export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): FreeSpinRoundResult {
+export function spinFreeRound(
+  rng: Rng,
+  wedge: FreeSpinMode,
+  betPerLine: number,
+  options: { activateChaiStorm?: boolean } = {},
+): FreeSpinRoundResult {
   const panic = wedge === "doorbell_panic" ? panicStartingGrid(rng) : undefined;
   const multiplier = wedge === "multiplying" ? rollWildMultiplier(rng) : undefined;
   const multiplying = multiplier ? multiplyingStartingGrid(rng, multiplier) : undefined;
@@ -139,17 +166,15 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
   const treatTime = treatTimeMode
     ? castTreatTimeWilds(rng, spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }), treatTimeMode)
     : undefined;
-  const keepsakeZone = wedge === "giant_gnome" ? rollKeepsakeZone(rng) : undefined;
-  const keepsakeGrid = keepsakeZone
-    ? applyKeepsakeZone(spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }), keepsakeZone)
+  const chaiStorm = wedge === "chai_back" && options.activateChaiStorm !== false
+    ? convertChaiToWilds(spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }))
     : undefined;
   const base = spin({
     rng,
     betPerLine,
     treatJar: emptyTreatJar(),
     spinsSincePopIn: 999,
-    startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? keepsakeGrid,
-    keepsakeZone,
+    startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? chaiStorm?.grid,
     allowDoorbells: false,
     includeBoldChaiPump: false,
     spinArea: "secondary",
@@ -168,15 +193,11 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
   }
 
   if (wedge === "multiplying") {
-    return { ...base, ...treatTimeMeta, multiplierWild: multiplying?.multiplierWild, extraWildsAdded: 0, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, multiplierWild: multiplying?.multiplierWild, panicWildsAdded: 0 };
   }
 
   if (wedge === "chai_back") {
-    // 1-3 extra wilds rain in — modeled as a flat coin bump scaled by how many
-    // landed, since the visual "extra wilds" effect is UI-layer (docs §7).
-    const extra = 1 + Math.floor(rng() * 3);
-    const bonusWin = Math.round(base.totalWin * (0.08 * extra));
-    return { ...base, ...treatTimeMeta, totalWin: base.totalWin + bonusWin, extraWildsAdded: extra, panicWildsAdded: 0 };
+    return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0, chaiRain: chaiStorm?.chaiRain };
   }
 
   return { ...base, ...treatTimeMeta, extraWildsAdded: 0, panicWildsAdded: 0 };
@@ -222,8 +243,12 @@ export function spinJoeyLaundryRound(
 }
 
 export interface FreeSpinSessionResult {
-  wedge: WheelWedge;
+  wedge: FreeSpinMode;
+  mode: FreeSpinMode;
   rounds: FreeSpinRoundResult[];
+  initialSpins: number;
+  retriggerSpins: number;
+  totalSpins: number;
   totalWin: number;
   bestCascade: number;
   retriggers: number;
@@ -292,40 +317,75 @@ export function runJoeyLaundrySession(
   };
 }
 
+export interface FreeSpinSessionOptions {
+  /** Bold Chai reuses the legacy wedge ID but must not launch Wild Chai Storm. */
+  allowChaiStorm?: boolean;
+  /** Treat Jar bonus spins are additive but cannot retrigger themselves. */
+  allowRetriggers?: boolean;
+}
+
 /** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
+export interface StandardFreeSpinSessionResult extends Omit<FreeSpinSessionResult, "wedge" | "mode"> {
+  wedge: "standard";
+  mode: "standard";
+}
 export function runFreeSpinSession(
   rng: Rng,
   wedge: WheelWedge,
   betPerLine: number,
   spinsAwarded: number,
-): FreeSpinSessionResult {
-  let remaining = spinsAwarded;
+  options?: FreeSpinSessionOptions,
+): FreeSpinSessionResult;
+export function runFreeSpinSession(
+  rng: Rng,
+  wedge: "standard",
+  betPerLine: number,
+  spinsAwarded: number,
+  options?: FreeSpinSessionOptions,
+): StandardFreeSpinSessionResult;
+
+/** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
+export function runFreeSpinSession(
+  rng: Rng,
+  wedge: FreeSpinMode,
+  betPerLine: number,
+  spinsAwarded: number,
+  options: FreeSpinSessionOptions = {},
+): FreeSpinSessionResult | StandardFreeSpinSessionResult {
+  const initialSpins = Math.max(0, spinsAwarded);
+  let remaining = initialSpins;
   const rounds: FreeSpinRoundResult[] = [];
   let retriggers = 0;
+  let retriggerSpins = 0;
   let totalWin = 0;
   let bestCascade = 0;
 
   while (remaining > 0) {
     remaining--;
-    const round = spinFreeRound(rng, wedge, betPerLine);
+    const round = spinFreeRound(rng, wedge, betPerLine, {
+      activateChaiStorm: options.allowChaiStorm !== false && rounds.length === 0,
+    });
     rounds.push(round);
     totalWin += round.totalWin;
     bestCascade = Math.max(bestCascade, round.cascades);
-    if (round.freeSpinsAwarded > 0) {
-      remaining += round.freeSpinsAwarded;
+    const retriggerAward = options.allowRetriggers === false ? 0 : round.freeSpinsAwarded;
+    if (retriggerAward > 0) {
+      remaining += retriggerAward;
       retriggers++;
+      retriggerSpins += retriggerAward;
     }
+    rounds[rounds.length - 1] = { ...round, freeSpinsAwarded: retriggerAward, spinsRemaining: remaining };
   }
 
-  return { wedge, rounds, totalWin, bestCascade, retriggers };
+  return { wedge, mode: wedge, rounds, initialSpins, retriggerSpins, totalSpins: initialSpins + retriggerSpins, totalWin, bestCascade, retriggers };
 }
 
 export function wheelWedgeLabel(wedge: WheelWedge): string {
   switch (wedge) {
     case "multiplying":
       return "We're Multiplying";
-    case "giant_gnome":
-      return "Keepsake Constellation";
+    case "keepsake_memory":
+      return "Moonlit Keepsake Trail";
     case "chai_back":
       return "Iced Chai Wild Rain";
     case "doorbell_panic":

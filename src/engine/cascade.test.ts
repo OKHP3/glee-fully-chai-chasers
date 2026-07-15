@@ -131,6 +131,27 @@ describe("spin", () => {
     expect(firstWin.payout).toBe(PAYTABLE.tumbler![5] * PAYOUT_SCALE * 3);
   });
 
+  it("applies a handbag wild's randomized line multiplier", () => {
+    const grid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),
+    );
+    for (let reel = 0; reel < 5; reel++) grid[reel][0] = { symbol: "tumbler" };
+    grid[4][0] = { symbol: "wild_handbag", handbagMultiplier: 5 };
+
+    const result = spin({
+      rng: () => 0.5,
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+      startingGrid: grid,
+    });
+    const firstWin = result.steps[0].wins[0];
+
+    expect(result.steps[0].wins).toHaveLength(1);
+    expect(firstWin.symbol).toBe("tumbler");
+    expect(firstWin.payout).toBe(PAYTABLE.tumbler![5] * PAYOUT_SCALE * 5);
+  });
+
   it("locks a giant footprint but changes its icon after it participates in a win", () => {
     const grid: Grid = Array.from({ length: 5 }, () =>
       Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),

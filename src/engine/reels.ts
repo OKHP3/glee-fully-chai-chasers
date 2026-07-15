@@ -10,7 +10,7 @@
  * symbol (docs §5 — "a legend, not a line symbol"); it's gated separately in
  * cascade.ts as a per-spin event at ~1/400.
  */
-import type { Cell, Grid, SymbolId } from "./types";
+import type { Cell, Grid, HandbagWildMultiplier, SymbolId } from "./types";
 import type { Rng } from "./rng";
 
 export const REELS = 5;
@@ -23,6 +23,9 @@ export const DOORBELL_REEL_TWO_RATE = 1 / 30;
 /** Bold Chai Pump uses its own base-game blocker rolls. */
 export const BOLD_CHAI_REEL_ONE_RATE = 1 / 17;
 export const BOLD_CHAI_REEL_TWO_RATE = 1 / 30;
+
+/** Most handbag landings stay special, but this gate keeps the multiplier rare. */
+export const HANDBAG_WILD_LAND_RATE = 0.85;
 
 export interface SpinGridOptions {
   /** Bonus screens suppress Doorbell landings as well. */
@@ -90,6 +93,12 @@ function wildStackSegments(reelIndex: number): SymbolId[][] {
   return [repeat("wild_joey", a), repeat("wild_phoebe", b)];
 }
 
+/** One exceptionally rare, non-cat handbag wild on the final reel. */
+function handbagWildSegments(reelIndex: number): SymbolId[][] {
+  if (reelIndex !== 4) return [];
+  return [repeat("wild_handbag", 1)];
+}
+
 /** Builds the fixed circular strip for a given reel index (0-based). */
 export function buildStrip(reelIndex: number): SymbolId[] {
   const segments = [...baseSegments(reelIndex)];
@@ -99,6 +108,7 @@ export function buildStrip(reelIndex: number): SymbolId[] {
   // Wild stacks are appended as literal contiguous blocks (not interleaved) so
   // they land as true 6-7-high runs on the tape.
   for (const seg of wildSegs) strip.push(...seg);
+  for (const seg of handbagWildSegments(reelIndex)) strip.push(...seg);
   return strip;
 }
 
@@ -119,12 +129,31 @@ function drawSymbol(rng: Rng, reelIndex: number): SymbolId {
 }
 
 /** Reads ROWS consecutive symbols from a reel's strip starting at `stop` (wrapping). */
-function windowFrom(reelIndex: number, stop: number): Cell[] {
+function rollHandbagMultiplier(rng: Rng): HandbagWildMultiplier {
+  const roll = rng();
+  if (roll < 0.55) return 3;
+  if (roll < 0.90) return 5;
+  return 10;
+}
+
+function drawNonHandbagSymbol(rng: Rng, reelIndex: number): SymbolId {
+  let symbol = drawSymbol(rng, reelIndex);
+  while (symbol === "wild_handbag") symbol = drawSymbol(rng, reelIndex);
+  return symbol;
+}
+
+function cellFrom(rng: Rng, reelIndex: number, symbol: SymbolId): Cell {
+  if (symbol !== "wild_handbag") return { symbol };
+  if (rng() >= HANDBAG_WILD_LAND_RATE) return cellFrom(rng, reelIndex, drawNonHandbagSymbol(rng, reelIndex));
+  return { symbol, handbagMultiplier: rollHandbagMultiplier(rng) };
+}
+
+function windowFrom(rng: Rng, reelIndex: number, stop: number): Cell[] {
   const strip = STRIPS[reelIndex];
   const len = strip.length;
   const column: Cell[] = [];
   for (let row = 0; row < ROWS; row++) {
-    column.push({ symbol: strip[(stop + row) % len] });
+    column.push(cellFrom(rng, reelIndex, strip[(stop + row) % len]));
   }
   return column;
 }
@@ -160,7 +189,7 @@ export function spinGrid(rng: Rng, options: SpinGridOptions = {}): Grid {
   const grid: Grid = [];
   for (let reel = 0; reel < REELS; reel++) {
     const stop = randomStop(rng, STRIPS[reel].length);
-    grid.push(windowFrom(reel, stop));
+    grid.push(windowFrom(rng, reel, stop));
   }
 
   const selection = selectBlockerFamily(rng, options.includeDoorbells !== false, options.includeBoldChaiPump !== false);
@@ -189,7 +218,7 @@ export function cascadeColumn(
   const missing = column.length - survivors.length;
   const fresh: Cell[] = [];
   for (let i = 0; i < missing; i++) {
-    fresh.push({ symbol: drawSymbol(rng, reelIndex) });
+    fresh.push(cellFrom(rng, reelIndex, drawSymbol(rng, reelIndex)));
   }
   return [...fresh, ...survivors];
 }
