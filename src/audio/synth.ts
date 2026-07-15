@@ -129,12 +129,62 @@ export function playJoeyCue(): void {
   tone(293.66, 0.19, 0.22, 0.17, "triangle");
 }
 
+/** Joey's Laundry Helper sock flutter — a soft, original fabric flick. */
+export function playLaundrySockDrop(): void {
+  tone(392, 0, 0.12, 0.08, "sine");
+  tone(523.25, 0.07, 0.16, 0.07, "triangle");
+}
+
+/** Joey's Laundry Helper paw strike — a compact boogie impact with a bright edge. */
+export function playLaundryPawStrike(multiplier: 2 | 3 | 5): void {
+  tone(98, 0, 0.12, 0.14, "square");
+  tone(multiplier === 5 ? 659.25 : multiplier === 3 ? 523.25 : 392, 0.045, 0.2, 0.12, "triangle");
+}
+
 /** Phoebe's purr-and-discovery signature — warm low pulse plus delighted trill. */
 export function playPhoebeCue(): void {
   tone(110, 0, 0.34, 0.1, "sine");
   tone(116.54, 0.08, 0.32, 0.08, "sine");
   tone(659.25, 0.18, 0.16, 0.14, "triangle");
   tone(783.99, 0.25, 0.2, 0.12, "triangle");
+}
+
+/** Phoebe's Lap Quest card reveal: three soft steps toward a cozy landing. */
+export function playLapQuestReveal(perfectLap: boolean): void {
+  const notes = perfectLap ? [196, 246.94, 329.63, 523.25] : [174.61, 220, 293.66];
+  notes.forEach((freq, i) => tone(freq, i * 0.09, perfectLap ? 0.3 : 0.24, 0.08, i === notes.length - 1 ? "sine" : "triangle"));
+}
+
+/** A quiet cushion-pop when Phoebe's comfort-wilds settle on the board. */
+export function playLapQuestWildLand(count: number): void {
+  const pulses = Math.min(Math.max(count, 2), 4);
+  for (let i = 0; i < pulses; i++) tone(261.63 + i * 32.7, i * 0.055, 0.18, 0.07, "sine");
+}
+
+/** Lap Quest ledge entrance — a soft cushion landing with a warm purr bed. */
+export function playLapQuestStart(): void {
+  tone(146.83, 0, 0.38, 0.08, "sine");
+  tone(174.61, 0.1, 0.32, 0.07, "sine");
+  tone(392, 0.2, 0.24, 0.09, "triangle");
+}
+
+/** A tiny original paw-and-purr response for each bounded pet interaction. */
+export function playLapQuestPet(): void {
+  tone(196, 0, 0.16, 0.06, "sine");
+  tone(329.63, 0.045, 0.12, 0.07, "triangle");
+}
+
+/** Joey's playful arrival cue; no alarm or impact language. */
+export function playLapQuestJoeyInterrupt(): void {
+  tone(261.63, 0, 0.16, 0.08, "triangle");
+  tone(329.63, 0.1, 0.14, 0.09, "square");
+  tone(392, 0.2, 0.2, 0.1, "triangle");
+}
+
+/** Phoebe's gentle self-exit cue when the lap goes unpetted. */
+export function playLapQuestSelfExit(): void {
+  tone(329.63, 0, 0.2, 0.07, "sine");
+  tone(246.94, 0.12, 0.24, 0.06, "sine");
 }
 
 /** Treat Time entrance: bright Phoebe morning, fuller Joey/Phoebe nighttime. */
