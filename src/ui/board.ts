@@ -532,19 +532,17 @@ async function runSpin(
   const btnAgain = root.querySelector<HTMLButtonElement>("#sparkle-btn");
   btnAgain?.classList.remove("is-spinning");
 
+  if (result.treatTimeBonus) {
+    await runTreatTimeBonus(root, state, result.treatTimeBonus.mode, result.treatTimeBonus.freeSpinsAwarded);
+  }
+
   if (result.freeSpinsAwarded > 0) {
-    if (result.treatTimeBonus) await runTreatTimeBonus(root, state, result.treatTimeBonus.mode, result.treatTimeBonus.freeSpinsAwarded);
-    else if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
+    if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
     else await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
     return;
   }
 
-  if (result.treatTimeBonus) {
-    await runTreatTimeBonus(root, state, result.treatTimeBonus.mode, result.treatTimeBonus.freeSpinsAwarded);
-    return;
-  }
-
-  renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
+  if (!result.treatTimeBonus) renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
 }
 
 function showDoorbellPanic(
@@ -778,23 +776,23 @@ async function runTreatTimeBonus(
 
   const rng = mulberry32(productionSeed());
   const session = runFreeSpinSession(rng, wedge, betPerLine(state.bet), spinsAwarded);
-  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  await playTreatTimeOnMainBoard(root, state, mode, session.rounds);
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
 
-  await showBonusSummary(root, session.totalWin, session.retriggers);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
+  setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins${session.retriggers > 0 ? ` · ${session.retriggers} retrigger${session.retriggers > 1 ? "s" : ""}` : ""}`);
 }
 
 function showTreatTimeEntry(root: HTMLElement, mode: TreatTimeMode, spinsAwarded: number): Promise<void> {
   return new Promise((resolve) => {
     const nighttime = mode === "nighttime";
     const overlay = document.createElement("div");
-    overlay.className = `treat-time-entry ${nighttime ? "treat-time-entry--night" : "treat-time-entry--morning"}`;
+    overlay.className = `treat-time-entry treat-time-entry--main ${nighttime ? "treat-time-entry--night" : "treat-time-entry--morning"}`;
     overlay.innerHTML = `
       <div class="treat-time-entry-hand">${treatTimeHandSvg()}</div>
       <div class="treat-time-entry-copy">
@@ -803,13 +801,68 @@ function showTreatTimeEntry(root: HTMLElement, mode: TreatTimeMode, spinsAwarded
         <div class="treat-time-entry-spins">${spinsAwarded} free spins · every spin gets a treat toss</div>
       </div>
     `;
-    root.querySelector(".cc-root")?.appendChild(overlay);
+    root.querySelector(".cabinet-frame")?.appendChild(overlay);
     playTreatTimeCue(mode);
     window.setTimeout(() => {
       overlay.remove();
       resolve();
     }, 1350);
   });
+}
+
+/** Treat Time stays inside the primary cabinet instead of creating a bonus screen. */
+async function playTreatTimeOnMainBoard(
+  root: HTMLElement,
+  state: GameState,
+  mode: TreatTimeMode,
+  rounds: FreeSpinRoundResult[],
+): Promise<void> {
+  const grid = root.querySelector<HTMLDivElement>("#reel-grid");
+  const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
+  const status = root.querySelector<HTMLElement>("#status-line");
+  const shell = root.querySelector<HTMLElement>(".cc-shell");
+  if (!grid || !cabinet || !status) return;
+
+  shell?.classList.add("treat-time-main-mode");
+  try {
+    for (const [roundIndex, round] of rounds.entries()) {
+      status.textContent = `${mode === "nighttime" ? "Nighttime" : "Morning"} Treat Time · Spin ${roundIndex + 1} of ${rounds.length}`;
+
+      for (const [stepIndex, step] of round.steps.entries()) {
+        grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
+        if (stepIndex === 0 && round.treatTimeWilds?.length) {
+          await animateTreatTimeCast(cabinet, grid, round.treatTimeWilds);
+        }
+
+        grid.querySelectorAll<HTMLElement>(".cell").forEach((cell) => cell.classList.add("beam-drop"));
+        updateJar(root, step.meterAfter);
+        if (step.wins.length > 0) {
+          playCascadeArpeggio(step.meterAfter);
+          beamToSaucers(root);
+          playWinPluck();
+          for (const win of step.wins) {
+            for (const [reel, row] of win.positions) {
+              grid.querySelector<HTMLElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("win-flash");
+            }
+          }
+        } else {
+          playCascadeTick();
+        }
+        await sleep(360);
+      }
+
+      if (round.freeSpinsAwarded > 0) {
+        status.textContent = `Treat Time retrigger! +${round.freeSpinsAwarded} more spins!`;
+        playBonusFanfare();
+      } else if (round.totalWin > 0) {
+        status.textContent = `Treat Time · +${round.totalWin.toLocaleString()} coins`;
+      }
+      await sleep(400);
+    }
+  } finally {
+    shell?.classList.remove("treat-time-main-mode");
+  }
+  void state;
 }
 
 /** AskJamie Wheel + the free-spin bonus session it unlocks — docs §7. */
@@ -900,7 +953,7 @@ async function playFreeSpinSession(
   overlay.className = `free-spins-overlay text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins" : ""}`;
   overlay.innerHTML = `
     <div class="night-garden aurora">${gardenDecor()}</div>
-    <div class="relative z-10 h-full w-full flex flex-col">
+    <div class="relative z-10 h-full w-full flex flex-col cc-shell free-spins-shell">
       <header class="marquee">
         <div class="marquee-row">
           <span class="level-chip">${wheelWedgeLabel(wedge)}</span>

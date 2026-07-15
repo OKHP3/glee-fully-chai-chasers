@@ -23,6 +23,18 @@ describe("Treat Time trigger math", () => {
     expect(result.treatTimeBonus).toEqual({ mode: "nighttime", freeSpinsAwarded: 14 });
   });
 
+  it("never triggers from a secondary bonus play area", () => {
+    const result = spin({
+      rng: mulberry32(20260713),
+      treatTimeRng: () => 0,
+      spinArea: "secondary",
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+    });
+    expect(result.treatTimeBonus).toBeUndefined();
+  });
+
   it("awards Morning Treat Time between 7 and 14 spins", () => {
     expect(rollTreatTimeTrigger(() => 0, "morning")).toEqual({ mode: "morning", freeSpinsAwarded: 7 });
     expect(rollTreatTimeTrigger(() => 0.999999, "morning")).toBeUndefined();

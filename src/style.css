@@ -307,6 +307,16 @@ body {
   background: #1c1440;
 }
 
+/* The aurora may fill the viewport, but bonus play uses the same responsive
+   game shell as base play. Without this wrapper, a free-spin cabinet expands
+   to the entire desktop viewport instead of the regular 560px play area. */
+.free-spins-overlay .free-spins-shell {
+  width: min(100%, 560px);
+  min-height: 100%;
+  height: 100%;
+  margin: 0 auto;
+}
+
 /* ------------------------------------------------------------------ */
 /* Marquee header                                                      */
 /* ------------------------------------------------------------------ */
@@ -1278,6 +1288,7 @@ body {
     padding: 7px;
   }
   .bet-console > .coin-chip { grid-column: 1 / -1; grid-row: 1; }
+  .bet-console > .coin-chip { min-width: 0; }
   .bet-console > .flex-1 { display: none; }
   .bet-console > #bet-down { grid-column: 1; grid-row: 2; }
   .bet-console > .bet-display { grid-column: 2; grid-row: 2; }
@@ -1297,6 +1308,7 @@ body {
 
 @media (min-width: 600px) {
   .cc-root { padding: 16px; }
+  .free-spins-overlay { padding: 16px; }
   .cc-shell {
     min-height: calc(100dvh - 32px);
     border: 1px solid rgba(245, 213, 118, 0.16);
@@ -1309,6 +1321,7 @@ body {
 
 @media (min-width: 900px) {
   .cc-root { padding: clamp(24px, 4vw, 56px); }
+  .free-spins-overlay { padding: clamp(24px, 4vw, 56px); }
   .cc-shell { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
   .chai-splash { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
   .chai-splash-copy { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
@@ -1351,6 +1364,22 @@ body {
   text-align: center;
   transform: rotate(-2deg);
   animation: treat-time-copy-pop 520ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.treat-time-entry--main {
+  inset: 8px;
+  min-height: 0;
+  height: auto;
+  align-items: stretch;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 52% 48%, rgba(245, 213, 118, .42), rgba(21, 15, 48, .9) 78%);
+}
+.treat-time-entry--main.treat-time-entry--night {
+  background: radial-gradient(ellipse at 52% 48%, rgba(107, 214, 201, .34), rgba(21, 15, 48, .92) 78%);
+}
+.treat-time-entry--main .treat-time-entry-hand { display: none; }
+.treat-time-entry--main .treat-time-entry-copy { max-width: none; width: 100%; padding: 12px 14px; }
+.treat-time-main-mode .cabinet-frame {
+  box-shadow: inset 0 0 0 2px rgba(159, 232, 197, .5), inset 0 0 26px rgba(107, 214, 201, .22), 0 0 22px rgba(245, 213, 118, .32);
 }
 .treat-time-entry-title {
   color: var(--cc-butter);

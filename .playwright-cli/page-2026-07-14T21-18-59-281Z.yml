@@ -1,0 +1,30 @@
+- generic [ref=e8]:
+  - banner [ref=e9]:
+    - generic [ref=e27]:
+      - generic "Player level" [ref=e28]:
+        - text: Lvl 1
+        - emphasis [ref=e29]: 0/500 Sparks
+      - heading "Glee-fully Chai Chasers" [level=1] [ref=e30]
+      - button "Open symbol guide and game rules" [ref=e31]
+      - button "Settings" [ref=e35]
+  - generic "Firefly cascade meter" [ref=e39]:
+    - generic [ref=e48]:
+      - generic [ref=e49]: Firefly Cascade
+      - strong [ref=e50]: 0 / 4
+      - generic [ref=e51]: Reach 4 to unlock 7 free spins
+  - main [ref=e52]:
+    - img "Reel board" [ref=e65]
+  - generic [ref=e111]:
+    - generic "Treat Jar" [ref=e112]:
+      - generic "Chicken Comets" [ref=e114]: "0"
+      - generic "Salmon Stars" [ref=e117]: "0"
+      - generic "Bougie Bites" [ref=e120]: "0"
+    - generic "AskJamie" [ref=e123]
+  - contentinfo [ref=e140]:
+    - generic "Glee-coin balance" [ref=e141]:
+      - text: 1,000,000
+      - emphasis [ref=e142]: coins
+    - button "Decrease bet" [ref=e143]: −
+    - generic [ref=e144]: "25"
+    - button "Increase bet" [ref=e145]: +
+    - button "SPARKLE!" [ref=e146]

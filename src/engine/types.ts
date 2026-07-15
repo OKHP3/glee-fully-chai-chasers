@@ -22,6 +22,9 @@ export type TreatKind = "chicken" | "salmon" | "bougie";
 
 export type TreatTimeMode = "morning" | "nighttime";
 
+/** Whether a spin is resolving on the primary board or a secondary bonus board. */
+export type SpinArea = "main" | "secondary";
+
 /** A single marked wild used by the We're Multiplying free-spin bonus. */
 export type WildMultiplier = 2 | 3 | 5 | 10;
 

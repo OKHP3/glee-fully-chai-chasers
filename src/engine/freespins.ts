@@ -132,6 +132,7 @@ export function spinFreeRound(rng: Rng, wedge: WheelWedge, betPerLine: number): 
     startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? keepsakeGrid,
     keepsakeZone,
     allowDoorbells: false,
+    spinArea: "secondary",
     allowTreatTimeBonus: false,
   });
   const treatTimeMeta = treatTime
