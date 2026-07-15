@@ -84,6 +84,16 @@ describe("free spin rounds", () => {
       }
     }
   });
+
+  it("never introduces Chai Pumps inside any bonus round", () => {
+    const wedges = ["multiplying", "giant_gnome", "chai_back", "doorbell_panic", "treat_time_morning", "treat_time_nighttime"] as const;
+    for (const [wedgeIndex, wedge] of wedges.entries()) {
+      for (let seed = 0; seed < 100; seed++) {
+        const round = spinFreeRound(mulberry32(seed + wedgeIndex * 1000), wedge, 1);
+        expect(round.steps.flatMap((step) => step.grid.flat()).some((cell) => cell.symbol === "chai_pump")).toBe(false);
+      }
+    }
+  });
 });
 
 describe("free spin session", () => {

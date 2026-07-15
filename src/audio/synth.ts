@@ -158,6 +158,28 @@ export function playDoorbellRing(): void {
   tone(1318.51, 0.02, 0.08, 0.06, "triangle");
 }
 
+/** Original iced-chai pump press cue; intentionally one-shot, never looping. */
+export function playBoldChaiPumpPress(completedCup = false): void {
+  tone(completedCup ? 196 : 146.83, 0, 0.08, 0.11, "square");
+  tone(completedCup ? 392 : 220, 0.045, completedCup ? 0.24 : 0.12, completedCup ? 0.18 : 0.1, "triangle");
+  if (completedCup) tone(659.25, 0.12, 0.28, 0.14, "sine");
+}
+
+/** Original iced-cube rattle for the intentional cup swap time cost. */
+export function playBoldChaiCupSwap(): void {
+  [523.25, 659.25, 783.99, 587.33, 698.46].forEach((freq, index) => {
+    tone(freq, index * 0.035, 0.07, 0.075, index % 2 ? "triangle" : "sine");
+  });
+  tone(246.94, 0.08, 0.18, 0.08, "triangle");
+}
+
+/** Original low shot-clock buzzer for the end of the 30-second Bold Chai run. */
+export function playBoldChaiTimerBuzzer(): void {
+  tone(110, 0, 0.42, 0.2, "square");
+  tone(123.47, 0.015, 0.42, 0.12, "sawtooth");
+  tone(82.41, 0.08, 0.34, 0.14, "square");
+}
+
 /** Doorbell Panic: a bright, original two-note chime followed by a cat-flight burst. */
 export function playStrangerDangerPanic(): void {
   tone(988, 0, 0.18, 0.2, "square");

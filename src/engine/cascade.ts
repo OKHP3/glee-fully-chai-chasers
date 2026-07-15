@@ -10,7 +10,7 @@
 import type { CascadeStep, Grid, KeepsakeZone, SpecialtyWild, SpinArea, SpinResult, SymbolId, TreatKind, TreatTimeMode } from "./types";
 import { FREE_SPIN_LADDER } from "./types";
 import { REELS, ROWS, cascadeColumn, drawSingle, spinGrid, stripFor } from "./reels";
-import { evaluateLines, findDoorbellTrigger, isWild } from "./paylines";
+import { evaluateLines, findBoldChaiTrigger, findDoorbellTrigger, isWild } from "./paylines";
 import { rollCatVisit, type TreatJar } from "./features";
 import { rollTreatTimeTrigger } from "./treattime";
 import type { Rng } from "./rng";
@@ -64,7 +64,8 @@ export function freeSpinsForCascades(cascades: number): number {
   return awarded;
 }
 
-const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe", "doorbell"];
+const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe", "doorbell", "chai_pump"];
+const PERSISTENT_BLOCKERS: SymbolId[] = ["doorbell", "chai_pump"];
 
 /** Sparkle Sort: 5-11 random non-wild/non-scatter cells shatter -> forced cascade. */
 function applySparkleSort(rng: Rng, grid: Grid, keepsakeZone?: KeepsakeZone): { grid: Grid; positions: Array<[number, number]> } {
@@ -92,7 +93,7 @@ function applyDropIn(rng: Rng, grid: Grid, keepsakeZone?: KeepsakeZone): Grid {
   const reel = 1 + Math.floor(rng() * (REELS - 1)); // reels 2-5 (index 1-4)
   const wild: SymbolId = rng() < 0.5 ? "wild_joey" : "wild_phoebe";
   const strip = stripFor(reel);
-  const column = grid[reel].map((cell) => cell.symbol === "doorbell"
+  const column = grid[reel].map((cell) => PERSISTENT_BLOCKERS.includes(cell.symbol)
     ? { ...cell }
     : { symbol: strip.length ? wild : cell.symbol });
   const next = grid.map((col, i) => (i === reel ? column : col));
@@ -158,6 +159,8 @@ export interface SpinInput {
   keepsakeZone?: KeepsakeZone;
   /** Bonus rounds suppress standard-spin-only doorbell events. */
   allowDoorbells?: boolean;
+  /** Secondary screens suppress the main-spin-only Chai Pump event. */
+  includeBoldChaiPump?: boolean;
   /** Treat Time is eligible only while resolving on the primary game board. */
   spinArea?: SpinArea;
   /** Additional opt-out for callers that intentionally suppress the feature. */
@@ -180,6 +183,7 @@ export function spin({
   startingGrid,
   keepsakeZone: inputKeepsakeZone,
   allowDoorbells = true,
+  includeBoldChaiPump = true,
   spinArea = "main",
   allowTreatTimeBonus = true,
   treatTimeMode = "either",
@@ -187,7 +191,7 @@ export function spin({
 }: SpinInput): SpinResult {
   let grid = startingGrid
     ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
-    : spinGrid(rng, allowDoorbells);
+    : spinGrid(rng, { includeDoorbells: allowDoorbells, includeBoldChaiPump });
   const steps: CascadeStep[] = [];
   let keepsakeZone = cloneKeepsakeZone(inputKeepsakeZone);
   if (keepsakeZone) grid = applyKeepsakeZone(grid, keepsakeZone);
@@ -199,6 +203,7 @@ export function spin({
   let doubleSparkleActive = false;
   const queue: SpecialtyWild[] = [];
   let doorbellPanic: SpinResult["doorbellPanic"];
+  let boldChaiPump: SpinResult["boldChaiPump"];
 
   if (unigleeTriggered) {
     // "The full package": Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts.
@@ -212,6 +217,10 @@ export function spin({
     if (!doorbellPanic) {
       const trigger = findDoorbellTrigger(grid, 0);
       if (trigger) doorbellPanic = { ...trigger, freeSpinsAwarded: rollDoorbellFreeSpins(rng) };
+    }
+    if (!boldChaiPump) {
+      const trigger = findBoldChaiTrigger(grid);
+      if (trigger) boldChaiPump = trigger;
     }
     const wins = evaluateLines(grid, betPerLine).map((win) => {
       const multiplier = win.positions
@@ -302,6 +311,7 @@ export function spin({
     unigleeTriggered,
     treatsCollected,
     doorbellPanic,
+    boldChaiPump,
     treatTimeBonus,
   };
 }

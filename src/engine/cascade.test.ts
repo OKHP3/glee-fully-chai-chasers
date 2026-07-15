@@ -95,6 +95,21 @@ describe("spin", () => {
     expect(result.steps.every((step) => step.grid.flat().some((cell) => cell.symbol === "doorbell"))).toBe(true);
   });
 
+  it("captures and preserves a Chai Pump through specialty steps", () => {
+    const grid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),
+    );
+    grid[0][0] = { symbol: "chai_pump" };
+    grid[1][0] = { symbol: "chai_pump" };
+    const fallbackRng = mulberry32(90417);
+    let forcedCalls = 0;
+    const rng = () => forcedCalls++ < 3 ? 0 : fallbackRng();
+    const result = spin({ rng, betPerLine: 1, treatJar: emptyTreatJar(), spinsSincePopIn: 0, startingGrid: grid });
+
+    expect(result.boldChaiPump?.lineIndex).toBe(0);
+    expect(result.steps.every((step) => step.grid.flat().filter((cell) => cell.symbol === "chai_pump").length >= 2)).toBe(true);
+  });
+
   it("multiplies only paylines that use the one marked wild", () => {
     const grid: Grid = Array.from({ length: 5 }, () =>
       Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),

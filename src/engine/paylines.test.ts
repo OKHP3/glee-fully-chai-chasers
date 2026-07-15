@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateLines, findDoorbellTrigger, PAYLINES } from "./paylines";
+import { evaluateLines, findBoldChaiTrigger, findDoorbellTrigger, PAYLINES } from "./paylines";
 import type { Grid } from "./types";
 
 function flatGrid(symbol: Grid[number][number]["symbol"]): Grid {
@@ -75,5 +75,15 @@ describe("evaluateLines", () => {
       positions: [[0, 0], [1, 0]],
       freeSpinsAwarded: 9,
     });
+  });
+
+  it("treats a Chai Pump as non-paying and detects the paired trigger", () => {
+    const grid: Grid = Array.from({ length: 5 }, (_, reel) =>
+      Array.from({ length: 4 }, (_, row) => ({
+        symbol: reel < 2 && row === 0 ? "chai_pump" as const : "treat_chicken" as const,
+      })),
+    );
+    expect(evaluateLines(grid, 1)).toHaveLength(0);
+    expect(findBoldChaiTrigger(grid)).toEqual({ lineIndex: 0, positions: [[0, 0], [1, 0]] });
   });
 });

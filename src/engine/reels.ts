@@ -20,6 +20,17 @@ export const ROWS = 4;
 export const DOORBELL_REEL_ONE_RATE = 1 / 17;
 export const DOORBELL_REEL_TWO_RATE = 1 / 30;
 
+/** Bold Chai Pump uses its own base-game blocker rolls. */
+export const BOLD_CHAI_REEL_ONE_RATE = 1 / 17;
+export const BOLD_CHAI_REEL_TWO_RATE = 1 / 30;
+
+export interface SpinGridOptions {
+  /** Bonus screens suppress Doorbell landings as well. */
+  includeDoorbells?: boolean;
+  /** Bonus screens suppress the Bold Chai Pump landing event entirely. */
+  includeBoldChaiPump?: boolean;
+}
+
 function repeat(symbol: SymbolId, count: number): SymbolId[] {
   return new Array(count).fill(symbol) as SymbolId[];
 }
@@ -118,29 +129,47 @@ function windowFrom(reelIndex: number, stop: number): Cell[] {
   return column;
 }
 
+type BlockerFamily = "none" | "doorbell" | "chai_pump";
+
+function selectBlockerFamily(rng: Rng, includeDoorbells: boolean, includeBoldChaiPump: boolean): {
+  family: BlockerFamily;
+  doorbellReelOne: boolean;
+  doorbellReelTwo: boolean;
+  pumpReelOne: boolean;
+  pumpReelTwo: boolean;
+} {
+  const doorbellReelOne = includeDoorbells && rng() < DOORBELL_REEL_ONE_RATE;
+  const doorbellReelTwo = includeDoorbells && rng() < DOORBELL_REEL_TWO_RATE;
+  const pumpReelOne = includeBoldChaiPump && rng() < BOLD_CHAI_REEL_ONE_RATE;
+  const pumpReelTwo = includeBoldChaiPump && rng() < BOLD_CHAI_REEL_TWO_RATE;
+  const family = doorbellReelOne || doorbellReelTwo
+    ? "doorbell"
+    : pumpReelOne || pumpReelTwo
+      ? "chai_pump"
+      : "none";
+  return { family, doorbellReelOne, doorbellReelTwo, pumpReelOne, pumpReelTwo };
+}
+
+function placeBlocker(grid: Grid, reel: number, symbol: "doorbell" | "chai_pump", rng: Rng): void {
+  const row = Math.floor(rng() * ROWS);
+  grid[reel][row] = { symbol };
+}
+
 /** Draws a fresh REELS x ROWS grid. grid[reel][row], row 0 = top. */
-export function spinGrid(rng: Rng, includeDoorbells = true): Grid {
+export function spinGrid(rng: Rng, options: SpinGridOptions = {}): Grid {
   const grid: Grid = [];
   for (let reel = 0; reel < REELS; reel++) {
     const stop = randomStop(rng, STRIPS[reel].length);
     grid.push(windowFrom(reel, stop));
   }
 
-  // Doorbell Panic is deliberately a landing event rather than a strip
-  // weight: this preserves the validated paytable/RTP while keeping the two
-  // doorbells visible as true blockers once they land. The independent
-  // 1-in-17 and 1-in-30 rolls produce a paired trigger about once per 510
-  // spins, while allowing each reel to show its own blocker on its requested
-  // cadence.
-  if (includeDoorbells) {
-    if (rng() < DOORBELL_REEL_ONE_RATE) {
-      const row = Math.floor(rng() * ROWS);
-      grid[0][row] = { symbol: "doorbell" };
-    }
-    if (rng() < DOORBELL_REEL_TWO_RATE) {
-      const row = Math.floor(rng() * ROWS);
-      grid[1][row] = { symbol: "doorbell" };
-    }
+  const selection = selectBlockerFamily(rng, options.includeDoorbells !== false, options.includeBoldChaiPump !== false);
+  if (selection.family === "doorbell") {
+    if (selection.doorbellReelOne) placeBlocker(grid, 0, "doorbell", rng);
+    if (selection.doorbellReelTwo) placeBlocker(grid, 1, "doorbell", rng);
+  } else if (selection.family === "chai_pump") {
+    if (selection.pumpReelOne) placeBlocker(grid, 0, "chai_pump", rng);
+    if (selection.pumpReelTwo) placeBlocker(grid, 1, "chai_pump", rng);
   }
   return grid;
 }
