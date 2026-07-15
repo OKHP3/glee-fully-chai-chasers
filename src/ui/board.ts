@@ -10,7 +10,7 @@
  * illustrated firefly-jar meter, a console-style bet bar, and a layered
  * night-garden scene behind it all (CSS + SVG, no canvas/WebGL).
  */
-import type { CascadeStep, ChaiRainWild, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } from "../engine/types";
+import type { CascadeStep, ChaiRainWild, SpinResult, SymbolId, TreatKind, TreatTimeMode, TreatTimeWild } from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
@@ -23,7 +23,7 @@ import {
   settleBoldChaiPump,
 } from "../engine/bold-chai-pump";
 import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
-import { addTreat, consumeForVisit } from "../engine/features";
+import { collectTreat, consumeForVisit, settleTreatJar, TREAT_JAR_FREE_SPINS } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
 import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinSessionResult, type WheelWedge } from "../engine/freespins";
 import type { GameState, ThemeMode } from "../state";
@@ -537,6 +537,12 @@ async function runSpin(
   sparkleBtn.classList.add("is-spinning");
 
   const seed = productionSeed();
+  let treatJarSpinsAwarded = state.pendingTreatJarSpins;
+  state.pendingTreatJarSpins = 0;
+  const settledTreatJar = settleTreatJar(state.treatJar);
+  state.treatJar = settledTreatJar.jar;
+  treatJarSpinsAwarded += settledTreatJar.freeSpinsAwarded;
+  const treatJarAwards: TreatKind[] = [...settledTreatJar.completed];
   const result = spin({
     rng: mulberry32(seed),
     treatTimeRng: mulberry32(seed ^ 0x9e3779b9),
@@ -556,7 +562,12 @@ async function runSpin(
   state.bestCascade = Math.max(state.bestCascade, result.cascades);
 
   for (const treat of result.treatsCollected) {
-    state.treatJar = addTreat(state.treatJar, treat);
+    const collected = collectTreat(state.treatJar, treat);
+    state.treatJar = collected.jar;
+    if (collected.freeSpinsAwarded > 0) {
+      treatJarSpinsAwarded += collected.freeSpinsAwarded;
+      treatJarAwards.push(treat);
+    }
   }
 
   if (result.doorbellPanic) {
@@ -594,11 +605,18 @@ async function runSpin(
   if (result.freeSpinsAwarded > 0) {
     if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
     else await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
+    if (treatJarSpinsAwarded > 0) await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
     return;
   }
 
   if (boldChaiSpinsAwarded > 0) {
     await runBoldChaiFreeSpins(root, state, boldChaiSpinsAwarded);
+    if (treatJarSpinsAwarded > 0) await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
+    return;
+  }
+
+  if (treatJarSpinsAwarded > 0) {
+    await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
     return;
   }
 
@@ -751,6 +769,39 @@ async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAw
   await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
+}
+
+/** Treat Jar rewards are additive free spins that never retrigger or touch Firefly progress. */
+async function runTreatJarFreeSpins(
+  root: HTMLElement,
+  state: GameState,
+  spinsAwarded: number,
+  awards: TreatKind[],
+): Promise<void> {
+  const awardLabels = awards.map((treat) => `${treatJarLabel(treat)} +${TREAT_JAR_FREE_SPINS[treat]}`).join(", ");
+  setStatus(root, `Treat Jar complete: ${awardLabels} free spins · no retriggers`);
+  const session = runFreeSpinSession(
+    mulberry32(productionSeed()),
+    "chai_back",
+    betPerLine(state.bet),
+    spinsAwarded,
+    { allowChaiStorm: false, allowRetriggers: false },
+  );
+  await playFreeSpinSession(root, state, session, { label: "Treat Jar Bonus", title: "TREAT JAR BONUS!" });
+  state.balance += session.totalWin;
+  state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
+  saveGameState(state);
+  await showBonusSummary(root, session.totalWin, 0, session.totalSpins);
+  const lastRound = session.rounds[session.rounds.length - 1];
+  renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
+}
+
+function treatJarLabel(treat: TreatKind): string {
+  switch (treat) {
+    case "chicken": return "Chicken Comets";
+    case "salmon": return "Salmon Stars";
+    case "bougie": return "Bougie Bites";
+  }
 }
 
 function showDoorbellPanic(
@@ -1155,6 +1206,7 @@ async function playFreeSpinSession(
   root: HTMLElement,
   state: GameState,
   session: FreeSpinSessionResult,
+  presentation: { label?: string; title?: string } = {},
 ): Promise<void> {
   const { wedge, rounds } = session;
   const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
@@ -1167,8 +1219,8 @@ async function playFreeSpinSession(
 
   const treatTime = wedge === "treat_time_morning" || wedge === "treat_time_nighttime";
   const chaiStormSession = wedge === "chai_back" && rounds.some((round) => round.chaiRain !== undefined);
-  const displayWedgeLabel = wedge === "chai_back" && !chaiStormSession ? "Bold Chai" : wheelWedgeLabel(wedge);
-  const title = treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : displayWedgeLabel === "Bold Chai" ? "BOLD CHAI!" : "Free Spins";
+  const displayWedgeLabel = presentation.label ?? (wedge === "chai_back" && !chaiStormSession ? "Bold Chai" : wheelWedgeLabel(wedge));
+  const title = presentation.title ?? (treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : displayWedgeLabel === "Bold Chai" ? "BOLD CHAI!" : "Free Spins");
   const panel = document.createElement("section");
   panel.className = `free-spins-panel text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins treat-time-cabinet" : ""}`;
   panel.setAttribute("aria-label", `${displayWedgeLabel} bonus spins`);

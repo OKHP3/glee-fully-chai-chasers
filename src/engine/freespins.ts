@@ -202,6 +202,8 @@ export interface FreeSpinSessionResult {
 export interface FreeSpinSessionOptions {
   /** Bold Chai reuses the legacy wedge ID but must not launch Wild Chai Storm. */
   allowChaiStorm?: boolean;
+  /** Treat Jar bonus spins are additive but cannot retrigger themselves. */
+  allowRetriggers?: boolean;
 }
 
 /** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
@@ -228,12 +230,13 @@ export function runFreeSpinSession(
     rounds.push(round);
     totalWin += round.totalWin;
     bestCascade = Math.max(bestCascade, round.cascades);
-    if (round.freeSpinsAwarded > 0) {
-      remaining += round.freeSpinsAwarded;
+    const retriggerAward = options.allowRetriggers === false ? 0 : round.freeSpinsAwarded;
+    if (retriggerAward > 0) {
+      remaining += retriggerAward;
       retriggers++;
-      retriggerSpins += round.freeSpinsAwarded;
+      retriggerSpins += retriggerAward;
     }
-    rounds[rounds.length - 1] = { ...round, spinsRemaining: remaining };
+    rounds[rounds.length - 1] = { ...round, freeSpinsAwarded: retriggerAward, spinsRemaining: remaining };
   }
 
   return { wedge, rounds, initialSpins, retriggerSpins, totalSpins: initialSpins + retriggerSpins, totalWin, bestCascade, retriggers };

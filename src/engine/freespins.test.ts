@@ -155,6 +155,17 @@ describe("free spin session", () => {
     expect(session.totalWin).toBeGreaterThanOrEqual(0);
   });
 
+  it("supports additive Treat Jar spins without retriggers", () => {
+    const session = runFreeSpinSession(mulberry32(519), "multiplying", 1, 67, { allowRetriggers: false });
+    expect(session.initialSpins).toBe(67);
+    expect(session.totalSpins).toBe(67);
+    expect(session.retriggers).toBe(0);
+    expect(session.retriggerSpins).toBe(0);
+    expect(session.rounds).toHaveLength(67);
+    expect(session.rounds.every((round) => round.freeSpinsAwarded === 0)).toBe(true);
+    expect(session.rounds[session.rounds.length - 1]?.spinsRemaining).toBe(0);
+  });
+
   it("with zero spins awarded, runs zero rounds", () => {
     const session = runFreeSpinSession(mulberry32(1), "chai_back", 1, 0);
     expect(session.initialSpins).toBe(0);
