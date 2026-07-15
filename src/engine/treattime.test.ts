@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
-import { castTreatTimeWilds, rollTreatTimeTrigger, TREAT_TIME_WILD_RANGE } from "./treattime";
+import { castTreatTimeWilds, rollTreatTimeTrigger, TREAT_TIME_TRIGGER_RATES, TREAT_TIME_WILD_RANGE } from "./treattime";
 import { spinFreeRound, runFreeSpinSession } from "./freespins";
 import { spin } from "./cascade";
 import { emptyTreatJar } from "./features";
@@ -58,6 +58,29 @@ describe("Treat Time trigger math", () => {
     calls = 0;
     const morning = () => (calls++ === 0 ? 0.005 : 0.5);
     expect(rollTreatTimeTrigger(morning)).toMatchObject({ mode: "morning", freeSpinsAwarded: 11 });
+  });
+
+  it("keeps the seeded default trigger rates in the intended band", () => {
+    const rng = mulberry32(20260714);
+    const spins = 120_000;
+    let morning = 0;
+    let nighttime = 0;
+
+    for (let i = 0; i < spins; i++) {
+      const trigger = rollTreatTimeTrigger(rng);
+      if (trigger?.mode === "morning") morning++;
+      if (trigger?.mode === "nighttime") nighttime++;
+    }
+
+    const morningRate = morning / spins;
+    const nighttimeRate = nighttime / spins;
+    const combinedRate = (morning + nighttime) / spins;
+    expect(morningRate).toBeGreaterThan(TREAT_TIME_TRIGGER_RATES.morning * 0.75);
+    expect(morningRate).toBeLessThan(TREAT_TIME_TRIGGER_RATES.morning * 1.25);
+    expect(nighttimeRate).toBeGreaterThan(TREAT_TIME_TRIGGER_RATES.nighttime * 0.75);
+    expect(nighttimeRate).toBeLessThan(TREAT_TIME_TRIGGER_RATES.nighttime * 1.25);
+    expect(combinedRate).toBeGreaterThan((1 / 75) * 0.75);
+    expect(combinedRate).toBeLessThan((1 / 75) * 1.25);
   });
 });
 
