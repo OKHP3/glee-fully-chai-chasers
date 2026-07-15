@@ -8,28 +8,38 @@
 
 Joey and Phoebe are ready. The chai chase is on.
 
-Glee-fully Chai Chasers is a free, original, mobile-first browser game of cascades, cats, iced chai, butterflies, and retro-bright midnight sparkle. It is made for Glee with fictional Glee-coins only—no purchases, accounts, ads, or cash-out.
+Glee-fully Chai Chasers is a free, original, mobile-first browser game of cascades, cats, iced chai, butterflies, and retro-bright midnight sparkle. Joey and Phoebe lead the Chai Chase through music, books, aurora, and other original keepsakes. It is made for Glee with fictional Glee-coins only—no purchases, accounts, ads, or cash-out.
 
-## On the board
+## In the current build
 
-The main game is a five-reel, four-row cascade board with 25 fixed paylines. Tap **SPARKLE!** to start a Chai Chase: winning symbols beam up, the reels settle, and the next cascade begins.
+The main game is a five-reel, four-row cascade board with 40 fixed paylines. Tap **SPARKLE!** to start a Chai Chase: winning symbols beam up, the reels settle, and the next cascade begins. Winning paths light up briefly, and an optional payline guide is available in Settings.
 
 - **Firefly Cascade meter:** reach four cascades in a spin to start free spins.
-- **Joey & Phoebe's Sparkle Wheel:** free-spin sessions add a wheel-selected twist to the chase.
+- **Joey & Phoebe's Sparkle Wheel:** its three current modes are *We're Multiplying*, *Keepsake Constellation*, and *Iced Chai Wild Rain*. In *We're Multiplying*, one opening-result wild can carry a ×2, ×3, ×5, or ×10 badge and applies only to the lines that use it; cascade drops never create extra multiplier wilds.
+- **Keepsake Constellation:** a giant 2×2 keepsake can hold its place through a free-spin cascade chain while the surrounding board resolves.
 - **Treat Jar and cat pop-ins:** Chicken Comets and Salmon Stars can call in Phoebe; Joey saves his stronger assist for Bougie Bites.
+- **Treat Time:** Morning and Nighttime Treat Time sessions toss cat wilds onto the board before the cascades begin.
 - **Doorbell Panic:** a matching pair of doorbells opens a cat-powered free-spin bonus.
-- **UniGlee:** the rare rainbow butterfly makes a mythic appearance; its larger multi-chapter marathon is still being tuned and tested.
+- **Bold Chai:** a matching pair of chai pumps opens a 30-second iced-chai pump scene. Every completed 12-pump cup awards 10 free spins.
+- **UniGlee:** the rare rainbow butterfly has a full-screen takeover today; its larger multi-chapter marathon is still being tuned and tested.
 
-The game keeps its balance, settings, Treat Jar, and progress on the device. It includes music and sound controls, reduced motion, accessible labels, and a reset option.
+New games begin with 500 Glee-coins and a 1-coin wager, with a friendly automatic refill when needed. The game keeps its balance, settings, Treat Jar, and progress on the device. It includes the official illustrated AskJamie perch, separate music and sound controls, reduced motion, accessible labels, and a reset option.
 
-## What is still coming
+## Still planned
 
-The Chai Chase will keep growing with the Birthday Reveal, Chai Tea Bonus shelf, daily bonus, milestone scenes, and the complete 100–500-spin UniGlee celebration. These are planned additions, not promises about the current build.
+These are approved directions, but they are not in the current build:
+
+- Birthday Reveal, daily bonus, milestone scenes, and the collection shelf.
+- The complete UniGlee marathon: 100–500 free spins across varied Joey, Phoebe, and keepsake chapters, with pause/resume, fast mode, and a summary.
+- Additional chapter-specific bonus presentation and the final music stems/mix.
+- Service-worker/offline verification, asset optimization, and the device-regression gallery.
+
+The existing Chai Tea shelf/pick-game concept is not represented as a shipped feature; Bold Chai is the current iced-chai bonus.
 
 ## Run it locally
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -41,6 +51,8 @@ npm run build
 ```
 
 The project is a Vite + TypeScript single-page app. Game math lives in `src/engine/`; the browser UI lives in `src/ui/`.
+
+Current engineering status: the production build passes. The seeded RTP simulation is intentionally left as a failing release gate after the 40-line change (93.54% measured versus the 96% ±0.5 target); it needs a simulation-backed engine retune before the project can claim release-ready math.
 
 ## Privacy and originality
 

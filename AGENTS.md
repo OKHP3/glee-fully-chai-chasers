@@ -31,8 +31,8 @@ This is one Git repository and one Vite SPA; no nested project was found in scop
 
 Implemented and integrated in the current tree:
 
-- splash/audio-unlock flow and the main five-reel × four-row, 25-payline cascade board;
-- pure-TypeScript reel, payline, cascade, specialty-wild, economy, cat-visit, Treat Jar, Doorbell Panic, Treat Time, free-spin, wheel, and Keepsake Constellation logic;
+- splash/audio-unlock flow and the main five-reel × four-row, 40-payline cascade board;
+- pure-TypeScript reel, payline, cascade, specialty-wild, economy, cat-visit, Treat Jar, Doorbell Panic, Treat Time, Bold Chai, free-spin, wheel, and Keepsake Constellation logic;
 - illustrated Joey/Phoebe presentation, cat pop-ins, Firefly Cascade meter, real post-spin resting grids, and cascade beam/drop motion;
 - UniGlee rare-event takeover presentation (the approved 100–500-spin marathon is not implemented yet);
 - original Web Audio SFX plus a 60-second synthesized base score; music chapter stems remain future work;
@@ -68,14 +68,14 @@ The engine/UI boundary is mandatory: engine code stays browser-DOM-free and test
 ```bash
 npm ci
 npm run dev       # Vite dev server, port 5000
-npm test          # Vitest; currently passes 13 files / 60 tests
-npm run build     # tsc --noEmit, then Vite production build
+npm test          # Vitest; 14 files / 79 tests, with the RTP release gate currently failing (see below)
+npm run build     # tsc --noEmit, then Vite production build; currently passes
 npm run preview   # preview the production build on port 5000
 ```
 
 CI uses Node 22, `npm ci`, tests, and the production build. The Pages workflow also checks that private folders are absent and rejects configured brand strings from `dist/`; its spec-oracle job is visible but non-blocking while the approved UniGlee math work remains incomplete.
 
-Known validation issue at this checkpoint: `npm run build` currently fails TypeScript checking at `src/engine/keepsake-constellation.test.ts:31` because a fixture still uses `treat_boogie`; the current type and implementation use `treat_bougie`. Vitest transpiles the fixture and therefore passes it. Fix that bounded test/documentation mismatch before claiming a clean production build. `npm run dev` and `npm run preview` were not run during the 2026-07-13 context pass.
+Known validation issue at this checkpoint: the seeded 200,000-spin RTP oracle in `src/engine/simulation.test.ts` currently measures **93.54%**, below the approved **96% ±0.5** target, so `npm test` has one failing test (78 passing / 79 total). This appeared after the 40-payline integration; its correction belongs to the engine owner and must be simulation-backed. Do not weaken the oracle or its threshold. `npm run build` now passes; the former `treat_boogie` test-fixture type mismatch was resolved in commit `6189af0`.
 
 ## Safe collaboration rules
 
