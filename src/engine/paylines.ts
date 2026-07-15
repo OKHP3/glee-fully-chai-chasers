@@ -55,7 +55,7 @@ export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: numbe
  * This small global tuning factor preserves the established ~96% RTP target
  * without making the doorbell itself a paying symbol.
  */
-export const PAYOUT_SCALE = 1.052864;
+export const PAYOUT_SCALE = 1.039055;
 
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */

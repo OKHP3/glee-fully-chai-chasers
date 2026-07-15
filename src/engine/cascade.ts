@@ -7,7 +7,7 @@
  * Drop-In Saucer / Double Sparkle / Facts-on-Facts) queued off wild line wins
  * with exactly one firing per dead board, per docs §5.
  */
-import type { CascadeStep, Grid, KeepsakeZone, SpecialtyWild, SpinResult, SymbolId, TreatKind, TreatTimeMode } from "./types";
+import type { CascadeStep, Grid, KeepsakeZone, SpecialtyWild, SpinArea, SpinResult, SymbolId, TreatKind, TreatTimeMode } from "./types";
 import { FREE_SPIN_LADDER } from "./types";
 import { REELS, ROWS, cascadeColumn, drawSingle, spinGrid, stripFor } from "./reels";
 import { evaluateLines, findDoorbellTrigger, isWild } from "./paylines";
@@ -156,7 +156,9 @@ export interface SpinInput {
   keepsakeZone?: KeepsakeZone;
   /** Bonus rounds suppress standard-spin-only doorbell events. */
   allowDoorbells?: boolean;
-  /** Free-spin rounds opt out; base spins use the either-mode cadence. */
+  /** Treat Time is eligible only while resolving on the primary game board. */
+  spinArea?: SpinArea;
+  /** Additional opt-out for callers that intentionally suppress the feature. */
   allowTreatTimeBonus?: boolean;
   treatTimeMode?: TreatTimeMode | "either";
   /** Separate stream keeps the established cascade/RTP stream stable. */
@@ -176,6 +178,7 @@ export function spin({
   startingGrid,
   keepsakeZone: inputKeepsakeZone,
   allowDoorbells = true,
+  spinArea = "main",
   allowTreatTimeBonus = true,
   treatTimeMode = "either",
   treatTimeRng,
@@ -275,7 +278,7 @@ export function spin({
   const ladderAward = freeSpinsForCascades(cascades);
   // Keep this draw at the end of the spin so adding Treat Time does not
   // perturb the established cascade/RTP simulation stream.
-  const treatTimeBonus = allowTreatTimeBonus && treatTimeRng
+  const treatTimeBonus = spinArea === "main" && allowTreatTimeBonus && treatTimeRng
     ? rollTreatTimeTrigger(treatTimeRng, treatTimeMode)
     : undefined;
   const doubleSparkleApplied = doubleSparkleActive && ladderAward > 0;

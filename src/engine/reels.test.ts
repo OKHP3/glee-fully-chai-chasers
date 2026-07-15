@@ -31,9 +31,9 @@ describe("spinGrid", () => {
   });
 
   it("uses the requested independent reel-specific doorbell odds", () => {
-    expect(DOORBELL_REEL_ONE_RATE).toBeCloseTo(1 / 13);
-    expect(DOORBELL_REEL_TWO_RATE).toBeCloseTo(1 / 23);
-    expect(DOORBELL_REEL_ONE_RATE * DOORBELL_REEL_TWO_RATE).toBeCloseTo(1 / 299);
+    expect(DOORBELL_REEL_ONE_RATE).toBeCloseTo(1 / 17);
+    expect(DOORBELL_REEL_TWO_RATE).toBeCloseTo(1 / 30);
+    expect(DOORBELL_REEL_ONE_RATE * DOORBELL_REEL_TWO_RATE).toBeCloseTo(1 / 510);
   });
 
   it("suppresses doorbell events for bonus grids", () => {

@@ -17,8 +17,8 @@ export const REELS = 5;
 export const ROWS = 4;
 
 /** Doorbells use independent reel-specific appearance rates. */
-export const DOORBELL_REEL_ONE_RATE = 1 / 13;
-export const DOORBELL_REEL_TWO_RATE = 1 / 23;
+export const DOORBELL_REEL_ONE_RATE = 1 / 17;
+export const DOORBELL_REEL_TWO_RATE = 1 / 30;
 
 function repeat(symbol: SymbolId, count: number): SymbolId[] {
   return new Array(count).fill(symbol) as SymbolId[];
@@ -128,7 +128,7 @@ export function spinGrid(rng: Rng, includeDoorbells = true): Grid {
   // Doorbell Panic is deliberately a landing event rather than a strip
   // weight: this preserves the validated paytable/RTP while keeping the two
   // doorbells visible as true blockers once they land. The independent
-  // 1-in-13 and 1-in-23 rolls produce a paired trigger about once per 299
+  // 1-in-17 and 1-in-30 rolls produce a paired trigger about once per 510
   // spins, while allowing each reel to show its own blocker on its requested
   // cadence.
   if (includeDoorbells) {

@@ -13,10 +13,10 @@ Approved bounded bonus amendment from Jamie. This document complements the canon
 
 ### Discoverability tuning — 2026-07-13
 
-- The reel-one blocker lands at approximately 1 in 13 base spins.
-- The reel-two blocker lands independently at approximately 1 in 23 base spins.
-- The paired trigger is therefore approximately 1 in 299 base spins, which is the requested ~1 in 300 frequency.
-- A player has approximately a 1 in 8.5 chance to see at least one doorbell on a base spin.
+- The reel-one blocker lands at approximately 1 in 17 base spins.
+- The reel-two blocker lands independently at approximately 1 in 30 base spins.
+- The paired trigger is therefore approximately 1 in 510 base spins, which is the requested ~1 in 500 frequency.
+- A player has approximately a 1 in 11.1 chance to see at least one doorbell on a base spin.
 - Because these blockers now land regularly, the paytable carries a small global compensation factor so the validated overall RTP remains approximately 96%; the doorbell itself still pays nothing.
 
 ## Implementation boundary
