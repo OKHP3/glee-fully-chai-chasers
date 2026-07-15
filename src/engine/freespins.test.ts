@@ -129,16 +129,37 @@ describe("free spin rounds", () => {
 });
 
 describe("free spin session", () => {
+  it("adds three separate ten-spin retriggers to the playable bank", () => {
+    const session = runFreeSpinSession(mulberry32(519), "multiplying", 1, 67);
+    const retriggerRounds = session.rounds.filter((round) => round.freeSpinsAwarded > 0);
+
+    expect(session.initialSpins).toBe(67);
+    expect(retriggerRounds.map((round) => round.freeSpinsAwarded)).toEqual([10, 10, 10]);
+    expect(session.retriggers).toBe(3);
+    expect(session.retriggerSpins).toBe(30);
+    expect(session.totalSpins).toBe(97);
+    expect(session.rounds).toHaveLength(97);
+    expect(session.rounds[session.rounds.length - 1]?.spinsRemaining).toBe(0);
+  });
+
   it("terminates and accounts for retriggers extending the session", () => {
     const rng = mulberry32(99);
     const session = runFreeSpinSession(rng, "multiplying", 1, 8);
+    const awardedByRounds = session.rounds.reduce((sum, round) => sum + round.freeSpinsAwarded, 0);
     expect(session.rounds.length).toBeGreaterThanOrEqual(8);
-    expect(session.rounds.length).toBe(8 + session.rounds.filter((r) => r.freeSpinsAwarded > 0).reduce((s, r) => s + r.freeSpinsAwarded, 0));
+    expect(session.initialSpins).toBe(8);
+    expect(session.retriggerSpins).toBe(awardedByRounds);
+    expect(session.totalSpins).toBe(8 + awardedByRounds);
+    expect(session.rounds.length).toBe(session.totalSpins);
+    expect(session.rounds[session.rounds.length - 1]?.spinsRemaining).toBe(0);
     expect(session.totalWin).toBeGreaterThanOrEqual(0);
   });
 
   it("with zero spins awarded, runs zero rounds", () => {
     const session = runFreeSpinSession(mulberry32(1), "chai_back", 1, 0);
+    expect(session.initialSpins).toBe(0);
+    expect(session.retriggerSpins).toBe(0);
+    expect(session.totalSpins).toBe(0);
     expect(session.rounds.length).toBe(0);
     expect(session.totalWin).toBe(0);
   });

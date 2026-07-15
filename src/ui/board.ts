@@ -25,7 +25,7 @@ import {
 import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
 import { addTreat, consumeForVisit } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
-import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinRoundResult, type WheelWedge } from "../engine/freespins";
+import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinSessionResult, type WheelWedge } from "../engine/freespins";
 import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState } from "../state";
 import {
@@ -744,11 +744,11 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
 /** Bold Chai awards enter the existing free-spin session without the wheel. */
 async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
   const session = runFreeSpinSession(mulberry32(productionSeed()), "chai_back", betPerLine(state.bet), spinsAwarded, { allowChaiStorm: false });
-  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  await playFreeSpinSession(root, state, session);
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
-  await showBonusSummary(root, session.totalWin, session.retriggers);
+  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
 }
@@ -984,7 +984,7 @@ async function runTreatTimeBonus(
 
   const rng = mulberry32(productionSeed());
   const session = runFreeSpinSession(rng, wedge, betPerLine(state.bet), spinsAwarded);
-  await playTreatTimeOnMainBoard(root, state, mode, session.rounds);
+  await playTreatTimeOnMainBoard(root, state, mode, session);
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
@@ -993,7 +993,7 @@ async function runTreatTimeBonus(
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
-  setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins${session.retriggers > 0 ? ` · ${session.retriggers} retrigger${session.retriggers > 1 ? "s" : ""}` : ""}`);
+  setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins · ${session.totalSpins} spins${session.retriggers > 0 ? ` · ${session.retriggers} retrigger${session.retriggers > 1 ? "s" : ""}` : ""}`);
 }
 
 function showTreatTimeEntry(root: HTMLElement, mode: TreatTimeMode, spinsAwarded: number): Promise<void> {
@@ -1023,7 +1023,7 @@ async function playTreatTimeOnMainBoard(
   root: HTMLElement,
   state: GameState,
   mode: TreatTimeMode,
-  rounds: FreeSpinRoundResult[],
+  session: FreeSpinSessionResult,
 ): Promise<void> {
   const grid = root.querySelector<HTMLDivElement>("#reel-grid");
   const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
@@ -1033,8 +1033,11 @@ async function playTreatTimeOnMainBoard(
 
   shell?.classList.add("treat-time-main-mode");
   try {
-    for (const [roundIndex, round] of rounds.entries()) {
-      status.textContent = `${mode === "nighttime" ? "Nighttime" : "Morning"} Treat Time · Spin ${roundIndex + 1} of ${rounds.length}`;
+    for (const [roundIndex, round] of session.rounds.entries()) {
+      const totalBeforeRound = roundIndex === 0
+        ? session.initialSpins
+        : roundIndex + (session.rounds[roundIndex - 1].spinsRemaining ?? session.rounds.length - roundIndex);
+      status.textContent = `${mode === "nighttime" ? "Nighttime" : "Morning"} Treat Time · Spin ${roundIndex + 1} of ${totalBeforeRound}`;
 
       for (const [stepIndex, step] of round.steps.entries()) {
         grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
@@ -1060,7 +1063,8 @@ async function playTreatTimeOnMainBoard(
       }
 
       if (round.freeSpinsAwarded > 0) {
-        status.textContent = `Treat Time retrigger! +${round.freeSpinsAwarded} more spins!`;
+        const totalAfterRound = roundIndex + 1 + (round.spinsRemaining ?? 0);
+        status.textContent = `Treat Time retrigger! +${round.freeSpinsAwarded} more spins! · ${totalAfterRound} total spins`;
         playBonusFanfare();
       } else if (round.totalWin > 0) {
         status.textContent = `Treat Time · +${round.totalWin.toLocaleString()} coins`;
@@ -1079,13 +1083,13 @@ async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAw
   const wedge = await showWheelScreen(root, rng);
   const session = runFreeSpinSession(rng, wedge, betPerLine(state.bet), spinsAwarded);
 
-  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  await playFreeSpinSession(root, state, session);
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
 
-  await showBonusSummary(root, session.totalWin, session.retriggers);
+  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
@@ -1095,13 +1099,13 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
   const rng = mulberry32(productionSeed());
   const session = runFreeSpinSession(rng, "doorbell_panic", betPerLine(state.bet), spinsAwarded);
 
-  await playFreeSpinSession(root, state, session.wedge, session.rounds);
+  await playFreeSpinSession(root, state, session);
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
 
-  await showBonusSummary(root, session.totalWin, session.retriggers);
+  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
@@ -1150,9 +1154,9 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
 async function playFreeSpinSession(
   root: HTMLElement,
   state: GameState,
-  wedge: WheelWedge,
-  rounds: FreeSpinRoundResult[],
+  session: FreeSpinSessionResult,
 ): Promise<void> {
+  const { wedge, rounds } = session;
   const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
   const standardGrid = root.querySelector<HTMLDivElement>("#reel-grid");
   if (!cabinet || !standardGrid) return;
@@ -1173,7 +1177,7 @@ async function playFreeSpinSession(
       <span class="free-spins-panel-kicker">${displayWedgeLabel}</span>
       <strong>${title}</strong>
     </div>
-    <div class="free-spins-panel-stats" aria-live="polite">Spin <span id="fs-index">1</span> of <span id="fs-total">${rounds.length}</span> · Round win: <span id="fs-round-win">0</span></div>
+    <div class="free-spins-panel-stats" aria-live="polite">Spin <span id="fs-index">1</span> of <span id="fs-total">${session.initialSpins}</span> · Round win: <span id="fs-round-win">0</span></div>
     <div id="fs-grid" class="reel-grid"></div>
     <div id="fs-status" class="status-line" aria-live="polite"></div>
   `;
@@ -1196,7 +1200,10 @@ async function playFreeSpinSession(
       const round = rounds[r];
       let doorbellRang = false;
       indexEl.textContent = String(r + 1);
-      totalEl.textContent = String(rounds.length);
+      const totalBeforeRound = r === 0
+        ? session.initialSpins
+        : r + (rounds[r - 1].spinsRemaining ?? rounds.length - r);
+      totalEl.textContent = String(totalBeforeRound);
       roundWinEl.textContent = round.totalWin.toLocaleString();
       if (round.multiplierWild) {
         statusEl.textContent = `×${round.multiplierWild.multiplier} wild on reel ${round.multiplierWild.position[0] + 1}!`;
@@ -1242,7 +1249,9 @@ async function playFreeSpinSession(
         statusEl.textContent = "";
       }
       if (round.freeSpinsAwarded > 0) {
-        statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins!`;
+        const totalAfterRound = r + 1 + (round.spinsRemaining ?? 0);
+        totalEl.textContent = String(totalAfterRound);
+        statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins! · ${totalAfterRound} total spins`;
         playBonusFanfare();
         await sleep(800);
       }
@@ -1356,13 +1365,13 @@ function treatTimeHandSvg(): string {
   </svg>`;
 }
 
-function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number): Promise<void> {
+function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number, totalSpins: number): Promise<void> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="text-2xl font-bold">Free Spins Complete!</h2>
-      <p class="text-lg">You won ${totalWin.toLocaleString()} coins${retriggers > 0 ? ` (with ${retriggers} retrigger${retriggers > 1 ? "s" : ""}!)` : ""}</p>
+      <p class="text-lg">You won ${totalWin.toLocaleString()} coins across ${totalSpins} free spins${retriggers > 0 ? ` (with ${retriggers} retrigger${retriggers > 1 ? "s" : ""}!)` : ""}</p>
       <button id="bonus-continue" class="sparkle-btn mt-4">Continue</button>
     `;
     const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;

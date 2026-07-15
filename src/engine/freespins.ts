@@ -100,6 +100,8 @@ export interface FreeSpinRoundResult extends SpinResult {
   treatTimeMode?: TreatTimeMode;
   /** Present only on the first round of the actual Wild Chai Storm session. */
   chaiRain?: ChaiRainResult;
+  /** Remaining spins after this round, including any retrigger just awarded. */
+  spinsRemaining?: number;
 }
 
 function panicStartingGrid(rng: Rng): { grid: Grid; wildsAdded: number } {
@@ -189,6 +191,9 @@ export function spinFreeRound(
 export interface FreeSpinSessionResult {
   wedge: WheelWedge;
   rounds: FreeSpinRoundResult[];
+  initialSpins: number;
+  retriggerSpins: number;
+  totalSpins: number;
   totalWin: number;
   bestCascade: number;
   retriggers: number;
@@ -207,9 +212,11 @@ export function runFreeSpinSession(
   spinsAwarded: number,
   options: FreeSpinSessionOptions = {},
 ): FreeSpinSessionResult {
-  let remaining = spinsAwarded;
+  const initialSpins = Math.max(0, spinsAwarded);
+  let remaining = initialSpins;
   const rounds: FreeSpinRoundResult[] = [];
   let retriggers = 0;
+  let retriggerSpins = 0;
   let totalWin = 0;
   let bestCascade = 0;
 
@@ -224,10 +231,12 @@ export function runFreeSpinSession(
     if (round.freeSpinsAwarded > 0) {
       remaining += round.freeSpinsAwarded;
       retriggers++;
+      retriggerSpins += round.freeSpinsAwarded;
     }
+    rounds[rounds.length - 1] = { ...round, spinsRemaining: remaining };
   }
 
-  return { wedge, rounds, totalWin, bestCascade, retriggers };
+  return { wedge, rounds, initialSpins, retriggerSpins, totalSpins: initialSpins + retriggerSpins, totalWin, bestCascade, retriggers };
 }
 
 export function wheelWedgeLabel(wedge: WheelWedge): string {
