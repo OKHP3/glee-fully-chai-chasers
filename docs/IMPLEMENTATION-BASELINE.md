@@ -45,7 +45,8 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - `src/ui/board.ts`
 - `src/ui/symbols.ts`
 - `src/style.css`
-- `public/assets/glee-symbol-atlas.png`
+- `public/assets/atlases/standard-symbol-atlas.{png,webp}` and `public/assets/atlases/special-symbol-atlas.{png,webp}`
+- `asset-source/glee-symbol-atlas.png` (source master for reproducible atlas generation)
 - `public/assets/joey-phoebe-wheel.png`
 - `public/assets/joey-phoebe-wilds.png`
 - `docs/DECISION-LOG.md` decisions S17-S23

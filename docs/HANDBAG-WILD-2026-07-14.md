@@ -5,7 +5,8 @@
 The Handbag Wild is a rare, non-cat wild inspired by Glee's everyday love of compact crossbody handbags. The shipped art is an original, generic satchel illustration: no person, logo, monogram, brand pattern, or product trade dress is used.
 
 - Engine ID: `wild_handbag`
-- Asset: `public/assets/handbag-wild.png`
+- Source master: `asset-source/handbag-wild.png`
+- Runtime placement: `public/assets/atlases/special-symbol-atlas.{png,webp}`
 - Placement: one candidate on reel 5 only; the candidate lands as the special wild 85% of the time, keeping it a rare late-reel surprise.
 - Multiplier roll: ×3 (55%), ×5 (35%), or ×10 (10%).
 - Payout: the multiplier scales the complete winning line payout, so a ×3 handbag contributes three times the line-bet-scaled value. It never creates a second currency or a cash-like award.
@@ -20,4 +21,4 @@ The tuning is intentionally bounded: the late-reel location, 85% landing gate, a
 
 ## Provenance
 
-Generated with the built-in image workflow on 2026-07-14 from an original game-symbol prompt, then processed locally with the project image-generation skill's chroma-key removal helper. The final PNG has an alpha background and is the only handbag-related file shipped; the supplied reference photos are not copied into the repository or bundle.
+Generated with the built-in image workflow on 2026-07-14 from an original game-symbol prompt, then processed locally with the project image-generation skill's chroma-key removal helper. The source master has an alpha background and is kept outside `public/`; the generated special atlas is the only handbag art shipped. The supplied reference photos are not copied into the repository or bundle.

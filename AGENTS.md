@@ -54,6 +54,7 @@ src/audio/          original Web Audio synthesis, base music loop, and SFX
 src/state.ts        versioned localStorage persistence and reset
 src/main.ts         splash entry point and board bootstrap; #board is dev-only QA bypass
 public/assets/      shipped raster art
+asset-source/       atlas-only source masters used by the reproducible asset generator
 public/icons/       favicon, touch, PWA, and maskable icons
 index.html          metadata, manifest, and constrained reach-measurement tag
 .github/workflows/  CI and GitHub Pages deployment

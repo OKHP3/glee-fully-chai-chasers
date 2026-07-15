@@ -13,12 +13,15 @@ const app = document.querySelector<HTMLDivElement>("#app")!;
 function renderSplash(): void {
   app.innerHTML = `
     <div class="chai-splash">
-      <img
-        class="chai-splash-art"
-        src="${import.meta.env.BASE_URL}assets/chai-chase-splash.png"
-        alt=""
-        aria-hidden="true"
-      />
+      <picture>
+        <source type="image/webp" srcset="${import.meta.env.BASE_URL}assets/optimized/chai-chase-splash.webp" />
+        <img
+          class="chai-splash-art"
+          src="${import.meta.env.BASE_URL}assets/chai-chase-splash.png"
+          alt=""
+          aria-hidden="true"
+        />
+      </picture>
       <div class="chai-splash-copy">
         <h1 class="chai-splash-title">Glee-fully Chai Chasers</h1>
         <p class="chai-splash-subtitle">Joey and Phoebe are ready. The chai chase is on.</p>

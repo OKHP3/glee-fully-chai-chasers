@@ -86,6 +86,14 @@ function publicAsset(fileName: string): string {
   return `${import.meta.env.BASE_URL}assets/${fileName}`;
 }
 
+function optimizedAsset(fileName: string): string {
+  return publicAsset(`optimized/${fileName.replace(/\.(png|jpe?g)$/i, ".webp")}`);
+}
+
+function publicPicture(fileName: string, className: string, alt = ""): string {
+  return `<picture class="${className}"><source type="image/webp" srcset="${optimizedAsset(fileName)}" /><img src="${publicAsset(fileName)}" alt="${alt}" /></picture>`;
+}
+
 function boldChaiAsset(fileName: string): string {
   return publicAsset(`bold-chai/${fileName}`);
 }
@@ -209,7 +217,7 @@ export function renderBoard(
             ${treatJarHtml(state)}
           </div>
           <div id="askjamie-perch" aria-label="AskJamie" class="askjamie-housing">
-            <div class="askjamie-icon"><img src="${publicAsset("askjamie-avatar.jpg")}" alt="" /></div>
+            <div class="askjamie-icon">${publicPicture("askjamie-avatar.jpg", "askjamie-picture")}</div>
             <span>AskJamie</span>
           </div>
         </div>
@@ -555,6 +563,7 @@ function openPaytablePage(root: HTMLElement): void {
         ${featureCard("doorbell", "Doorbell", "A pair on the first two positions of any line begins Doorbell Panic free spins.")}
         ${featureCard("chai_pump", "Bold Chai Pump", "A same-payline pair opens the 30-second barista pump scene. Main spins only.")}
         ${featureCard("uniglee", "UniGlee", "The rare rainbow-butterfly legend begins a special Chai Chase celebration.")}
+        ${featureCard("wild_chai", "Wild Chai", "The mermaid iced-chai cup substitutes for every paying symbol and can carry a bonus multiplier.")}
       </section>
       <p class="paytable-footnote">Line values are shown with the game’s live tuning applied, so this guide always matches what the board awards.</p>
     </div>`;
@@ -976,9 +985,9 @@ function keepsakeMemoryCardLabel(card: KeepsakeMemoryViewCard): string {
 function renderKeepsakeMemoryCard(card: KeepsakeMemoryViewCard): string {
   return `<button type="button" class="keepsake-memory-card-button" data-card-index="${card.index}" aria-label="${keepsakeMemoryCardLabel(card)}">
     <span class="keepsake-memory-card${card.revealed ? " is-revealed" : ""}">
-      <span class="keepsake-card-face keepsake-card-back" aria-hidden="true"><img src="${import.meta.env.BASE_URL}assets/keepsake-memory-card-back.png" alt=""></span>
+      <span class="keepsake-card-face keepsake-card-back" aria-hidden="true">${publicPicture("keepsake-memory-card-back.png", "keepsake-card-image")}</span>
       <span class="keepsake-card-face keepsake-card-front">${symbolSvg(card.symbol)}</span>
-      <span class="keepsake-mismatch-mark" aria-hidden="true"><img src="${import.meta.env.BASE_URL}assets/keepsake-memory-mismatch-overlay.png" alt=""></span>
+      <span class="keepsake-mismatch-mark" aria-hidden="true">${publicPicture("keepsake-memory-mismatch-overlay.png", "keepsake-card-image")}</span>
     </span>
   </button>`;
 }
