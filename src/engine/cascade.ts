@@ -64,7 +64,7 @@ export function freeSpinsForCascades(cascades: number): number {
   return awarded;
 }
 
-const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe", "doorbell", "chai_pump"];
+const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe", "wild_handbag", "doorbell", "chai_pump"];
 const PERSISTENT_BLOCKERS: SymbolId[] = ["doorbell", "chai_pump"];
 
 /** Sparkle Sort: 5-11 random non-wild/non-scatter cells shatter -> forced cascade. */
@@ -226,9 +226,12 @@ export function spin({
       const multiplier = win.positions
         .map(([reel, row]) => grid[reel][row].multiplier)
         .find((value): value is NonNullable<typeof value> => value !== undefined);
-      return multiplier
-        ? { ...win, multiplier, payout: win.payout * multiplier }
-        : win;
+      const handbagMultiplier = Math.max(...win.positions.map(([reel, row]) => grid[reel][row].handbagMultiplier ?? 1));
+      const payout = multiplier ? win.payout * multiplier : win.payout;
+      if (handbagMultiplier > 1) {
+        return { ...win, ...(multiplier ? { multiplier } : {}), payout: payout * handbagMultiplier };
+      }
+      return multiplier ? { ...win, multiplier, payout } : win;
     });
 
     if (wins.length === 0) {

@@ -21,6 +21,7 @@ Status: ☐ todo · ◐ in progress · ☑ done
 | Low | butterfly hair clip, VHS tape, aurora keepsake, shared-life keepsake locket | ☑ same atlas |
 | Treats | Chicken Comets (yellow), Salmon Stars (blue), Bougie Bites (navy) | ☑ same atlas |
 | Wilds | Joey-saucer and Phoebe-saucer | ☑ `public/assets/joey-phoebe-wilds.png` |
+| Handbag Wild | Generic compact crossbody satchel; rare non-cat high-value wild | ☑ `public/assets/handbag-wild.png` |
 | Legend | UniGlee rainbow butterfly | ☑ symbol atlas |
 
 Generated source prompts were constrained to original, unbranded illustration; no private reference photo was uploaded or transformed. Engine IDs for five replaced prototype symbols remain temporarily stable so this art-only pass cannot perturb tested reel weights or payout math. The 2026-07-12 atlas revision replaced only the former Toolbox and Twelve-medallion cells.

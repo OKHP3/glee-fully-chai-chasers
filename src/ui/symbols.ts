@@ -398,6 +398,9 @@ const SYMBOL_SVG: Record<SymbolId, string> = {
   `,
     { glow: "142, 201, 255" },
   ),
+  // Rendered as a project PNG in symbolSvg; the empty entry keeps the symbol
+  // table exhaustive for TypeScript while avoiding a second inline handbag.
+  wild_handbag: "",
   uniglee: wrap(
     `
     <defs>
@@ -445,6 +448,10 @@ export function symbolSvg(id: SymbolId): string {
   if (id === "wild_joey" || id === "wild_phoebe") {
     const position = id === "wild_joey" ? "0% 50%" : "100% 50%";
     return `<span class="symbol-sprite symbol-sprite--wild" style="background-image:url('${import.meta.env.BASE_URL}assets/joey-phoebe-wilds.png');background-position:${position}" aria-hidden="true"></span>`;
+  }
+
+  if (id === "wild_handbag") {
+    return `<img class="symbol-asset symbol-asset--handbag" src="${import.meta.env.BASE_URL}assets/handbag-wild.png" alt="" aria-hidden="true" />`;
   }
 
   const position = atlasPosition[id];

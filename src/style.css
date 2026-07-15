@@ -922,6 +922,17 @@ body {
   filter: drop-shadow(0 0 8px rgba(107,214,201,.42)) drop-shadow(0 3px 4px rgba(0,0,0,.48));
 }
 
+.symbol-asset {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.symbol-asset--handbag {
+  filter: drop-shadow(0 0 8px rgba(245,213,118,.58)) drop-shadow(0 3px 4px rgba(0,0,0,.48));
+}
+
 .cat-pop-asset {
   display: block;
   width: 100%;
