@@ -64,7 +64,7 @@ export function freeSpinsForCascades(cascades: number): number {
   return awarded;
 }
 
-const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe"];
+const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe", "doorbell"];
 
 /** Sparkle Sort: 5-11 random non-wild/non-scatter cells shatter -> forced cascade. */
 function applySparkleSort(rng: Rng, grid: Grid, keepsakeZone?: KeepsakeZone): { grid: Grid; positions: Array<[number, number]> } {
@@ -92,7 +92,9 @@ function applyDropIn(rng: Rng, grid: Grid, keepsakeZone?: KeepsakeZone): Grid {
   const reel = 1 + Math.floor(rng() * (REELS - 1)); // reels 2-5 (index 1-4)
   const wild: SymbolId = rng() < 0.5 ? "wild_joey" : "wild_phoebe";
   const strip = stripFor(reel);
-  const column = grid[reel].map((cell) => ({ symbol: strip.length ? wild : cell.symbol }));
+  const column = grid[reel].map((cell) => cell.symbol === "doorbell"
+    ? { ...cell }
+    : { symbol: strip.length ? wild : cell.symbol });
   const next = grid.map((col, i) => (i === reel ? column : col));
   return keepsakeZone ? applyKeepsakeZone(next, keepsakeZone) : next;
 }
