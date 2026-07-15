@@ -74,6 +74,27 @@ describe("spin", () => {
     expect(result.freeSpinsAwarded).toBe(result.doorbellPanic?.freeSpinsAwarded);
   });
 
+  it("preserves a doorbell through Drop-In and Sparkle Sort specialty steps", () => {
+    const grid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),
+    );
+    grid[1][0] = { symbol: "doorbell" };
+
+    const fallbackRng = mulberry32(90417);
+    let forcedCalls = 0;
+    const rng = () => forcedCalls++ < 3 ? 0 : fallbackRng();
+    const result = spin({
+      rng,
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+      startingGrid: grid,
+    });
+
+    expect(result.unigleeTriggered).toBe(true);
+    expect(result.steps.every((step) => step.grid.flat().some((cell) => cell.symbol === "doorbell"))).toBe(true);
+  });
+
   it("multiplies only paylines that use the one marked wild", () => {
     const grid: Grid = Array.from({ length: 5 }, () =>
       Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),
