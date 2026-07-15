@@ -53,7 +53,7 @@ Portrait 390x844 layout, top to bottom: status bar (level + Chai Sparks meter) �
 
 ## 4. Board, symbols & paytable
 
-5 reels × 4 rows, 25 fixed paylines (classic Moolah skeleton), left-to-right evaluation, wilds substitute for all paying symbols. Bet levels: 1 / 2 / 5 / 10 / 25 / 50 Glee-coins (level 6 unlocks at player level 12).
+5 reels × 4 rows, 40 fixed paylines, left-to-right evaluation, wilds substitute for all paying symbols. Bet levels: 1 / 2 / 5 / 10 / 25 / 50 Glee-coins (level 6 unlocks at player level 12).
 
 Paytable (× line bet; tuned by simulation, these are the starting values):
 
@@ -86,7 +86,7 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 
 ## 5. Cascades, wilds & the UniGlee
 
-**Cascade loop:** evaluate 25 lines → winning symbols beam up into the saucers (float-shrink-flash, 380ms) → columns compress down → new symbols drop from the saucer bays (staggered per reel, 90ms offsets) → re-evaluate. Repeat to dead board. Each cascade tier plays a rising arpeggio one step higher — by cascade 4+ it's musical euphoria.
+**Cascade loop:** evaluate 40 lines → winning symbols beam up into the saucers (float-shrink-flash, 380ms) → columns compress down → new symbols drop from the saucer bays (staggered per reel, 90ms offsets) → re-evaluate. Repeat to dead board. Each cascade tier plays a rising arpeggio one step higher — by cascade 4+ it's musical euphoria.
 
 **Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow. Ladder: **4→7, 5→10, 6→15, 7→20, 8→50, 9→75, 10→100, 11+→200 free spins.** At meter 3 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Retriggers during free spins use the same ladder.
 

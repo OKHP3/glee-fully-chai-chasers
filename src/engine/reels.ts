@@ -61,7 +61,7 @@ function treatSegments(): SymbolId[][] {
 }
 
 /**
- * Saucer-cat wild stacks — placed as contiguous 6-7 runs on reels 2-5
+ * Saucer-cat wild stacks — placed as contiguous 5-6 runs on reels 2-5
  * (index 1-4), per docs §5. Two stacks per wild per reel keeps them rare
  * enough to feel special while making cascade chains/free-spin ladder
  * reachable (a single stack landing fully in view spans most of the window).

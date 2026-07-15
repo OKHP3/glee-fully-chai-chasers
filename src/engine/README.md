@@ -7,7 +7,7 @@ Zero DOM imports. Everything deterministic under a seeded RNG. Vitest coverage r
 | `types.ts` | Shared types, free-spin ladder, config | ☑ stub |
 | `rng.ts` | Seedable mulberry32, weighted pick | ☑ ready |
 | `reels.ts` | Reel strips (symbol weights per reel), spin → Grid, gravity refill | ☐ TODO |
-| `paylines.ts` | 25 fixed lines, left-to-right evaluation, wild substitution, paytable | ☐ TODO |
+| `paylines.ts` | 40 fixed lines, left-to-right evaluation, wild substitution, paytable | ☐ TODO |
 | `cascade.ts` | Cascade loop: evaluate → remove → refill → repeat; meter; specialty-wild queue (one per dead board, extras queue) | ☐ TODO |
 | `features.ts` | Cat visits (Phoebe any-treat / Joey bougie-only, pity weighting), UniGlee package, wheel modifiers, Chai Bonus pick math | ☐ TODO |
 | `economy.ts` | Balance/bet/win in Sparks, automatic refill trigger, XP/levels, daily bonus gating | ☐ TODO |

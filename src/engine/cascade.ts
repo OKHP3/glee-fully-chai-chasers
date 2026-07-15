@@ -1,5 +1,5 @@
 /**
- * Cascade loop: evaluate 25 lines -> remove winners -> gravity refill ->
+ * Cascade loop: evaluate 40 lines -> remove winners -> gravity refill ->
  * repeat to a dead board. Pure TS, zero DOM. Spec: docs/DESIGN-SPEC.md §5.
  *
  * Round 2: real reel strips w/ wild stacking (reels.ts), UniGlee gated as a

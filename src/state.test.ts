@@ -48,6 +48,7 @@ describe("game state persistence", () => {
       bestCascade: 3,
       spinsSincePopIn: 2,
       soundOn: true,
+      paylineGuideOn: true,
       musicVolume: 0.72,
       sfxVolume: 0.82,
       theme: "dark",
@@ -59,6 +60,7 @@ describe("game state persistence", () => {
     expect(loadGameState().fireflyMeter).toBe(3);
     expect(loadGameState().theme).toBe("dark");
     expect(loadGameState().musicVolume).toBe(0.72);
+    expect(loadGameState().paylineGuideOn).toBe(true);
   });
 
   it("migrates the old Boogie Bites save key without losing treats", () => {

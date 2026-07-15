@@ -14,7 +14,7 @@ import type { CascadeStep, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } 
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
-import { PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
+import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
 import { addTreat, consumeForVisit } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
 import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinRoundResult, type WheelWedge } from "../engine/freespins";
@@ -123,7 +123,7 @@ export function renderBoard(
           <span class="ornament ornament-bl">${miniStar()}</span>
           <span class="ornament ornament-br">${miniStar()}</span>
           <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
-            ${renderGridHtml(settledGrid)}
+            ${renderGridHtml(settledGrid, undefined, state.paylineGuideOn)}
           </div>
         </main>
 
@@ -225,6 +225,8 @@ function treatJarHtml(state: GameState): string {
 export function renderGridHtml(
   grid: SpinResult["steps"][number]["grid"],
   keepsakeZone?: SpinResult["steps"][number]["keepsakeZone"],
+  showGuide = false,
+  winningLineIndices: readonly number[] = [],
 ): string {
   let html = "";
   for (let reel = 0; reel < REELS; reel++) {
@@ -246,7 +248,13 @@ export function renderGridHtml(
       </div>
     </div>`;
   }
-  return html;
+  const winning = new Set(winningLineIndices);
+  const paths = PAYLINES.map((line, lineIndex) => {
+    const points = line.map((row, reel) => `${10 + reel * 20},${12.5 + row * 25}`);
+    const winningClass = winning.has(lineIndex) ? " is-winning" : "";
+    return `<path class="payline-path${showGuide ? " is-guide" : ""}${winningClass}" data-line-index="${lineIndex}" d="M${points.join(" L")}" pathLength="1"/>`;
+  }).join("");
+  return `${html}<svg class="payline-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${paths}</svg>`;
 }
 
 function setStatus(root: HTMLElement, message: string): void {
@@ -344,6 +352,11 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
         <label class="sound-switch"><input id="reduced-motion-toggle" type="checkbox" ${state.reducedMotion ? "checked" : ""}/><span aria-hidden="true"></span><b>${state.reducedMotion ? "On" : "Off"}</b></label>
       </section>
 
+      <section class="settings-card settings-card--compact">
+        <div><h3>Payline guide</h3><p class="settings-help">Show all 40 paylines faintly on the resting board. Winning lines still glow after every win.</p></div>
+        <label class="sound-switch"><input id="payline-guide-toggle" type="checkbox" ${state.paylineGuideOn ? "checked" : ""}/><span aria-hidden="true"></span><b>${state.paylineGuideOn ? "On" : "Off"}</b></label>
+      </section>
+
       <section class="settings-card about-card">
         <h3>About this gift</h3>
         <p>A cozy, original Chai Chase for Glee — fictional Glee-coins only, with no purchases or ads. Basic reach measurement helps Jamie understand how the gift is finding people.</p>
@@ -393,6 +406,17 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
     saveGameState(state);
   });
 
+  const paylineGuide = page.querySelector<HTMLInputElement>("#payline-guide-toggle")!;
+  paylineGuide.addEventListener("change", () => {
+    state.paylineGuideOn = paylineGuide.checked;
+    root.querySelectorAll<SVGPathElement>(".payline-path").forEach((path) => {
+      path.classList.toggle("is-guide", state.paylineGuideOn);
+    });
+    const guideStatus = paylineGuide.parentElement?.querySelector("b");
+    if (guideStatus) guideStatus.textContent = state.paylineGuideOn ? "On" : "Off";
+    saveGameState(state);
+  });
+
   page.querySelector<HTMLButtonElement>("#settings-reset")?.addEventListener("click", () => {
     if (confirm("Start fresh? This clears your Chai Chase progress and settings on this device.")) {
       resetAll();
@@ -437,7 +461,7 @@ function openPaytablePage(root: HTMLElement): void {
       <span class="page-top-spacer" aria-hidden="true"></span>
     </div>
     <div class="game-page-scroll">
-      <section class="paytable-intro"><strong>25 fixed lines</strong><span>Match 3, 4, or 5 symbols from the left. Values are × your line bet.</span></section>
+      <section class="paytable-intro"><strong>40 fixed lines</strong><span>Match 3, 4, or 5 symbols from the left. Values are × your line bet.</span></section>
       <section class="paytable-grid" aria-label="Paying symbols">${PAYTABLE_SYMBOLS.map(paytableCard).join("")}</section>
       <h3 class="page-section-title">Special symbols</h3>
       <section class="feature-symbol-grid">
@@ -581,7 +605,7 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
         return;
       }
       const step = steps[i];
-      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
       if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
         playDoorbellRing();
         doorbellRang = true;
@@ -829,7 +853,7 @@ async function playTreatTimeOnMainBoard(
       status.textContent = `${mode === "nighttime" ? "Nighttime" : "Morning"} Treat Time · Spin ${roundIndex + 1} of ${rounds.length}`;
 
       for (const [stepIndex, step] of round.steps.entries()) {
-        grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
+        grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
         if (stepIndex === 0 && round.treatTimeWilds?.length) {
           await animateTreatTimeCast(cabinet, grid, round.treatTimeWilds);
         }
@@ -990,7 +1014,7 @@ async function playFreeSpinSession(
     }
 
     for (const [stepIndex, step] of round.steps.entries()) {
-      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone);
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
       if (stepIndex === 0 && round.treatTimeWilds?.length) {
         await animateTreatTimeCast(
           overlay.querySelector<HTMLElement>(".treat-time-cabinet")!,
