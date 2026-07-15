@@ -79,6 +79,7 @@ body {
   user-select: none;
   filter: saturate(1.02) contrast(1.02);
 }
+.chai-splash > picture { position: absolute; inset: 0; z-index: 0; }
 
 .chai-splash-copy {
   position: relative;
@@ -900,6 +901,7 @@ body {
   object-fit: cover;
   transform: scale(1.08);
 }
+.askjamie-picture { display: block; width: 100%; height: 100%; }
 
 .status-line {
   min-height: 1.4rem;
@@ -1172,9 +1174,22 @@ body {
   transform-origin: center;
 }
 
+.symbol-sprite--atlas {
+  /* Atlas cells are fixed and padded at build time; never scale the art to
+     compensate for the old fractional 1254px source grid. */
+  background-size: 400% 400%;
+  background-repeat: no-repeat;
+}
+
 .symbol-sprite--wild {
   background-size: 200% 100%;
   filter: drop-shadow(0 0 8px rgba(107,214,201,.42)) drop-shadow(0 3px 4px rgba(0,0,0,.48));
+}
+
+.symbol-picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .symbol-asset {
@@ -1182,6 +1197,10 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.symbol-asset--vector {
+  filter: drop-shadow(0 0 6px rgba(231,126,157,.45)) drop-shadow(0 3px 4px rgba(0,0,0,.48));
 }
 
 .symbol-asset--handbag {
@@ -1451,6 +1470,7 @@ body {
   border-radius: 28px;
   box-shadow: 0 20px 54px rgba(0,0,0,.55), 0 0 42px rgba(107,214,201,.14);
 }
+.wheel-hero-picture { position: absolute; inset: 0; z-index: 2; display: block; }
 .wheel-glow-ring {
   position: absolute;
   z-index: 0;

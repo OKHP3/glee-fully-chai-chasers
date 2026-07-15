@@ -39,6 +39,7 @@ jobs:
       - run: npm test
         env:
           SKIP_ORACLE: "1"
+      - run: npm run validate:assets
       - run: npm run build
 
       - name: Brand-string gate — shipped bundle must be clean
