@@ -401,6 +401,8 @@ const SYMBOL_SVG: Record<SymbolId, string> = {
   // Rendered as a project PNG in symbolSvg; the empty entry keeps the symbol
   // table exhaustive for TypeScript while avoiding a second inline handbag.
   wild_handbag: "",
+  // Rendered through the shipped mermaid-tumbler atlas in symbolSvg().
+  wild_chai: "",
   uniglee: wrap(
     `
     <defs>
@@ -452,6 +454,9 @@ export function symbolSvg(id: SymbolId): string {
 
   if (id === "wild_handbag") {
     return `<img class="symbol-asset symbol-asset--handbag" src="${import.meta.env.BASE_URL}assets/handbag-wild.png" alt="" aria-hidden="true" />`;
+  }
+  if (id === "wild_chai") {
+    return `<span class="symbol-sprite symbol-sprite--chai-wild" style="background-image:url('${import.meta.env.BASE_URL}assets/glee-symbol-atlas.png');background-position:0% 0%" aria-hidden="true"></span>`;
   }
 
   const position = atlasPosition[id];

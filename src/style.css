@@ -318,6 +318,145 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
+/* One-shot Wild Chai Storm                                           */
+/* ------------------------------------------------------------------ */
+
+.chai-storm-splash {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(245, 213, 118, .34), transparent 32%),
+    radial-gradient(ellipse at 50% 58%, rgba(211, 91, 45, .42), transparent 62%),
+    linear-gradient(160deg, rgba(68, 29, 58, .96), rgba(28, 20, 64, .98));
+  animation: chai-storm-splash-in 260ms ease-out both;
+}
+.chai-storm-copy {
+  position: relative;
+  z-index: 2;
+  width: min(88vw, 430px);
+  padding: 22px 18px 20px;
+  border: 2px solid rgba(255, 244, 224, .84);
+  border-radius: 24px;
+  background: linear-gradient(160deg, rgba(104, 48, 55, .88), rgba(45, 31, 76, .94));
+  box-shadow: 0 0 28px rgba(245, 213, 118, .48), inset 0 0 24px rgba(211, 91, 45, .26);
+  text-align: center;
+  transform: rotate(-1.5deg);
+  animation: chai-storm-copy-pop 640ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.chai-storm-kicker {
+  color: var(--cc-mint);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.chai-storm-copy h2 {
+  margin: 5px 0 0;
+  color: #fff4e0;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(30px, 9vw, 54px);
+  font-weight: 900;
+  letter-spacing: .045em;
+  line-height: .95;
+  text-shadow: 0 3px 0 #7a2f16, 0 0 18px rgba(245, 213, 118, .82);
+}
+.chai-storm-copy p {
+  margin: 9px 0 0;
+  color: var(--cc-butter);
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: .05em;
+}
+.chai-storm-copy small {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255, 244, 224, .88);
+  font-size: 12px;
+  font-weight: 700;
+}
+.chai-storm-drops,
+.chai-storm-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.chai-storm-drop {
+  position: absolute;
+  top: -12%;
+  left: var(--drop-left);
+  width: var(--drop-size);
+  height: calc(var(--drop-size) * 1.55);
+  border-radius: 70% 70% 65% 65%;
+  background: linear-gradient(150deg, #fff4e0, #f5d576 45%, #d35b2d);
+  box-shadow: 0 0 10px rgba(245, 213, 118, .8);
+  opacity: .86;
+  transform: rotate(12deg);
+  animation: chai-storm-drop-fall var(--drop-duration) ease-in var(--drop-delay) both;
+}
+.chai-storm-sparkles i {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff4e0;
+  box-shadow: 0 0 11px 3px rgba(245, 213, 118, .9);
+  animation: chai-storm-sparkle 980ms ease-in-out infinite alternate;
+}
+.chai-storm-sparkles i:nth-child(1) { top: 18%; left: 17%; }
+.chai-storm-sparkles i:nth-child(2) { top: 27%; left: 76%; animation-delay: 120ms; }
+.chai-storm-sparkles i:nth-child(3) { top: 72%; left: 12%; animation-delay: 220ms; }
+.chai-storm-sparkles i:nth-child(4) { top: 76%; left: 84%; animation-delay: 340ms; }
+.chai-storm-sparkles i:nth-child(5) { top: 13%; left: 52%; animation-delay: 440ms; }
+.chai-storm-sparkles i:nth-child(6) { top: 86%; left: 53%; animation-delay: 560ms; }
+.chai-wild-cell {
+  position: relative;
+  background: linear-gradient(160deg, rgba(211, 91, 45, .28), rgba(245, 213, 118, .18));
+  box-shadow: inset 0 0 0 2px rgba(245, 213, 118, .62), 0 0 12px 2px rgba(211, 91, 45, .46);
+}
+.chai-wild-badge {
+  position: absolute;
+  right: 3px;
+  bottom: 2px;
+  padding: 1px 3px;
+  border-radius: 4px;
+  background: rgba(45, 31, 76, .84);
+  color: #fff4e0;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+.chai-wild-conversion {
+  animation: chai-wild-conversion 520ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+@keyframes chai-storm-splash-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes chai-storm-copy-pop {
+  0% { transform: scale(.58) rotate(-8deg); opacity: 0; }
+  72% { transform: scale(1.05) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-1.5deg); opacity: 1; }
+}
+@keyframes chai-storm-drop-fall {
+  0% { transform: translateY(-10vh) rotate(12deg) scale(.62); opacity: 0; }
+  18% { opacity: .9; }
+  100% { transform: translateY(122vh) rotate(24deg) scale(1); opacity: 0; }
+}
+@keyframes chai-storm-sparkle {
+  from { transform: scale(.35); opacity: .24; }
+  to { transform: scale(1.7); opacity: 1; }
+}
+@keyframes chai-wild-conversion {
+  0% { transform: scale(.74); filter: brightness(1.8) saturate(1.3); }
+  62% { transform: scale(1.12); filter: brightness(1.35) saturate(1.2); }
+  100% { transform: scale(1); filter: brightness(1) saturate(1); }
+}
+
+/* ------------------------------------------------------------------ */
 /* Marquee header                                                      */
 /* ------------------------------------------------------------------ */
 
@@ -1619,6 +1758,13 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .chai-storm-splash,
+  .chai-storm-copy,
+  .chai-storm-drop,
+  .chai-storm-sparkles i,
+  .chai-wild-conversion {
+    animation: none;
+  }
   .treat-time-entry,
   .treat-time-entry-hand,
   .treat-time-entry-copy,

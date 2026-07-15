@@ -61,6 +61,7 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - event-frequency simulation oracle
 - free-spin ladder, modifier selection, and free-spin session flow
 - We're Multiplying opening-spin math: one reel-bound wild at most, line-specific awards, and no multiplier creation during cascades
+- one-shot Wild Chai Storm: opening-board iced-chai symbols convert to mermaid-cup wild chai once per session
 - persistent balance, XP, settings, Treat Jar, and cat-visit state
 - original Web Audio one-shot SFX
 - Treat Time direct primary-board bonus with Morning/Nighttime modes and typed wild-cast payload
@@ -78,7 +79,7 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - Daily Bonus Wheel
 - milestone scenes and collection shelf
 - a replacement for the legacy 2×2 Toolbox modifier, expressed as an approved keepsake/chapter effect
-- literal iced-chai wild-rain board behavior
+- one-shot literal iced-chai Wild Chai Storm board behavior (implementation now present; RTP release gate remains pending)
 - production music loops and final mix
 - approved production AskJamie avatar integration
 - service-worker/offline verification

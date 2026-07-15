@@ -48,6 +48,19 @@ describe("evaluateLines", () => {
     expect(topLine.payout).toBeCloseTo(67.54, 2);
   });
 
+  it("treats a converted mermaid cup as an ordinary wild", () => {
+    const grid: Grid = [
+      [{ symbol: "wild_chai" }, { symbol: "x" as never }, { symbol: "x" as never }, { symbol: "x" as never }],
+      [{ symbol: "tumbler" }, { symbol: "x" as never }, { symbol: "x" as never }, { symbol: "x" as never }],
+      [{ symbol: "tumbler" }, { symbol: "x" as never }, { symbol: "x" as never }, { symbol: "x" as never }],
+      [{ symbol: "yarn" }, { symbol: "x" as never }, { symbol: "x" as never }, { symbol: "x" as never }],
+      [{ symbol: "yarn" }, { symbol: "x" as never }, { symbol: "x" as never }, { symbol: "x" as never }],
+    ];
+    const topLine = evaluateLines(grid, 1).find((win) => win.lineIndex === 0)!;
+    expect(topLine.symbol).toBe("tumbler");
+    expect(topLine.count).toBe(3);
+  });
+
   it("stops counting at the first non-matching, non-wild symbol", () => {
     const grid: Grid = [
       [{ symbol: "yarn" }, { symbol: "x" as never }, { symbol: "x" as never }, { symbol: "x" as never }],

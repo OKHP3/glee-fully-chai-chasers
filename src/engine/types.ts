@@ -16,7 +16,7 @@ export type SymbolId =
   // treats (feature symbols, reels 1/3/5 only)
   | "treat_chicken" | "treat_salmon" | "treat_bougie"
   // wilds & legend
-  | "wild_joey" | "wild_phoebe" | "wild_handbag" | "uniglee";
+  | "wild_joey" | "wild_phoebe" | "wild_handbag" | "wild_chai" | "uniglee";
 
 export type TreatKind = "chicken" | "salmon" | "bougie";
 
@@ -38,6 +38,17 @@ export interface TreatTimeWild {
 export interface TreatTimeTrigger {
   mode: TreatTimeMode;
   freeSpinsAwarded: number;
+}
+
+/** Opening-board conversion performed once by the Iced Chai Wild Rain wheel wedge. */
+export interface ChaiRainWild {
+  position: [reel: number, row: number];
+  symbol: "wild_chai";
+}
+
+export interface ChaiRainResult {
+  /** Every standard iced-chai cell converted by the one-shot storm. */
+  wilds: ChaiRainWild[];
 }
 
 export interface Cell {
