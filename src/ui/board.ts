@@ -10,7 +10,7 @@
  * illustrated firefly-jar meter, a console-style bet bar, and a layered
  * night-garden scene behind it all (CSS + SVG, no canvas/WebGL).
  */
-import type { CascadeStep, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } from "../engine/types";
+import type { CascadeStep, ChaiRainWild, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
@@ -41,6 +41,7 @@ import {
 import {
   isUnlocked,
   playBonusFanfare,
+  playChaiStorm,
   playCascadeArpeggio,
   playCascadeTick,
   playDoorbellRing,
@@ -255,7 +256,11 @@ export function renderGridHtml(
       const badge = visibleMultiplier
         ? `<span class="multiplier-badge" aria-label="${visibleMultiplier} times wild">×${visibleMultiplier}</span>`
         : "";
-      html += `<div class="cell ${visibleMultiplier ? "multiplier-wild" : ""}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
+      const chaiWild = symbol === "wild_chai";
+      const chaiWildBadge = chaiWild ? `<span class="chai-wild-badge" aria-hidden="true">WILD CHAI</span>` : "";
+      const classes = ["cell", visibleMultiplier ? "multiplier-wild" : "", chaiWild ? "chai-wild-cell" : ""].filter(Boolean).join(" ");
+      const accessibility = chaiWild ? ` role="img" aria-label="Mermaid cup wild chai"` : "";
+      html += `<div class="${classes}" data-row="${row}" data-symbol="${symbol}"${accessibility}>${symbolSvg(symbol as SymbolId)}${badge}${chaiWildBadge}</div>`;
     }
     html += "</div>";
   }
@@ -736,7 +741,7 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
 
 /** Bold Chai awards enter the existing free-spin session without the wheel. */
 async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
-  const session = runFreeSpinSession(mulberry32(productionSeed()), "chai_back", betPerLine(state.bet), spinsAwarded);
+  const session = runFreeSpinSession(mulberry32(productionSeed()), "chai_back", betPerLine(state.bet), spinsAwarded, { allowChaiStorm: false });
   await playFreeSpinSession(root, state, session.wedge, session.rounds);
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
@@ -1151,14 +1156,16 @@ async function playFreeSpinSession(
 
   const overlay = document.createElement("div");
   const treatTime = wedge === "treat_time_morning" || wedge === "treat_time_nighttime";
+  const chaiStormSession = wedge === "chai_back" && rounds.some((round) => round.chaiRain !== undefined);
+  const displayWedgeLabel = wedge === "chai_back" && !chaiStormSession ? "Bold Chai" : wheelWedgeLabel(wedge);
   overlay.className = `free-spins-overlay text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins" : ""}`;
   overlay.innerHTML = `
     <div class="night-garden aurora">${gardenDecor()}</div>
     <div class="relative z-10 h-full w-full flex flex-col cc-shell free-spins-shell">
       <header class="marquee">
         <div class="marquee-row">
-          <span class="level-chip">${wheelWedgeLabel(wedge)}</span>
-          <h1 class="marquee-title">${treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : "Free Spins"}</h1>
+          <span class="level-chip">${displayWedgeLabel}</span>
+          <h1 class="marquee-title">${treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : displayWedgeLabel === "Bold Chai" ? "BOLD CHAI!" : "Free Spins"}</h1>
         </div>
       </header>
       <div class="jar-meter">
@@ -1180,6 +1187,9 @@ async function playFreeSpinSession(
   const panicBellTimer = wedge === "doorbell_panic" ? window.setInterval(playDoorbellRing, 3000) : undefined;
   if (panicBellTimer !== undefined) playDoorbellRing();
 
+  const chaiStorm = wedge === "chai_back" ? rounds.find((round) => round.chaiRain)?.chaiRain : undefined;
+  if (chaiStorm) await showChaiStormSplash(overlay, chaiStorm.wilds.length);
+
   for (let r = 0; r < rounds.length; r++) {
     const round = rounds[r];
     let doorbellRang = false;
@@ -1198,6 +1208,9 @@ async function playFreeSpinSession(
           grid,
           round.treatTimeWilds,
         );
+      }
+      if (r === 0 && stepIndex === 0 && round.chaiRain) {
+        await animateChaiStormConversions(grid, round.chaiRain.wilds);
       }
       if (!doorbellRang && step.grid.flat().some((cell) => cell.symbol === "doorbell")) {
         playDoorbellRing();
@@ -1219,9 +1232,11 @@ async function playFreeSpinSession(
       playJoeyCue();
       playPhoebeCue();
       await sleep(520);
-    } else if (round.extraWildsAdded > 0) {
-      statusEl.textContent = "We Want Our Chai Back — extra wilds landed!";
-      await sleep(500);
+    } else if (round.chaiRain) {
+      statusEl.textContent = round.chaiRain.wilds.length > 0
+        ? `WILD CHAI STORM! ${round.chaiRain.wilds.length} mermaid-cup wild chai!`
+        : "WILD CHAI STORM! The chai sky is charged!";
+      await sleep(520);
     } else if (round.totalWin > 0) {
       statusEl.textContent = `+${round.totalWin.toLocaleString()} coins`;
       await sleep(400);
@@ -1240,6 +1255,50 @@ async function playFreeSpinSession(
   bgLayer?.classList.remove("aurora");
   document.body.classList.remove("aurora-mode");
   void state; // state saved by caller after totals are tallied
+}
+
+function showChaiStormSplash(parent: HTMLElement, convertedCount: number): Promise<void> {
+  return new Promise((resolve) => {
+    const splash = document.createElement("div");
+    splash.className = "chai-storm-splash";
+    const droplets = Array.from({ length: 28 }, (_, index) => {
+      const left = (index * 37) % 100;
+      const delay = ((index * 0.071) % 0.8).toFixed(2);
+      const duration = (0.8 + (index % 5) * 0.12).toFixed(2);
+      const size = 5 + (index % 4) * 2;
+      return `<span class="chai-storm-drop" style="--drop-left:${left}%;--drop-delay:${delay}s;--drop-duration:${duration}s;--drop-size:${size}px"></span>`;
+    }).join("");
+    splash.innerHTML = `
+      <div class="chai-storm-drops" aria-hidden="true">${droplets}</div>
+      <div class="chai-storm-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="chai-storm-copy" role="status" aria-live="assertive">
+        <div class="chai-storm-kicker">AskJamie pours the sky open</div>
+        <h2>WILD CHAI STORM</h2>
+        <p>Chai storm! Chai storm!</p>
+        <small>${convertedCount > 0 ? `${convertedCount} mermaid cups are becoming wild chai.` : "The mermaid cups are listening."}</small>
+      </div>
+    `;
+    parent.appendChild(splash);
+    playChaiStorm(convertedCount);
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    window.setTimeout(() => {
+      splash.remove();
+      resolve();
+    }, reduced ? 720 : 1320);
+  });
+}
+
+function animateChaiStormConversions(grid: HTMLElement, wilds: ChaiRainWild[]): Promise<void> {
+  return new Promise((resolve) => {
+    const targets = wilds
+      .map(({ position: [reel, row] }) => grid.querySelector<HTMLElement>(`[data-reel="${reel}"] [data-row="${row}"]`))
+      .filter((cell): cell is HTMLElement => Boolean(cell));
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    targets.forEach((cell, index) => {
+      window.setTimeout(() => cell.classList.add("chai-wild-conversion"), reduced ? 0 : index * 70);
+    });
+    window.setTimeout(() => resolve(), reduced ? 100 : 560 + targets.length * 70);
+  });
 }
 
 function animateTreatTimeCast(stage: HTMLElement, grid: HTMLElement, wilds: TreatTimeWild[]): Promise<void> {

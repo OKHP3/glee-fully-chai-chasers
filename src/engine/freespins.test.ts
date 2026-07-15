@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
-import { rollWildMultiplier, runFreeSpinSession, spinFreeRound, spinWheel, wheelWedgeLabel } from "./freespins";
+import { convertChaiToWilds, rollWildMultiplier, runFreeSpinSession, spinFreeRound, spinWheel, wheelWedgeLabel } from "./freespins";
+import type { Grid } from "./types";
 
 describe("AskJamie wheel", () => {
   it("always lands on one of the three wedges", () => {
@@ -31,6 +32,37 @@ describe("free spin rounds", () => {
     const round = spinFreeRound(() => 0.2, "multiplying", 1);
     expect(round.multiplierWild).toEqual({ multiplier: 2, position: [1, 0] });
     expect(round.steps[0].grid.flat().filter((cell) => cell.multiplier !== undefined)).toHaveLength(1);
+  });
+
+  it("converts every standard iced chai on the opening board into a mermaid-cup wild", () => {
+    const grid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "tumbler" as const })),
+    );
+    grid[0][1] = { symbol: "chai" };
+    grid[3][2] = { symbol: "chai" };
+
+    const converted = convertChaiToWilds(grid);
+
+    expect(converted.chaiRain.wilds).toEqual([
+      { position: [0, 1], symbol: "wild_chai" },
+      { position: [3, 2], symbol: "wild_chai" },
+    ]);
+    expect(converted.grid[0][1]).toEqual({ symbol: "wild_chai" });
+    expect(converted.grid[3][2]).toEqual({ symbol: "wild_chai" });
+    expect(converted.grid[1][1]).toEqual({ symbol: "tumbler" });
+  });
+
+  it("fires the Wild Chai Storm once at session entry, never on retriggers", () => {
+    const session = runFreeSpinSession(mulberry32(20260715), "chai_back", 1, 8);
+
+    expect(session.rounds[0].chaiRain).toBeDefined();
+    expect(session.rounds.slice(1).every((round) => round.chaiRain === undefined)).toBe(true);
+  });
+
+  it("does not fire the storm for Bold Chai's legacy session path", () => {
+    const session = runFreeSpinSession(mulberry32(20260715), "chai_back", 1, 3, { allowChaiStorm: false });
+
+    expect(session.rounds.every((round) => round.chaiRain === undefined)).toBe(true);
   });
 
   it("never produces a negative or NaN win", () => {

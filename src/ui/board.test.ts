@@ -15,4 +15,18 @@ describe("free-spin multiplier overlay", () => {
     expect(html).toContain('class="multiplier-badge" aria-label="10 times wild">×10</span>');
     expect((html.match(/multiplier-badge/g) ?? [])).toHaveLength(1);
   });
+
+  it("renders converted mermaid cups as accessible Wild Chai cells", () => {
+    const grid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "tumbler" as const })),
+    );
+    grid[2][1] = { symbol: "wild_chai" };
+
+    const html = renderGridHtml(grid);
+
+    expect(html).toContain('data-symbol="wild_chai"');
+    expect(html).toContain('aria-label="Mermaid cup wild chai"');
+    expect(html).toContain("WILD CHAI");
+    expect(html).toContain("symbol-sprite--chai-wild");
+  });
 });

@@ -151,6 +151,17 @@ export function playTreatLand(count: number): void {
   [523.25, 659.25, 783.99].forEach((freq, i) => tone(freq, i * 0.045, 0.16, 0.08 + landings * 0.006, "triangle"));
 }
 
+/** One-shot Wild Chai Storm: warm amber lift, cool tumbler drops, bright settle. */
+export function playChaiStorm(convertedCount: number): void {
+  const intensity = Math.min(Math.max(convertedCount, 0), 20);
+  [261.63, 329.63, 415.3, 523.25].forEach((freq, index) => {
+    tone(freq, index * 0.075, 0.3, 0.12 + intensity * 0.002, index % 2 ? "triangle" : "sine");
+  });
+  [659.25, 783.99, 987.77].forEach((freq, index) => {
+    tone(freq, 0.34 + index * 0.055, 0.2, 0.08, "triangle");
+  });
+}
+
 /** Original house-doorbell ding-dong, played whenever a doorbell lands. */
 export function playDoorbellRing(): void {
   tone(880, 0, 0.18, 0.18, "sine");

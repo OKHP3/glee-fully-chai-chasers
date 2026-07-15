@@ -64,7 +64,7 @@ export function freeSpinsForCascades(cascades: number): number {
   return awarded;
 }
 
-const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe", "wild_handbag", "doorbell", "chai_pump"];
+const NEVER_SHATTER: SymbolId[] = ["uniglee", "wild_joey", "wild_phoebe", "wild_handbag", "wild_chai", "doorbell", "chai_pump"];
 const PERSISTENT_BLOCKERS: SymbolId[] = ["doorbell", "chai_pump"];
 
 /** Sparkle Sort: 5-11 random non-wild/non-scatter cells shatter -> forced cascade. */
