@@ -6,7 +6,7 @@ import "./style.css";
 import { unlock, setMusicEnabled, setSfxEnabled, setSfxVolume, playChaiChaseStart } from "./audio/synth";
 import { setMusicVolume, startBaseMusic } from "./audio/music";
 import { loadGameState } from "./state";
-import { renderBoard } from "./ui/board";
+import { renderBoard, runLapQuestChapter } from "./ui/board";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
@@ -44,9 +44,9 @@ function renderSplash(): void {
   });
 }
 
-// Dev-only QA aid: `#board` skips the splash tap-in gate so screenshots/manual
-// QA can reach the main board without a user gesture. Never referenced by
-// game logic; safe to leave in since it changes nothing for real players.
+// Dev-only QA aids: these hashes skip the splash tap-in gate so screenshots/
+// manual QA can reach the board or the Lap Quest presentation without a user
+// gesture. Never referenced by game logic; real players never enter them.
 if (location.hash === "#board") {
   const state = loadGameState();
   setSfxEnabled(state.soundOn);
@@ -54,6 +54,14 @@ if (location.hash === "#board") {
   setSfxVolume(state.sfxVolume);
   setMusicVolume(state.musicVolume);
   renderBoard(app, state);
+} else if (location.hash === "#lap-quest") {
+  const state = loadGameState();
+  setSfxEnabled(state.soundOn);
+  setMusicEnabled(state.soundOn);
+  setSfxVolume(state.sfxVolume);
+  setMusicVolume(state.musicVolume);
+  renderBoard(app, state);
+  requestAnimationFrame(() => { void runLapQuestChapter(app, state, () => 0); });
 } else {
   renderSplash();
 }
