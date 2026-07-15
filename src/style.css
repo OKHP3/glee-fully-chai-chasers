@@ -1889,4 +1889,16 @@ body {
   .panic-grid .cell[data-symbol="wild_phoebe"] {
     animation: none;
   }
+  .lap-quest-overlay,
+  .lap-quest-reveal,
+  .lap-quest-cat,
+  .lap-quest-reveal-cat,
+  .lap-quest-wild-land,
+  .lap-quest-phoebe-wrap,
+  .lap-quest-phoebe-speech,
+  .lap-quest-joey-entrant,
+  .lap-quest-ledge-progress span {
+    animation: none;
+    transition: none;
+  }
 }
