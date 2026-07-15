@@ -62,7 +62,7 @@ export interface KeepsakeZone {
 }
 
 export interface LineWin {
-  lineIndex: number;       // 0..24 (25 fixed paylines)
+  lineIndex: number;       // 0..39 (40 fixed paylines)
   symbol: SymbolId;
   count: number;           // consecutive from reel 0
   payout: number;          // in Sparks, bet-scaled
@@ -117,7 +117,7 @@ export interface SpinResult {
 export interface EngineConfig {
   reels: 5;
   rows: 4;
-  paylines: number[][];          // 25 lines; each = row index per reel
+  paylines: number[][];          // 40 lines; each = row index per reel
   targetRtp: number;             // ~0.96, verified by 1M-spin simulation test
   catVisitBaseRate: number;      // ~1/32, pity-weighted (docs/DESIGN-SPEC.md §2)
   unigleeRate: number;           // ~1/400
