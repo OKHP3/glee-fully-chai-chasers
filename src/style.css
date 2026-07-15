@@ -1152,6 +1152,271 @@ body {
 .uniglee-sub { font-size: 15px; color: #fff4e0; }
 
 /* ------------------------------------------------------------------ */
+/* Phoebe's Lap Quest chapter                                           */
+/* ------------------------------------------------------------------ */
+
+.lap-quest-overlay,
+.lap-quest-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 56;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: radial-gradient(ellipse at 50% 42%, rgba(232, 165, 184, .52), rgba(21, 15, 48, .94) 73%);
+  animation: lap-quest-fade-in 260ms ease-out both;
+}
+
+.lap-quest-panel {
+  width: min(100%, 520px);
+  border: 1px solid rgba(245, 213, 118, .72);
+  border-radius: 24px;
+  background: rgba(26, 31, 60, .94);
+  padding: 20px 16px 18px;
+  text-align: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .4), 0 0 30px rgba(232, 165, 184, .24);
+}
+
+.lap-quest-cat {
+  width: 104px;
+  height: 78px;
+  margin: -58px auto 2px;
+  animation: lap-quest-cat-settle 520ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+.lap-quest-title {
+  margin: 0;
+  color: var(--cc-butter);
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(25px, 7vw, 38px);
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(245, 213, 118, .45);
+}
+
+.lap-quest-copy {
+  margin: 10px auto 16px;
+  max-width: 34rem;
+  color: #fff4e0;
+  font-size: 14px;
+}
+
+.lap-quest-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.lap-quest-choice {
+  min-height: 106px;
+  border: 1px solid rgba(159, 232, 197, .5);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(45, 31, 76, .96), rgba(66, 44, 83, .96));
+  color: #fff4e0;
+  padding: 12px 7px;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.lap-quest-choice:hover,
+.lap-quest-choice:focus-visible {
+  border-color: var(--cc-butter);
+  box-shadow: 0 0 16px rgba(245, 213, 118, .36);
+  outline: none;
+  transform: translateY(-3px);
+}
+
+.lap-quest-choice strong,
+.lap-quest-choice small { display: block; }
+.lap-quest-choice strong { color: var(--cc-mint); font-size: 14px; }
+.lap-quest-choice small { margin-top: 5px; color: rgba(255, 244, 224, .78); font-size: 11px; }
+.lap-quest-choice-spark { display: block; color: var(--cc-butter); font-size: 20px; }
+
+.lap-quest-reveal {
+  flex-direction: column;
+  gap: 6px;
+  background: radial-gradient(ellipse at 50% 44%, rgba(232, 165, 184, .68), rgba(21, 15, 48, .9) 72%);
+  color: #fff4e0;
+  text-align: center;
+}
+
+.lap-quest-reveal strong { color: var(--cc-butter); font-size: clamp(23px, 6vw, 34px); }
+.lap-quest-reveal span { font-size: 14px; }
+.lap-quest-reveal-cat { width: 136px; height: 102px; animation: lap-quest-cat-settle 520ms cubic-bezier(.34, 1.56, .64, 1) both; }
+
+.lap-quest-wild {
+  position: relative;
+  z-index: 3;
+  box-shadow: inset 0 0 0 2px rgba(232, 165, 184, .9), 0 0 17px 4px rgba(245, 213, 118, .58);
+}
+
+.lap-quest-wild-land { animation: lap-quest-wild-land 430ms cubic-bezier(.34, 1.56, .64, 1) both; }
+
+@keyframes lap-quest-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lap-quest-cat-settle {
+  from { opacity: 0; transform: translateY(22px) scale(.78); }
+  70% { opacity: 1; transform: translateY(-4px) scale(1.04); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes lap-quest-wild-land {
+  from { opacity: .2; transform: translateY(-65%) scale(.55); filter: brightness(1.7); }
+  70% { opacity: 1; transform: translateY(6%) scale(1.08); filter: brightness(1.3); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+}
+
+/* Phoebe's live ledge — presentation-only layer over the active cabinet. */
+.lap-quest-ledge {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  overflow: visible;
+  pointer-events: none;
+  color: #fff4e0;
+}
+.lap-quest-ledge-surface {
+  position: absolute;
+  inset: -2px -1px auto;
+  height: clamp(76px, 22vw, 124px);
+  border-radius: 18px 18px 28px 28px;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(245, 213, 118, .24), transparent 52%),
+    linear-gradient(180deg, rgba(46, 35, 80, .98), rgba(73, 44, 82, .96) 68%, rgba(232, 165, 184, .88));
+  border: 1px solid rgba(245, 213, 118, .7);
+  box-shadow: inset 0 -9px 14px rgba(20, 12, 43, .4), 0 9px 15px rgba(0, 0, 0, .35), 0 0 20px rgba(232, 165, 184, .26);
+}
+.lap-quest-ledge-stitch {
+  position: absolute;
+  inset: auto 8px 8px;
+  height: 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 244, 224, .45);
+  opacity: .72;
+}
+.lap-quest-ledge-glow {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: -7px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(245, 213, 118, .34);
+  filter: blur(7px);
+}
+.lap-quest-phoebe-wrap {
+  position: absolute;
+  z-index: 3;
+  top: clamp(-18px, -3vw, -6px);
+  left: 50%;
+  width: min(78%, 360px);
+  height: clamp(96px, 28vw, 154px);
+  transform: translateX(-50%);
+  pointer-events: none;
+  filter: drop-shadow(0 10px 8px rgba(0, 0, 0, .42));
+  animation: lap-quest-ledge-arrive 620ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.lap-quest-phoebe-art { display: block; width: 100%; height: 100%; overflow: visible; }
+.lap-quest-phoebe-speech {
+  position: absolute;
+  z-index: 5;
+  top: -5px;
+  left: 8%;
+  max-width: 45%;
+  transform: translateY(-100%);
+  border: 2px solid #20163a;
+  border-radius: 14px 14px 14px 4px;
+  background: #fff4e0;
+  box-shadow: 0 4px 0 rgba(32, 22, 58, .22), 0 5px 9px rgba(0, 0, 0, .2);
+  padding: 5px 8px;
+  color: #20163a;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(10px, 2.7vw, 14px);
+  line-height: 1.05;
+  text-align: center;
+  white-space: nowrap;
+  animation: lap-quest-speech-pop 420ms cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.lap-quest-phoebe-speech::after {
+  position: absolute;
+  left: 15px;
+  bottom: -9px;
+  width: 13px;
+  height: 13px;
+  border-right: 2px solid #20163a;
+  border-bottom: 2px solid #20163a;
+  background: #fff4e0;
+  content: "";
+  transform: skewY(24deg) rotate(28deg);
+}
+.lap-quest-ledge[data-phase="active"] .lap-quest-phoebe-speech { border-color: var(--cc-pink); }
+.lap-quest-ledge[data-exit="joey"] .lap-quest-phoebe-speech,
+.lap-quest-ledge[data-exit="self"] .lap-quest-phoebe-speech,
+.lap-quest-ledge[data-exit="quiet"] .lap-quest-phoebe-speech { animation: lap-quest-speech-fade 220ms ease-in forwards; }
+.lap-quest-pet-target {
+  position: absolute;
+  z-index: 4;
+  top: 18%;
+  left: 24%;
+  width: 52%;
+  height: 58%;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(245, 213, 118, .02);
+  color: var(--cc-butter);
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+.lap-quest-pet-target:focus-visible,
+.lap-quest-pet-target:hover {
+  border-color: rgba(245, 213, 118, .9);
+  background: rgba(245, 213, 118, .16);
+  outline: none;
+}
+.lap-quest-pet-target:active { transform: scale(.97); }
+.lap-quest-pet-target:disabled { cursor: default; pointer-events: none; }
+.lap-quest-paw-mark { display: block; opacity: 0; font-size: 20px; transition: opacity 140ms ease; }
+.lap-quest-pet-target:focus-visible .lap-quest-paw-mark,
+.lap-quest-pet-target:hover .lap-quest-paw-mark { opacity: 1; }
+.lap-quest-phoebe-wrap.is-petted { animation: lap-quest-pet-bounce 230ms ease-out; }
+.lap-quest-ledge-copy,
+.lap-quest-ledge-timer {
+  position: absolute;
+  z-index: 6;
+  top: 8px;
+  border-radius: 999px;
+  background: rgba(26, 31, 60, .72);
+  border: 1px solid rgba(255, 244, 224, .3);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .22);
+  pointer-events: none;
+  line-height: 1.05;
+}
+.lap-quest-ledge-copy { left: 8px; display: grid; gap: 2px; max-width: 38%; padding: 6px 9px; }
+.lap-quest-ledge-copy strong { color: var(--cc-butter); font-family: "Baloo Display", "Arial Black", sans-serif; font-size: clamp(10px, 2.7vw, 14px); }
+.lap-quest-ledge-copy span { color: rgba(255, 244, 224, .86); font-size: clamp(8px, 2.1vw, 11px); }
+.lap-quest-ledge-timer { right: 8px; display: flex; align-items: baseline; gap: 3px; padding: 6px 8px; }
+.lap-quest-timer-label { color: var(--cc-mint); font-size: clamp(8px, 2vw, 10px); }
+.lap-quest-timer-value { min-width: 2ch; color: var(--cc-butter); font-family: "Baloo Display", "Arial Black", sans-serif; font-size: clamp(15px, 4vw, 21px); text-align: right; }
+.lap-quest-ledge-timer small { color: rgba(255, 244, 224, .74); font-size: 9px; }
+.lap-quest-ledge-progress { position: absolute; z-index: 7; left: 12%; right: 12%; top: clamp(70px, 19vw, 108px); height: 4px; overflow: hidden; border-radius: 999px; background: rgba(20, 12, 43, .5); pointer-events: none; }
+.lap-quest-ledge-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cc-mint), var(--cc-butter), var(--cc-pink)); box-shadow: 0 0 9px rgba(245, 213, 118, .68); transition: width 250ms linear; }
+.lap-quest-ledge-status { position: absolute; z-index: 9; left: 50%; bottom: 8px; width: max-content; max-width: 78%; transform: translateX(-50%); border-radius: 999px; background: rgba(26, 31, 60, .88); padding: 4px 10px; color: #fff4e0; font-size: clamp(9px, 2.2vw, 12px); text-align: center; opacity: 0; pointer-events: none; }
+.lap-quest-ledge[data-phase="active"] .lap-quest-ledge-status { opacity: 1; }
+.lap-quest-joey-entrant { position: absolute; z-index: 8; top: 12px; left: -72px; width: clamp(58px, 15vw, 92px); height: clamp(48px, 13vw, 72px); opacity: 0; pointer-events: none; }
+.lap-quest-ledge[data-exit="joey"] .lap-quest-joey-entrant { animation: lap-quest-joey-arrive 620ms cubic-bezier(.2, .8, .3, 1) forwards; }
+.lap-quest-ledge[data-exit="joey"] .lap-quest-phoebe-wrap { animation: lap-quest-phoebe-scurry 700ms ease-in forwards; }
+.lap-quest-ledge[data-exit="self"] .lap-quest-phoebe-wrap { animation: lap-quest-phoebe-self-exit 520ms ease-in forwards; }
+.lap-quest-ledge[data-exit="quiet"] .lap-quest-phoebe-wrap { animation: lap-quest-phoebe-self-exit 280ms ease-in forwards; }
+@keyframes lap-quest-ledge-arrive { from { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(.88); } 70% { opacity: 1; transform: translateX(-50%) translateY(5px) scale(1.02); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+@keyframes lap-quest-speech-pop { from { opacity: 0; transform: translateY(-100%) scale(.76); } to { opacity: 1; transform: translateY(-100%) scale(1); } }
+@keyframes lap-quest-speech-fade { to { opacity: 0; transform: translateY(-112%) scale(.9); } }
+@keyframes lap-quest-pet-bounce { 0% { transform: translateX(-50%) rotate(0); } 40% { transform: translateX(-50%) translateY(3px) rotate(-1deg) scale(1.02); } 100% { transform: translateX(-50%) rotate(0); } }
+@keyframes lap-quest-joey-arrive { from { opacity: 0; transform: translateX(-30px) rotate(-9deg); } 65% { opacity: 1; transform: translateX(4px) rotate(4deg); } to { opacity: 1; transform: translateX(0) rotate(0); } }
+@keyframes lap-quest-phoebe-scurry { 0% { transform: translateX(-50%) rotate(0); opacity: 1; } 32% { transform: translateX(-44%) translateY(-7px) rotate(-2deg); } 100% { transform: translateX(86%) translateY(-24px) rotate(8deg); opacity: 0; } }
+@keyframes lap-quest-phoebe-self-exit { 0% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; } 100% { transform: translateX(-50%) translateY(22px) scale(.82); opacity: 0; } }
+
+/* ------------------------------------------------------------------ */
 /* Wheel + free spins                                                   */
 /* ------------------------------------------------------------------ */
 

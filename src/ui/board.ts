@@ -10,7 +10,7 @@
  * illustrated firefly-jar meter, a console-style bet bar, and a layered
  * night-garden scene behind it all (CSS + SVG, no canvas/WebGL).
  */
-import type { CascadeStep, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } from "../engine/types";
+import type { CascadeStep, LapQuestSpot, SpinResult, SymbolId, TreatTimeMode, TreatTimeWild } from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
@@ -26,6 +26,14 @@ import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
 import { addTreat, consumeForVisit } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
 import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinRoundResult, type WheelWedge } from "../engine/freespins";
+import {
+  createLapQuestChallenge,
+  LAP_QUEST_SPOT_LABELS,
+  spinLapQuestRound,
+  type LapQuestChallenge,
+  type LapQuestRoundResult,
+} from "../engine/lap-quest";
+import { mountLapQuestLedge } from "./lap-quest-ledge";
 import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState } from "../state";
 import {
@@ -49,6 +57,8 @@ import {
   playBoldChaiTimerBuzzer,
   playJoeyCue,
   playPhoebeCue,
+  playLapQuestReveal,
+  playLapQuestWildLand,
   playTreatLand,
   playTreatTimeCue,
   playUniGleeSting,
@@ -254,7 +264,11 @@ export function renderGridHtml(
       const badge = cell.multiplier
         ? `<span class="multiplier-badge" aria-label="${cell.multiplier} times wild">×${cell.multiplier}</span>`
         : "";
-      html += `<div class="cell ${cell.multiplier ? "multiplier-wild" : ""}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
+      const cellClasses = [
+        cell.multiplier ? "multiplier-wild" : "",
+        cell.sticky === "lap_quest" ? "lap-quest-wild" : "",
+      ].filter(Boolean).join(" ");
+      html += `<div class="cell ${cellClasses}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
     }
     html += "</div>";
   }
@@ -558,6 +572,7 @@ async function runSpin(
   } else if (result.unigleeTriggered) {
     playUniGleeSting();
     await showUnigleeTakeover(root);
+    await runLapQuestChapter(root, state, mulberry32(seed ^ 0x51f15e5d));
   } else if (result.totalWin > 0) {
     await showWinCelebration(root, result.totalWin, state.bet);
   }
@@ -962,6 +977,154 @@ function showUnigleeTakeover(root: HTMLElement): Promise<void> {
       resolve();
     }, 2600);
   });
+}
+
+/** Reusable UniGlee chapter hook; the marathon session owns when to call it. */
+export async function runLapQuestChapter(
+  root: HTMLElement,
+  state: GameState,
+  rng = mulberry32(productionSeed()),
+): Promise<LapQuestRoundResult | undefined> {
+  const challenge = createLapQuestChallenge(rng);
+  const selectedSpot = await showLapQuestChoice(root, challenge);
+  const round = spinLapQuestRound(rng, challenge, selectedSpot, betPerLine(state.bet));
+
+  await showLapQuestReveal(root, round);
+  const ledge = mountLapQuestLedge(root, {
+    interruptAtMs: 15_000 + Math.floor(rng() * 75_001),
+    reducedMotion: state.reducedMotion,
+    onPet: ({ petCount }) => {
+      const status = root.querySelector<HTMLElement>("#status-line");
+      if (status) status.textContent = `Phoebe's Lap Quest · ${petCount} gentle pet${petCount === 1 ? "" : "s"}`;
+    },
+  });
+  let lastRound = round;
+  let totalWin = 0;
+  let bestCascade = 0;
+  let ledgeEnded = false;
+  ledge.finished.then(() => { ledgeEnded = true; });
+
+  const playRound = async (nextRound: LapQuestRoundResult): Promise<void> => {
+    lastRound = nextRound;
+    totalWin += nextRound.totalWin;
+    bestCascade = Math.max(bestCascade, nextRound.cascades);
+    await playLapQuestRound(root, nextRound);
+  };
+
+  await playRound(round);
+  while (!ledgeEnded) {
+    await Promise.race([ledge.finished, sleep(900)]);
+    if (ledgeEnded) break;
+    await playRound(spinLapQuestRound(rng, challenge, selectedSpot, betPerLine(state.bet)));
+  }
+
+  const ledgeResult = await ledge.finished;
+
+  state.balance += totalWin;
+  state.bestCascade = Math.max(state.bestCascade, bestCascade);
+  saveGameState(state);
+  const finalStep = lastRound.steps[lastRound.steps.length - 1];
+  renderBoard(root, state, finalStep?.grid);
+  setStatus(root, ledgeResult.reason === "joey_interrupt"
+    ? `Phoebe's Lap Quest · Joey whisked her away · +${totalWin.toLocaleString()} coins`
+    : ledgeResult.reason === "inactivity"
+      ? `Phoebe's Lap Quest · she wandered off · +${totalWin.toLocaleString()} coins`
+      : `Phoebe's Lap Quest · complete · +${totalWin.toLocaleString()} coins`);
+  return lastRound;
+}
+
+function showLapQuestChoice(root: HTMLElement, challenge: LapQuestChallenge): Promise<LapQuestSpot> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "lap-quest-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "lap-quest-title");
+    overlay.innerHTML = `
+      <div class="lap-quest-panel">
+        <div class="lap-quest-cat" aria-hidden="true">${catSprite("phoebe", "strut")}</div>
+        <h2 id="lap-quest-title" class="lap-quest-title">Phoebe’s Lap Quest</h2>
+        <p class="lap-quest-copy">Phoebe is conducting a comfort survey. Which cozy place should she investigate?</p>
+        <div class="lap-quest-choices" role="group" aria-label="Choose Phoebe's cozy place">
+          ${challenge.choices.map((spot) => `
+            <button type="button" class="lap-quest-choice" data-lap-spot="${spot}">
+              <span class="lap-quest-choice-spark" aria-hidden="true">✦</span>
+              <strong>${LAP_QUEST_SPOT_LABELS[spot]}</strong>
+              <small> Phoebe-approved comfort</small>
+            </button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+    root.querySelector(".cc-root")?.appendChild(overlay);
+    playPhoebeCue();
+
+    const finish = (spot: LapQuestSpot): void => {
+      overlay.remove();
+      resolve(spot);
+    };
+    overlay.querySelectorAll<HTMLButtonElement>("[data-lap-spot]").forEach((button) => {
+      button.addEventListener("click", () => finish(button.dataset.lapSpot as LapQuestSpot), { once: true });
+    });
+    overlay.querySelector<HTMLButtonElement>("[data-lap-spot]")?.focus();
+  });
+}
+
+function showLapQuestReveal(root: HTMLElement, round: LapQuestRoundResult): Promise<void> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "lap-quest-reveal";
+    overlay.setAttribute("role", "status");
+    overlay.innerHTML = `
+      <div class="lap-quest-reveal-cat" aria-hidden="true">${catSprite("phoebe", "eat")}</div>
+      <strong>${round.perfectLap ? "Perfect lap located." : "A cozy lap will do beautifully."}</strong>
+      <span>${round.perfectLap ? "Phoebe has made a decision." : "Phoebe is settling in."}</span>
+    `;
+    root.querySelector(".cc-root")?.appendChild(overlay);
+    playLapQuestReveal(round.perfectLap);
+    window.setTimeout(() => {
+      overlay.remove();
+      resolve();
+    }, 1050);
+  });
+}
+
+async function playLapQuestRound(root: HTMLElement, round: LapQuestRoundResult): Promise<void> {
+  const grid = root.querySelector<HTMLDivElement>("#reel-grid");
+  const status = root.querySelector<HTMLElement>("#status-line");
+  const shell = root.querySelector<HTMLElement>(".cc-shell");
+  if (!grid || !status) return;
+
+  shell?.classList.add("lap-quest-mode");
+  try {
+    status.textContent = `Phoebe’s Lap Quest · ${LAP_QUEST_SPOT_LABELS[round.selectedSpot]}`;
+    for (const [stepIndex, step] of round.steps.entries()) {
+      grid.innerHTML = renderGridHtml(step.grid, step.keepsakeZone, false, step.wins.map((win) => win.lineIndex));
+      if (stepIndex === 0 && round.comfortWilds.length > 0) {
+        round.comfortWilds.forEach(({ position: [reel, row] }) => {
+          grid.querySelector<HTMLElement>(`[data-reel="${reel}"] [data-row="${row}"]`)?.classList.add("lap-quest-wild-land");
+        });
+        playLapQuestWildLand(round.comfortWilds.length);
+      }
+      grid.querySelectorAll<HTMLElement>(".cell").forEach((cell) => cell.classList.add("beam-drop"));
+      updateJar(root, step.meterAfter);
+      if (step.wins.length > 0) {
+        playCascadeArpeggio(step.meterAfter);
+        beamToSaucers(root);
+        playWinPluck();
+      } else {
+        playCascadeTick();
+      }
+      await sleep(360);
+    }
+
+    status.textContent = round.totalWin > 0
+      ? `Phoebe’s Lap Quest · +${round.totalWin.toLocaleString()} coins`
+      : "Phoebe’s Lap Quest · cozy and complete";
+    await sleep(420);
+  } finally {
+    shell?.classList.remove("lap-quest-mode");
+  }
 }
 
 async function runTreatTimeBonus(
