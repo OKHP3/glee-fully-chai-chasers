@@ -48,6 +48,21 @@ describe("evaluateLines", () => {
     expect(topLine.payout).toBeCloseTo(67.54, 2);
   });
 
+  it("recognizes a Handbag Wild on every fixed payline shape", () => {
+    for (const [lineIndex, line] of PAYLINES.entries()) {
+      const grid = flatGrid("treat_chicken");
+      for (let reel = 0; reel < 4; reel++) grid[reel][line[reel]] = { symbol: "tumbler" };
+      grid[4][line[4]] = { symbol: "wild_handbag", handbagMultiplier: 10 };
+
+      const win = evaluateLines(grid, 1).find((candidate) => candidate.lineIndex === lineIndex);
+      expect(win).toMatchObject({
+        symbol: "tumbler",
+        count: 5,
+        positions: line.map((row, reel) => [reel, row]),
+      });
+    }
+  });
+
   it("treats a converted mermaid cup as an ordinary wild", () => {
     const grid: Grid = [
       [{ symbol: "wild_chai" }, { symbol: "x" as never }, { symbol: "x" as never }, { symbol: "x" as never }],
