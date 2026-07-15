@@ -2,13 +2,13 @@
  * Balance, bet levels, and XP/level progression. Pure TS, zero DOM.
  * Spec: docs/DESIGN-SPEC.md §9. Currency = Glee-coins; Chai Sparks = XP.
  */
-export const BET_LEVELS = [25, 50, 125, 250, 625, 1250] as const;
+export const BET_LEVELS = [1, 2, 5, 10, 25, 50] as const;
 export type BetLevel = (typeof BET_LEVELS)[number];
 
 export const LEVEL_6_UNLOCK_PLAYER_LEVEL = 12;
 export const LINES = 25;
-export const STARTING_BALANCE = 1_000_000;
-export const BUST_PROOF_REFILL = 500_000;
+export const STARTING_BALANCE = 500;
+export const BUST_PROOF_REFILL = 500;
 
 /** Coins per bet-level index the player may currently use. */
 export function availableBetLevels(playerLevel: number): number[] {

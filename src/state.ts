@@ -75,7 +75,7 @@ export function loadGameState(): GameState {
   const soundOn = load("soundOn", true);
   return {
     balance: load("balance", STARTING_BALANCE),
-    bet: load("bet", 25),
+    bet: load("bet", 1),
     xp: load("xp", 0),
     treatJar: loadTreatJar(),
     fireflyMeter: load("fireflyMeter", 0),

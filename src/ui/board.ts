@@ -28,7 +28,6 @@ import {
   gardenForegroundSvg,
   fireflyJarSvg,
   gleeAvatarSvg,
-  askJamieSvg,
   type CatPose,
 } from "./symbols";
 import {
@@ -134,7 +133,7 @@ export function renderBoard(
             ${treatJarHtml(state)}
           </div>
           <div id="askjamie-perch" aria-label="AskJamie" class="askjamie-housing">
-            <div class="askjamie-icon">${askJamieSvg()}</div>
+            <div class="askjamie-icon"><img src="/assets/askjamie-avatar.jpg" alt="" /></div>
             <span>AskJamie</span>
           </div>
         </div>
@@ -480,7 +479,7 @@ async function runSpin(
 ): Promise<void> {
   const { balance: refilled, refilled: didRefill } = applyBustProofRefill(state.balance, state.bet);
   state.balance = refilled;
-  if (didRefill) setStatus(root, "AskJamie found coins under the couch! +500,000 coins");
+  if (didRefill) setStatus(root, "AskJamie found coins under the couch! +500 coins");
 
   state.balance -= state.bet;
   sparkleBtn.disabled = true;

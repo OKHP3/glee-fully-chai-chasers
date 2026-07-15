@@ -53,7 +53,7 @@ Portrait 390x844 layout, top to bottom: status bar (level + Chai Sparks meter) �
 
 ## 4. Board, symbols & paytable
 
-5 reels × 4 rows, 25 fixed paylines (classic Moolah skeleton), left-to-right evaluation, wilds substitute for all paying symbols. Bet levels: 25 / 50 / 125 / 250 / 625 / 1250 coins (25-credit-style increments; level 6 unlocks at player level 12, obviously).
+5 reels × 4 rows, 25 fixed paylines (classic Moolah skeleton), left-to-right evaluation, wilds substitute for all paying symbols. Bet levels: 1 / 2 / 5 / 10 / 25 / 50 Glee-coins (level 6 unlocks at player level 12).
 
 Paytable (× line bet; tuned by simulation, these are the starting values):
 
@@ -135,7 +135,7 @@ Free spins play on an aurora-shifted board (navy → violet-green), same cascade
 ## 9. Economy & progression
 
 - **Currency: Glee-coins** (S11). Bet/win/balance — full slot semantics, zero money language, never purchasable.
-- Start: 1,000,000 Glee-coins. If balance < one max-bet spin: **AskJamie finds coins under the couch** — cheerful animation, +500k. The automatic refill keeps play uninterrupted and lands as a recurring joke.
+- Start: 500 Glee-coins with a default 1-coin wager. If balance < one current-bet spin: **AskJamie finds coins under the couch** — cheerful animation, +500 coins. The automatic refill keeps play uninterrupted and lands as a recurring joke.
 - **Chai Sparks = XP** (Codex's term, repurposed): every spin earns Sparks (scaled by bet), filling the level meter. Levels unlock bet tiers, scenes (§10), and cosmetics (board trims, saucer colors, quip packs). **Level 12 is a major celebration.**
 - **Daily Bonus Wheel:** once per calendar day, 100k-1M coins + a random treat for the jar. Streaks acknowledged, never punished ("Day 3! The cats noticed.").
 - All persistence via versioned localStorage (`ccv1.*`), reset action in settings.
@@ -163,7 +163,7 @@ Scenes award nothing but delight and a collection checkmark. That's the point.
 
 ## 12. The Birthday Reveal
 
-First launch on/after 2026-07-17 (date check, one-time flag): night sky, two saucers fly in carrying a banner — **"Happy Birthday, Glee"** — Joey and Phoebe pop out, a chai tumbler descends into her hand silhouette, and one line from Jamie (text he writes himself, stored in one obvious constant: `BIRTHDAY_MESSAGE`). Then the Toolbox opens and the game begins with a full Treat Jar and 2,000,000 coins. Skippable after first view; re-watchable from the scene shelf.
+First launch on/after 2026-07-17 (date check, one-time flag): night sky, two saucers fly in carrying a banner — **"Happy Birthday, Glee"** — Joey and Phoebe pop out, a chai tumbler descends into her hand silhouette, and one line from Jamie (text he writes himself, stored in one obvious constant: `BIRTHDAY_MESSAGE`). Then the Toolbox opens and the game begins with a full Treat Jar and 500 coins. Skippable after first view; re-watchable from the scene shelf.
 
 ## 13. Settings & accessibility
 
