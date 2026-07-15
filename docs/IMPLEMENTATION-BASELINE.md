@@ -63,6 +63,7 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 - We're Multiplying opening-spin math: one reel-bound wild at most, line-specific awards, and no multiplier creation during cascades
 - persistent balance, XP, settings, Treat Jar, and cat-visit state
 - original Web Audio one-shot SFX
+- Treat Time direct primary-board bonus with Morning/Nighttime modes and typed wild-cast payload
 - production symbol, Joey, Phoebe, wild, and wheel art
 - mobile-first board, Firefly Cascade meter, Treat Jar, AskJamie perch, and controls
 - real post-spin resting grid and cascade beam/drop motion
