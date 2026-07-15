@@ -18,6 +18,54 @@ export type SymbolId =
   // wilds & legend
   | "wild_joey" | "wild_phoebe" | "wild_handbag" | "wild_chai" | "uniglee";
 
+/** The paying-symbol subset used by the Moonlit Keepsake Trail cards. */
+export type KeepsakeSymbolId =
+  | "tumbler" | "butterfly" | "mixtape" | "crystal"
+  | "chai" | "candle" | "cassette" | "gnome"
+  | "mailbox" | "vhs" | "teapot" | "yarn";
+
+export type KeepsakeMemoryPhase =
+  | "preview"
+  | "choosing_first"
+  | "choosing_second"
+  | "resolving_match"
+  | "resolving_mismatch"
+  | "complete"
+  | "failed";
+
+export interface KeepsakeMemoryCard {
+  index: number;
+  symbol: KeepsakeSymbolId;
+  revealed: boolean;
+  matched: boolean;
+}
+
+export interface KeepsakeMemoryState {
+  kind: "keepsake_memory";
+  phase: KeepsakeMemoryPhase;
+  cards: KeepsakeMemoryCard[];
+  firstPick?: number;
+  pairsFound: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  fails: 0 | 1 | 2;
+  maxFails: 2;
+  freeSpinsAwarded: 0 | 40;
+}
+
+export type KeepsakeMemoryEvent =
+  | { kind: "preview_complete" }
+  | { kind: "card_revealed"; index: number }
+  | { kind: "match"; indices: [number, number]; pairsFound: number }
+  | { kind: "mismatch"; indices: [number, number]; fails: 1 | 2 }
+  | { kind: "completed"; freeSpinsAwarded: 40 }
+  | { kind: "failed"; freeSpinsAwarded: 0 };
+
+export interface KeepsakeMemoryActionResult {
+  state: KeepsakeMemoryState;
+  accepted: boolean;
+  event?: KeepsakeMemoryEvent;
+  reason?: "preview" | "invalid_index" | "matched_card" | "same_card" | "resolving" | "ended";
+}
+
 export type TreatKind = "chicken" | "salmon" | "bougie";
 
 export type TreatTimeMode = "morning" | "nighttime";

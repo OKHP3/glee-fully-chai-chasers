@@ -10,7 +10,18 @@
  * illustrated firefly-jar meter, a console-style bet bar, and a layered
  * night-garden scene behind it all (CSS + SVG, no canvas/WebGL).
  */
-import type { CascadeStep, ChaiRainWild, SpinResult, SymbolId, TreatKind, TreatTimeMode, TreatTimeWild } from "../engine/types";
+import type {
+  CascadeStep,
+  ChaiRainWild,
+  KeepsakeMemoryActionResult,
+  KeepsakeMemoryCard,
+  KeepsakeMemoryState,
+  SpinResult,
+  SymbolId,
+  TreatKind,
+  TreatTimeMode,
+  TreatTimeWild,
+} from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
@@ -26,6 +37,7 @@ import { PAYLINES, PAYOUT_SCALE, PAYTABLE } from "../engine/paylines";
 import { collectTreat, consumeForVisit, settleTreatJar, TREAT_JAR_FREE_SPINS } from "../engine/features";
 import { mulberry32, productionSeed } from "../engine/rng";
 import { runFreeSpinSession, spinWheel, wheelWedgeLabel, type FreeSpinSessionResult, type WheelWedge } from "../engine/freespins";
+import { beginKeepsakeMemory, createKeepsakeMemory, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
 import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState } from "../state";
 import {
@@ -48,6 +60,11 @@ import {
   playBoldChaiCupSwap,
   playBoldChaiPumpPress,
   playBoldChaiTimerBuzzer,
+  playKeepsakeCardFlip,
+  playKeepsakeFailure,
+  playKeepsakeMatch,
+  playKeepsakeMismatch,
+  playKeepsakeSuccess,
   playJoeyCue,
   playPhoebeCue,
   playTreatLand,
@@ -87,6 +104,45 @@ const PAYTABLE_SYMBOLS: ReadonlyArray<{ id: SymbolId; name: string }> = [
   { id: "teapot", name: "Aurora Keepsake" },
   { id: "yarn", name: "Shared-Life Locket" },
 ];
+
+/**
+ * Presentation boundary for the engine-owned Moonlit Keepsake Trail state.
+ * The controller is intentionally supplied by the engine workstream: this
+ * file renders typed state and forwards card indexes, but never compares
+ * symbols, counts strikes, or awards spins.
+ */
+export type KeepsakeMemoryViewCard = KeepsakeMemoryCard;
+export type KeepsakeMemoryViewState = KeepsakeMemoryState;
+export type KeepsakeMemoryViewActionResult = KeepsakeMemoryActionResult;
+
+export interface KeepsakeMemoryController {
+  state: KeepsakeMemoryViewState;
+  begin(): KeepsakeMemoryViewState;
+  pick(index: number): KeepsakeMemoryViewActionResult;
+  resolveMismatch(): KeepsakeMemoryViewActionResult;
+}
+
+/** Adapts the pure engine state machine to the UI's typed presentation port. */
+export function createKeepsakeMemoryController(initialState: KeepsakeMemoryState): KeepsakeMemoryController {
+  let state = initialState;
+  return {
+    get state() { return state; },
+    begin() {
+      state = beginKeepsakeMemory(state);
+      return state;
+    },
+    pick(index) {
+      const action = pickKeepsakeMemoryCard(state, index);
+      state = action.state;
+      return action;
+    },
+    resolveMismatch() {
+      const action = resolveKeepsakeMemoryMismatchResult(state);
+      state = action.state;
+      return action;
+    },
+  };
+}
 
 export function renderBoard(
   root: HTMLElement,
@@ -759,6 +815,195 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
   });
 }
 
+/**
+ * Runs the memory-match presentation inside the existing reel-stage box.
+ * Engine ownership stays explicit: this adapter forwards indexes and renders
+ * only the returned state/event payloads.
+ */
+export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMemoryController): Promise<number> {
+  return new Promise((resolve) => {
+    const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
+    const reelGrid = root.querySelector<HTMLElement>("#reel-grid");
+    if (!cabinet || !reelGrid) { resolve(0); return; }
+
+    reelGrid.hidden = true;
+    const scene = document.createElement("section");
+    scene.className = "keepsake-memory-scene";
+    scene.setAttribute("aria-label", "Moonlit Keepsake Trail memory bonus");
+    scene.innerHTML = `
+      <div class="keepsake-trail-backdrop" aria-hidden="true">${keepsakeMemoryTrailSvg()}</div>
+      <div class="keepsake-memory-header">
+        <strong>MOONLIT KEEPSAKE TRAIL</strong>
+        <span>Six keepsakes. Twelve stops. One path to follow.</span>
+      </div>
+      <div class="keepsake-memory-status" id="keepsake-memory-status" aria-live="polite">The trail is laid out. Memorize the keepsakes…</div>
+      <div class="keepsake-memory-grid" id="keepsake-memory-grid" role="group" aria-label="Twelve keepsake memory cards"></div>
+      <div class="keepsake-memory-footer">
+        <span id="keepsake-memory-pairs">Pairs 0 / 6</span>
+        <span class="keepsake-mismatch-track" id="keepsake-memory-fails" aria-label="Mismatches 0 of 2">
+          <b>Mismatches</b>
+          <i data-strike="0" aria-label="First mismatch unused"></i>
+          <i data-strike="1" aria-label="Second mismatch unused"></i>
+          <em>0 / 2</em>
+        </span>
+      </div>
+      <div class="keepsake-memory-result" id="keepsake-memory-result" hidden role="status" aria-live="assertive"></div>`;
+    cabinet.appendChild(scene);
+
+    const grid = scene.querySelector<HTMLDivElement>("#keepsake-memory-grid")!;
+    const status = scene.querySelector<HTMLDivElement>("#keepsake-memory-status")!;
+    const pairs = scene.querySelector<HTMLSpanElement>("#keepsake-memory-pairs")!;
+    const fails = scene.querySelector<HTMLSpanElement>("#keepsake-memory-fails")!;
+    const result = scene.querySelector<HTMLDivElement>("#keepsake-memory-result")!;
+    let view = controller.state;
+    let activeCompare: number[] = [];
+    let settled = false;
+    let previewTimer: number | undefined;
+    let mismatchTimer: number | undefined;
+
+    grid.innerHTML = view.cards.map(renderKeepsakeMemoryCard).join("");
+
+    const updateCardButtons = (next: KeepsakeMemoryViewState, animate: boolean): void => {
+      const previous = view;
+      view = next;
+      next.cards.forEach((card) => {
+        const button = grid.querySelector<HTMLButtonElement>(`[data-card-index="${card.index}"]`);
+        if (!button) return;
+        const face = button.querySelector<HTMLElement>(".keepsake-memory-card");
+        if (!face) return;
+        const before = previous.cards.find((candidate) => candidate.index === card.index);
+        const changedFace = animate && before !== undefined && before.revealed !== card.revealed;
+        button.classList.toggle("is-active", activeCompare.includes(card.index));
+        button.classList.toggle("is-matched", card.matched);
+        button.classList.toggle("is-mismatch", activeCompare.includes(card.index) && next.phase === "resolving_mismatch");
+        button.setAttribute("aria-label", keepsakeMemoryCardLabel(card));
+        if (changedFace) animateKeepsakeCard(face, card.revealed);
+        else face.classList.toggle("is-revealed", card.revealed);
+      });
+      pairs.textContent = `Pairs ${next.pairsFound} / 6`;
+      const usedFails = Math.min(next.fails, next.maxFails);
+      fails.setAttribute("aria-label", `Mismatches ${usedFails} of ${next.maxFails}`);
+      fails.querySelector("em")!.textContent = `${usedFails} / ${next.maxFails}`;
+      fails.querySelectorAll<HTMLElement>("[data-strike]").forEach((marker, index) => {
+        marker.classList.toggle("is-filled", index < usedFails);
+        marker.setAttribute("aria-label", `${index < usedFails ? "Used" : "Unused"} ${index === 0 ? "first" : "second"} mismatch`);
+      });
+    };
+
+    const showOutcome = (outcome: "success" | "failure"): void => {
+      if (settled) return;
+      settled = true;
+      result.hidden = false;
+      result.className = `keepsake-memory-result is-${outcome}`;
+      result.textContent = outcome === "success"
+        ? "All six pairs found! You win 40 free spins!"
+        : "Trail over — no free spins this time. The night is still lovely.";
+      if (outcome === "success") playKeepsakeSuccess();
+      else playKeepsakeFailure();
+      window.setTimeout(() => {
+        window.clearTimeout(previewTimer);
+        window.clearTimeout(mismatchTimer);
+        scene.remove();
+        reelGrid.hidden = false;
+        resolve(view.freeSpinsAwarded);
+      }, 1500);
+    };
+
+    const handlePick = (index: number): void => {
+      if (settled) return;
+      const action = controller.pick(index);
+      if (!action.accepted) return;
+      const event = action.event;
+      activeCompare = event?.kind === "card_revealed" ? [event.index] : event && "indices" in event ? [...event.indices] : activeCompare;
+      updateCardButtons(action.state, true);
+      if (!event) return;
+
+      if (event.kind === "card_revealed") {
+        playKeepsakeCardFlip();
+        status.textContent = "A keepsake is glowing. Find its match.";
+        return;
+      }
+
+      if (event.kind === "match" || event.kind === "completed") {
+        playKeepsakeCardFlip();
+        playKeepsakeMatch();
+        activeCompare = [];
+        grid.querySelectorAll<HTMLButtonElement>(".is-active").forEach((card) => card.classList.remove("is-active"));
+        status.textContent = event.kind === "completed" ? "The whole trail is glowing!" : "Pair found. Keep following the trail.";
+        if (event.kind === "completed") window.setTimeout(() => showOutcome("success"), 450);
+        return;
+      }
+
+      if (event.kind === "mismatch" || event.kind === "failed") {
+        playKeepsakeCardFlip();
+        playKeepsakeMismatch();
+        status.textContent = event.kind === "failed" || ("fails" in event && event.fails === 2)
+          ? "The keepsakes are taking a little night walk."
+          : "A near-match. The trail is still glowing.";
+        mismatchTimer = window.setTimeout(() => {
+          const resolved = controller.resolveMismatch();
+          activeCompare = [];
+          updateCardButtons(resolved.state, true);
+          if (resolved.event?.kind === "failed" || resolved.state.phase === "failed") {
+            showOutcome("failure");
+            return;
+          }
+          status.textContent = "Choose the next keepsake pair.";
+        }, 900);
+      }
+    };
+
+    grid.querySelectorAll<HTMLButtonElement>("[data-card-index]").forEach((button) => {
+      button.addEventListener("click", () => handlePick(Number(button.dataset.cardIndex)));
+    });
+
+    updateCardButtons(view, false);
+    previewTimer = window.setTimeout(() => {
+      const next = controller.begin();
+      status.textContent = "The trail is ready. Choose a keepsake.";
+      activeCompare = [];
+      updateCardButtons(next, true);
+    }, 2500);
+  });
+}
+
+function keepsakeMemoryCardLabel(card: KeepsakeMemoryViewCard): string {
+  if (!card.revealed) return `Hidden keepsake card ${card.index + 1}`;
+  const name = PAYTABLE_SYMBOLS.find((symbol) => symbol.id === card.symbol)?.name ?? "Keepsake";
+  return `${name} memory card${card.matched ? ", matched" : ", revealed"}`;
+}
+
+function renderKeepsakeMemoryCard(card: KeepsakeMemoryViewCard): string {
+  return `<button type="button" class="keepsake-memory-card-button" data-card-index="${card.index}" aria-label="${keepsakeMemoryCardLabel(card)}">
+    <span class="keepsake-memory-card${card.revealed ? " is-revealed" : ""}">
+      <span class="keepsake-card-face keepsake-card-back" aria-hidden="true"><img src="${import.meta.env.BASE_URL}assets/keepsake-memory-card-back.png" alt=""></span>
+      <span class="keepsake-card-face keepsake-card-front">${symbolSvg(card.symbol)}</span>
+      <span class="keepsake-mismatch-mark" aria-hidden="true"><img src="${import.meta.env.BASE_URL}assets/keepsake-memory-mismatch-overlay.png" alt=""></span>
+    </span>
+  </button>`;
+}
+
+function animateKeepsakeCard(face: HTMLElement, revealed: boolean): void {
+  face.classList.remove("is-flipping-front", "is-flipping-back");
+  void face.offsetWidth;
+  if (revealed) face.classList.add("is-revealed");
+  face.classList.add(revealed ? "is-flipping-front" : "is-flipping-back");
+  window.setTimeout(() => {
+    face.classList.toggle("is-revealed", revealed);
+    face.classList.remove("is-flipping-front", "is-flipping-back");
+  }, 470);
+}
+
+function keepsakeMemoryTrailSvg(): string {
+  return `<svg viewBox="0 0 500 320" preserveAspectRatio="none">
+    <defs><linearGradient id="keepsake-trail-fill" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#573c78"/><stop offset=".55" stop-color="#29204f"/><stop offset="1" stop-color="#171335"/></linearGradient></defs>
+    <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="#11102b" stroke-width="92" opacity=".58"/>
+    <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="url(#keepsake-trail-fill)" stroke-width="76" opacity=".9"/>
+    <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="#f5d576" stroke-width="2" stroke-dasharray="2 13" opacity=".36"/>
+    <circle cx="70" cy="268" r="4" fill="#9fe8c5"/><circle cx="228" cy="194" r="3" fill="#f5d576"/><circle cx="390" cy="205" r="4" fill="#9fe8c5"/>
+  </svg>`;
+}
+
 /** Bold Chai awards enter the existing free-spin session without the wheel. */
 async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
   const session = runFreeSpinSession(mulberry32(productionSeed()), "chai_back", betPerLine(state.bet), spinsAwarded, { allowChaiStorm: false });
@@ -1132,6 +1377,25 @@ async function playTreatTimeOnMainBoard(
 async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAwarded: number): Promise<void> {
   const rng = mulberry32(productionSeed());
   const wedge = await showWheelScreen(root, rng);
+
+  if (wedge === "keepsake_memory") {
+    const memory = createKeepsakeMemory(mulberry32(productionSeed()));
+    const earnedSpins = await runKeepsakeMemoryBonus(root, createKeepsakeMemoryController(memory));
+    if (earnedSpins === 0) {
+      renderBoard(root, state);
+      return;
+    }
+    const standardSession = runFreeSpinSession(rng, "standard", betPerLine(state.bet), earnedSpins);
+    await playFreeSpinSession(root, state, standardSession);
+    state.balance += standardSession.totalWin;
+    state.bestCascade = Math.max(state.bestCascade, standardSession.bestCascade);
+    saveGameState(state);
+    await showBonusSummary(root, standardSession.totalWin, standardSession.retriggers, standardSession.totalSpins);
+    const lastRound = standardSession.rounds[standardSession.rounds.length - 1];
+    renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
+    return;
+  }
+
   const session = runFreeSpinSession(rng, wedge, betPerLine(state.bet), spinsAwarded);
 
   await playFreeSpinSession(root, state, session);
@@ -1165,7 +1429,7 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
 function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWedge> {
   return new Promise((resolve) => {
     const wedge = spinWheel(rng);
-    const finalDeg = 1080 + (({ multiplying: 30, giant_gnome: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
+    const finalDeg = 1080 + (({ multiplying: 30, keepsake_memory: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
 
     const overlay = document.createElement("div");
     overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
@@ -1181,7 +1445,7 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
       </div>
       <div class="wheel-legends" aria-hidden="true">
         <span><b>We're Multiplying</b> Extra sparkle</span>
-        <span><b>Keepsake Constellation</b> mega-keepsakes</span>
+        <span><b>Moonlit Keepsake Trail</b> memory match</span>
         <span><b>Iced Chai</b> wild rain</span>
       </div>
       <p id="wheel-result" class="min-h-[1.5rem] text-center font-semibold"></p>
@@ -1219,7 +1483,7 @@ async function playFreeSpinSession(
 
   const treatTime = wedge === "treat_time_morning" || wedge === "treat_time_nighttime";
   const chaiStormSession = wedge === "chai_back" && rounds.some((round) => round.chaiRain !== undefined);
-  const displayWedgeLabel = presentation.label ?? (wedge === "chai_back" && !chaiStormSession ? "Bold Chai" : wheelWedgeLabel(wedge));
+  const displayWedgeLabel = presentation.label ?? (wedge === "standard" ? "Standard Chai Chase" : wedge === "chai_back" && !chaiStormSession ? "Bold Chai" : wheelWedgeLabel(wedge));
   const title = presentation.title ?? (treatTime ? "IT'S TREAT TIME!" : wedge === "doorbell_panic" ? "Panic Spins" : displayWedgeLabel === "Bold Chai" ? "BOLD CHAI!" : "Free Spins");
   const panel = document.createElement("section");
   panel.className = `free-spins-panel text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins treat-time-cabinet" : ""}`;
