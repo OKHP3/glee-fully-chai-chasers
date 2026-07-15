@@ -18,14 +18,55 @@ export interface TreatJar {
 
 export const TREAT_JAR_CAP = 12;
 
+export const TREAT_JAR_FREE_SPINS: Record<TreatKind, number> = {
+  chicken: 5,
+  salmon: 7,
+  bougie: 10,
+};
+
+export interface TreatCollectionResult {
+  jar: TreatJar;
+  freeSpinsAwarded: number;
+}
+
+export interface TreatJarSettlement {
+  jar: TreatJar;
+  freeSpinsAwarded: number;
+  completed: TreatKind[];
+}
+
 export function emptyTreatJar(): TreatJar {
   return { chicken: 0, salmon: 0, bougie: 0 };
 }
 
-export function addTreat(jar: TreatJar, treat: TreatKind): TreatJar {
+/** Resolves any completed bags already present in a persisted jar. */
+export function settleTreatJar(jar: TreatJar): TreatJarSettlement {
   const next = { ...jar };
-  next[treat] = Math.min(TREAT_JAR_CAP, next[treat] + 1);
-  return next;
+  const completed: TreatKind[] = [];
+  let freeSpinsAwarded = 0;
+  for (const treat of ["chicken", "salmon", "bougie"] as const) {
+    const completions = Math.floor(next[treat] / TREAT_JAR_CAP);
+    if (completions < 1) continue;
+    next[treat] %= TREAT_JAR_CAP;
+    freeSpinsAwarded += completions * TREAT_JAR_FREE_SPINS[treat];
+    for (let i = 0; i < completions; i++) completed.push(treat);
+  }
+  return { jar: next, freeSpinsAwarded, completed };
+}
+
+/** Adds one treat and pays/resets only the bag that reaches twelve. */
+export function collectTreat(jar: TreatJar, treat: TreatKind): TreatCollectionResult {
+  const next = { ...jar };
+  next[treat] += 1;
+  if (next[treat] < TREAT_JAR_CAP) return { jar: next, freeSpinsAwarded: 0 };
+
+  next[treat] = 0;
+  return { jar: next, freeSpinsAwarded: TREAT_JAR_FREE_SPINS[treat] };
+}
+
+/** Backward-compatible jar-only helper for callers that do not need rewards. */
+export function addTreat(jar: TreatJar, treat: TreatKind): TreatJar {
+  return collectTreat(jar, treat).jar;
 }
 
 const BASE_POP_IN_RATE = 1 / 32; // docs §6 target ~1/30, pity-weighted below

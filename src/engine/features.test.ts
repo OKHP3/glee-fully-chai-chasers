@@ -1,12 +1,43 @@
 import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
-import { addTreat, consumeForVisit, emptyTreatJar, rollCatVisit } from "./features";
+import { addTreat, collectTreat, consumeForVisit, emptyTreatJar, rollCatVisit, settleTreatJar } from "./features";
 
 describe("treat jar", () => {
-  it("caps each treat at 12", () => {
+  it("pays five Chicken Comet spins and resets only that bag at twelve", () => {
     let jar = emptyTreatJar();
-    for (let i = 0; i < 20; i++) jar = addTreat(jar, "bougie");
-    expect(jar.bougie).toBe(12);
+    for (let i = 0; i < 11; i++) jar = addTreat(jar, "chicken");
+
+    const completed = collectTreat(jar, "chicken");
+
+    expect(completed.jar).toEqual({ chicken: 0, salmon: 0, bougie: 0 });
+    expect(completed.freeSpinsAwarded).toBe(5);
+  });
+
+  it("awards Salmon Stars and Bougie Bites independently", () => {
+    const jar = { chicken: 4, salmon: 11, bougie: 11 };
+
+    const salmon = collectTreat(jar, "salmon");
+    const bougie = collectTreat(salmon.jar, "bougie");
+
+    expect(salmon.jar).toEqual({ chicken: 4, salmon: 0, bougie: 11 });
+    expect(salmon.freeSpinsAwarded).toBe(7);
+    expect(bougie.jar).toEqual({ chicken: 4, salmon: 0, bougie: 0 });
+    expect(bougie.freeSpinsAwarded).toBe(10);
+  });
+
+  it("keeps collecting after a completed bag resets", () => {
+    let jar = emptyTreatJar();
+    for (let i = 0; i < 12; i++) jar = addTreat(jar, "bougie");
+    for (let i = 0; i < 3; i++) jar = addTreat(jar, "bougie");
+
+    expect(jar.bougie).toBe(3);
+  });
+
+  it("settles completed persisted bags independently", () => {
+    const settled = settleTreatJar({ chicken: 12, salmon: 13, bougie: 0 });
+    expect(settled.jar).toEqual({ chicken: 0, salmon: 1, bougie: 0 });
+    expect(settled.completed).toEqual(["chicken", "salmon"]);
+    expect(settled.freeSpinsAwarded).toBe(12);
   });
 });
 

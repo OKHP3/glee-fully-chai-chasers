@@ -44,6 +44,7 @@ describe("game state persistence", () => {
       bet: 25,
       xp: 12,
       treatJar: emptyTreatJar(),
+      pendingTreatJarSpins: 0,
       fireflyMeter: 3,
       bestCascade: 3,
       spinsSincePopIn: 2,
@@ -67,5 +68,14 @@ describe("game state persistence", () => {
     storage.setItem("ccv1.treatJar", JSON.stringify({ chicken: 2, salmon: 1, boogie: 4 }));
 
     expect(loadGameState().treatJar).toEqual({ chicken: 2, salmon: 1, bougie: 4 });
+  });
+
+  it("migrates completed legacy treat bags into pending bonus spins", () => {
+    storage.setItem("ccv1.treatJar", JSON.stringify({ chicken: 12, salmon: 12, bougie: 4 }));
+
+    const migrated = loadGameState();
+    expect(migrated.treatJar).toEqual({ chicken: 0, salmon: 0, bougie: 4 });
+    expect(migrated.pendingTreatJarSpins).toBe(12);
+    expect(loadGameState().pendingTreatJarSpins).toBe(12);
   });
 });
