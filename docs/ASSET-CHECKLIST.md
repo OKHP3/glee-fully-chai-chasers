@@ -9,7 +9,7 @@ Status: ☐ todo · ◐ in progress · ☑ done
 |---|---|---|---|---|
 | Joey (illustrated) | Slender gray, yellow eyes; wheel-rim and saucer-wild production art | ChatGPT imagegen, 2026-07-11 | original | ☑ `public/assets/joey-phoebe-wheel.png`, `joey-phoebe-wilds.png` |
 | Phoebe (illustrated) | Curvy tuxedo, white chest/paws; wheel-rim and saucer-wild production art | ChatGPT imagegen, 2026-07-11 | original | ☑ same files |
-| AskJamie avatar | Existing cartoon | drop-in from askjamie.bot | Jamie-owned | ☑ (asset exists) |
+| AskJamie avatar | Official illustrated human avatar used at the board perch | Jamie-provided asset, 2026-07-14 | Jamie-owned | ☑ `public/assets/askjamie-avatar.jpg` |
 | Chai Captain motifs | Tumbler, butterfly clip, cardigan palette — silhouette/mood only, no likeness | Claude SVG | original | ☐ |
 
 ## Symbols (production sprite atlas; equal 4×4 cells)
