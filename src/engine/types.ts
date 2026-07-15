@@ -16,7 +16,7 @@ export type SymbolId =
   // treats (feature symbols, reels 1/3/5 only)
   | "treat_chicken" | "treat_salmon" | "treat_bougie"
   // wilds & legend
-  | "wild_joey" | "wild_phoebe" | "uniglee";
+  | "wild_joey" | "wild_phoebe" | "wild_handbag" | "uniglee";
 
 export type TreatKind = "chicken" | "salmon" | "bougie";
 
@@ -27,6 +27,7 @@ export type SpinArea = "main" | "secondary";
 
 /** A single marked wild used by the We're Multiplying free-spin bonus. */
 export type WildMultiplier = 2 | 3 | 5 | 10;
+export type HandbagWildMultiplier = 3 | 5 | 10;
 
 export interface TreatTimeWild {
   position: [reel: number, row: number];
@@ -43,6 +44,8 @@ export interface Cell {
   symbol: SymbolId;
   /** Present only on the one marked wild that opened a multiplying free spin. */
   multiplier?: WildMultiplier;
+  /** Present on a Handbag Wild; scales a winning line that uses this symbol. */
+  handbagMultiplier?: HandbagWildMultiplier;
 }
 
 /** 5 reels x 4 rows; grid[reel][row], row 0 = top. */

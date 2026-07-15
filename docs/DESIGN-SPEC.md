@@ -70,6 +70,7 @@ Paytable (× line bet; tuned by simulation, these are the starting values):
 | 🦋 Butterfly clip / 📼 VHS / 🌌 Aurora keepsake / 12 charm | 3 | 8 | 25 | Personally meaningful low tier |
 | Treat pouches | — | — | — | Non-paying feature symbols, reels 1/3/5 (§6) |
 | Saucer-Cat Wilds | pay as top symbol | | | Stacked 6-7 high (§5) |
+| Handbag Wild | — | — | — | Rare non-cat wild; multiplies a winning line by ×3, ×5, or ×10 |
 | UniGlee 🦋🌈 | — | — | — | Legend, not a line symbol (§5) |
 
 Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%):

@@ -251,10 +251,11 @@ export function renderGridHtml(
     for (let row = 0; row < ROWS; row++) {
       const cell = grid[reel][row];
       const symbol = cell.symbol;
-      const badge = cell.multiplier
-        ? `<span class="multiplier-badge" aria-label="${cell.multiplier} times wild">×${cell.multiplier}</span>`
+      const visibleMultiplier = cell.multiplier ?? cell.handbagMultiplier;
+      const badge = visibleMultiplier
+        ? `<span class="multiplier-badge" aria-label="${visibleMultiplier} times wild">×${visibleMultiplier}</span>`
         : "";
-      html += `<div class="cell ${cell.multiplier ? "multiplier-wild" : ""}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
+      html += `<div class="cell ${visibleMultiplier ? "multiplier-wild" : ""}" data-row="${row}" data-symbol="${symbol}">${symbolSvg(symbol as SymbolId)}${badge}</div>`;
     }
     html += "</div>";
   }
@@ -484,6 +485,7 @@ function openPaytablePage(root: HTMLElement): void {
       <section class="feature-symbol-grid">
         ${featureCard("wild_joey", "Joey Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
         ${featureCard("wild_phoebe", "Phoebe Saucer Wild", "Substitutes for every paying symbol. A wild-only line pays as the Mermaid Tumbler.")}
+        ${featureCard("wild_handbag", "Handbag Wild", "A rare high-value wild. Each one carries a randomized ×3, ×5, or ×10 line multiplier, including bonus boards.")}
         ${featureCard("treat_chicken", "Chicken Comets", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
         ${featureCard("treat_salmon", "Salmon Stars", "A Phoebe treat. It joins the Treat Jar and can invite a helpful cat pop-in.")}
         ${featureCard("treat_bougie", "Bougie Bites", "Joey's favorite. Keep one in the Treat Jar for his stronger assist.")}
