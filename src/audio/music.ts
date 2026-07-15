@@ -74,19 +74,25 @@ const LEAD: readonly LeadNote[] = [
 type ScheduledSource = OscillatorNode | AudioBufferSourceNode;
 
 let musicBus: GainNode | undefined;
+let urgencyBus: GainNode | undefined;
 let running = false;
+let urgencyRunning = false;
+let boldChaiUrgencyEnabled = false;
 let musicVolume = 0.72;
 let cycleStart = 0;
 let loopTimer: number | undefined;
+let urgencyCycleStart = 0;
+let urgencyLoopTimer: number | undefined;
 const scheduledSources = new Set<ScheduledSource>();
+const scheduledUrgencySources = new Set<ScheduledSource>();
 
 function frequency(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
-function track(source: ScheduledSource): void {
-  scheduledSources.add(source);
-  source.addEventListener("ended", () => scheduledSources.delete(source), { once: true });
+function track(source: ScheduledSource, collection: Set<ScheduledSource> = scheduledSources): void {
+  collection.add(source);
+  source.addEventListener("ended", () => collection.delete(source), { once: true });
 }
 
 function scheduleOscillator(
@@ -97,8 +103,10 @@ function scheduleOscillator(
   peak: number,
   type: OscillatorType,
   attack = 0.03,
+  destination: GainNode | undefined = musicBus,
+  collection: Set<ScheduledSource> = scheduledSources,
 ): void {
-  if (!musicBus) return;
+  if (!destination) return;
   const oscillator = audio.createOscillator();
   const gain = audio.createGain();
   oscillator.type = type;
@@ -106,15 +114,22 @@ function scheduleOscillator(
   gain.gain.setValueAtTime(0.0001, start);
   gain.gain.linearRampToValueAtTime(peak, start + attack);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-  oscillator.connect(gain).connect(musicBus);
-  track(oscillator);
+  oscillator.connect(gain).connect(destination);
+  track(oscillator, collection);
   oscillator.start(start);
   oscillator.stop(start + duration + 0.03);
 }
 
 /** A synthesized, filtered noise brush; no recorded percussion is used. */
-function scheduleBrush(audio: AudioContext, start: number, brightness: number): void {
-  if (!musicBus) return;
+function scheduleBrush(
+  audio: AudioContext,
+  start: number,
+  brightness: number,
+  destination: GainNode | undefined = musicBus,
+  collection: Set<ScheduledSource> = scheduledSources,
+  peak = 0.022,
+): void {
+  if (!destination) return;
   const duration = 0.09;
   const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * duration), audio.sampleRate);
   const data = buffer.getChannelData(0);
@@ -128,10 +143,10 @@ function scheduleBrush(audio: AudioContext, start: number, brightness: number): 
   filter.type = "highpass";
   filter.frequency.setValueAtTime(brightness, start);
   gain.gain.setValueAtTime(0.0001, start);
-  gain.gain.linearRampToValueAtTime(0.022, start + 0.008);
+  gain.gain.linearRampToValueAtTime(peak, start + 0.008);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-  source.connect(filter).connect(gain).connect(musicBus);
-  track(source);
+  source.connect(filter).connect(gain).connect(destination);
+  track(source, collection);
   source.start(start);
   source.stop(start + duration + 0.02);
 }
@@ -175,6 +190,150 @@ function scheduleCycle(start: number): void {
   });
 }
 
+const BOLD_CHAI_URGENCY_BPM = 104;
+const BOLD_CHAI_URGENCY_BEAT_SECONDS = 60 / BOLD_CHAI_URGENCY_BPM;
+const BOLD_CHAI_URGENCY_BAR_SECONDS = BOLD_CHAI_URGENCY_BEAT_SECONDS * 4;
+const BOLD_CHAI_URGENCY_CYCLE_SECONDS = BOLD_CHAI_URGENCY_BAR_SECONDS * 2;
+
+/**
+ * A compact pressure layer for the 30-second barista scene. It is deliberately
+ * a layer rather than a replacement score: warm low pulses suggest a busy
+ * counter, offbeat chord taps add forward motion, and synthesized brushes keep
+ * the hands-in-motion feeling without introducing a borrowed melody or sample.
+ */
+function scheduleUrgencyCycle(start: number): void {
+  const audio = getAudioContext();
+  if (!audio || !urgencyBus) return;
+
+  const bassPattern = [40, 40, 43, 40, 38, 38, 36, 38];
+  const chordPattern = [
+    [52, 55, 59],
+    [50, 54, 57],
+  ];
+
+  bassPattern.forEach((midi, beat) => {
+    const beatStart = start + beat * BOLD_CHAI_URGENCY_BEAT_SECONDS;
+    scheduleOscillator(
+      audio,
+      frequency(midi),
+      beatStart,
+      BOLD_CHAI_URGENCY_BEAT_SECONDS * 0.72,
+      0.026,
+      beat % 2 === 0 ? "triangle" : "sawtooth",
+      0.012,
+      urgencyBus,
+      scheduledUrgencySources,
+    );
+
+    // The tiny offbeat chord is the rhythmic "pump" of the layer; it stays
+    // quiet enough for the registered pump and cascade effects to lead.
+    const offbeatStart = beatStart + BOLD_CHAI_URGENCY_BEAT_SECONDS * 0.5;
+    chordPattern[beat % chordPattern.length].forEach((chordTone, voice) => {
+      scheduleOscillator(
+        audio,
+        frequency(chordTone + (voice === 2 && beat % 4 === 3 ? 12 : 0)),
+        offbeatStart + voice * 0.008,
+        BOLD_CHAI_URGENCY_BEAT_SECONDS * 0.24,
+        0.012,
+        "triangle",
+        0.008,
+        urgencyBus,
+        scheduledUrgencySources,
+      );
+    });
+
+    scheduleBrush(
+      audio,
+      beatStart + BOLD_CHAI_URGENCY_BEAT_SECONDS * 0.25,
+      beat % 2 === 0 ? 2_350 : 3_000,
+      urgencyBus,
+      scheduledUrgencySources,
+      0.011,
+    );
+    scheduleBrush(
+      audio,
+      beatStart + BOLD_CHAI_URGENCY_BEAT_SECONDS * 0.75,
+      3_300,
+      urgencyBus,
+      scheduledUrgencySources,
+      0.008,
+    );
+  });
+
+  // A short two-note lift at the end of each phrase gives the layer a
+  // little barista-counter urgency without becoming a second lead melody.
+  scheduleOscillator(
+    audio,
+    frequency(64),
+    start + BOLD_CHAI_URGENCY_CYCLE_SECONDS - BOLD_CHAI_URGENCY_BEAT_SECONDS * 0.35,
+    0.18,
+    0.012,
+    "sine",
+    0.01,
+    urgencyBus,
+    scheduledUrgencySources,
+  );
+  scheduleOscillator(
+    audio,
+    frequency(71),
+    start + BOLD_CHAI_URGENCY_CYCLE_SECONDS - BOLD_CHAI_URGENCY_BEAT_SECONDS * 0.12,
+    0.16,
+    0.014,
+    "sine",
+    0.01,
+    urgencyBus,
+    scheduledUrgencySources,
+  );
+}
+
+function scheduleFollowingUrgencyCycle(): void {
+  const audio = getAudioContext();
+  if (!urgencyRunning || !audio) return;
+  urgencyCycleStart += BOLD_CHAI_URGENCY_CYCLE_SECONDS;
+  scheduleUrgencyCycle(urgencyCycleStart);
+  const wakeAt = Math.max(30, (urgencyCycleStart - audio.currentTime - 0.45) * 1_000);
+  urgencyLoopTimer = window.setTimeout(scheduleFollowingUrgencyCycle, wakeAt);
+}
+
+function startUrgencyLayer(start: number): void {
+  const audio = getAudioContext();
+  if (!audio || !musicBus || urgencyRunning) return;
+
+  urgencyBus = audio.createGain();
+  urgencyBus.gain.setValueAtTime(0.0001, audio.currentTime);
+  urgencyBus.gain.linearRampToValueAtTime(musicVolume * 0.075, audio.currentTime + 0.12);
+  urgencyBus.connect(audio.destination);
+  urgencyRunning = true;
+  urgencyCycleStart = start;
+  scheduleUrgencyCycle(start);
+  urgencyLoopTimer = window.setTimeout(
+    scheduleFollowingUrgencyCycle,
+    Math.max(30, (BOLD_CHAI_URGENCY_CYCLE_SECONDS - 0.45) * 1_000),
+  );
+}
+
+function stopUrgencyLayer(): void {
+  urgencyRunning = false;
+  if (urgencyLoopTimer !== undefined) {
+    window.clearTimeout(urgencyLoopTimer);
+    urgencyLoopTimer = undefined;
+  }
+
+  const audio = getAudioContext();
+  if (urgencyBus && audio) urgencyBus.gain.setTargetAtTime(0.0001, audio.currentTime, 0.025);
+  for (const source of scheduledUrgencySources) {
+    try {
+      source.stop((audio?.currentTime ?? 0) + 0.08);
+    } catch {
+      // A source can have ended between the loop and stop call.
+    }
+  }
+  scheduledUrgencySources.clear();
+  const busToDisconnect = urgencyBus;
+  urgencyBus = undefined;
+  if (busToDisconnect) window.setTimeout(() => busToDisconnect.disconnect(), 150);
+}
+
 function scheduleFollowingCycle(): void {
   const audio = getAudioContext();
   if (!running || !audio) return;
@@ -196,7 +355,22 @@ export function startBaseMusic(): void {
   running = true;
   cycleStart = audio.currentTime + 0.06;
   scheduleCycle(cycleStart);
+  if (boldChaiUrgencyEnabled) startUrgencyLayer(cycleStart);
   loopTimer = window.setTimeout(scheduleFollowingCycle, Math.max(30, (BASE_SCORE_DURATION_SECONDS - 0.5) * 1_000));
+}
+
+/**
+ * Toggle the original high-velocity chai-production layer. The base score
+ * keeps running underneath; disabling it fades only this layer back out.
+ */
+export function setBoldChaiUrgency(enabled: boolean): void {
+  boldChaiUrgencyEnabled = enabled;
+  if (enabled) {
+    const audio = getAudioContext();
+    if (running && audio) startUrgencyLayer(audio.currentTime + 0.06);
+  } else {
+    stopUrgencyLayer();
+  }
 }
 
 /** Set the music mix (0–1); changes take effect immediately while playing. */
@@ -204,11 +378,13 @@ export function setMusicVolume(volume: number): void {
   musicVolume = Math.min(1, Math.max(0, volume));
   const audio = getAudioContext();
   if (musicBus && audio) musicBus.gain.setTargetAtTime(musicVolume * 0.14, audio.currentTime, 0.025);
+  if (urgencyBus && audio) urgencyBus.gain.setTargetAtTime(musicVolume * 0.075, audio.currentTime, 0.025);
 }
 
 /** Stop all scheduled score voices immediately when the shared Sound toggle is off. */
 export function stopBaseMusic(): void {
   running = false;
+  stopUrgencyLayer();
   if (loopTimer !== undefined) {
     window.clearTimeout(loopTimer);
     loopTimer = undefined;
