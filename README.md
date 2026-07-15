@@ -52,7 +52,7 @@ npm run build
 
 The project is a Vite + TypeScript single-page app. Game math lives in `src/engine/`; the browser UI lives in `src/ui/`.
 
-Current engineering status (verified 2026-07-15): the production build passes, all 82 tests pass, and the seeded 200,000-spin release oracle is green — measured RTP 95.91% against the 96% ±0.5 target, with free spins, mega-cascade, UniGlee, and cat pop-in frequencies all inside their approved bands.
+Current engineering status: the production build passes, the full test suite is green, and the seeded 200,000-spin base-game oracle is green at 95.91% against the 96% ±0.5 target. Full-game release math still needs a combined model for downstream bonus payouts, including the human success rate and 40-spin handoff of Moonlit Keepsake Trail.
 
 ## Privacy and originality
 
