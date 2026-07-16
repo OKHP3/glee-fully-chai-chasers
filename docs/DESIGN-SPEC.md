@@ -89,7 +89,7 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 
 **Cascade loop:** evaluate 40 lines → winning symbols beam up into the saucers (float-shrink-flash, 380ms) → columns compress down → new symbols drop from the saucer bays (staggered per reel, 90ms offsets) → re-evaluate. Repeat to dead board. Each cascade tier plays a rising arpeggio one step higher — by cascade 4+ it's musical euphoria.
 
-**Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow. Ladder: **4→7, 5→10, 6→15, 7→20, 8→50, 9→75, 10→100, 11+→200 free spins.** At meter 3 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Retriggers during free spins use the same ladder.
+**Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow. Ladder: **6→15, 7→20, 8→50, 9→75, 10→100, 11+→200 free spins** (2026-07 retune: entry raised from 4 to 6 cascades). At meter 5 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Retriggers are blocked in all bonuses (2026-07 retune): free spins never extend themselves.
 
 **Saucer-Cat Wilds:** Joey-saucer and Phoebe-saucer wilds arrive in stacks up to 6-7 high on reels 2-5, substitute for all paying symbols, pay as Mermaid Tumbler when forming their own line.
 
