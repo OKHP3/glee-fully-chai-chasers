@@ -1,4 +1,0 @@
-- generic [ref=e3]:
-  - heading "Glee-fully Chai Chasers" [level=1] [ref=e4]
-  - paragraph [ref=e5]: Joey and Phoebe are ready. The chai chase is on.
-  - button "START THE CHAI CHASE" [ref=e6] [cursor=pointer]
