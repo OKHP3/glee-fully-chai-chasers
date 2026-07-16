@@ -1,11 +1,12 @@
 /**
  * UniGlee marathon structure. Pure TypeScript, zero DOM.
  *
- * This module owns the amended five-act plan only. Chapter payout/effect math,
- * the reel-activated trigger, and the eventual session runner remain separate
- * engine work so this contract can be integrated without nesting bonuses.
+ * This module owns the amended five-act plan and the active-line trigger
+ * contract. Chapter payout/effect math remains in the chapter engines.
  */
 import type { Rng } from "./rng";
+import type { Grid, SymbolId, UniGleeTrigger } from "./types";
+import { PAYLINES } from "./paylines";
 import { baseLaundryAllocation, type UniGleeAwardSpins } from "./laundry";
 
 export type UniGleeSubBonusId =
@@ -20,6 +21,58 @@ export const UNIGLEE_MIDDLE_SUB_BONUSES = [
   "keepsake_collection",
   "nighttime_treat_time",
 ] as const satisfies readonly UniGleeSubBonusId[];
+
+export const UNIGLEE_ACTIVE_REELS = [2, 3, 4] as const;
+export const UNIGLEE_ACTIVE_RATE = 1 / 400;
+
+const ACTIVE_REEL_WEIGHTS: readonly [2 | 3 | 4, number][] = [
+  [2, 45],
+  [3, 35],
+  [4, 20],
+];
+
+const TRIGGER_SYMBOLS: readonly SymbolId[] = [
+  "tumbler", "butterfly", "mixtape", "crystal", "chai", "candle", "cassette", "gnome",
+  "mailbox", "vhs", "teapot", "yarn",
+];
+
+function weightedActiveReel(rng: Rng): 2 | 3 | 4 {
+  let roll = rng() * ACTIVE_REEL_WEIGHTS.reduce((sum, [, weight]) => sum + weight, 0);
+  for (const [reel, weight] of ACTIVE_REEL_WEIGHTS) {
+    if (roll < weight) return reel;
+    roll -= weight;
+  }
+  return 2;
+}
+
+/**
+ * Places one guaranteed active UniGlee capture on a selected payline. The
+ * symbol is never placed on reels 1–2; the prefix is made line-valid so the
+ * event cannot be a decorative, non-paying-looking scatter.
+ */
+export function placeUniGleeTrigger(rng: Rng, input: Grid): { grid: Grid; trigger: UniGleeTrigger } {
+  const reel = weightedActiveReel(rng);
+  const lineIndex = Math.floor(rng() * PAYLINES.length);
+  const line = PAYLINES[lineIndex];
+  const row = line[reel];
+  const symbol = TRIGGER_SYMBOLS[Math.floor(rng() * TRIGGER_SYMBOLS.length)];
+  const grid = input.map((column) => column.map((cell) => ({ ...cell })));
+  for (let lineReel = 0; lineReel < reel; lineReel++) {
+    grid[lineReel][line[lineReel]] = { symbol };
+  }
+  grid[reel][row] = { symbol: "uniglee" };
+  const linePositions = Array.from({ length: reel + 1 }, (_, lineReel) => [lineReel, line[lineReel]] as [number, number]);
+  return {
+    grid,
+    trigger: {
+      reel,
+      lineIndex,
+      position: [reel, row],
+      linePositions,
+      initialAwardSpins: (reel + 1) * 100 as UniGleeAwardSpins,
+    },
+  };
+}
 
 export interface UniGleeSubBonusPlan {
   id: UniGleeSubBonusId;

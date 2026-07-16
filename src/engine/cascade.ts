@@ -15,6 +15,7 @@ import { rollCatVisit, type TreatJar } from "./features";
 import { rollTreatTimeTrigger } from "./treattime";
 import type { Rng } from "./rng";
 import { applyKeepsakeZone, cloneKeepsakeZone, isKeepsakePosition, rollKeepsakeSymbol } from "./keepsake-constellation";
+import { placeUniGleeTrigger, UNIGLEE_ACTIVE_RATE } from "./uniglee";
 
 const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
   treat_chicken: "chicken",
@@ -22,8 +23,8 @@ const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
   treat_bougie: "bougie",
 };
 
-/** ~1/400 per spin (docs §5) — a legend, not a line symbol. */
-export const UNIGLEE_RATE = 1 / 400;
+/** Compatibility export: the active-line capture rate remains one in 400. */
+export const UNIGLEE_RATE = UNIGLEE_ACTIVE_RATE;
 
 /** Chance a wild participating in a line win queues a specialty (tuned for §4 mega-cascade band). */
 const SPECIALTY_TRIGGER_CHANCE = 0.05;
@@ -93,7 +94,7 @@ function applyDropIn(rng: Rng, grid: Grid, keepsakeZone?: KeepsakeZone): Grid {
   const reel = 1 + Math.floor(rng() * (REELS - 1)); // reels 2-5 (index 1-4)
   const wild: SymbolId = rng() < 0.5 ? "wild_joey" : "wild_phoebe";
   const strip = stripFor(reel);
-  const column = grid[reel].map((cell) => PERSISTENT_BLOCKERS.includes(cell.symbol)
+  const column = grid[reel].map((cell) => PERSISTENT_BLOCKERS.includes(cell.symbol) || cell.symbol === "uniglee"
     ? { ...cell }
     : cell.sticky
       ? { ...cell }
@@ -261,6 +262,11 @@ export function spin({
   if (keepsakeZone) grid = applyKeepsakeZone(grid, keepsakeZone);
   const treatsCollected = collectTreats(grid);
   const unigleeTriggered = allowUniGlee && spinArea === "main" && rng() < UNIGLEE_RATE;
+  // A supplied grid is a test/bonus fixture, not a main-game opening reel
+  // window. Keep its legacy takeover behavior intact while live main spins
+  // receive the reel-activated capture payload.
+  const unigleeTrigger = unigleeTriggered && !startingGrid ? placeUniGleeTrigger(rng, grid) : undefined;
+  if (unigleeTrigger) grid = unigleeTrigger.grid;
 
   let totalWin = 0;
   let cascades = 0;
@@ -270,7 +276,6 @@ export function spin({
   let boldChaiPump: SpinResult["boldChaiPump"];
 
   if (unigleeTriggered) {
-    // "The full package": Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts.
     queue.push("drop_in", "facts_on_facts", "sparkle_sort", "sparkle_sort", "sparkle_sort");
     doubleSparkleActive = true;
     grid = applyDropIn(rng, grid, keepsakeZone);
@@ -376,6 +381,7 @@ export function spin({
     doubleSparkleApplied,
     catVisit,
     unigleeTriggered,
+    ...(unigleeTrigger ? { unigleeTrigger: unigleeTrigger.trigger } : {}),
     treatsCollected,
     doorbellPanic,
     boldChaiPump,

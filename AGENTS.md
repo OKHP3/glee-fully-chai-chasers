@@ -35,12 +35,12 @@ Implemented and integrated in the current tree:
 - pure-TypeScript reel, payline, cascade, specialty-wild, economy, cat-visit, Treat Jar, Doorbell Panic, Treat Time, Bold Chai, free-spin, wheel, Moonlit Keepsake Trail memory-bonus, and one-shot Wild Chai Storm logic;
 - illustrated Joey/Phoebe presentation, cat pop-ins, Firefly Cascade meter, real post-spin resting grids, and cascade beam/drop motion;
 - Moonlit Keepsake Trail 12-card memory staging, mismatch strike indicators, dedicated card-turn presentation, and original bonus audio/assets;
-- UniGlee rare-event takeover presentation (the approved 100–500-spin marathon is not implemented yet);
+- UniGlee reel-activated takeover plus playable 300/400/500-spin five-act marathon, typed chapter accounting, and separate long-form synthesized marathon score;
 - original Web Audio SFX plus a 60-second synthesized base score; music chapter stems remain future work;
 - versioned browser-local persistence for balance, bet, XP, Treat Jar, meter, progress, settings, and reset; and
 - GitHub Pages deployment configuration, PWA manifest/icons, and the current public art under `public/assets/` and `public/icons/`.
 
-Still planned or partial, and not evidence of being shipped merely because the spec describes them: Birthday Reveal, Chai Tea Bonus pick shelf, daily bonus, milestone scenes/collection shelf, full 100–500-spin UniGlee marathon with persistence/fast mode/summary, additional chapter-specific bonus presentation, service-worker/offline verification, final audio mix/stems, production AskJamie integration, asset optimization, and device-regression gallery.
+Still planned or partial, and not evidence of being shipped merely because the spec describes them: Birthday Reveal, Chai Tea Bonus pick shelf, daily bonus, milestone scenes/collection shelf, in-flight UniGlee reload persistence and fast/skip controls, additional chapter-specific bonus presentation, service-worker/offline verification, final audio mix/stems, production AskJamie integration, asset optimization, and device-regression gallery.
 
 The approved realignment also leaves a math migration gap: legacy uses of twelve remain in some engine constants (including level/treat-cap behavior). Do not expand those uses or silently retune them; any migration belongs to the engine owner and must be simulation-backed.
 

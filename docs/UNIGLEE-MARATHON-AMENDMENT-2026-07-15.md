@@ -1,7 +1,7 @@
 # UniGlee Marathon Bonus — Amended Release Contract
 
 **Date:** 2026-07-15  
-**Status:** approved structural amendment; chapter payout math remains simulation-gated  
+**Status:** implemented release contract; chapter payout math remains simulation-gated
 **Scope:** replaces the earlier random award-builder and 20–25-spin chapter-block proposal
 
 ## Entry award
@@ -57,7 +57,11 @@ UniGlee music is a separate original Web Audio score from the base Chai Chase lo
 
 `src/engine/uniglee.ts` owns the seeded five-act plan and quarter allocations only. It does not launch nested bonus sessions or decide payout math. Existing chapter modules remain responsible for their own typed round effects. The eventual parent runner must compose those results and keep all retriggers local to the active act.
 
-The current pure-TypeScript plan builder is covered by `src/engine/uniglee.test.ts`. Reel activation, full session execution, Lap Quest settlement, persistence, and overall RTP remain follow-up engine work.
+The release implementation is split across `src/engine/uniglee.ts`, `src/engine/uniglee-marathon.ts`, `src/engine/cascade.ts`, and the existing chapter engines. The live main-spin path now emits a typed active-line trigger; acts 1–4 resolve through chapter-local queues; the existing interactive Lap Quest runs last; and the UI reports one marathon total. Keepsake Collection uses the existing locked-zone math, while Nighttime Treat Time and We're Multiplying reuse their settled round modifiers.
+
+Release defaults are explicit: Laundry uses a 25% sock-drop rate, 18% paw-strike rate, and 60/30/10 weights for ×2/×3/×5. Each base act has a deterministic 500-spin safety ceiling; reaching it terminates that act and reports the cap in its typed session result. The ceiling is a termination guard, not a payout retune.
+
+Browser reload persistence for an in-flight marathon and a user-facing fast-mode/skip control remain outside this initial playable handoff; the bonus is resolved deterministically before presentation and the browser-local game save is settled after each chapter.
 
 ## Required gates before player-facing enablement
 
@@ -66,6 +70,5 @@ The current pure-TypeScript plan builder is covered by `src/engine/uniglee.test.
 - the middle order is seeded and contains each candidate exactly once;
 - local retriggers cannot leak across act boundaries;
 - Lap Quest extras reconcile into total spins and total Glee-coins;
-- pause/resume, fast mode, skip-to-summary, and reload persistence are deterministic;
+- pause/resume, fast mode, skip-to-summary, and reload persistence are deterministic for a later marathon-controls pass;
 - the full 96% ±0.5 RTP oracle and all repository tests remain green.
-
