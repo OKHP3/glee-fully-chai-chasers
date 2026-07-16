@@ -102,7 +102,7 @@ export function findBoldChaiTrigger(grid: Grid): BoldChaiTrigger | undefined {
   return findBlockerTrigger(grid, "chai_pump");
 }
 
-/** Evaluates all 25 lines against a grid for a given per-line bet. Pure — no RNG. */
+/** Evaluates all 40 lines against a grid for a given per-line bet. Pure — no RNG. */
 export function evaluateLines(grid: Grid, betPerLine: number): LineWin[] {
   const wins: LineWin[] = [];
 

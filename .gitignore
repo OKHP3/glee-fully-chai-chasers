@@ -10,3 +10,6 @@ dist/
 # OS / editor noise
 .DS_Store
 Thumbs.db
+
+# Playwright CLI snapshots (test artifacts)
+.playwright-cli/
