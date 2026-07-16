@@ -62,13 +62,15 @@ const skipOracle =
 describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded spins vs DESIGN-SPEC §4`, () => {
   const s = simulate();
 
-  // Base RTP retuned 2026-07: UniGlee now rolls each reel independently
+  // Full-game RTP retuned 2026-07 to land base + all bonuses in the 95-98%
+  // band (~96.5% total). Base game alone now targets ~61%; bonuses carry the
+  // rest. Previously: UniGlee rolled each reel independently
   // (1/2500, 1/4000, 1/7500; combined ~1/1,277 vs the old single 1/400 roll),
   // removing most guaranteed trigger-line wins from the base stream and
   // lowering base RTP roughly a point below the original ~96% target.
-  it(`RTP ~95.1% ±0.5 (actual: ${(s.rtp * 100).toFixed(2)}%)`, () => {
-    expect(s.rtp).toBeGreaterThan(0.946);
-    expect(s.rtp).toBeLessThan(0.956);
+  it(`base RTP ~60.9% ±1 (actual: ${(s.rtp * 100).toFixed(2)}%)`, () => {
+    expect(s.rtp).toBeGreaterThan(0.599);
+    expect(s.rtp).toBeLessThan(0.619);
   });
 
   it(`any-win rate ~1 in 2.9 ±15% (actual: 1 in ${(1 / s.winRate).toFixed(2)})`, () => {

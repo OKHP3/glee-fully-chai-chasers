@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateLines, findBoldChaiTrigger, findDoorbellTrigger, PAYLINES } from "./paylines";
+import { evaluateLines, findBoldChaiTrigger, findDoorbellTrigger, PAYLINES, PAYOUT_SCALE } from "./paylines";
 import type { Grid } from "./types";
 
 function flatGrid(symbol: Grid[number][number]["symbol"]): Grid {
@@ -23,7 +23,7 @@ describe("evaluateLines", () => {
     const wins = evaluateLines(grid, 1);
     const topLine = wins.find((w) => w.lineIndex === 0)!;
     expect(topLine.count).toBe(5);
-    expect(topLine.payout).toBeCloseTo(1341.07, 2);
+    expect(topLine.payout).toBeCloseTo(1112 * PAYOUT_SCALE, 2);
   });
 
   it("does not pay treats or UniGlee as line symbols", () => {
@@ -45,7 +45,7 @@ describe("evaluateLines", () => {
     const topLine = wins.find((w) => w.lineIndex === 0)!;
     expect(topLine.symbol).toBe("tumbler");
     expect(topLine.count).toBe(3);
-    expect(topLine.payout).toBeCloseTo(67.54, 2);
+    expect(topLine.payout).toBeCloseTo(56 * PAYOUT_SCALE, 2);
   });
 
   it("recognizes a Handbag Wild on every fixed payline shape", () => {

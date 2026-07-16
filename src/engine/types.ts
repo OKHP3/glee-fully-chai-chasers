@@ -162,7 +162,7 @@ export interface UniGleeTrigger {
   lineIndex: number;
   position: [reel: 2 | 3 | 4, row: number];
   linePositions: Array<[reel: number, row: number]>;
-  initialAwardSpins: 300 | 400 | 500;
+  initialAwardSpins: 40 | 60 | 80;
 }
 
 export type BoldChaiPumpPhase = "ready" | "pumping" | "resetting" | "ended";
@@ -219,7 +219,7 @@ export type SpecialtyWild = "sparkle_sort" | "drop_in" | "double_sparkle" | "fac
  * Firefly free-spin bonus frequency (and its RTP contribution) down.
  */
 export const FREE_SPIN_LADDER: Record<number, number> = {
-  6: 15, 7: 20, 8: 50, 9: 75, 10: 100, 11: 200,
+  6: 6, 7: 9, 8: 15, 9: 25, 10: 40, 11: 60,
 };
 
 export interface CatVisit {

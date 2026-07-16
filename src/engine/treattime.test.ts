@@ -20,7 +20,7 @@ describe("Treat Time trigger math", () => {
       treatJar: emptyTreatJar(),
       spinsSincePopIn: 0,
     });
-    expect(result.treatTimeBonus).toEqual({ mode: "nighttime", freeSpinsAwarded: 14 });
+    expect(result.treatTimeBonus).toEqual({ mode: "nighttime", freeSpinsAwarded: 8 });
   });
 
   it("never triggers from a secondary bonus play area", () => {
@@ -35,15 +35,15 @@ describe("Treat Time trigger math", () => {
     expect(result.treatTimeBonus).toBeUndefined();
   });
 
-  it("awards Morning Treat Time between 7 and 14 spins", () => {
-    expect(rollTreatTimeTrigger(() => 0, "morning")).toEqual({ mode: "morning", freeSpinsAwarded: 7 });
+  it("awards Morning Treat Time between 5 and 8 spins", () => {
+    expect(rollTreatTimeTrigger(() => 0, "morning")).toEqual({ mode: "morning", freeSpinsAwarded: 5 });
     expect(rollTreatTimeTrigger(() => 0.999999, "morning")).toBeUndefined();
   });
 
-  it("awards rarer Nighttime Treat Time between 14 and 50 spins", () => {
+  it("awards rarer Nighttime Treat Time between 8 and 14 spins", () => {
     let calls = 0;
     const lowest = () => (calls++ === 0 ? 0 : 0);
-    expect(rollTreatTimeTrigger(lowest, "nighttime")).toEqual({ mode: "nighttime", freeSpinsAwarded: 14 });
+    expect(rollTreatTimeTrigger(lowest, "nighttime")).toEqual({ mode: "nighttime", freeSpinsAwarded: 8 });
 
     calls = 0;
     const highest = () => (calls++ === 0 ? 0.999999 : 0.999999);
@@ -53,11 +53,11 @@ describe("Treat Time trigger math", () => {
   it("keeps the default modes independently readable", () => {
     let calls = 0;
     const nighttime = () => (calls++ === 0 ? 0 : 0.5);
-    expect(rollTreatTimeTrigger(nighttime)).toMatchObject({ mode: "nighttime", freeSpinsAwarded: 32 });
+    expect(rollTreatTimeTrigger(nighttime)).toMatchObject({ mode: "nighttime", freeSpinsAwarded: 11 });
 
     calls = 0;
     const morning = () => (calls++ === 0 ? 0.005 : 0.5);
-    expect(rollTreatTimeTrigger(morning)).toMatchObject({ mode: "morning", freeSpinsAwarded: 11 });
+    expect(rollTreatTimeTrigger(morning)).toMatchObject({ mode: "morning", freeSpinsAwarded: 7 });
   });
 
   it("keeps the seeded default trigger rates in the intended band", () => {
@@ -79,8 +79,8 @@ describe("Treat Time trigger math", () => {
     expect(morningRate).toBeLessThan(TREAT_TIME_TRIGGER_RATES.morning * 1.25);
     expect(nighttimeRate).toBeGreaterThan(TREAT_TIME_TRIGGER_RATES.nighttime * 0.75);
     expect(nighttimeRate).toBeLessThan(TREAT_TIME_TRIGGER_RATES.nighttime * 1.25);
-    expect(combinedRate).toBeGreaterThan((1 / 75) * 0.75);
-    expect(combinedRate).toBeLessThan((1 / 75) * 1.25);
+    expect(combinedRate).toBeGreaterThan((1 / 167) * 0.75);
+    expect(combinedRate).toBeLessThan((1 / 167) * 1.25);
   });
 });
 

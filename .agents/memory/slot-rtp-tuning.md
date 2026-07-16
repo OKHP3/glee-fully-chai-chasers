@@ -25,3 +25,16 @@ the session, so every bonus plays exactly its initial award.
 **How to apply:** any new bonus must route through these runners (or zero its
 own in-bonus awards); the `allowRetriggers` option is a deprecated no-op, and
 an engine-wide invariant test in freespins.test.ts guards the block.
+
+## Full-game RTP shape (2026-07 rebalance)
+Target: total RTP (base + bonuses) 95-98%. Landed ~96.1% (210k-spin pooled
+fleets) as base ~61% + bonus layer ~35% with PAYOUT_SCALE as the final linear
+solve knob.
+**Why:** every win (base and bonus) flows through the same paytable ×
+PAYOUT_SCALE, so total RTP is exactly linear in it — do structural cuts first
+(award spins, trigger rates, ladder values), then solve scale =
+old_scale × target/measured in one step.
+**How to apply:** one 5×5k fleet is too noisy for a 95-98% band (UniGlee
+variance swings ±8pp); pool ≥150k spins before trusting the mean. Player-facing
+copy (board meter text) and DESIGN-SPEC/IMPLEMENTATION-BASELINE tables hardcode
+old numbers — grep them after every retune.

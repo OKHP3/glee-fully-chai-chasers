@@ -232,7 +232,8 @@ export interface SpinInput {
 }
 
 export function rollDoorbellFreeSpins(rng: Rng): number {
-  return 5 + Math.floor(rng() * 16);
+  // 2026-07 RTP retune: 3-6 spins (was 5-20).
+  return 3 + Math.floor(rng() * 4);
 }
 
 /** Runs one full spin -> cascade-to-dead-board sequence. */

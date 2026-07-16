@@ -16,7 +16,7 @@ export interface TreatJar {
   bougie: number;
 }
 
-export const TREAT_JAR_CAP = 12;
+export const TREAT_JAR_CAP = 24;
 
 export const TREAT_JAR_FREE_SPINS: Record<TreatKind, number> = {
   chicken: 1,

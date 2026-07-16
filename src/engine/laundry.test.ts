@@ -33,9 +33,9 @@ function blankGrid(): Grid {
 
 describe("Joey's Laundry Helper", () => {
   it("allocates twenty-five percent of the parent UniGlee award", () => {
-    expect(baseLaundryAllocation(300)).toBe(75);
-    expect(baseLaundryAllocation(400)).toBe(100);
-    expect(baseLaundryAllocation(500)).toBe(125);
+    expect(baseLaundryAllocation(40)).toBe(10);
+    expect(baseLaundryAllocation(60)).toBe(15);
+    expect(baseLaundryAllocation(80)).toBe(20);
   });
 
   it("rolls a sock drop only on a middle reel", () => {

@@ -25,8 +25,8 @@ export const UNIGLEE_MIDDLE_SUB_BONUSES = [
 export const UNIGLEE_ACTIVE_REELS = [2, 3, 4] as const;
 
 /**
- * Per-reel independent capture odds: Reel 3 (index 2) 1-in-2,500 → 300 spins,
- * Reel 4 (index 3) 1-in-4,000 → 400 spins, Reel 5 (index 4) 1-in-7,500 → 500
+ * Per-reel independent capture odds: Reel 3 (index 2) 1-in-2,500 → 40 spins,
+ * Reel 4 (index 3) 1-in-4,000 → 60 spins, Reel 5 (index 4) 1-in-7,500 → 80
  * spins. Combined per-spin rate is their sum (~1 in 1,277).
  */
 export const UNIGLEE_REEL_RATES: readonly [2 | 3 | 4, number][] = [
@@ -91,7 +91,7 @@ export function placeUniGleeTrigger(rng: Rng, input: Grid, capturedReel?: 2 | 3 
       lineIndex,
       position: [reel, row],
       linePositions,
-      initialAwardSpins: (reel + 1) * 100 as UniGleeAwardSpins,
+      initialAwardSpins: reel * 20 as UniGleeAwardSpins,
     },
   };
 }
@@ -108,7 +108,7 @@ export interface UniGleeSubBonusPlan {
 
 export interface UniGleeMarathonPlan {
   initialAwardSpins: UniGleeAwardSpins;
-  quarterSpins: 75 | 100 | 125;
+  quarterSpins: 10 | 15 | 20;
   /** Joey first, a seeded permutation of the middle three, Phoebe last. */
   order: readonly UniGleeSubBonusId[];
   baseSubBonuses: readonly UniGleeSubBonusPlan[];

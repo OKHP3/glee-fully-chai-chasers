@@ -9,13 +9,13 @@ import { REELS, ROWS } from "./reels";
 import type { Rng } from "./rng";
 
 export const TREAT_TIME_TRIGGER_RATES: Record<TreatTimeMode, number> = {
-  morning: 1 / 100,
-  nighttime: 1 / 300,
+  morning: 1 / 250,
+  nighttime: 1 / 500,
 };
 
 export const TREAT_TIME_SPIN_RANGES: Record<TreatTimeMode, readonly [number, number]> = {
-  morning: [7, 14],
-  nighttime: [14, 50],
+  morning: [5, 8],
+  nighttime: [8, 14],
 };
 
 export const TREAT_TIME_WILD_RANGE = { min: 0, max: 4 } as const;
