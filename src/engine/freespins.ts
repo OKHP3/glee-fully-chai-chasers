@@ -116,7 +116,7 @@ export interface FreeSpinRoundResult extends SpinResult {
   laundryEffect?: JoeyLaundryEffect;
   /** Present only on the first round of the actual Wild Chai Storm session. */
   chaiRain?: ChaiRainResult;
-  /** Remaining spins after this round, including any retrigger just awarded. */
+  /** Remaining spins in the session after this round. */
   spinsRemaining?: number;
 }
 
@@ -211,9 +211,9 @@ export function spinFreeRound(
  * Resolves one Joey Laundry Helper counted round.
  *
  * Laundry is a chapter-local modifier: it preloads the opening grid, then
- * delegates payout, cascades, and ordinary retriggers to the shared cascade
- * engine. All other bonus triggers are suppressed so this round cannot nest
- * another bonus or leak a retrigger into a later chapter.
+ * delegates payout and cascades to the shared cascade engine. All other bonus
+ * triggers are suppressed, and retriggers are blocked engine-wide, so this
+ * round can never nest another bonus or extend a later chapter.
  */
 export function spinJoeyLaundryRound(
   rng: Rng,
@@ -310,11 +310,9 @@ export function runJoeyLaundrySession(
     rounds.push(round);
     totalWin += round.totalWin;
     bestCascade = Math.max(bestCascade, round.cascades);
-    if (round.freeSpinsAwarded > 0) {
-      budget.retriggerSpins += round.freeSpinsAwarded;
-      budget.remainingSpins += round.freeSpinsAwarded;
-      retriggers++;
-    }
+    // Retriggers are blocked in all bonuses: Joey's chapter plays exactly its
+    // initial allocation, no matter what the cascade ladder awards mid-round.
+    rounds[rounds.length - 1] = { ...round, freeSpinsAwarded: 0 };
   }
 
   return {
@@ -334,13 +332,17 @@ export function runJoeyLaundrySession(
 export interface FreeSpinSessionOptions {
   /** Bold Chai reuses the legacy wedge ID but must not launch Wild Chai Storm. */
   allowChaiStorm?: boolean;
-  /** Treat Jar bonus spins are additive but cannot retrigger themselves. */
+  /**
+   * @deprecated Retriggers are now blocked in every bonus session (2026-07
+   * RTP retune): in-bonus cascades never extend the session. The option is
+   * kept only so legacy callers keep compiling; it has no effect.
+   */
   allowRetriggers?: boolean;
   /** Marathon-only deterministic guard against an unbounded retrigger chain. */
   maxTotalSpins?: number;
 }
 
-/** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
+/** Runs a full free-spin session: exactly `spinsAwarded` rounds; retriggers are blocked in all bonuses. */
 export interface StandardFreeSpinSessionResult extends Omit<FreeSpinSessionResult, "wedge" | "mode"> {
   wedge: "standard";
   mode: "standard";
@@ -360,7 +362,7 @@ export function runFreeSpinSession(
   options?: FreeSpinSessionOptions,
 ): StandardFreeSpinSessionResult;
 
-/** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
+/** Runs a full free-spin session: exactly `spinsAwarded` rounds; retriggers are blocked in all bonuses. */
 export function runFreeSpinSession(
   rng: Rng,
   wedge: FreeSpinMode,
@@ -382,16 +384,11 @@ export function runFreeSpinSession(
     const round = spinFreeRound(rng, wedge, betPerLine, {
       activateChaiStorm: options.allowChaiStorm !== false && rounds.length === 0,
     });
-    rounds.push(round);
     totalWin += round.totalWin;
     bestCascade = Math.max(bestCascade, round.cascades);
-    const retriggerAward = options.allowRetriggers === false ? 0 : round.freeSpinsAwarded;
-    if (retriggerAward > 0) {
-      remaining += retriggerAward;
-      retriggers++;
-      retriggerSpins += retriggerAward;
-    }
-    rounds[rounds.length - 1] = { ...round, freeSpinsAwarded: retriggerAward, spinsRemaining: remaining };
+    // Retriggers are blocked in all bonuses: cascade ladder awards earned
+    // during a bonus round are zeroed and never extend the session.
+    rounds.push({ ...round, freeSpinsAwarded: 0, spinsRemaining: remaining });
   }
 
   return {

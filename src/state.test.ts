@@ -75,7 +75,7 @@ describe("game state persistence", () => {
 
     const migrated = loadGameState();
     expect(migrated.treatJar).toEqual({ chicken: 0, salmon: 0, bougie: 4 });
-    expect(migrated.pendingTreatJarSpins).toBe(12);
-    expect(loadGameState().pendingTreatJarSpins).toBe(12);
+    expect(migrated.pendingTreatJarSpins).toBe(3);
+    expect(loadGameState().pendingTreatJarSpins).toBe(3);
   });
 });

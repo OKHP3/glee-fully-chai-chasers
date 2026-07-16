@@ -1654,11 +1654,7 @@ async function playTreatTimeOnMainBoard(
         await sleep(360);
       }
 
-      if (round.freeSpinsAwarded > 0) {
-        const totalAfterRound = roundIndex + 1 + (round.spinsRemaining ?? 0);
-        status.textContent = `Treat Time retrigger! +${round.freeSpinsAwarded} more spins! · ${totalAfterRound} total spins`;
-        playBonusFanfare();
-      } else if (round.totalWin > 0) {
+      if (round.totalWin > 0) {
         status.textContent = `Treat Time · +${round.totalWin.toLocaleString()} coins`;
       }
       await sleep(400);
@@ -1859,13 +1855,6 @@ async function playFreeSpinSession(
         await sleep(400);
       } else {
         statusEl.textContent = "";
-      }
-      if (round.freeSpinsAwarded > 0) {
-        const totalAfterRound = r + 1 + (round.spinsRemaining ?? 0);
-        totalEl.textContent = String(totalAfterRound);
-        statusEl.textContent = `Retrigger! +${round.freeSpinsAwarded} more free spins! · ${totalAfterRound} total spins`;
-        playBonusFanfare();
-        await sleep(800);
       }
     }
   } finally {

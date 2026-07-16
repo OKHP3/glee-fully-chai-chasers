@@ -3,14 +3,14 @@ import { mulberry32 } from "./rng";
 import { addTreat, CAT_QUIP_POOLS, collectTreat, consumeForVisit, emptyTreatJar, rollCatVisit, settleTreatJar } from "./features";
 
 describe("treat jar", () => {
-  it("pays five Chicken Comet spins and resets only that bag at twelve", () => {
+  it("pays one Chicken Comet spin and resets only that bag at twelve", () => {
     let jar = emptyTreatJar();
     for (let i = 0; i < 11; i++) jar = addTreat(jar, "chicken");
 
     const completed = collectTreat(jar, "chicken");
 
     expect(completed.jar).toEqual({ chicken: 0, salmon: 0, bougie: 0 });
-    expect(completed.freeSpinsAwarded).toBe(5);
+    expect(completed.freeSpinsAwarded).toBe(1);
   });
 
   it("awards Salmon Stars and Bougie Bites independently", () => {
@@ -20,9 +20,9 @@ describe("treat jar", () => {
     const bougie = collectTreat(salmon.jar, "bougie");
 
     expect(salmon.jar).toEqual({ chicken: 4, salmon: 0, bougie: 11 });
-    expect(salmon.freeSpinsAwarded).toBe(7);
+    expect(salmon.freeSpinsAwarded).toBe(2);
     expect(bougie.jar).toEqual({ chicken: 4, salmon: 0, bougie: 0 });
-    expect(bougie.freeSpinsAwarded).toBe(10);
+    expect(bougie.freeSpinsAwarded).toBe(3);
   });
 
   it("keeps collecting after a completed bag resets", () => {
@@ -37,7 +37,7 @@ describe("treat jar", () => {
     const settled = settleTreatJar({ chicken: 12, salmon: 13, bougie: 0 });
     expect(settled.jar).toEqual({ chicken: 0, salmon: 1, bougie: 0 });
     expect(settled.completed).toEqual(["chicken", "salmon"]);
-    expect(settled.freeSpinsAwarded).toBe(12);
+    expect(settled.freeSpinsAwarded).toBe(3);
   });
 });
 

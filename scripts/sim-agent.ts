@@ -46,10 +46,10 @@ interface BonusTally {
 const tally = (): BonusTally => ({ encountered: 0, played: 0, freeSpinsPlayed: 0, win: 0, cappedSessions: 0 });
 
 /**
- * Safety guard: the real UI runs sessions with NO spin cap. The nighttime
- * Treat Time wedge casts 2-10 wilds per free spin with retriggers live, which
- * can produce runaway sessions. We cap at 5,000 rounds per session and COUNT
- * every capped session — a nonzero count is itself a finding.
+ * Safety guard kept from the pre-retune era: bonus retriggers are now blocked
+ * engine-wide and Treat Time casts 0-4 wilds per free spin, so sessions are
+ * bounded by their initial award. We still cap at 5,000 rounds per session and
+ * COUNT every capped session — a nonzero count means the block regressed.
  */
 const SESSION_CAP = 5000;
 

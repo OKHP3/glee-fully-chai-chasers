@@ -54,7 +54,7 @@ describe("Bold Chai Pump state", () => {
     expect(completeBoldChaiPump(state, 30_000)).toMatchObject({
       completedChais: 1,
       partialPumps: 0,
-      freeSpinsAwarded: 10,
+      freeSpinsAwarded: BOLD_CHAI_FREE_SPINS_PER_CUP,
     });
   });
 
