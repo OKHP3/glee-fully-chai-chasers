@@ -162,6 +162,68 @@ body {
   outline-offset: 5px;
 }
 
+/* ── Birthday bonus panel (July 17 only, one-time) ── */
+.chai-bday-panel {
+  width: min(100%, 360px);
+  margin-top: 20px;
+  padding: 14px 18px 16px;
+  border-radius: 18px;
+  border: 1.5px solid rgba(255, 213, 100, .55);
+  background:
+    linear-gradient(145deg, rgba(212, 100, 30, .28), rgba(100, 30, 160, .32));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 0 3px rgba(255, 200, 80, .10),
+    0 8px 28px rgba(0, 0, 0, .45);
+  text-align: center;
+}
+.chai-bday-emoji {
+  display: block;
+  font-size: 26px;
+  line-height: 1;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.5));
+}
+.chai-bday-headline {
+  display: block;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(17px, 4.6vw, 20px);
+  font-weight: 800;
+  color: #ffe48a;
+  text-shadow: 0 1px 6px rgba(200, 100, 0, .6);
+  margin-bottom: 6px;
+}
+.chai-bday-body {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(255, 238, 195, .92);
+}
+.chai-bday-coins {
+  font-weight: 800;
+  color: #ffe78a;
+  white-space: nowrap;
+}
+.chai-splash-button--bday {
+  background: linear-gradient(160deg, #e0b030, #c47c18 55%, #a85810);
+  border-color: rgba(255, 230, 120, .85);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .30),
+    0 0 0 3px rgba(255, 210, 80, .22),
+    0 5px 0 #6e3a08,
+    0 11px 24px rgba(0, 0, 0, .42),
+    0 0 32px rgba(255, 210, 80, .25);
+}
+.chai-splash-button--bday:hover { filter: brightness(1.09); }
+
+@media (max-height: 760px) {
+  .chai-bday-panel { margin-top: 12px; padding: 10px 14px 12px; }
+  .chai-bday-emoji { font-size: 20px; }
+  .chai-bday-headline { font-size: clamp(15px, 4vw, 17px); }
+}
+
 @media (max-height: 760px) {
   .chai-splash-copy { padding-bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 14px)); }
   .chai-splash-title { font-size: clamp(30px, 8.4vw, 42px); }

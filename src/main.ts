@@ -5,12 +5,40 @@
 import "./style.css";
 import { unlock, setMusicEnabled, setSfxEnabled, setSfxVolume, playChaiChaseStart } from "./audio/synth";
 import { setMusicVolume, startBaseMusic } from "./audio/music";
-import { loadGameState } from "./state";
+import { loadGameState, load, save } from "./state";
 import { renderBoard, runLapQuestChapter } from "./ui/board";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
+/** Returns true if today is Glee's birthday (July 17, 2026) and the one-time bonus has not yet been claimed. */
+function isBirthdayBonusAvailable(): boolean {
+  const now = new Date();
+  return (
+    now.getFullYear() === 2026 &&
+    now.getMonth() === 6 && // July is month index 6
+    now.getDate() === 17 &&
+    !load("birthdayBonusClaimed", false)
+  );
+}
+
+/** Marks the birthday bonus as claimed and adds 1 000 coins to state. */
+function claimBirthdayBonus(state: ReturnType<typeof loadGameState>): void {
+  save("birthdayBonusClaimed", true);
+  state.balance += 1000;
+  save("balance", state.balance);
+}
+
 function renderSplash(): void {
+  const showBirthday = isBirthdayBonusAvailable();
+
+  const birthdayBlock = showBirthday
+    ? `<div class="chai-bday-panel" role="status" aria-live="polite">
+        <span class="chai-bday-emoji" aria-hidden="true">🎂🦋🎉</span>
+        <strong class="chai-bday-headline">Happy Birthday, Glee!</strong>
+        <p class="chai-bday-body">Jamie hid&nbsp;<span class="chai-bday-coins">+1&thinsp;000&nbsp;Glee&#8209;coins</span>&nbsp;in your wallet as a birthday surprise — tap in to collect&nbsp;them!</p>
+       </div>`
+    : "";
+
   app.innerHTML = `
     <div class="chai-splash">
       <picture>
@@ -25,9 +53,10 @@ function renderSplash(): void {
       <div class="chai-splash-copy">
         <h1 class="chai-splash-title">Glee-fully Chai Chasers</h1>
         <p class="chai-splash-subtitle">Joey and Phoebe are ready. The chai chase is on.</p>
+        ${birthdayBlock}
         <button id="tap-in"
-          class="chai-splash-button">
-          START THE CHAI CHASE
+          class="chai-splash-button${showBirthday ? " chai-splash-button--bday" : ""}">
+          ${showBirthday ? "🎂 START THE CHAI CHASE" : "START THE CHAI CHASE"}
         </button>
       </div>
     </div>
@@ -36,6 +65,9 @@ function renderSplash(): void {
   // iOS requires a user gesture to unlock AudioContext — this button is that gesture.
   document.querySelector("#tap-in")?.addEventListener("click", () => {
     const state = loadGameState();
+    if (isBirthdayBonusAvailable()) {
+      claimBirthdayBonus(state);
+    }
     setSfxEnabled(state.soundOn);
     setMusicEnabled(state.soundOn);
     setSfxVolume(state.sfxVolume);
