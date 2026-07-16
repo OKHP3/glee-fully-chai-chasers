@@ -31,7 +31,8 @@ describe("spin", () => {
   it("looks up the free-spin ladder correctly by cascade count", () => {
     expect(freeSpinsForCascades(0)).toBe(0);
     expect(freeSpinsForCascades(3)).toBe(0);
-    expect(freeSpinsForCascades(4)).toBe(7);
+    expect(freeSpinsForCascades(4)).toBe(0);
+    expect(freeSpinsForCascades(5)).toBe(0);
     expect(freeSpinsForCascades(6)).toBe(15);
     expect(freeSpinsForCascades(11)).toBe(200);
     expect(freeSpinsForCascades(50)).toBe(200);

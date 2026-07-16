@@ -76,9 +76,11 @@ describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded sp
     expect(s.winRate).toBeLessThan(1 / 2.5);
   });
 
-  it(`free spins ~1 in 35 ±15% (actual: 1 in ${(1 / Math.max(s.freeSpinRate, 1e-9)).toFixed(0)})`, () => {
-    expect(s.freeSpinRate).toBeGreaterThan(1 / 41);
-    expect(s.freeSpinRate).toBeLessThan(1 / 30);
+  // 2026-07 retune: ladder entry raised from 4 to 6 cascades, dropping the
+  // Firefly free-spin trigger from ~1 in 35 to ~1 in 150.
+  it(`free spins ~1 in 150 ±20% (actual: 1 in ${(1 / Math.max(s.freeSpinRate, 1e-9)).toFixed(0)})`, () => {
+    expect(s.freeSpinRate).toBeGreaterThan(1 / 188);
+    expect(s.freeSpinRate).toBeLessThan(1 / 120);
   });
 
   it(`8+ cascade mega ~1 in 900, wide band (actual: 1 in ${(1 / Math.max(s.mega8Rate, 1e-9)).toFixed(0)})`, () => {

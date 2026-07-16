@@ -213,9 +213,13 @@ export interface CascadeStep {
 
 export type SpecialtyWild = "sparkle_sort" | "drop_in" | "double_sparkle" | "facts_on_facts";
 
-/** Free-spin ladder — docs/DESIGN-SPEC.md §1. Index by cascade count. */
+/**
+ * Free-spin ladder — docs/DESIGN-SPEC.md §1. Index by cascade count.
+ * 2026-07 retune: entry threshold raised from 4 to 6 cascades to bring the
+ * Firefly free-spin bonus frequency (and its RTP contribution) down.
+ */
 export const FREE_SPIN_LADDER: Record<number, number> = {
-  4: 7, 5: 10, 6: 15, 7: 20, 8: 50, 9: 75, 10: 100, 11: 200,
+  6: 15, 7: 20, 8: 50, 9: 75, 10: 100, 11: 200,
 };
 
 export interface CatVisit {
