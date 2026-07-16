@@ -19,9 +19,9 @@ export interface TreatJar {
 export const TREAT_JAR_CAP = 12;
 
 export const TREAT_JAR_FREE_SPINS: Record<TreatKind, number> = {
-  chicken: 5,
-  salmon: 7,
-  bougie: 10,
+  chicken: 1,
+  salmon: 2,
+  bougie: 3,
 };
 
 /**

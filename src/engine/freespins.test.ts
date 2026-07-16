@@ -9,6 +9,7 @@ import {
   spinJoeyLaundryRound,
   spinWheel,
   wheelWedgeLabel,
+  type FreeSpinMode,
 } from "./freespins";
 import type { Grid } from "./types";
 
@@ -154,33 +155,49 @@ describe("free spin rounds", () => {
 });
 
 describe("free spin session", () => {
-  it("adds retrigger awards to the playable bank", () => {
+  it("blocks retriggers: sessions play exactly their initial award", () => {
     const session = runFreeSpinSession(mulberry32(519), "multiplying", 1, 67);
-    const retriggerRounds = session.rounds.filter((round) => round.freeSpinsAwarded > 0);
 
     expect(session.initialSpins).toBe(67);
-    expect(retriggerRounds.length).toBe(session.retriggers);
-    expect(retriggerRounds.length).toBeGreaterThan(0);
-    expect(retriggerRounds.every((round) => round.freeSpinsAwarded > 0)).toBe(true);
-    expect(session.retriggerSpins).toBe(
-      retriggerRounds.reduce((sum, round) => sum + round.freeSpinsAwarded, 0),
-    );
-    expect(session.totalSpins).toBe(session.initialSpins + session.retriggerSpins);
-    expect(session.rounds).toHaveLength(session.totalSpins);
+    expect(session.retriggers).toBe(0);
+    expect(session.retriggerSpins).toBe(0);
+    expect(session.totalSpins).toBe(67);
+    expect(session.rounds).toHaveLength(67);
+    expect(session.rounds.every((round) => round.freeSpinsAwarded === 0)).toBe(true);
     expect(session.rounds[session.rounds.length - 1]?.spinsRemaining).toBe(0);
   });
 
-  it("terminates and accounts for retriggers extending the session", () => {
+  it("terminates after the initial award with no retrigger extension", () => {
     const rng = mulberry32(99);
     const session = runFreeSpinSession(rng, "multiplying", 1, 8);
-    const awardedByRounds = session.rounds.reduce((sum, round) => sum + round.freeSpinsAwarded, 0);
-    expect(session.rounds.length).toBeGreaterThanOrEqual(8);
     expect(session.initialSpins).toBe(8);
-    expect(session.retriggerSpins).toBe(awardedByRounds);
-    expect(session.totalSpins).toBe(8 + awardedByRounds);
-    expect(session.rounds.length).toBe(session.totalSpins);
+    expect(session.retriggerSpins).toBe(0);
+    expect(session.totalSpins).toBe(8);
+    expect(session.rounds.length).toBe(8);
+    expect(session.rounds.every((round) => round.freeSpinsAwarded === 0)).toBe(true);
     expect(session.rounds[session.rounds.length - 1]?.spinsRemaining).toBe(0);
     expect(session.totalWin).toBeGreaterThanOrEqual(0);
+  });
+
+  it("blocks retriggers across every wedge (engine-wide invariant)", () => {
+    const wedges: FreeSpinMode[] = [
+      "multiplying",
+      "keepsake_memory",
+      "keepsake_collection",
+      "chai_back",
+      "doorbell_panic",
+      "treat_time_morning",
+      "treat_time_nighttime",
+      "standard",
+    ];
+    for (const wedge of wedges) {
+      const session = runFreeSpinSession(mulberry32(2026), wedge as never, 1, 15);
+      expect(session.retriggers).toBe(0);
+      expect(session.retriggerSpins).toBe(0);
+      expect(session.totalSpins).toBe(15);
+      expect(session.rounds).toHaveLength(15);
+      expect(session.rounds.every((round) => round.freeSpinsAwarded === 0)).toBe(true);
+    }
   });
 
   it("supports additive Treat Jar spins without retriggers", () => {

@@ -14,3 +14,14 @@ description: Non-obvious couplings between trigger frequencies, base RTP, and th
   - **How to apply:** Use `scripts/sim-agent.ts` (5 agents × 5,000 paid spins, foreground parallel bash with explicit `wait`) to measure full-game RTP after any bonus tuning. Detached/nohup processes die between tool calls.
 
 - **Lesson:** Additive per-reel trigger odds combine as the sum — three "rare" rates are dominated by the most frequent one; rarity must be set on the combined rate.
+
+## Retrigger blocking (2026-07)
+Retriggers are blocked engine-wide: `runFreeSpinSession` and
+`runJoeyLaundrySession` zero each round's `freeSpinsAwarded` and never extend
+the session, so every bonus plays exactly its initial award.
+**Why:** retrigger chains were the dominant RTP inflator (UniGlee sessions ran
+~691 spins on a 375-spin average award; full-game RTP halved from ~685% to
+~371% once blocked).
+**How to apply:** any new bonus must route through these runners (or zero its
+own in-bonus awards); the `allowRetriggers` option is a deprecated no-op, and
+an engine-wide invariant test in freespins.test.ts guards the block.
