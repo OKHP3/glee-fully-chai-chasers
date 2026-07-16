@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildUniGleeMarathonPlan, placeUniGleeTrigger, UNIGLEE_ACTIVE_REELS, UNIGLEE_MIDDLE_SUB_BONUSES } from "./uniglee";
+import { buildUniGleeMarathonPlan, placeUniGleeTrigger, rollUniGleeCapture, UNIGLEE_ACTIVE_REELS, UNIGLEE_MIDDLE_SUB_BONUSES, UNIGLEE_REEL_RATES, UNIGLEE_ACTIVE_RATE } from "./uniglee";
 import { mulberry32 } from "./rng";
 import { runUniGleeBaseMarathon } from "./uniglee-marathon";
 import type { Grid } from "./types";
@@ -59,6 +59,42 @@ describe("UniGlee marathon plan", () => {
     expect(linePositions[0][0]).toBe(0);
     expect(lineIndex).toBeGreaterThanOrEqual(0);
     expect(placed.grid[reel][position[1]].symbol).toBe("uniglee");
+  });
+
+  it("rolls each reel independently at its own capture rate", () => {
+    const rng = mulberry32(20260716);
+    const draws = 3_000_000;
+    const hits: Record<number, number> = { 2: 0, 3: 0, 4: 0 };
+    let total = 0;
+    for (let i = 0; i < draws; i++) {
+      const reel = rollUniGleeCapture(rng);
+      if (reel !== undefined) {
+        hits[reel]++;
+        total++;
+      }
+    }
+    for (const [reel, rate] of UNIGLEE_REEL_RATES) {
+      const measured = hits[reel] / draws;
+      expect(measured).toBeGreaterThan(rate * 0.85);
+      expect(measured).toBeLessThan(rate * 1.15);
+    }
+    const combined = total / draws;
+    expect(combined).toBeGreaterThan(UNIGLEE_ACTIVE_RATE * 0.9);
+    expect(combined).toBeLessThan(UNIGLEE_ACTIVE_RATE * 1.1);
+  });
+
+  it("resolves a simultaneous multi-reel hit deterministically to the highest reel", () => {
+    // rng always below every rate -> all three reels hit; highest reel must win.
+    const reel = rollUniGleeCapture(() => 0);
+    expect(reel).toBe(4);
+  });
+
+  it("honors an explicitly captured reel when placing the trigger", () => {
+    for (const reel of UNIGLEE_ACTIVE_REELS) {
+      const placed = placeUniGleeTrigger(mulberry32(5), blankGrid(), reel);
+      expect(placed.trigger.reel).toBe(reel);
+      expect(placed.trigger.initialAwardSpins).toBe((reel + 1) * 100);
+    }
   });
 
   it("resolves all four base chapters with chapter-local spin accounting", () => {

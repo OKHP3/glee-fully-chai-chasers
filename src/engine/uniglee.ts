@@ -37,6 +37,20 @@ export const UNIGLEE_REEL_RATES: readonly [2 | 3 | 4, number][] = [
 
 export const UNIGLEE_ACTIVE_RATE = UNIGLEE_REEL_RATES.reduce((sum, [, rate]) => sum + rate, 0);
 
+/**
+ * Rolls each active reel independently at its own capture rate (one RNG draw
+ * per reel, in reel order). If more than one reel hits on the same spin, the
+ * highest reel wins — deterministic, and the tie goes to the rarer, larger
+ * award. Returns the capturing reel or undefined when no reel hits.
+ */
+export function rollUniGleeCapture(rng: Rng): 2 | 3 | 4 | undefined {
+  let hit: 2 | 3 | 4 | undefined;
+  for (const [reel, rate] of UNIGLEE_REEL_RATES) {
+    if (rng() < rate) hit = reel;
+  }
+  return hit;
+}
+
 const ACTIVE_REEL_WEIGHTS: readonly [2 | 3 | 4, number][] = UNIGLEE_REEL_RATES;
 
 const TRIGGER_SYMBOLS: readonly SymbolId[] = [
@@ -58,8 +72,8 @@ function weightedActiveReel(rng: Rng): 2 | 3 | 4 {
  * symbol is never placed on reels 1–2; the prefix is made line-valid so the
  * event cannot be a decorative, non-paying-looking scatter.
  */
-export function placeUniGleeTrigger(rng: Rng, input: Grid): { grid: Grid; trigger: UniGleeTrigger } {
-  const reel = weightedActiveReel(rng);
+export function placeUniGleeTrigger(rng: Rng, input: Grid, capturedReel?: 2 | 3 | 4): { grid: Grid; trigger: UniGleeTrigger } {
+  const reel = capturedReel ?? weightedActiveReel(rng);
   const lineIndex = Math.floor(rng() * PAYLINES.length);
   const line = PAYLINES[lineIndex];
   const row = line[reel];
