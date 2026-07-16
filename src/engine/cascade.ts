@@ -15,7 +15,7 @@ import { rollCatVisit, type TreatJar } from "./features";
 import { rollTreatTimeTrigger } from "./treattime";
 import type { Rng } from "./rng";
 import { applyKeepsakeZone, cloneKeepsakeZone, isKeepsakePosition, rollKeepsakeSymbol } from "./keepsake-constellation";
-import { placeUniGleeTrigger, UNIGLEE_ACTIVE_RATE } from "./uniglee";
+import { placeUniGleeTrigger, rollUniGleeCapture, UNIGLEE_ACTIVE_RATE } from "./uniglee";
 
 const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
   treat_chicken: "chicken",
@@ -261,11 +261,13 @@ export function spin({
   let keepsakeZone = cloneKeepsakeZone(inputKeepsakeZone);
   if (keepsakeZone) grid = applyKeepsakeZone(grid, keepsakeZone);
   const treatsCollected = collectTreats(grid);
-  const unigleeTriggered = allowUniGlee && spinArea === "main" && rng() < UNIGLEE_RATE;
+  // Each active reel rolls independently at its own capture rate.
+  const unigleeCapturedReel = allowUniGlee && spinArea === "main" ? rollUniGleeCapture(rng) : undefined;
+  const unigleeTriggered = unigleeCapturedReel !== undefined;
   // A supplied grid is a test/bonus fixture, not a main-game opening reel
   // window. Keep its legacy takeover behavior intact while live main spins
   // receive the reel-activated capture payload.
-  const unigleeTrigger = unigleeTriggered && !startingGrid ? placeUniGleeTrigger(rng, grid) : undefined;
+  const unigleeTrigger = unigleeTriggered && !startingGrid ? placeUniGleeTrigger(rng, grid, unigleeCapturedReel) : undefined;
   if (unigleeTrigger) grid = unigleeTrigger.grid;
 
   let totalWin = 0;
