@@ -59,7 +59,7 @@ import {
 import { mountLapQuestLedge } from "./lap-quest-ledge";
 import { beginKeepsakeMemory, createKeepsakeMemory, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
 import type { GameState, ThemeMode } from "../state";
-import { resetAll, saveGameState } from "../state";
+import { resetAll, saveGameState, load, save } from "../state";
 import {
   symbolSvg,
   catSprite,
@@ -241,10 +241,11 @@ export function renderBoard(
             <span class="treat-jar-title">Treat Jar</span>
             ${treatJarHtml(state)}
           </div>
-          <div id="askjamie-perch" aria-label="AskJamie" class="askjamie-housing">
+          <button id="askjamie-perch" aria-label="AskJamie — tap for daily bonus" class="askjamie-housing">
             <div class="askjamie-icon">${publicPicture("askjamie-avatar.jpg", "askjamie-picture")}</div>
             <span>AskJamie</span>
-          </div>
+            <div id="askjamie-bubble" class="askjamie-bubble" aria-hidden="true"></div>
+          </button>
         </div>
 
         <div id="status-line" class="status-line" aria-live="polite"></div>
@@ -392,6 +393,58 @@ function updateJar(root: HTMLElement, count: number): void {
   if (label) label.textContent = `${count} / 6`;
 }
 
+const ASKJAMIE_URLS: readonly string[] = [
+  "https://glee-fully.tools/arcade/",
+  "https://glee-fully.tools/about/",
+  "https://overkillhill.com/projects/glee-fully-chai-chasers/",
+  "https://overkillhill.com/manifesto/",
+];
+
+function todayDateKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function wireAskJamie(root: HTMLElement, state: GameState): void {
+  const perch = root.querySelector<HTMLButtonElement>("#askjamie-perch")!;
+  const bubble = root.querySelector<HTMLDivElement>("#askjamie-bubble")!;
+  let bubbleTimer: number | undefined;
+
+  function showBubble(inner: string, durationMs = 6000): void {
+    bubble.innerHTML = inner;
+    bubble.removeAttribute("aria-hidden");
+    bubble.classList.add("askjamie-bubble--visible");
+    window.clearTimeout(bubbleTimer);
+    bubbleTimer = window.setTimeout(() => {
+      bubble.classList.remove("askjamie-bubble--visible");
+      bubble.setAttribute("aria-hidden", "true");
+    }, durationMs);
+  }
+
+  perch.addEventListener("click", () => {
+    const today = todayDateKey();
+    if (load("askjamieLastClaim", "") === today) {
+      showBubble(`<span class="aj-msg">Come back tomorrow for more coins! 🌙</span>`);
+      return;
+    }
+
+    state.balance += 500;
+    save("askjamieLastClaim", today);
+    save("balance", state.balance);
+
+    const chip = root.querySelector<HTMLElement>(".coin-chip");
+    if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
+
+    const url = ASKJAMIE_URLS[Math.floor(Math.random() * ASKJAMIE_URLS.length)];
+    showBubble(
+      `<span class="aj-msg">+500 coins! 🎉 Want to learn more about us?</span>` +
+      `<a class="aj-link" href="${url}" target="_blank" rel="noopener noreferrer">Visit us →</a>`,
+      8000,
+    );
+    setStatus(root, "AskJamie slipped you +500 coins!");
+  });
+}
+
 function wireControls(root: HTMLElement, state: GameState, bets: number[]): void {
   const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
   const betDisplay = root.querySelector<HTMLSpanElement>("#bet-display")!;
@@ -420,6 +473,7 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
 
   settingsBtn.addEventListener("click", () => openSettingsPage(root, state));
   paytableBtn.addEventListener("click", () => openPaytablePage(root));
+  wireAskJamie(root, state);
 
   sparkleBtn.addEventListener("click", () => {
     if (!isUnlocked()) unlock();
