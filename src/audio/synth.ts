@@ -16,6 +16,12 @@ let sfxEnabled = true;
 let sfxVolume = 0.82;
 let sfxBus: GainNode | null = null;
 
+export const SFX_VOLUME_MAX = 2;
+
+export function clampSfxVolume(volume: number): number {
+  return Math.min(SFX_VOLUME_MAX, Math.max(0, volume));
+}
+
 export function setMusicEnabled(enabled: boolean): void {
   musicEnabled = enabled;
 }
@@ -25,9 +31,9 @@ export function setSfxEnabled(enabled: boolean): void {
   updateSfxGain();
 }
 
-/** Set the effects mix (0–1) without changing the master sound preference. */
+/** Set the effects mix (0–2) without changing the master sound preference. */
 export function setSfxVolume(volume: number): void {
-  sfxVolume = Math.min(1, Math.max(0, volume));
+  sfxVolume = clampSfxVolume(volume);
   updateSfxGain();
 }
 

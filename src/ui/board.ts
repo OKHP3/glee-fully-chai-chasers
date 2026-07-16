@@ -96,12 +96,13 @@ import {
   playWinPluck,
   playWheelTick,
   playStrangerDangerPanic,
+  SFX_VOLUME_MAX,
   setMusicEnabled,
   setSfxEnabled,
   setSfxVolume,
   unlock,
 } from "../audio/synth";
-import { setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
+import { MUSIC_VOLUME_MAX, setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
 
 let statusTimeout: number | undefined;
 
@@ -545,7 +546,8 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 
 function volumeControl(id: "music" | "sfx", label: string, value: number, help: string): string {
   const percent = Math.round(value * 100);
-  return `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">${percent}%</output><input id="${id}-volume" type="range" min="0" max="100" value="${percent}" aria-label="${label} volume"/></label>`;
+  const maxPercent = id === "music" ? MUSIC_VOLUME_MAX * 100 : SFX_VOLUME_MAX * 100;
+  return `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">(max)</output><input id="${id}-volume" type="range" min="0" max="${maxPercent}" value="${percent}" aria-label="${label} volume"/></label>`;
 }
 
 function wireVolume(
@@ -555,11 +557,8 @@ function wireVolume(
   persist: () => void,
 ): void {
   const input = page.querySelector<HTMLInputElement>(`#${id}-volume`)!;
-  const output = page.querySelector<HTMLOutputElement>(`#${id}-volume-value`)!;
   input.addEventListener("input", () => {
     const value = Number(input.value) / 100;
-    output.value = `${input.value}%`;
-    output.textContent = output.value;
     apply(value);
   });
   input.addEventListener("change", persist);

@@ -14,6 +14,13 @@ const BEAT_SECONDS = 60 / BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 export const BASE_SCORE_DURATION_SECONDS = BAR_SECONDS * 20;
 
+/** The music control has three times the previous 100% headroom. */
+export const MUSIC_VOLUME_MAX = 3;
+
+export function clampMusicVolume(volume: number): number {
+  return Math.min(MUSIC_VOLUME_MAX, Math.max(0, volume));
+}
+
 const UNIGLEE_BPM = 112;
 const UNIGLEE_BEAT_SECONDS = 60 / UNIGLEE_BPM;
 const UNIGLEE_BAR_SECONDS = UNIGLEE_BEAT_SECONDS * 4;
@@ -455,9 +462,9 @@ export function setBoldChaiUrgency(enabled: boolean): void {
   }
 }
 
-/** Set the music mix (0–1); changes take effect immediately while playing. */
+/** Set the music mix (0–3); changes take effect immediately while playing. */
 export function setMusicVolume(volume: number): void {
-  musicVolume = Math.min(1, Math.max(0, volume));
+  musicVolume = clampMusicVolume(volume);
   const audio = getAudioContext();
   if (musicBus && audio) musicBus.gain.setTargetAtTime(musicVolume * 0.14, audio.currentTime, 0.025);
   if (urgencyBus && audio) urgencyBus.gain.setTargetAtTime(musicVolume * 0.075, audio.currentTime, 0.025);
