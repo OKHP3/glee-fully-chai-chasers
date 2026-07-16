@@ -78,18 +78,18 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 | Event | Frequency |
 |---|---|
 | Any cascade (spin produces ≥1 win) | ~1 in 2.9 spins |
-| Free spins via meter (4+ cascades) | ~1 in 35 spins |
+| Free spins via meter (6+ cascades) | ~1 in 150 spins |
 | 8+ cascade mega-trigger | ~1 in 900 spins |
 | Chai Tea Bonus (3+ scatters) | ~1 in 110 spins |
 | Cat pop-in | ~1 in 30 spins (pity-weighted, §6) |
-| UniGlee | ~1 in 400 spins |
-| Overall RTP | 96% ±0.5 |
+| UniGlee | ~1 in 1,277 spins (independent per-reel rolls) |
+| Overall RTP (base + all bonuses) | ~96.5% (95-98% band). Base game alone ~61%; bonus layer ~35%. |
 
 ## 5. Cascades, wilds & the UniGlee
 
 **Cascade loop:** evaluate 40 lines → winning symbols beam up into the saucers (float-shrink-flash, 380ms) → columns compress down → new symbols drop from the saucer bays (staggered per reel, 90ms offsets) → re-evaluate. Repeat to dead board. Each cascade tier plays a rising arpeggio one step higher — by cascade 4+ it's musical euphoria.
 
-**Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow. Ladder: **6→15, 7→20, 8→50, 9→75, 10→100, 11+→200 free spins** (2026-07 retune: entry raised from 4 to 6 cascades). At meter 5 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Retriggers are blocked in all bonuses (2026-07 retune): free spins never extend themselves.
+**Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow. Ladder: **6→6, 7→9, 8→15, 9→25, 10→40, 11+→60 free spins** (2026-07 retune: entry raised from 4 to 6 cascades; awards right-sized for the 95-98% full-game RTP target). At meter 5 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Retriggers are blocked in all bonuses (2026-07 retune): free spins never extend themselves.
 
 **Saucer-Cat Wilds:** Joey-saucer and Phoebe-saucer wilds arrive in stacks up to 6-7 high on reels 2-5, substitute for all paying symbols, pay as Mermaid Tumbler when forming their own line.
 
@@ -106,7 +106,7 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 
 ## 6. The Treat Jar & Cat Pop-Ins (signature system)
 
-**Treats:** three non-paying pouch symbols on reels 1/3/5 — **Chicken Comets** (butter-yellow), **Salmon Stars** (dusty blue), **Bougie Bites** (midnight navy, rarest, sparkly). Landing one flies it into the **Treat Jar** (persistent across sessions; caps at 12 of each because of course it does).
+**Treats:** three non-paying pouch symbols on reels 1/3/5 — **Chicken Comets** (butter-yellow), **Salmon Stars** (dusty blue), **Bougie Bites** (midnight navy, rarest, sparkly). Landing one flies it into the **Treat Jar** (persistent across sessions; caps at 24 of each because of course it does (2026-07 RTP retune)).
 
 **Pop-ins** (~1/30 spins, pity-weighted: rate doubles after 15 spins without a win event):
 
@@ -127,11 +127,11 @@ Meter hits 4+ → celebration → **AskJamie spins Joey & Phoebe's Sparkle Wheel
 | **Giant Toolbox Mode** (35%) | 2x2 mega-keepsakes land on reels 2-3/4-5, with Phoebe supervising from the open Toolbox |
 | **Iced Chai Wild Rain** (25%) | One-shot Wild Chai Storm at bonus entry: every standard iced-chai symbol on the opening board becomes a mermaid-cup `wild_chai`; it does not repeat on cascades or retriggered spins. See `docs/ICED-CHAI-WILD-RAIN-2026-07-14.md`. |
 
-Free spins play on an aurora-shifted board (navy → violet-green), same cascade rules, retriggers live. Double Sparkle doubles the entry award. Exit screen always ends warm: total, best cascade, and a Glee-ism sized to the result (Glee-Lite for modest, Bleeds Glee for monsters).
+Free spins play on an aurora-shifted board (navy → violet-green), same cascade rules; retriggers are blocked (2026-07 retune) — sessions never extend themselves. Double Sparkle doubles the entry award. Exit screen always ends warm: total, best cascade, and a Glee-ism sized to the result (Glee-Lite for modest, Bleeds Glee for monsters).
 
 ## 8. Bold Chai Bonus (rapid-pump scene)
 
-The main screen may trigger a dedicated Bold Chai feature scene within the existing reel-area dimensions. The player has **30 seconds** to tap the oversized pump as quickly as possible. Each registered pump advances the visible iced cup by one of **12 fill steps**; the 12th pump completes one strong chai and awards **10 free spins**. The cup then swaps to an empty iced cup over **3 seconds** while the clock continues running; taps during the swap or after timeout do nothing. Incomplete cups award no free spins.
+The main screen may trigger a dedicated Bold Chai feature scene within the existing reel-area dimensions. The player has **30 seconds** to tap the oversized pump as quickly as possible. Each registered pump advances the visible iced cup by one of **12 fill steps**; the 12th pump completes one strong chai and awards **3 free spins** (2026-07 RTP retune; was 10, then 5). The cup then swaps to an empty iced cup over **3 seconds** while the clock continues running; taps during the swap or after timeout do nothing. Incomplete cups award no free spins.
 
 Chai pump symbol should appear: 1/17 on reel 1 and 1/30 on reel 2 for a same-payline "Bold Chai" bonus trigger: approximately 1/510-spins
 

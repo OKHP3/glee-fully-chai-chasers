@@ -11,7 +11,7 @@ import type {
 
 export const BOLD_CHAI_DURATION_MS = 30_000;
 export const BOLD_CHAI_PUMPS_PER_CUP = 12;
-export const BOLD_CHAI_FREE_SPINS_PER_CUP = 5;
+export const BOLD_CHAI_FREE_SPINS_PER_CUP = 3;
 /** Initial presentation target; the RTP/playtest pass may tune this later. */
 export const BOLD_CHAI_CUP_RESET_MS = 3_000;
 

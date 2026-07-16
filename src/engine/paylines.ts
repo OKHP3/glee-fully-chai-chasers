@@ -67,10 +67,10 @@ export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: numbe
 
 /**
  * Doorbell visibility adds intentional dead-space blockers to reels 1–2.
- * This small global tuning factor preserves the established ~96% RTP target
- * without making the doorbell itself a paying symbol.
+ * This global tuning factor sets the full-game RTP (base + all bonuses) to
+ * ~96.5%, inside the 95-98% target band. Solved linearly from fleet sims.
  */
-export const PAYOUT_SCALE = 1.206;
+export const PAYOUT_SCALE = 0.775;
 
 const WILDS: SymbolId[] = ["wild_joey", "wild_phoebe", "wild_handbag", "wild_chai"];
 /** Symbols that never pay on a line (treats are feature-only; UniGlee is a legend trigger). */

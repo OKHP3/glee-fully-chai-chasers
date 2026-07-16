@@ -33,9 +33,9 @@ describe("spin", () => {
     expect(freeSpinsForCascades(3)).toBe(0);
     expect(freeSpinsForCascades(4)).toBe(0);
     expect(freeSpinsForCascades(5)).toBe(0);
-    expect(freeSpinsForCascades(6)).toBe(15);
-    expect(freeSpinsForCascades(11)).toBe(200);
-    expect(freeSpinsForCascades(50)).toBe(200);
+    expect(freeSpinsForCascades(6)).toBe(6);
+    expect(freeSpinsForCascades(11)).toBe(60);
+    expect(freeSpinsForCascades(50)).toBe(60);
   });
 
   it("a spin's freeSpinsAwarded always matches the ladder for its cascade count", () => {
@@ -56,7 +56,7 @@ describe("spin", () => {
     }
   });
 
-  it("awards 5–20 spins when a first/second-reel doorbell pair lands", () => {
+  it("awards 3–6 spins when a first/second-reel doorbell pair lands", () => {
     const grid: Grid = Array.from({ length: 5 }, (_, reel) =>
       Array.from({ length: 4 }, (_, row) => ({
         symbol: reel < 2 && row === 0 ? "doorbell" as const : "treat_chicken" as const,
@@ -70,8 +70,8 @@ describe("spin", () => {
       startingGrid: grid,
     });
 
-    expect(result.doorbellPanic?.freeSpinsAwarded).toBeGreaterThanOrEqual(5);
-    expect(result.doorbellPanic?.freeSpinsAwarded).toBeLessThanOrEqual(20);
+    expect(result.doorbellPanic?.freeSpinsAwarded).toBeGreaterThanOrEqual(3);
+    expect(result.doorbellPanic?.freeSpinsAwarded).toBeLessThanOrEqual(6);
     expect(result.freeSpinsAwarded).toBe(result.doorbellPanic?.freeSpinsAwarded);
   });
 

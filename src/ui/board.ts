@@ -24,6 +24,7 @@ import type {
   UniGleeTrigger,
 } from "../engine/types";
 import type { LapQuestSpot } from "../engine/types";
+import type { UniGleeAwardSpins } from "../engine/laundry";
 import { REELS, ROWS } from "../engine/reels";
 import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
@@ -220,8 +221,8 @@ export function renderBoard(
           <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(state.fireflyMeter)}</div>
           <div class="jar-meter-copy">
             <span class="jar-meter-kicker">Firefly Cascade</span>
-            <strong id="meter-count" class="jar-meter-count">${state.fireflyMeter} / 4</strong>
-            <small>Reach 4 to unlock 7 free spins</small>
+            <strong id="meter-count" class="jar-meter-count">${state.fireflyMeter} / 6</strong>
+            <small>Reach 6 to unlock 6 free spins</small>
           </div>
         </div>
 
@@ -388,7 +389,7 @@ function updateJar(root: HTMLElement, count: number): void {
   const icon = root.querySelector<HTMLDivElement>("#jar-icon");
   if (icon) icon.innerHTML = fireflyJarSvg(count);
   const label = root.querySelector<HTMLSpanElement>("#meter-count");
-  if (label) label.textContent = `${count} / 4`;
+  if (label) label.textContent = `${count} / 6`;
 }
 
 function wireControls(root: HTMLElement, state: GameState, bets: number[]): void {
@@ -664,7 +665,7 @@ async function runSpin(
 
   if (result.unigleeTriggered) {
     playUniGleeSting();
-    const award = result.unigleeTrigger?.initialAwardSpins ?? 300;
+    const award = result.unigleeTrigger?.initialAwardSpins ?? 40;
     startUniGleeMusic();
     await showUnigleeTakeover(root, result.unigleeTrigger, award);
     await runUniGleeMarathonBonus(root, state, award, seed ^ 0x51f15e5d);
@@ -1283,7 +1284,7 @@ function showCatPopIn(root: HTMLElement, cat: "joey" | "phoebe", fed: boolean, q
 }
 
 /** UniGlee entry: the captured symbol flies out of the board into the marathon. */
-function showUnigleeTakeover(root: HTMLElement, trigger: UniGleeTrigger | undefined, award: 300 | 400 | 500): Promise<void> {
+function showUnigleeTakeover(root: HTMLElement, trigger: UniGleeTrigger | undefined, award: UniGleeAwardSpins): Promise<void> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "uniglee-takeover";
@@ -1322,7 +1323,7 @@ function uniGleeChapterTitle(id: string): string {
 async function runUniGleeMarathonBonus(
   root: HTMLElement,
   state: GameState,
-  award: 300 | 400 | 500,
+  award: UniGleeAwardSpins,
   seed: number,
 ): Promise<void> {
   const marathon: UniGleeBaseMarathonResult = runUniGleeBaseMarathon(
