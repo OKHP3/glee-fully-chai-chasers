@@ -49,7 +49,7 @@ export interface GameState {
   soundOn: boolean;
   /** Optional payline guide; disabled by default for a clean board. */
   paylineGuideOn: boolean;
-  /** Independent, persisted mix controls. `soundOn` remains the master mute. */
+  /** Independent, persisted mix controls. Music supports 0–3 and SFX 0–2; `soundOn` remains the master mute. */
   musicVolume: number;
   sfxVolume: number;
   theme: ThemeMode;
