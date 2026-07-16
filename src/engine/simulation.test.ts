@@ -62,9 +62,12 @@ const skipOracle =
 describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded spins vs DESIGN-SPEC §4`, () => {
   const s = simulate();
 
-  it(`RTP ~96% ±0.5 (actual: ${(s.rtp * 100).toFixed(2)}%)`, () => {
-    expect(s.rtp).toBeGreaterThan(0.955);
-    expect(s.rtp).toBeLessThan(0.965);
+  // Base RTP retuned 2026-07: UniGlee per-reel odds (1/2500, 1/4000, 1/7500;
+  // combined ~1/1,277 vs the old 1/400) removed most guaranteed trigger-line
+  // wins from the base stream, lowering base RTP ~1.9pp to ~94.2%.
+  it(`RTP ~94.2% ±0.5 (actual: ${(s.rtp * 100).toFixed(2)}%)`, () => {
+    expect(s.rtp).toBeGreaterThan(0.937);
+    expect(s.rtp).toBeLessThan(0.947);
   });
 
   it(`any-win rate ~1 in 2.9 ±15% (actual: 1 in ${(1 / s.winRate).toFixed(2)})`, () => {
@@ -82,9 +85,9 @@ describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded sp
     expect(s.mega8Rate).toBeLessThan(1 / 450);
   });
 
-  it(`UniGlee ~1 in 400 (actual: 1 in ${(1 / Math.max(s.unigleeRate, 1e-9)).toFixed(0)})`, () => {
-    expect(s.unigleeRate).toBeGreaterThan(1 / 600);
-    expect(s.unigleeRate).toBeLessThan(1 / 280);
+  it(`UniGlee ~1 in 1,277 combined per-reel odds (actual: 1 in ${(1 / Math.max(s.unigleeRate, 1e-9)).toFixed(0)})`, () => {
+    expect(s.unigleeRate).toBeGreaterThan(1 / 2000);
+    expect(s.unigleeRate).toBeLessThan(1 / 850);
   });
 
   it(`cat pop-in ~1 in 30 ±30% (actual: 1 in ${(1 / Math.max(s.catVisitRate, 1e-9)).toFixed(1)})`, () => {

@@ -23,13 +23,21 @@ export const UNIGLEE_MIDDLE_SUB_BONUSES = [
 ] as const satisfies readonly UniGleeSubBonusId[];
 
 export const UNIGLEE_ACTIVE_REELS = [2, 3, 4] as const;
-export const UNIGLEE_ACTIVE_RATE = 1 / 400;
 
-const ACTIVE_REEL_WEIGHTS: readonly [2 | 3 | 4, number][] = [
-  [2, 45],
-  [3, 35],
-  [4, 20],
+/**
+ * Per-reel independent capture odds: Reel 3 (index 2) 1-in-2,500 → 300 spins,
+ * Reel 4 (index 3) 1-in-4,000 → 400 spins, Reel 5 (index 4) 1-in-7,500 → 500
+ * spins. Combined per-spin rate is their sum (~1 in 1,277).
+ */
+export const UNIGLEE_REEL_RATES: readonly [2 | 3 | 4, number][] = [
+  [2, 1 / 2500],
+  [3, 1 / 4000],
+  [4, 1 / 7500],
 ];
+
+export const UNIGLEE_ACTIVE_RATE = UNIGLEE_REEL_RATES.reduce((sum, [, rate]) => sum + rate, 0);
+
+const ACTIVE_REEL_WEIGHTS: readonly [2 | 3 | 4, number][] = UNIGLEE_REEL_RATES;
 
 const TRIGGER_SYMBOLS: readonly SymbolId[] = [
   "tumbler", "butterfly", "mixtape", "crystal", "chai", "candle", "cassette", "gnome",
