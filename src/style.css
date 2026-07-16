@@ -947,11 +947,29 @@ body {
 .treat-icon { width: 25px; height: 25px; display: inline-block; overflow: hidden; border-radius: 6px; }
 
 .askjamie-housing {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 10px;
   opacity: 0.9;
+  /* reset <button> defaults */
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+.askjamie-housing:hover { opacity: 1; }
+.askjamie-housing:focus-visible {
+  outline: 2px solid var(--cc-mint);
+  outline-offset: 4px;
+  border-radius: 14px;
 }
 .askjamie-icon {
   width: 42px;
@@ -962,6 +980,11 @@ body {
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .25), 0 0 10px rgba(159, 232, 197, .2);
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+.askjamie-housing:hover .askjamie-icon {
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .3), 0 0 16px rgba(159, 232, 197, .38);
+  transform: scale(1.06);
 }
 .askjamie-icon img {
   display: block;
@@ -971,6 +994,69 @@ body {
   transform: scale(1.08);
 }
 .askjamie-picture { display: block; width: 100%; height: 100%; }
+
+/* ── AskJamie speech bubble ── */
+.askjamie-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  width: max(180px, min(260px, 70vw));
+  padding: 10px 13px 11px;
+  border-radius: 14px 14px 2px 14px;
+  border: 1.5px solid rgba(159, 232, 197, .45);
+  background:
+    linear-gradient(145deg, rgba(18, 32, 62, .96), rgba(28, 18, 62, .96));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 0 3px rgba(159, 232, 197, .10),
+    0 8px 28px rgba(0, 0, 0, .55);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px) scale(.95);
+  transform-origin: bottom right;
+  transition: opacity 180ms ease, transform 180ms ease;
+  z-index: 10;
+}
+.askjamie-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  right: 14px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-top: 8px solid rgba(28, 18, 62, .96);
+}
+.askjamie-bubble--visible {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.aj-msg {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(255, 238, 195, .95);
+}
+.aj-link {
+  display: inline-block;
+  padding: 5px 11px 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(159, 232, 197, .5);
+  background: rgba(159, 232, 197, .12);
+  font-size: 12px;
+  font-weight: 700;
+  color: #9fe8c5;
+  text-decoration: none;
+  transition: background 120ms ease, color 120ms ease;
+}
+.aj-link:hover { background: rgba(159, 232, 197, .22); color: #c8f5e0; }
+.aj-link:focus-visible { outline: 2px solid var(--cc-mint); outline-offset: 3px; }
 
 .status-line {
   min-height: 1.4rem;
