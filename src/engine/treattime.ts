@@ -18,7 +18,7 @@ export const TREAT_TIME_SPIN_RANGES: Record<TreatTimeMode, readonly [number, num
   nighttime: [14, 50],
 };
 
-export const TREAT_TIME_WILD_RANGE = { min: 2, max: 10 } as const;
+export const TREAT_TIME_WILD_RANGE = { min: 0, max: 4 } as const;
 
 /**
  * Rolls a Treat Time trigger. With the default "either" mode, the two
@@ -63,7 +63,7 @@ function wildForTreat(treat: TreatKind): Extract<SymbolId, "wild_joey" | "wild_p
 }
 
 /**
- * Casts 2–10 unique treats from the lower-left sweep onto a 5×4 board.
+ * Casts 0–4 unique treats from the lower-left sweep onto a 5×4 board.
  * Treats are immediately represented in engine state as their character wild,
  * while the UI uses the returned metadata to animate the visible cast.
  */

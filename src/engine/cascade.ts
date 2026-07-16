@@ -23,7 +23,7 @@ const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
   treat_bougie: "bougie",
 };
 
-/** Compatibility export: the active-line capture rate remains one in 400. */
+/** Compatibility export: combined per-reel active-line capture rate (~1 in 1,277). */
 export const UNIGLEE_RATE = UNIGLEE_ACTIVE_RATE;
 
 /** Chance a wild participating in a line win queues a specialty (tuned for §4 mega-cascade band). */

@@ -85,7 +85,7 @@ describe("Treat Time trigger math", () => {
 });
 
 describe("Treat Time wild casting", () => {
-  it("casts 2–10 unique wilds and replaces the existing cells", () => {
+  it("casts 0–4 unique wilds and replaces the existing cells", () => {
     const result = castTreatTimeWilds(() => 0.999999, blankGrid(), "nighttime");
     expect(result.wilds.length).toBe(TREAT_TIME_WILD_RANGE.max);
     expect(new Set(result.wilds.map((wild) => wild.position.join(":"))).size).toBe(result.wilds.length);
@@ -95,9 +95,18 @@ describe("Treat Time wild casting", () => {
     });
   });
 
-  it("keeps Morning Treat Time Phoebe-only", () => {
+  it("handles a zero-wild throw gracefully at the range minimum", () => {
     const result = castTreatTimeWilds(() => 0, blankGrid(), "morning");
-    expect(result.wilds.length).toBe(TREAT_TIME_WILD_RANGE.min);
+    expect(TREAT_TIME_WILD_RANGE.min).toBe(0);
+    expect(result.wilds).toHaveLength(0);
+    expect(result.grid.flat().every((cell) => cell.symbol === "treat_chicken")).toBe(true);
+  });
+
+  it("keeps Morning Treat Time Phoebe-only when wilds land", () => {
+    let calls = 0;
+    const rng = () => (calls++ === 0 ? 0.999999 : 0);
+    const result = castTreatTimeWilds(rng, blankGrid(), "morning");
+    expect(result.wilds.length).toBe(TREAT_TIME_WILD_RANGE.max);
     expect(result.wilds.every((wild) => wild.treat === "chicken" && wild.wild === "phoebe")).toBe(true);
   });
 });
@@ -106,8 +115,8 @@ describe("Treat Time free-spin rounds", () => {
   it("preloads the returned treat wilds before cascade evaluation", () => {
     const round = spinFreeRound(mulberry32(20260713), "treat_time_nighttime", 1);
     expect(round.treatTimeMode).toBe("nighttime");
-    expect(round.treatTimeWilds?.length).toBeGreaterThanOrEqual(2);
-    expect(round.treatTimeWilds?.length).toBeLessThanOrEqual(10);
+    expect(round.treatTimeWilds?.length).toBeGreaterThanOrEqual(TREAT_TIME_WILD_RANGE.min);
+    expect(round.treatTimeWilds?.length).toBeLessThanOrEqual(TREAT_TIME_WILD_RANGE.max);
     round.treatTimeWilds?.forEach(({ position, wild }) => {
       expect(round.steps[0].grid[position[0]][position[1]].symbol).toBe(wild === "joey" ? "wild_joey" : "wild_phoebe");
     });
