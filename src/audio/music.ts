@@ -14,6 +14,12 @@ const BEAT_SECONDS = 60 / BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 export const BASE_SCORE_DURATION_SECONDS = BAR_SECONDS * 20;
 
+const UNIGLEE_BPM = 112;
+const UNIGLEE_BEAT_SECONDS = 60 / UNIGLEE_BPM;
+const UNIGLEE_BAR_SECONDS = UNIGLEE_BEAT_SECONDS * 4;
+/** 48 original synthesized bars: long enough to keep a marathon from feeling like a 15-second loop. */
+export const UNIGLEE_SCORE_DURATION_SECONDS = UNIGLEE_BAR_SECONDS * 48;
+
 type ScoreBar = Readonly<{
   pad: readonly number[];
   bass: number;
@@ -77,14 +83,19 @@ let musicBus: GainNode | undefined;
 let urgencyBus: GainNode | undefined;
 let running = false;
 let urgencyRunning = false;
+let unigleeRunning = false;
 let boldChaiUrgencyEnabled = false;
 let musicVolume = 0.72;
 let cycleStart = 0;
 let loopTimer: number | undefined;
 let urgencyCycleStart = 0;
 let urgencyLoopTimer: number | undefined;
+let unigleeLoopTimer: number | undefined;
+let unigleeCycleStart = 0;
+let unigleeBus: GainNode | undefined;
 const scheduledSources = new Set<ScheduledSource>();
 const scheduledUrgencySources = new Set<ScheduledSource>();
+const scheduledUniGleeSources = new Set<ScheduledSource>();
 
 function frequency(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
@@ -188,6 +199,77 @@ function scheduleCycle(start: number): void {
       0.018,
     );
   });
+}
+
+/** Edgy, faster UniGlee marathon score: bright suspended chords, octave bass,
+ * offbeat synthesized brushes, and a non-repeating 48-bar contour. */
+function scheduleUniGleeCycle(start: number): void {
+  const audio = getAudioContext();
+  if (!audio || !unigleeBus) return;
+  const pads = [
+    [52, 55, 59, 66], [50, 54, 57, 64], [45, 52, 57, 62], [47, 54, 59, 64],
+    [52, 55, 60, 67], [48, 52, 57, 64], [50, 55, 59, 65], [45, 50, 55, 62],
+  ];
+  const basses = [40, 38, 33, 35, 40, 36, 38, 33];
+  const lead = [76, 79, 83, 81, 78, 86, 83, 88, 81, 79, 91, 86];
+  for (let bar = 0; bar < 48; bar++) {
+    const barStart = start + bar * UNIGLEE_BAR_SECONDS;
+    const chord = pads[bar % pads.length];
+    chord.forEach((midi, voice) => scheduleOscillator(
+      audio, frequency(midi + (bar > 31 && voice === 3 ? 12 : 0)),
+      barStart + voice * 0.01, UNIGLEE_BAR_SECONDS * 0.82, 0.028, "sawtooth", 0.06,
+      unigleeBus, scheduledUniGleeSources,
+    ));
+    const bass = basses[bar % basses.length];
+    for (let beat = 0; beat < 4; beat++) {
+      const beatStart = barStart + beat * UNIGLEE_BEAT_SECONDS;
+      scheduleOscillator(audio, frequency(bass + (beat === 2 ? 12 : 0)), beatStart, UNIGLEE_BEAT_SECONDS * 0.58, 0.036, "square", 0.012, unigleeBus, scheduledUniGleeSources);
+      scheduleBrush(audio, beatStart + UNIGLEE_BEAT_SECONDS * 0.5, beat % 2 ? 3_200 : 2_100, unigleeBus, scheduledUniGleeSources, 0.018);
+    }
+    if (bar % 2 === 1) {
+      scheduleOscillator(audio, frequency(lead[bar % lead.length]), barStart + UNIGLEE_BEAT_SECONDS * 2.5, UNIGLEE_BEAT_SECONDS * 0.72, 0.042, "triangle", 0.018, unigleeBus, scheduledUniGleeSources);
+    }
+    if (bar % 4 === 3) scheduleBrush(audio, barStart + UNIGLEE_BEAT_SECONDS * 3.75, 4_800, unigleeBus, scheduledUniGleeSources, 0.028);
+  }
+}
+
+function scheduleFollowingUniGleeCycle(): void {
+  const audio = getAudioContext();
+  if (!unigleeRunning || !audio) return;
+  unigleeCycleStart += UNIGLEE_SCORE_DURATION_SECONDS;
+  scheduleUniGleeCycle(unigleeCycleStart);
+  unigleeLoopTimer = window.setTimeout(scheduleFollowingUniGleeCycle, Math.max(30, (UNIGLEE_SCORE_DURATION_SECONDS - 0.6) * 1_000));
+}
+
+/** Start the distinct long-form UniGlee score after the capture gesture. */
+export function startUniGleeMusic(): void {
+  const audio = getAudioContext();
+  if (!audio || !musicEnabled || unigleeRunning) return;
+  unigleeBus = audio.createGain();
+  unigleeBus.gain.setValueAtTime(0.0001, audio.currentTime);
+  unigleeBus.gain.linearRampToValueAtTime(musicVolume * 0.19, audio.currentTime + 0.3);
+  unigleeBus.connect(audio.destination);
+  unigleeRunning = true;
+  unigleeCycleStart = audio.currentTime + 0.05;
+  scheduleUniGleeCycle(unigleeCycleStart);
+  unigleeLoopTimer = window.setTimeout(scheduleFollowingUniGleeCycle, Math.max(30, (UNIGLEE_SCORE_DURATION_SECONDS - 0.6) * 1_000));
+}
+
+export function stopUniGleeMusic(): void {
+  unigleeRunning = false;
+  if (unigleeLoopTimer !== undefined) {
+    window.clearTimeout(unigleeLoopTimer);
+    unigleeLoopTimer = undefined;
+  }
+  const audio = getAudioContext();
+  if (unigleeBus && audio) unigleeBus.gain.setTargetAtTime(0.0001, audio.currentTime, 0.025);
+  for (const source of scheduledUniGleeSources) {
+    try { source.stop((audio?.currentTime ?? 0) + 0.08); } catch { /* voice already ended */ }
+  }
+  scheduledUniGleeSources.clear();
+  const busToDisconnect = unigleeBus;
+  unigleeBus = undefined;
+  if (busToDisconnect) window.setTimeout(() => busToDisconnect.disconnect(), 150);
 }
 
 const BOLD_CHAI_URGENCY_BPM = 104;
@@ -379,11 +461,13 @@ export function setMusicVolume(volume: number): void {
   const audio = getAudioContext();
   if (musicBus && audio) musicBus.gain.setTargetAtTime(musicVolume * 0.14, audio.currentTime, 0.025);
   if (urgencyBus && audio) urgencyBus.gain.setTargetAtTime(musicVolume * 0.075, audio.currentTime, 0.025);
+  if (unigleeBus && audio) unigleeBus.gain.setTargetAtTime(musicVolume * 0.19, audio.currentTime, 0.025);
 }
 
 /** Stop all scheduled score voices immediately when the shared Sound toggle is off. */
 export function stopBaseMusic(): void {
   running = false;
+  stopUniGleeMusic();
   stopUrgencyLayer();
   if (loopTimer !== undefined) {
     window.clearTimeout(loopTimer);

@@ -12,6 +12,7 @@ import { REELS, spinGrid } from "./reels";
 import type { Rng } from "./rng";
 import { emptyTreatJar } from "./features";
 import { castTreatTimeWilds } from "./treattime";
+import { rollKeepsakeZone } from "./keepsake-constellation";
 import {
   applyJoeyLaundryEffect,
   baseLaundryAllocation,
@@ -25,6 +26,7 @@ import {
 export type WheelWedge =
   | "multiplying"
   | "keepsake_memory"
+  | "keepsake_collection"
   | "chai_back"
   | "doorbell_panic"
   | "treat_time_morning"
@@ -165,7 +167,8 @@ export function spinFreeRound(
       : undefined;
   const treatTime = treatTimeMode
     ? castTreatTimeWilds(rng, spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }), treatTimeMode)
-    : undefined;
+      : undefined;
+  const keepsakeZone = wedge === "keepsake_collection" ? rollKeepsakeZone(rng) : undefined;
   const chaiStorm = wedge === "chai_back" && options.activateChaiStorm !== false
     ? convertChaiToWilds(spinGrid(rng, { includeDoorbells: false, includeBoldChaiPump: false }))
     : undefined;
@@ -175,6 +178,7 @@ export function spinFreeRound(
     treatJar: emptyTreatJar(),
     spinsSincePopIn: 999,
     startingGrid: panic?.grid ?? treatTime?.grid ?? multiplying?.grid ?? chaiStorm?.grid,
+    keepsakeZone,
     allowDoorbells: false,
     includeBoldChaiPump: false,
     spinArea: "secondary",
@@ -252,6 +256,7 @@ export interface FreeSpinSessionResult {
   totalWin: number;
   bestCascade: number;
   retriggers: number;
+  terminatedByCap: boolean;
 }
 
 export interface JoeyLaundrySessionResult {
@@ -259,8 +264,12 @@ export interface JoeyLaundrySessionResult {
   budget: UniGleeSubBonusBudget;
   rounds: FreeSpinRoundResult[];
   totalWin: number;
+  initialSpins: number;
+  retriggerSpins: number;
+  totalSpins: number;
   bestCascade: number;
   retriggers: number;
+  terminatedByCap: boolean;
 }
 
 /**
@@ -276,6 +285,7 @@ export function runJoeyLaundrySession(
   awardedSpins: UniGleeAwardSpins,
   config: LaundryRollConfig,
   blockIndex = 0,
+  maxTotalSpins = Number.MAX_SAFE_INTEGER,
 ): JoeyLaundrySessionResult {
   const initialAllocation = baseLaundryAllocation(awardedSpins);
   const budget: UniGleeSubBonusBudget = {
@@ -289,7 +299,7 @@ export function runJoeyLaundrySession(
   let bestCascade = 0;
   let roundOrdinal = 0;
 
-  while (budget.remainingSpins > 0) {
+  while (budget.remainingSpins > 0 && rounds.length < maxTotalSpins) {
     budget.remainingSpins--;
     const round = spinJoeyLaundryRound(rng, betPerLine, {
       blockIndex,
@@ -312,8 +322,12 @@ export function runJoeyLaundrySession(
     budget,
     rounds,
     totalWin,
+    initialSpins: initialAllocation,
+    retriggerSpins: budget.retriggerSpins,
+    totalSpins: initialAllocation + budget.retriggerSpins,
     bestCascade,
     retriggers,
+    terminatedByCap: budget.remainingSpins > 0,
   };
 }
 
@@ -322,6 +336,8 @@ export interface FreeSpinSessionOptions {
   allowChaiStorm?: boolean;
   /** Treat Jar bonus spins are additive but cannot retrigger themselves. */
   allowRetriggers?: boolean;
+  /** Marathon-only deterministic guard against an unbounded retrigger chain. */
+  maxTotalSpins?: number;
 }
 
 /** Runs a full free-spin session: `spinsRemaining` rounds, with retriggers via the same ladder. */
@@ -359,8 +375,9 @@ export function runFreeSpinSession(
   let retriggerSpins = 0;
   let totalWin = 0;
   let bestCascade = 0;
+  const maxTotalSpins = Math.max(initialSpins, options.maxTotalSpins ?? Number.MAX_SAFE_INTEGER);
 
-  while (remaining > 0) {
+  while (remaining > 0 && rounds.length < maxTotalSpins) {
     remaining--;
     const round = spinFreeRound(rng, wedge, betPerLine, {
       activateChaiStorm: options.allowChaiStorm !== false && rounds.length === 0,
@@ -377,7 +394,18 @@ export function runFreeSpinSession(
     rounds[rounds.length - 1] = { ...round, freeSpinsAwarded: retriggerAward, spinsRemaining: remaining };
   }
 
-  return { wedge, mode: wedge, rounds, initialSpins, retriggerSpins, totalSpins: initialSpins + retriggerSpins, totalWin, bestCascade, retriggers };
+  return {
+    wedge,
+    mode: wedge,
+    rounds,
+    initialSpins,
+    retriggerSpins,
+    totalSpins: rounds.length,
+    totalWin,
+    bestCascade,
+    retriggers,
+    terminatedByCap: remaining > 0,
+  };
 }
 
 export function wheelWedgeLabel(wedge: WheelWedge): string {
@@ -386,6 +414,8 @@ export function wheelWedgeLabel(wedge: WheelWedge): string {
       return "We're Multiplying";
     case "keepsake_memory":
       return "Moonlit Keepsake Trail";
+    case "keepsake_collection":
+      return "Keepsake Collection";
     case "chai_back":
       return "Iced Chai Wild Rain";
     case "doorbell_panic":

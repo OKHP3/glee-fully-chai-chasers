@@ -156,6 +156,15 @@ export interface BoldChaiTrigger {
   positions: Array<[number, number]>;
 }
 
+/** Active UniGlee capture on reels 3, 4, or 5 (zero-based 2, 3, or 4). */
+export interface UniGleeTrigger {
+  reel: 2 | 3 | 4;
+  lineIndex: number;
+  position: [reel: 2 | 3 | 4, row: number];
+  linePositions: Array<[reel: number, row: number]>;
+  initialAwardSpins: 300 | 400 | 500;
+}
+
 export type BoldChaiPumpPhase = "ready" | "pumping" | "resetting" | "ended";
 
 /** Pure state for the 30-second rapid-tap Bold Chai Pump bonus. */
@@ -224,6 +233,7 @@ export interface SpinResult {
   doubleSparkleApplied: boolean; // true if freeSpinsAwarded was doubled this spin
   catVisit?: CatVisit;
   unigleeTriggered: boolean;
+  unigleeTrigger?: UniGleeTrigger;
   treatsCollected: TreatKind[];
   doorbellPanic?: DoorbellTrigger;
   boldChaiPump?: BoldChaiTrigger;

@@ -21,6 +21,7 @@ import type {
   TreatKind,
   TreatTimeMode,
   TreatTimeWild,
+  UniGleeTrigger,
 } from "../engine/types";
 import type { LapQuestSpot } from "../engine/types";
 import { REELS, ROWS } from "../engine/reels";
@@ -46,6 +47,7 @@ import {
   type JoeyLaundrySessionResult,
   type WheelWedge,
 } from "../engine/freespins";
+import { runUniGleeBaseMarathon, type UniGleeBaseMarathonResult } from "../engine/uniglee-marathon";
 import {
   createLapQuestChallenge,
   LAP_QUEST_SPOT_LABELS,
@@ -99,7 +101,7 @@ import {
   setSfxVolume,
   unlock,
 } from "../audio/synth";
-import { setBoldChaiUrgency, setMusicVolume, startBaseMusic, stopBaseMusic } from "../audio/music";
+import { setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
 
 let statusTimeout: number | undefined;
 
@@ -661,15 +663,18 @@ async function runSpin(
     }
   }
 
-  if (result.doorbellPanic) {
+  if (result.unigleeTriggered) {
+    playUniGleeSting();
+    const award = result.unigleeTrigger?.initialAwardSpins ?? 300;
+    startUniGleeMusic();
+    await showUnigleeTakeover(root, result.unigleeTrigger, award);
+    await runUniGleeMarathonBonus(root, state, award, seed ^ 0x51f15e5d);
+    stopUniGleeMusic();
+  } else if (result.doorbellPanic) {
     playStrangerDangerPanic();
     await showDoorbellPanic(root, result.doorbellPanic.freeSpinsAwarded, result.doorbellPanic.positions);
   } else if (result.boldChaiPump) {
     boldChaiSpinsAwarded = await runBoldChaiBonus(root);
-  } else if (result.unigleeTriggered) {
-    playUniGleeSting();
-    await showUnigleeTakeover(root);
-    await runLapQuestChapter(root, state, mulberry32(seed ^ 0x51f15e5d));
   } else if (result.totalWin > 0) {
     await showWinCelebration(root, result.totalWin, state.bet);
   }
@@ -1278,8 +1283,8 @@ function showCatPopIn(root: HTMLElement, cat: "joey" | "phoebe", fed: boolean, q
   });
 }
 
-/** UniGlee legend takeover — violet dim, butterfly storm, Glee avatar. ~1/400 (docs §5). */
-function showUnigleeTakeover(root: HTMLElement): Promise<void> {
+/** UniGlee entry: the captured symbol flies out of the board into the marathon. */
+function showUnigleeTakeover(root: HTMLElement, trigger: UniGleeTrigger | undefined, award: 300 | 400 | 500): Promise<void> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "uniglee-takeover";
@@ -1293,24 +1298,121 @@ function showUnigleeTakeover(root: HTMLElement): Promise<void> {
       <div class="uniglee-butterflies">${butterflies}</div>
       <div class="uniglee-content">
         <div class="uniglee-avatar">${gleeAvatarSvg()}</div>
-        <div class="uniglee-title">UNIGLEE!</div>
-        <div class="uniglee-sub">Freak'n facts on FACTS.</div>
+        <div class="uniglee-title">UNI-GLEE!</div>
+        <div class="uniglee-sub">The mythical capture is yours.</div>
+        <div class="uniglee-award">${award} SPIN MARATHON · REEL ${(trigger?.reel ?? 2) + 1}</div>
       </div>
     `;
     root.querySelector(".cc-root")?.appendChild(overlay);
     window.setTimeout(() => {
       overlay.remove();
       resolve();
-    }, 2600);
+    }, 3200);
+  });
+}
+
+function uniGleeChapterTitle(id: string): string {
+  switch (id) {
+    case "joey_laundry_helper": return "Joey’s Laundry Helper";
+    case "were_multiplying": return "We’re Multiplying";
+    case "keepsake_collection": return "Keepsake Collection";
+    default: return "Nighttime Treat Time";
+  }
+}
+
+async function runUniGleeMarathonBonus(
+  root: HTMLElement,
+  state: GameState,
+  award: 300 | 400 | 500,
+  seed: number,
+): Promise<void> {
+  const marathon: UniGleeBaseMarathonResult = runUniGleeBaseMarathon(
+    mulberry32(seed),
+    betPerLine(state.bet),
+    award,
+  );
+  let totalWin = 0;
+  let totalSpins = 0;
+  let totalRetriggers = 0;
+  const chapterNumber = (id: string): number => marathon.plan.order.indexOf(id as never) + 1;
+
+  for (const chapter of marathon.chapters) {
+    const title = uniGleeChapterTitle(chapter.id);
+    if (chapter.id === "joey_laundry_helper") {
+      await playJoeyLaundryChapter(root, chapter.session as JoeyLaundrySessionResult);
+    } else {
+      await playFreeSpinSession(root, state, chapter.session as FreeSpinSessionResult, {
+        label: `UniGlee · Chapter ${chapterNumber(chapter.id)}`,
+        title,
+      });
+    }
+    totalWin += chapter.totalWin;
+    totalSpins += chapter.totalSpins;
+    totalRetriggers += chapter.retriggers;
+    state.balance += chapter.totalWin;
+    state.bestCascade = Math.max(
+      state.bestCascade,
+      chapter.session.bestCascade,
+    );
+    saveGameState(state);
+  }
+
+  const lapQuest = await runLapQuestChapter(root, state, mulberry32(seed ^ 0x6a09e667));
+  if (lapQuest) {
+    totalWin += lapQuest.totalWin;
+    totalSpins += lapQuest.totalSpins;
+    totalRetriggers += lapQuest.retriggers;
+  }
+  await showUniGleeSummary(root, award, totalWin, totalSpins, totalRetriggers);
+  setStatus(root, `UNI-GLEE complete · +${totalWin.toLocaleString()} coins · ${totalSpins} spins played`);
+}
+
+function showUniGleeSummary(
+  root: HTMLElement,
+  award: number,
+  totalWin: number,
+  totalSpins: number,
+  retriggers: number,
+): Promise<void> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "uniglee-summary-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.innerHTML = `
+      <div class="uniglee-summary-butterfly">${symbolSvg("butterfly")}</div>
+      <div class="uniglee-summary-title">UNI-GLEE COMPLETE!</div>
+      <p class="uniglee-summary-copy">The mythical marathon is captured.</p>
+      <div class="uniglee-summary-stats">
+        <span><b>${totalSpins}</b><small>spins played</small></span>
+        <span><b>${totalWin.toLocaleString()}</b><small>Glee-coins won</small></span>
+      </div>
+      <p class="uniglee-summary-note">${award} initial spins · ${retriggers} local retrigger${retriggers === 1 ? "" : "s"} · Phoebe’s sweetener included</p>
+      <button id="uniglee-summary-continue" class="sparkle-btn">Return to the chase</button>`;
+    root.querySelector(".cc-root")?.appendChild(overlay);
+    playBonusFanfare();
+    overlay.querySelector<HTMLButtonElement>("#uniglee-summary-continue")?.addEventListener("click", () => {
+      overlay.remove();
+      resolve();
+    });
   });
 }
 
 /** Reusable UniGlee chapter hook; the marathon session owns when to call it. */
+export interface LapQuestChapterSummary {
+  lastRound: LapQuestRoundResult;
+  totalWin: number;
+  totalSpins: number;
+  retriggers: number;
+  bestCascade: number;
+  endReason: string;
+}
+
 export async function runLapQuestChapter(
   root: HTMLElement,
   state: GameState,
   rng = mulberry32(productionSeed()),
-): Promise<LapQuestRoundResult | undefined> {
+): Promise<LapQuestChapterSummary | undefined> {
   const challenge = createLapQuestChallenge(rng);
   const selectedSpot = await showLapQuestChoice(root, challenge);
   const round = spinLapQuestRound(rng, challenge, selectedSpot, betPerLine(state.bet));
@@ -1326,12 +1428,16 @@ export async function runLapQuestChapter(
   });
   let lastRound = round;
   let totalWin = 0;
+  let totalSpins = 0;
+  let retriggers = 0;
   let bestCascade = 0;
   let ledgeEnded = false;
   ledge.finished.then(() => { ledgeEnded = true; });
 
   const playRound = async (nextRound: LapQuestRoundResult): Promise<void> => {
     lastRound = nextRound;
+    totalSpins += 1;
+    retriggers += nextRound.freeSpinsAwarded > 0 ? 1 : 0;
     totalWin += nextRound.totalWin;
     bestCascade = Math.max(bestCascade, nextRound.cascades);
     await playLapQuestRound(root, nextRound);
@@ -1356,7 +1462,14 @@ export async function runLapQuestChapter(
     : ledgeResult.reason === "inactivity"
       ? `Phoebe's Lap Quest · she wandered off · +${totalWin.toLocaleString()} coins`
       : `Phoebe's Lap Quest · complete · +${totalWin.toLocaleString()} coins`);
-  return lastRound;
+  return {
+    lastRound,
+    totalWin,
+    totalSpins,
+    retriggers,
+    bestCascade,
+    endReason: ledgeResult.reason,
+  };
 }
 
 function showLapQuestChoice(root: HTMLElement, challenge: LapQuestChallenge): Promise<LapQuestSpot> {
