@@ -10,15 +10,27 @@ import { renderBoard, runLapQuestChapter } from "./ui/board";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
-/** Returns true if today is Glee's birthday (July 17, 2026) and the one-time bonus has not yet been claimed. */
+/**
+ * Jamie's birthday message to Glee. Written by Jamie. Do not edit, translate,
+ * summarize, or "improve" this string. It is the whole point.
+ */
+const BIRTHDAY_MESSAGE =
+  "I built you a tiny universe where the coins never run out, the chai is " +
+  "always iced, and the cats finally have jobs. Every sparkle in it is " +
+  "something you taught me to see. Do you love it? Wait. No. Really love it? " +
+  "Eternal love, Jamie";
+
+/**
+ * True from Glee's birthday (July 17, 2026) through the end of July, once per
+ * device. The window (not a single day) means every device she opens in July
+ * gets its own birthday moment; the claimed flag keeps it one-time per device.
+ * After July 2026 the path goes dormant permanently.
+ */
 function isBirthdayBonusAvailable(): boolean {
   const now = new Date();
-  return (
-    now.getFullYear() === 2026 &&
-    now.getMonth() === 6 && // July is month index 6
-    now.getDate() === 17 &&
-    !load("birthdayBonusClaimed", false)
-  );
+  const start = new Date(2026, 6, 17); // July 17, 2026 00:00 local
+  const end = new Date(2026, 7, 1);    // August 1, 2026 00:00 local
+  return now >= start && now < end && !load("birthdayBonusClaimed", false);
 }
 
 /** Marks the birthday bonus as claimed and adds 1 000 coins to state. */
@@ -35,7 +47,8 @@ function renderSplash(): void {
     ? `<div class="chai-bday-panel" role="status" aria-live="polite">
         <span class="chai-bday-emoji" aria-hidden="true">🎂🦋🎉</span>
         <strong class="chai-bday-headline">Happy Birthday, Glee!</strong>
-        <p class="chai-bday-body">Jamie hid&nbsp;<span class="chai-bday-coins">+1&thinsp;000&nbsp;Glee&#8209;coins</span>&nbsp;in your wallet as a birthday surprise — tap in to collect&nbsp;them!</p>
+        <p class="chai-bday-body">${BIRTHDAY_MESSAGE}</p>
+        <p class="chai-bday-body"><span class="chai-bday-coins">+1&thinsp;000&nbsp;Glee&#8209;coins</span>&nbsp;are waiting in your wallet. Tap in to collect&nbsp;them!</p>
        </div>`
     : "";
 
