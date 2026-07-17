@@ -26,7 +26,7 @@ import type {
 import type { LapQuestSpot } from "../engine/types";
 import type { UniGleeAwardSpins } from "../engine/laundry";
 import { REELS, ROWS } from "../engine/reels";
-import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, levelForXp, applyBustProofRefill } from "../engine/economy";
+import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, levelForXp, applyBustProofRefill, applyBonusSpinXp } from "../engine/economy";
 import { spin } from "../engine/cascade";
 import {
   BOLD_CHAI_DURATION_MS,
@@ -1122,6 +1122,7 @@ async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAw
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
   await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
+  await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
 }
@@ -1147,6 +1148,7 @@ async function runTreatJarFreeSpins(
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
   await showBonusSummary(root, session.totalWin, 0, session.totalSpins);
+  await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
 }
@@ -1434,6 +1436,7 @@ async function runUniGleeMarathonBonus(
   }
   await showUniGleeSummary(root, award, totalWin, totalSpins, totalRetriggers);
   setStatus(root, `UNI-GLEE complete · +${totalWin.toLocaleString()} coins · ${totalSpins} spins played`);
+  await maybeLevelUpAfterBonus(root, state, totalSpins);
 }
 
 function showUniGleeSummary(
@@ -1650,12 +1653,12 @@ async function runTreatTimeBonus(
 
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
-  saveGameState(state);
 
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
   setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins · ${session.totalSpins} spins${session.retriggers > 0 ? ` · ${session.retriggers} retrigger${session.retriggers > 1 ? "s" : ""}` : ""}`);
+  await maybeLevelUpAfterBonus(root, state, session.totalSpins);
 }
 
 function showTreatTimeEntry(root: HTMLElement, mode: TreatTimeMode, spinsAwarded: number): Promise<void> {
@@ -1753,6 +1756,7 @@ async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAw
     state.bestCascade = Math.max(state.bestCascade, standardSession.bestCascade);
     saveGameState(state);
     await showBonusSummary(root, standardSession.totalWin, standardSession.retriggers, standardSession.totalSpins);
+    await maybeLevelUpAfterBonus(root, state, standardSession.totalSpins);
     const lastRound = standardSession.rounds[standardSession.rounds.length - 1];
     renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
     return;
@@ -1767,6 +1771,7 @@ async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAw
   saveGameState(state);
 
   await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
+  await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
@@ -1783,6 +1788,7 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
   saveGameState(state);
 
   await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
+  await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
@@ -2260,6 +2266,32 @@ function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: numbe
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/**
+ * Awards Chai Sparks for all spins played inside a bonus session, then fires
+ * the level-up celebration if a new level was reached.  Always saves state
+ * after the XP grant so the new total is persisted whether or not a level-up
+ * occurred.  The celebration fires AFTER the bonus summary so it doesn't
+ * interrupt the bonus-win reveal.
+ */
+async function maybeLevelUpAfterBonus(
+  root: HTMLElement,
+  state: GameState,
+  totalSpins: number,
+): Promise<void> {
+  const { levelBefore, levelAfter } = applyBonusSpinXp(state, totalSpins);
+  if (levelAfter > levelBefore) {
+    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
+    const coinReward = 200 * levelAfter;
+    state.balance += coinReward;
+    const chip = root.querySelector<HTMLElement>(".coin-chip");
+    if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
+    saveGameState(state);
+    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
+  } else {
+    saveGameState(state);
+  }
 }
 
 /** Level-up saucer celebration — a flying saucer zips in, crashes into a spark

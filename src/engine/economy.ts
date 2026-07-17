@@ -51,3 +51,22 @@ export function applyBustProofRefill(balance: number, currentBet: number): { bal
   if (balance >= currentBet) return { balance, refilled: false };
   return { balance: balance + BUST_PROOF_REFILL, refilled: true };
 }
+
+/**
+ * Awards Chai Sparks for every spin played inside a bonus session and returns
+ * the player level before and after the grant. Mutates state.xp in place.
+ *
+ * Bonus sessions (free spins, treat-jar spins, UniGlee chapters, etc.) each
+ * play multiple reels — each of those counts as a real spin for XP purposes.
+ * The caller must still check whether levelAfter > levelBefore and show the
+ * celebration if so.
+ */
+export function applyBonusSpinXp(
+  state: { xp: number; bet: number },
+  totalSpins: number,
+): { levelBefore: number; levelAfter: number } {
+  const levelBefore = levelForXp(state.xp);
+  state.xp += sparksForSpin(state.bet) * totalSpins;
+  const levelAfter = levelForXp(state.xp);
+  return { levelBefore, levelAfter };
+}
