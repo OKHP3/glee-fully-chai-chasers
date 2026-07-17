@@ -93,6 +93,7 @@ import {
   playLapQuestWildLand,
   playTreatLand,
   playTreatTimeCue,
+  playLevelUpFanfare,
   playUniGleeSting,
   playWinPluck,
   playWheelTick,
@@ -2296,7 +2297,7 @@ async function maybeLevelUpAfterBonus(
 
 /** Level-up saucer celebration — a flying saucer zips in, crashes into a spark
  *  burst, and the congratulations message blooms from the explosion.
- *  TODO: add a sound cue once the audio system supports one-shot fanfares.
+ *  The fanfare fires at the saucer impact moment (~480 ms in).
  */
 function showLevelUpCelebration(
   root: HTMLElement,
@@ -2305,6 +2306,7 @@ function showLevelUpCelebration(
   coinReward: number,
 ): Promise<void> {
   return new Promise((resolve) => {
+    window.setTimeout(() => playLevelUpFanfare(), 480);
     const overlay = document.createElement("div");
     overlay.className = "levelup-overlay";
     overlay.setAttribute("aria-live", "assertive");
