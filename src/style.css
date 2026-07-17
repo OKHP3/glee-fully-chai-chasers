@@ -653,11 +653,48 @@ body {
 /* Firefly-jar cascade meter                                           */
 /* ------------------------------------------------------------------ */
 
+/* ── Bonus banner (above cabinet, filled only during a bonus) ── */
+.bonus-banner {
+  display: none;
+  margin: 5px 12px 0;
+  padding: 5px 12px 6px;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 12% 50%, rgba(255, 226, 122, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(20, 51, 59, 0.93), rgba(11, 26, 48, 0.96));
+  border: 1px solid rgba(245, 213, 118, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 3px 12px rgba(0,0,0,.34);
+  color: #fff4e0;
+}
+.bonus-banner--active { display: block; }
+.bonus-banner-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: "Baloo Display", "Arial Black", sans-serif;
+  font-size: clamp(13px, 3.8vw, 18px);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.bonus-banner-kicker { color: var(--cc-butter); font-size: .72em; letter-spacing: .08em; }
+.bonus-banner-title { color: #fff4e0; text-shadow: 0 0 10px rgba(245, 213, 118, .4); }
+.bonus-banner-stats {
+  margin-top: 2px;
+  font-size: clamp(11px, 3vw, 13px);
+  color: rgba(255, 244, 224, .82);
+}
+
+/* ── Firefly Cascade meter (now lives inside companion-row) ── */
 .jar-meter {
-  margin: 7px 12px 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+}
+/* Full-size standalone variant (used in Joey Laundry chapter etc.) */
+.jar-meter:not(.jar-meter--inline) {
+  margin: 7px 12px 0;
   min-height: 68px;
   padding: 6px 12px;
   border-radius: 18px;
@@ -667,11 +704,27 @@ body {
   border: 1px solid rgba(245, 213, 118, 0.42);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 3px 12px rgba(0,0,0,.34), 0 0 18px rgba(107,214,201,.08);
 }
+/* Compact variant inside companion-row */
+.jar-meter--inline {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 12% 50%, rgba(255, 226, 122, 0.10), transparent 34%),
+    linear-gradient(180deg, rgba(20, 51, 59, 0.85), rgba(11, 26, 48, 0.88));
+  border: 1px solid rgba(245, 213, 118, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 2px 8px rgba(0,0,0,.28);
+}
 .jar-meter-icon { width: 58px; height: 52px; flex-shrink: 0; }
-.jar-meter-copy { min-width: 0; display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 1px 10px; flex: 1; }
+.jar-meter--inline .jar-meter-icon { width: 32px; height: 30px; }
+.jar-meter-copy { min-width: 0; display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 1px 8px; flex: 1; }
 .jar-meter-kicker { font-family: "Baloo Display", "Arial Black", sans-serif; color: var(--cc-butter); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+.jar-meter--inline .jar-meter-kicker { font-size: 9px; }
 .jar-meter-count { font-family: "Baloo Display", "Arial Black", sans-serif; font-size: 21px; line-height: 1; color: #fff4e0; text-shadow: 0 0 10px rgba(255,226,122,.65); }
+.jar-meter--inline .jar-meter-count { font-size: 14px; }
 .jar-meter-copy small { grid-column: 1 / -1; font-size: 10px; color: rgba(214,255,239,.74); }
+.jar-meter--inline .jar-meter-copy small { font-size: 8px; }
 .jar-firefly { filter: drop-shadow(0 0 2px rgba(255, 226, 122, 0.9)); }
 
 /* ------------------------------------------------------------------ */
@@ -928,6 +981,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
   min-height: 52px;
   margin: 6px 12px 0;
 }
@@ -2033,10 +2087,7 @@ body {
   .level-chip em { font-size: 8px; }
   .chrome-btn { min-width: 44px; min-height: 44px; }
 
-  .jar-meter { margin-inline: 7px; gap: 7px; padding-inline: 8px; }
-  .jar-meter-icon { width: 50px; height: 46px; }
-  .jar-meter-kicker { font-size: 12px; }
-  .jar-meter-count { font-size: 19px; }
+  .bonus-banner { margin-inline: 7px; }
 
   .cabinet-frame { width: calc(100% - 12px); margin-top: 6px; padding: 5px; border-radius: 16px; }
   .reel-grid { gap: 2px; padding: 4px; }
@@ -2071,8 +2122,6 @@ body {
 @media (max-height: 720px) {
   .cc-shell { min-height: 100%; }
   .marquee { margin-top: 5px; }
-  .jar-meter { min-height: 60px; margin-top: 5px; }
-  .jar-meter-icon { width: 50px; height: 46px; }
   .cabinet-frame { margin-top: 5px; }
   .companion-row { min-height: 46px; margin-top: 4px; }
   .bet-console { margin-top: 2px; }
