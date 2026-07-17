@@ -67,8 +67,19 @@ export const PAYTABLE: Partial<Record<SymbolId, { 3: number; 4: number; 5: numbe
 
 /**
  * Doorbell visibility adds intentional dead-space blockers to reels 1–2.
- * This global tuning factor sets the full-game RTP (base + all bonuses) to
+ * This global tuning factor sets everyday RTP (base + the common bonuses:
+ * Treat Jar, Doorbell Panic, Bold Chai, Treat Time, and the Sparkle Wheel) to
  * ~96.5%, inside the 95-98% target band. Solved linearly from fleet sims.
+ *
+ * UniGlee (S33, 2026-07-17) is deliberately excluded from that band. There is
+ * no real-money stake in this game, so its rare (~1-in-4,212 real capture,
+ * S34 — distinct from the far more common ~1-in-850 non-paying tease
+ * sighting in reels.ts) 300/400/500-spin marathon is allowed to push measured
+ * full-game RTP to ~103% when it lands — that is the intended "coins never
+ * run out" jackpot feeling, not a bug. Do not lower PAYOUT_SCALE or cut
+ * UniGlee's rate to force total RTP back under 100%; that would gut the base
+ * game and every other bonus to pay for one rare, intentionally generous
+ * event. See DECISION-LOG S33/S34.
  */
 export const PAYOUT_SCALE = 0.775;
 

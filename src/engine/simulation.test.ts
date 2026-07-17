@@ -62,15 +62,19 @@ const skipOracle =
 describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded spins vs DESIGN-SPEC §4`, () => {
   const s = simulate();
 
-  // Full-game RTP retuned 2026-07 to land base + all bonuses in the 95-98%
-  // band (~96.5% total). Base game alone now targets ~61%; bonuses carry the
-  // rest. Previously: UniGlee rolled each reel independently
-  // (1/2500, 1/4000, 1/7500; combined ~1/1,277 vs the old single 1/400 roll),
-  // removing most guaranteed trigger-line wins from the base stream and
-  // lowering base RTP roughly a point below the original ~96% target.
-  it(`base RTP ~60.9% ±1 (actual: ${(s.rtp * 100).toFixed(2)}%)`, () => {
-    expect(s.rtp).toBeGreaterThan(0.599);
-    expect(s.rtp).toBeLessThan(0.619);
+  // Full-game RTP retuned 2026-07 to land base + the common bonuses in the
+  // 95-98% band (~96.5%). UniGlee is exempt from that band entirely (S33) —
+  // its restored 300/400/500 award is an intentionally generous rare jackpot
+  // with no RTP ceiling. S34 (2026-07-17) made the real UniGlee capture
+  // rarer again (1/2500,1/4000,1/7500 -> 1/8000,1/16000,1/20000, combined
+  // ~1/1,277 -> ~1/4,212) and added a separate, much more common, purely
+  // decorative tease sighting (~1/850, reels.ts) with zero paytable weight.
+  // Both changes further reduce how often a guaranteed trigger-line prefix
+  // or a rare dead-space blocker appears in the base stream, nudging base
+  // RTP down about another point from the prior ~60.9% target.
+  it(`base RTP ~59.7% ±1 (actual: ${(s.rtp * 100).toFixed(2)}%)`, () => {
+    expect(s.rtp).toBeGreaterThan(0.587);
+    expect(s.rtp).toBeLessThan(0.607);
   });
 
   it(`any-win rate ~1 in 2.9 ±15% (actual: 1 in ${(1 / s.winRate).toFixed(2)})`, () => {
@@ -90,9 +94,9 @@ describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded sp
     expect(s.mega8Rate).toBeLessThan(1 / 450);
   });
 
-  it(`UniGlee ~1 in 1,277 combined per-reel odds (actual: 1 in ${(1 / Math.max(s.unigleeRate, 1e-9)).toFixed(0)})`, () => {
-    expect(s.unigleeRate).toBeGreaterThan(1 / 2000);
-    expect(s.unigleeRate).toBeLessThan(1 / 850);
+  it(`UniGlee ~1 in 4,212 combined per-reel odds, S34 (actual: 1 in ${(1 / Math.max(s.unigleeRate, 1e-9)).toFixed(0)})`, () => {
+    expect(s.unigleeRate).toBeGreaterThan(1 / 6000);
+    expect(s.unigleeRate).toBeLessThan(1 / 3000);
   });
 
   it(`cat pop-in ~1 in 30 ±30% (actual: 1 in ${(1 / Math.max(s.catVisitRate, 1e-9)).toFixed(1)})`, () => {

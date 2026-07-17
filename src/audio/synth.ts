@@ -285,6 +285,19 @@ export function playStrangerDangerPanic(): void {
   [220, 277.18, 329.63, 415.3].forEach((freq, i) => tone(freq, 0.32 + i * 0.07, 0.16, 0.13, "triangle"));
 }
 
+/**
+ * UniGlee tease sighting — a fleeting harp-like glissando for the decorative,
+ * non-paying sighting only (reels.ts UNIGLEE_TEASE_RATE). Deliberately much
+ * quieter and shorter than playUniGleeSting so a glimpse never rivals the
+ * real arrival: a quick six-note ascending run, alternating sine/triangle
+ * (a rough harp-string timbre from oscillators alone, no samples).
+ */
+export function playUniGleeTease(): void {
+  [523.25, 587.33, 659.25, 783.99, 880, 1046.5].forEach((freq, i) => {
+    tone(freq, i * 0.032, 0.2, 0.085, i % 2 ? "triangle" : "sine");
+  });
+}
+
 /** UniGlee's mythic arrival — glassy lift, breath, then a wide butterfly shimmer. */
 export function playUniGleeSting(): void {
   [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {

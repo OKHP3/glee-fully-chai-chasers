@@ -7,8 +7,11 @@
  * ROWS consecutive symbols (wrapping). Saucer-cat wilds are placed on the
  * tapes as contiguous runs of 6-7 (docs §5) so stacking is a natural
  * consequence of window position, not a special case. UniGlee is NOT a strip
- * symbol (docs §5 — "a legend, not a line symbol"); it's gated separately in
- * cascade.ts as a per-spin event at ~1/400.
+ * symbol (docs §5 — "a legend, not a line symbol"); the real, marathon-
+ * granting capture is gated separately in uniglee.ts/cascade.ts (currently
+ * ~1-in-4,200 combined). This file also places a much more common, purely
+ * decorative UniGlee tease sighting (UNIGLEE_TEASE_RATE, ~1-in-850) that
+ * never pays and never triggers anything — see maybePlaceUniGleeTease.
  */
 import type { Cell, Grid, HandbagWildMultiplier, SymbolId } from "./types";
 import type { Rng } from "./rng";
@@ -24,6 +27,17 @@ export const DOORBELL_REEL_TWO_RATE = 1 / 30;
 export const BOLD_CHAI_REEL_ONE_RATE = 1 / 17;
 export const BOLD_CHAI_REEL_TWO_RATE = 1 / 30;
 
+/**
+ * UniGlee tease sighting (S34, 2026-07-17): a lone, non-paying decorative
+ * "uniglee" symbol on one of the three active reels (3/4/5), rolled fully
+ * independently of and far more often than the real capture in uniglee.ts.
+ * Psychological "she's near" cue with zero RTP cost — the symbol is already
+ * flagged non-paying in paylines.ts, so a tease sighting can never form a
+ * win or fire the marathon on its own.
+ */
+export const UNIGLEE_TEASE_RATE = 1 / 850;
+const UNIGLEE_TEASE_REELS = [2, 3, 4] as const;
+
 /** Most handbag landings stay special, but this gate keeps the multiplier rare. */
 export const HANDBAG_WILD_LAND_RATE = 0.85;
 
@@ -32,6 +46,8 @@ export interface SpinGridOptions {
   includeDoorbells?: boolean;
   /** Bonus screens suppress the Bold Chai Pump landing event entirely. */
   includeBoldChaiPump?: boolean;
+  /** Main-board-only, same gate as the real UniGlee capture. */
+  includeUniGleeTease?: boolean;
 }
 
 function repeat(symbol: SymbolId, count: number): SymbolId[] {
@@ -184,6 +200,14 @@ function placeBlocker(grid: Grid, reel: number, symbol: "doorbell" | "chai_pump"
   grid[reel][row] = { symbol };
 }
 
+/** Rolls and, on success, drops one decorative UniGlee sighting. See UNIGLEE_TEASE_RATE. */
+function maybePlaceUniGleeTease(grid: Grid, rng: Rng): void {
+  if (rng() >= UNIGLEE_TEASE_RATE) return;
+  const reel = UNIGLEE_TEASE_REELS[Math.floor(rng() * UNIGLEE_TEASE_REELS.length)];
+  const row = Math.floor(rng() * ROWS);
+  grid[reel][row] = { symbol: "uniglee" };
+}
+
 /** Draws a fresh REELS x ROWS grid. grid[reel][row], row 0 = top. */
 export function spinGrid(rng: Rng, options: SpinGridOptions = {}): Grid {
   const grid: Grid = [];
@@ -200,6 +224,7 @@ export function spinGrid(rng: Rng, options: SpinGridOptions = {}): Grid {
     if (selection.pumpReelOne) placeBlocker(grid, 0, "chai_pump", rng);
     if (selection.pumpReelTwo) placeBlocker(grid, 1, "chai_pump", rng);
   }
+  if (options.includeUniGleeTease !== false) maybePlaceUniGleeTease(grid, rng);
   return grid;
 }
 

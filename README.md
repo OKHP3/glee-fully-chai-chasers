@@ -21,7 +21,7 @@ The main game is a five-reel, four-row cascade board with 40 fixed paylines. Tap
 - **Treat Time:** Morning and Nighttime Treat Time sessions toss cat wilds onto the board before the cascades begin.
 - **Doorbell Panic:** a matching pair of doorbells opens a cat-powered free-spin bonus.
 - **Bold Chai:** a matching pair of chai pumps opens a 30-second iced-chai pump scene. Every completed 12-pump cup awards 3 free spins.
-- **UniGlee:** the rare rainbow butterfly opens the full multi-chapter marathon — 40, 60, or 80 free spins across Joey, Phoebe, and keepsake chapters, sized by which reel captures the butterfly.
+- **UniGlee:** the mythical rainbow butterfly is glimpsed often (a purely decorative sighting, ~1-in-850) but only truly caught rarely (~1-in-4,200) — a real capture opens the full multi-chapter marathon: 300, 400, or 500 free spins across Joey, Phoebe, and keepsake chapters, sized by which reel captures her, plus Phoebe's Lap Quest as an additive, timed sweetener.
 - **Birthday Reveal:** a one-time, date-gated splash moment live across all of July, every year — Jamie's own message to Glee plus a Glee-coin bonus, once per device per year.
 - **AskJamie perch:** tap once a day for a surprise coin top-up.
 
@@ -54,7 +54,7 @@ npm run build
 
 The project is a Vite + TypeScript single-page app. Game math lives in `src/engine/`; the browser UI lives in `src/ui/`.
 
-Current engineering status: the production build passes, the full test suite is green, and the seeded 200,000-spin oracle tracks the retuned base game. Full-game return-to-player (base plus every bonus) measures ~96.1% across 210,000 simulated spins — inside the 95–98% design band — with retriggers blocked engine-wide so no bonus can run away.
+Current engineering status: the production build passes, the full test suite is green, and the seeded 200,000-spin oracle tracks the retuned base game. Everyday return-to-player (base plus the common bonuses — Treat Jar, Doorbell Panic, Bold Chai, Treat Time, and the Sparkle Wheel) measures ~96.5%, inside the 95–98% design band, with retriggers blocked engine-wide so no bonus can run away. UniGlee, the true marathon-granting capture (~1-in-4,200, distinct from the far more common ~1-in-850 decorative sighting), is intentionally excluded from that band: there's no real-money stake in this game, so its full-size 300/400/500-spin award is left generous on purpose, measuring ~103% full-game RTP at scale. The coins are supposed to never run out.
 
 ## Privacy and originality
 

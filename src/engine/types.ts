@@ -162,7 +162,7 @@ export interface UniGleeTrigger {
   lineIndex: number;
   position: [reel: 2 | 3 | 4, row: number];
   linePositions: Array<[reel: number, row: number]>;
-  initialAwardSpins: 40 | 60 | 80;
+  initialAwardSpins: 300 | 400 | 500;
 }
 
 export type BoldChaiPumpPhase = "ready" | "pumping" | "resetting" | "ended";

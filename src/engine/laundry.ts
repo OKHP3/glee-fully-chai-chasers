@@ -17,11 +17,16 @@ export const LAUNDRY_REELS = [1, 2, 3] as const satisfies readonly LaundryReel[]
 export const LAUNDRY_MULTIPLIERS = [2, 3, 5] as const satisfies readonly LaundryMultiplier[];
 export const LAUNDRY_ALLOCATION_FRACTION = 0.25;
 
-/** 2026-07 RTP retune: marathon award reduced from 300/400/500 to 40/60/80. */
-export type UniGleeAwardSpins = 40 | 60 | 80;
+/**
+ * 2026-07-15 release contract: 300/400/500. Cut to 40/60/80 in a same-month
+ * RTP retune, then restored here (S33) once retriggers were blocked
+ * engine-wide — the runaway-session risk that motivated the cut no longer
+ * exists, so the original award stands and PAYOUT_SCALE absorbs the RTP.
+ */
+export type UniGleeAwardSpins = 300 | 400 | 500;
 
-export function baseLaundryAllocation(awardedSpins: UniGleeAwardSpins): 10 | 15 | 20 {
-  return (awardedSpins * LAUNDRY_ALLOCATION_FRACTION) as 10 | 15 | 20;
+export function baseLaundryAllocation(awardedSpins: UniGleeAwardSpins): 75 | 100 | 125 {
+  return (awardedSpins * LAUNDRY_ALLOCATION_FRACTION) as 75 | 100 | 125;
 }
 
 export interface LaundryRollConfig {

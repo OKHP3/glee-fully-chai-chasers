@@ -255,7 +255,11 @@ export function spin({
 }: SpinInput): SpinResult {
   let grid = startingGrid
     ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
-    : spinGrid(rng, { includeDoorbells: allowDoorbells, includeBoldChaiPump });
+    : spinGrid(rng, {
+        includeDoorbells: allowDoorbells,
+        includeBoldChaiPump,
+        includeUniGleeTease: allowUniGlee && spinArea === "main",
+      });
   const stickyWilds = cloneStickyWilds(inputStickyWilds);
   grid = applyStickyWilds(grid, stickyWilds);
   const steps: CascadeStep[] = [];

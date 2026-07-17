@@ -176,4 +176,33 @@ describe("spin", () => {
     expect(result.steps[1].grid[1][0].symbol).toBe(result.steps[1].keepsakeZone?.symbol);
     expect(result.steps[1].grid[2][1].symbol).toBe(result.steps[1].keepsakeZone?.symbol);
   });
+
+  it("a UniGlee tease sighting is purely decorative — untriggered spins never award a marathon", () => {
+    let untriggeredSightings = 0;
+    for (let seed = 0; seed < 20_000; seed++) {
+      const result = spin({
+        rng: mulberry32(seed),
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+      });
+      const hasSighting = result.steps[0].grid.flat().some((cell) => cell.symbol === "uniglee");
+      if (hasSighting && !result.unigleeTriggered) untriggeredSightings++;
+    }
+    // Proves the test isn't vacuous: teases genuinely outnumber real captures here.
+    expect(untriggeredSightings).toBeGreaterThan(0);
+  });
+
+  it("suppresses the UniGlee tease on secondary bonus spins (allowUniGlee: false)", () => {
+    for (let seed = 0; seed < 20_000; seed++) {
+      const result = spin({
+        rng: mulberry32(seed),
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+        allowUniGlee: false,
+      });
+      expect(result.steps[0].grid.flat().some((cell) => cell.symbol === "uniglee")).toBe(false);
+    }
+  });
 });

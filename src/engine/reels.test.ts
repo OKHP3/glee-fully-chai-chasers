@@ -7,6 +7,7 @@ import {
   DOORBELL_REEL_TWO_RATE,
   REELS,
   ROWS,
+  UNIGLEE_TEASE_RATE,
   cascadeColumn,
   spinGrid,
 } from "./reels";
@@ -115,6 +116,45 @@ describe("spinGrid", () => {
       const hasPump = grid.flat().some((cell) => cell.symbol === "chai_pump");
       expect(hasDoorbell && hasPump).toBe(false);
     }
+  });
+
+  describe("UniGlee tease sighting", () => {
+    it("only ever lands on reels 2, 3, or 4 (human reels 3-5)", () => {
+      for (let seed = 0; seed < 20_000; seed++) {
+        const grid = spinGrid(mulberry32(seed));
+        for (const reel of [0, 1]) {
+          expect(grid[reel].some((cell) => cell.symbol === "uniglee")).toBe(false);
+        }
+      }
+    });
+
+    it("never places more than one tease sighting per spin", () => {
+      for (let seed = 0; seed < 20_000; seed++) {
+        const grid = spinGrid(mulberry32(seed));
+        const count = grid.flat().filter((cell) => cell.symbol === "uniglee").length;
+        expect(count).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it("is suppressed when includeUniGleeTease is false", () => {
+      for (let seed = 0; seed < 20_000; seed++) {
+        const grid = spinGrid(mulberry32(seed), { includeUniGleeTease: false });
+        expect(grid.flat().some((cell) => cell.symbol === "uniglee")).toBe(false);
+      }
+    });
+
+    it("fires at roughly its configured rate over many spins", () => {
+      let sightings = 0;
+      const trials = 400_000;
+      const rng = mulberry32(20260717);
+      for (let i = 0; i < trials; i++) {
+        const grid = spinGrid(rng);
+        if (grid.flat().some((cell) => cell.symbol === "uniglee")) sightings++;
+      }
+      const measured = sightings / trials;
+      expect(measured).toBeGreaterThan(UNIGLEE_TEASE_RATE * 0.8);
+      expect(measured).toBeLessThan(UNIGLEE_TEASE_RATE * 1.2);
+    });
   });
 });
 
