@@ -294,6 +294,17 @@ export function playUniGleeSting(): void {
   tone(392, 0.62, 0.68, 0.1, "triangle");
 }
 
+/** Level-up fanfare — a bright ascending triad burst with a shimmer tail,
+ *  timed to fire at the saucer crash impact moment (~480 ms in). */
+export function playLevelUpFanfare(): void {
+  [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+    tone(freq, i * 0.07, 0.38, 0.2, i % 2 ? "triangle" : "sine");
+  });
+  tone(1318.51, 0.26, 0.28, 0.14, "triangle");
+  tone(1567.98, 0.34, 0.36, 0.12, "sine");
+  [261.63, 329.63].forEach((freq, i) => tone(freq, i * 0.06, 0.32, 0.1, "sine"));
+}
+
 /** AskJamie Wheel spin-up — a ratchety descending tick loop. */
 export function playWheelTick(): void {
   for (let i = 0; i < 14; i++) {
