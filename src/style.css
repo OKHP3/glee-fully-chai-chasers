@@ -656,19 +656,13 @@ body {
 /* ── Bonus banner (above cabinet, filled only during a bonus) ── */
 .bonus-banner {
   display: block;
-  margin: 7px 12px 0;
   min-height: 68px;
   padding: 5px 12px 6px;
-  border-radius: 14px;
-  /* transparent / collapsed when idle — holds space, no visible background */
+  /* transparent / idle — holds space inside the cabinet-shell */
   color: #fff4e0;
 }
 .bonus-banner--active {
-  background:
-    radial-gradient(circle at 12% 50%, rgba(255, 226, 122, 0.14), transparent 34%),
-    linear-gradient(180deg, rgba(20, 51, 59, 0.93), rgba(11, 26, 48, 0.96));
-  border: 1px solid rgba(245, 213, 118, 0.42);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 3px 12px rgba(0,0,0,.34);
+  background: radial-gradient(circle at 12% 50%, rgba(255, 226, 122, 0.12), transparent 34%);
 }
 .bonus-banner-heading {
   display: flex;
@@ -734,16 +728,15 @@ body {
 /* The cabinet — ornate reel-window frame                              */
 /* ------------------------------------------------------------------ */
 
-.cabinet-frame {
-  position: relative;
+/* ── Unified cabinet shell: encloses bonus-banner + reel grid ── */
+.cabinet-shell {
   width: calc(100% - 20px);
-  aspect-ratio: 5 / 4;
   margin: 8px auto 0;
-  padding: 8px;
-  border-radius: 20px;
   flex: 0 0 auto;
   display: flex;
-  min-height: 0;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
   background: linear-gradient(160deg, #3a2f5c, #1c1440 60%, #150f30);
   border: 2px solid rgba(245, 213, 118, 0.55);
   box-shadow:
@@ -751,6 +744,22 @@ body {
     inset 0 0 22px rgba(107, 214, 201, 0.18),
     0 0 0 1px rgba(0, 0, 0, 0.5),
     0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+.cabinet-shell-divider {
+  height: 1px;
+  flex-shrink: 0;
+  background: rgba(245, 213, 118, 0.28);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cabinet-frame {
+  position: relative;
+  aspect-ratio: 5 / 4;
+  padding: 8px;
+  flex: 0 0 auto;
+  display: flex;
+  min-height: 0;
 }
 
 .ornament {
@@ -1360,7 +1369,7 @@ body {
 .cc-root[data-theme="light"] .marquee, .cc-root[data-theme="light"] .jar-meter, .cc-root[data-theme="light"] .bet-console { color: #2d1f4c; background: linear-gradient(180deg, rgba(255,253,246,.95), rgba(238,222,247,.92)); border-color: rgba(87,55,112,.28); }
 .cc-root[data-theme="light"] .marquee-title, .cc-root[data-theme="light"] .jar-meter-count, .cc-root[data-theme="light"] .bet-display { color: #2d1f4c; text-shadow: none; }
 .cc-root[data-theme="light"] .jar-meter-copy small, .cc-root[data-theme="light"] .level-chip, .cc-root[data-theme="light"] .coin-chip { color: #443051; }
-.cc-root[data-theme="light"] .cabinet-frame { border-color: rgba(87,55,112,.58); box-shadow: inset 0 0 0 2px rgba(255,255,255,.42), 0 8px 20px rgba(69,34,90,.24); }
+.cc-root[data-theme="light"] .cabinet-shell { border-color: rgba(87,55,112,.58); box-shadow: inset 0 0 0 2px rgba(255,255,255,.42), 0 8px 20px rgba(69,34,90,.24); }
 .cc-root[data-theme="light"] .game-page { color: #2d1f4c; background: linear-gradient(180deg, #fff7e8, #dff4ec 55%, #eadcf5); }
 .cc-root[data-theme="light"] .game-page-topbar { background: rgba(255,255,255,.66); border-color: rgba(87,55,112,.2); }
 .cc-root[data-theme="light"] .game-page h2, .cc-root[data-theme="light"] .settings-card h3, .cc-root[data-theme="light"] .page-section-title, .cc-root[data-theme="light"] .pay-symbol-card h3, .cc-root[data-theme="light"] .feature-symbol-card h3 { color: #352047; }
@@ -2090,9 +2099,8 @@ body {
   .level-chip em { font-size: 8px; }
   .chrome-btn { min-width: 44px; min-height: 44px; }
 
-  .bonus-banner { margin-inline: 7px; }
-
-  .cabinet-frame { width: calc(100% - 12px); margin-top: 6px; padding: 5px; border-radius: 16px; }
+  .cabinet-shell { width: calc(100% - 12px); margin-top: 6px; border-radius: 16px; }
+  .cabinet-frame { padding: 5px; }
   .reel-grid { gap: 2px; padding: 4px; }
   .reel-col { gap: 2px; }
   .cell { border-radius: 7px; padding: 1px; }
@@ -2125,7 +2133,7 @@ body {
 @media (max-height: 720px) {
   .cc-shell { min-height: 100%; }
   .marquee { margin-top: 5px; }
-  .cabinet-frame { margin-top: 5px; }
+  .cabinet-shell { margin-top: 5px; }
   .companion-row { min-height: 46px; margin-top: 4px; }
   .bet-console { margin-top: 2px; }
 }
@@ -2200,7 +2208,7 @@ body {
 }
 .treat-time-entry--main .treat-time-entry-hand { display: none; }
 .treat-time-entry--main .treat-time-entry-copy { max-width: none; width: 100%; padding: 12px 14px; }
-.treat-time-main-mode .cabinet-frame {
+.treat-time-main-mode .cabinet-shell {
   box-shadow: inset 0 0 0 2px rgba(159, 232, 197, .5), inset 0 0 26px rgba(107, 214, 201, .22), 0 0 22px rgba(245, 213, 118, .32);
 }
 .treat-time-entry-title {
