@@ -217,14 +217,7 @@ export function renderBoard(
           </div>
         </header>
 
-        <div class="jar-meter" aria-live="polite" aria-label="Firefly cascade meter">
-          <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(state.fireflyMeter)}</div>
-          <div class="jar-meter-copy">
-            <span class="jar-meter-kicker">Firefly Cascade</span>
-            <strong id="meter-count" class="jar-meter-count">${state.fireflyMeter} / 6</strong>
-            <small>Reach 6 to unlock 6 free spins</small>
-          </div>
-        </div>
+        <div id="bonus-banner" class="bonus-banner" aria-live="polite"></div>
 
         <main class="cabinet-frame">
           <span class="ornament ornament-tl">${miniStar()}</span>
@@ -240,6 +233,14 @@ export function renderBoard(
           <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
             <span class="treat-jar-title">Treat Jar</span>
             ${treatJarHtml(state)}
+          </div>
+          <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+            <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(state.fireflyMeter)}</div>
+            <div class="jar-meter-copy">
+              <span class="jar-meter-kicker">Firefly Cascade</span>
+              <strong id="meter-count" class="jar-meter-count">${state.fireflyMeter} / 6</strong>
+              <small>Reach 6 · 6 free spins</small>
+            </div>
           </div>
           <button id="askjamie-perch" aria-label="AskJamie — tap for daily bonus" class="askjamie-housing">
             <div class="askjamie-icon">${publicPicture("askjamie-avatar.jpg", "askjamie-picture")}</div>
@@ -1836,21 +1837,29 @@ async function playFreeSpinSession(
   panel.className = `free-spins-panel text-amber-100 ${wedge === "doorbell_panic" ? "panic-free-spins" : ""} ${treatTime ? "treat-time-free-spins treat-time-cabinet" : ""}`;
   panel.setAttribute("aria-label", `${displayWedgeLabel} bonus spins`);
   panel.innerHTML = `
-    <div class="free-spins-panel-heading">
-      <span class="free-spins-panel-kicker">${displayWedgeLabel}</span>
-      <strong>${title}</strong>
-    </div>
-    <div class="free-spins-panel-stats" aria-live="polite">Spin <span id="fs-index">1</span> of <span id="fs-total">${session.initialSpins}</span> · Round win: <span id="fs-round-win">0</span></div>
     <div id="fs-grid" class="reel-grid"></div>
     <div id="fs-status" class="status-line" aria-live="polite"></div>
   `;
+
+  const banner = root.querySelector<HTMLDivElement>("#bonus-banner");
+  if (banner) {
+    banner.innerHTML = `
+      <div class="bonus-banner-heading">
+        <span class="bonus-banner-kicker">${displayWedgeLabel}</span>
+        <strong class="bonus-banner-title">${title}</strong>
+      </div>
+      <div class="bonus-banner-stats">Spin <span id="fs-index">1</span> of <span id="fs-total">${session.initialSpins}</span> · Round win: <span id="fs-round-win">0</span></div>
+    `;
+    banner.classList.add("bonus-banner--active");
+  }
+
   standardGrid.hidden = true;
   cabinet.appendChild(panel);
 
   const grid = panel.querySelector<HTMLDivElement>("#fs-grid")!;
-  const indexEl = panel.querySelector<HTMLSpanElement>("#fs-index")!;
-  const totalEl = panel.querySelector<HTMLSpanElement>("#fs-total")!;
-  const roundWinEl = panel.querySelector<HTMLSpanElement>("#fs-round-win")!;
+  const indexEl = root.querySelector<HTMLSpanElement>("#fs-index")!;
+  const totalEl = root.querySelector<HTMLSpanElement>("#fs-total")!;
+  const roundWinEl = root.querySelector<HTMLSpanElement>("#fs-round-win")!;
   const statusEl = panel.querySelector<HTMLDivElement>("#fs-status")!;
   const panicBellTimer = wedge === "doorbell_panic" ? window.setInterval(playDoorbellRing, 3000) : undefined;
   if (panicBellTimer !== undefined) playDoorbellRing();
@@ -1918,6 +1927,10 @@ async function playFreeSpinSession(
     standardGrid.hidden = false;
     bgLayer?.classList.remove("aurora");
     document.body.classList.remove("aurora-mode");
+    if (banner) {
+      banner.innerHTML = "";
+      banner.classList.remove("bonus-banner--active");
+    }
   }
   void state; // state saved by caller after totals are tallied
 }
