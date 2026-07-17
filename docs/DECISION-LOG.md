@@ -4,7 +4,11 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 
 ## Open decisions
 
-*(none — D1-D5 ruled by Jamie 2026-07-10; raise new ones as D6+)*
+| # | Date opened | Question | Status |
+|---|---|---|---|
+| D6 | 2026-07-17 | **Win presentation pacing** (the game-feel term of art, per Steve Swink's coinage, for the sequencing/dwell time between a reel result landing and its meaning being legible to the player — cascade step timing, payline highlight duration, bonus-trigger announcements; distinct from RTP/math and from art/motion design). Surfaced because restoring UniGlee's 300/400/500 award (S33) means a full marathon can now take several minutes of real wall-clock time to play through: `playFreeSpinSession` in `src/ui/board.ts` sleeps a fixed 360ms per cascade step with zero reduced-motion scaling, unlike Joey's Laundry Helper's session player, which already branches its delays under reduced motion (S33/S34 did not touch this at all — found only because Jamie asked whether "spin speed" had been addressed, and it hadn't). A parallel thread outside this repo is evaluating options, including a "sparkle-button-as-throttle" idea (Option B, details not yet in hand) where the SPARKLE! button itself governs pacing rather than a separate fast-mode toggle. | **Open — awaiting the rest of that thread's options before scoping a fix.** |
+
+*(D1-D5 ruled by Jamie 2026-07-10; raise further new ones as D7+)*
 
 ## Settled decisions
 
