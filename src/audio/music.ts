@@ -14,8 +14,8 @@ const BEAT_SECONDS = 60 / BPM;
 const BAR_SECONDS = BEAT_SECONDS * 4;
 export const BASE_SCORE_DURATION_SECONDS = BAR_SECONDS * 20;
 
-/** The music control has three times the previous 100% headroom. */
-export const MUSIC_VOLUME_MAX = 3;
+/** The music control has seven times the previous 100% headroom. */
+export const MUSIC_VOLUME_MAX = 7;
 
 export function clampMusicVolume(volume: number): number {
   return Math.min(MUSIC_VOLUME_MAX, Math.max(0, volume));
@@ -92,7 +92,7 @@ let running = false;
 let urgencyRunning = false;
 let unigleeRunning = false;
 let boldChaiUrgencyEnabled = false;
-let musicVolume = 0.72;
+let musicVolume = 4.0;
 let cycleStart = 0;
 let loopTimer: number | undefined;
 let urgencyCycleStart = 0;
