@@ -21,16 +21,16 @@ const BIRTHDAY_MESSAGE =
   "Happy birthday, my bride. Eternal love, Jamie";
 
 /**
- * True during July 17–31 of any year, once per device per year.
- * The window (not a single day) means every device Glee opens in July
- * gets its own birthday moment; the per-year claimed flag keeps it
- * one-time per device per calendar year so it recurs every July.
+ * True during all of July, any year, once per device per year (Jamie's ruling
+ * 2026-07-16: "the entire month of July, each July thereafter"). The window
+ * means every device Glee opens in July gets its own birthday moment; the
+ * per-year claimed flag keeps it one-time per device per calendar year.
  */
 function isBirthdayBonusAvailable(): boolean {
   const now = new Date();
   const year = now.getFullYear();
-  const start = new Date(year, 6, 17); // July 17 00:00 local
-  const end   = new Date(year, 7, 1);  // August 1 00:00 local
+  const start = new Date(year, 6, 1); // July 1 00:00 local
+  const end   = new Date(year, 7, 1); // August 1 00:00 local
   return now >= start && now < end && !load(`birthdayBonusClaimed_${year}`, false);
 }
 
@@ -50,7 +50,7 @@ function renderSplash(): void {
         <span class="chai-bday-emoji" aria-hidden="true">🎂🦋🎉</span>
         <strong class="chai-bday-headline">Happy Birthday, Glee!</strong>
         <p class="chai-bday-body">${BIRTHDAY_MESSAGE}</p>
-        <p class="chai-bday-body"><span class="chai-bday-coins">+1&thinsp;000&nbsp;Glee&#8209;coins</span>&nbsp;are waiting in your wallet. Tap in to collect&nbsp;them!</p>
+        <p class="chai-bday-body"><span class="chai-bday-coins">+10&thinsp;000&nbsp;Glee&#8209;coins</span>&nbsp;are waiting in your wallet. Tap in to collect&nbsp;them!</p>
        </div>`
     : "";
 
