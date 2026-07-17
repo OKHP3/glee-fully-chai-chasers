@@ -18,7 +18,7 @@ const BIRTHDAY_MESSAGE =
   "I built you a tiny universe where the coins never run out, the chai is " +
   "always iced, and the cats finally have jobs. Every sparkle in it is " +
   "something you taught me to see. Do you love it? Wait. No. Really love it? " +
-  "Eternal love, Jamie";
+  "Happy birthday, my bride. Eternal love, Jamie";
 
 /**
  * True from Glee's birthday (July 17, 2026) through the end of July, once per
