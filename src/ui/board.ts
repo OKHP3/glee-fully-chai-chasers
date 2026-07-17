@@ -722,6 +722,16 @@ async function runSpin(
     }
   }
 
+  if (levelAfter > levelBefore) {
+    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
+    const coinReward = 200 * levelAfter;
+    state.balance += coinReward;
+    const chip = root.querySelector<HTMLElement>(".coin-chip");
+    if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
+    saveGameState(state);
+    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
+  }
+
   if (result.unigleeTriggered) {
     playUniGleeSting();
     const award = result.unigleeTrigger?.initialAwardSpins ?? 40;
@@ -750,14 +760,6 @@ async function runSpin(
   }
 
   saveGameState(state);
-
-  if (levelAfter > levelBefore) {
-    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
-    const coinReward = 200 * levelAfter;
-    state.balance += coinReward;
-    saveGameState(state);
-    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
-  }
 
   const btnAgain = root.querySelector<HTMLButtonElement>("#sparkle-btn");
   btnAgain?.classList.remove("is-spinning");
