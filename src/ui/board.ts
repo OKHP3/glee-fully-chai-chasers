@@ -26,7 +26,7 @@ import type {
 import type { LapQuestSpot } from "../engine/types";
 import type { UniGleeAwardSpins } from "../engine/laundry";
 import { REELS, ROWS } from "../engine/reels";
-import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, applyBustProofRefill } from "../engine/economy";
+import { BET_LEVELS, LINES, availableBetLevels, betPerLine, sparksForSpin, xpIntoLevel, levelForXp, applyBustProofRefill } from "../engine/economy";
 import { spin } from "../engine/cascade";
 import {
   BOLD_CHAI_DURATION_MS,
@@ -707,7 +707,9 @@ async function runSpin(
   let boldChaiSpinsAwarded = 0;
 
   state.balance += result.totalWin;
+  const levelBefore = levelForXp(state.xp);
   state.xp += sparksForSpin(state.bet);
+  const levelAfter = levelForXp(state.xp);
   state.fireflyMeter = result.cascades;
   state.bestCascade = Math.max(state.bestCascade, result.cascades);
 
@@ -748,6 +750,14 @@ async function runSpin(
   }
 
   saveGameState(state);
+
+  if (levelAfter > levelBefore) {
+    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
+    const coinReward = 200 * levelAfter;
+    state.balance += coinReward;
+    saveGameState(state);
+    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
+  }
 
   const btnAgain = root.querySelector<HTMLButtonElement>("#sparkle-btn");
   btnAgain?.classList.remove("is-spinning");
@@ -2248,6 +2258,72 @@ function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: numbe
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/** Level-up saucer celebration — a flying saucer zips in, crashes into a spark
+ *  burst, and the congratulations message blooms from the explosion.
+ *  TODO: add a sound cue once the audio system supports one-shot fanfares.
+ */
+function showLevelUpCelebration(
+  root: HTMLElement,
+  newLevel: number,
+  cat: "joey" | "phoebe",
+  coinReward: number,
+): Promise<void> {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "levelup-overlay";
+    overlay.setAttribute("aria-live", "assertive");
+    overlay.setAttribute("aria-label", `Level ${newLevel} reached!`);
+
+    const fromLeft = Math.random() < 0.5;
+    const NUM_SPARKS = 14;
+    const catName = cat === "joey" ? "Joey" : "Phoebe";
+    const quips = [
+      `${catName} is impressed — Sparks are flying!`,
+      `${catName} demands extra treats for this!`,
+      `${catName} zoomed in just to celebrate!`,
+      `Even ${catName} couldn't resist cheering!`,
+    ];
+    const quip = quips[Math.floor(Math.random() * quips.length)];
+
+    const sparksHtml = Array.from({ length: NUM_SPARKS }, (_, i) => {
+      const angle = Math.round((i / NUM_SPARKS) * 360);
+      const dist = 90 + Math.round(Math.random() * 70);
+      const size = 6 + Math.round(Math.random() * 8);
+      const hue = Math.random() < 0.6 ? "#f5d576" : Math.random() < 0.5 ? "#6bd6c9" : "#ff9ecb";
+      return `<span class="levelup-spark" style="--angle:${angle}deg;--dist:${dist}px;width:${size}px;height:${size}px;background:${hue};animation-delay:${0.45 + i * 0.012}s"></span>`;
+    }).join("");
+
+    overlay.innerHTML = `
+      <div class="levelup-saucer${fromLeft ? " levelup-saucer--from-left" : " levelup-saucer--from-right"}" aria-hidden="true">
+        ${saucerSvg(cat === "joey" ? 1 : 4)}
+      </div>
+      <div class="levelup-burst" aria-hidden="true">${sparksHtml}</div>
+      <div class="levelup-msg" role="status">
+        <div class="levelup-msg-level">LEVEL ${newLevel}!</div>
+        <div class="levelup-msg-quip">${quip}</div>
+        <div class="levelup-msg-coins">+${coinReward.toLocaleString()} coins</div>
+        <div class="levelup-msg-hint">Tap to continue</div>
+      </div>
+    `;
+
+    root.appendChild(overlay);
+
+    let dismissed = false;
+    const dismiss = () => {
+      if (dismissed) return;
+      dismissed = true;
+      overlay.classList.add("levelup-overlay--out");
+      overlay.addEventListener("animationend", () => {
+        overlay.remove();
+        resolve();
+      }, { once: true });
+    };
+
+    overlay.addEventListener("click", dismiss, { once: true });
+    window.setTimeout(dismiss, 3600);
+  });
 }
 
 export { BET_LEVELS, LINES };
