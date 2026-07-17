@@ -94,7 +94,7 @@ export function loadGameState(): GameState {
     spinsSincePopIn: load("spinsSincePopIn", 0),
     soundOn,
     paylineGuideOn: load("paylineGuideOn", false),
-    musicVolume: load("musicVolume", soundOn ? 0.72 : 0),
+    musicVolume: load("musicVolume", soundOn ? 4.0 : 0),
     sfxVolume: load("sfxVolume", soundOn ? 0.82 : 0),
     theme: load<ThemeMode>("theme", "system"),
     reducedMotion: load(

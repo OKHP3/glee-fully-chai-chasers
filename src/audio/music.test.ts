@@ -6,11 +6,11 @@ describe("Chai Chase base score", () => {
     expect(BASE_SCORE_DURATION_SECONDS).toBe(60);
   });
 
-  it("keeps the former 100% level while allowing a 3x music ceiling", () => {
-    expect(MUSIC_VOLUME_MAX).toBe(3);
+  it("keeps the former 100% level while allowing a 7x music ceiling", () => {
+    expect(MUSIC_VOLUME_MAX).toBe(7);
     expect(clampMusicVolume(1)).toBe(1);
-    expect(clampMusicVolume(3)).toBe(3);
-    expect(clampMusicVolume(4)).toBe(3);
+    expect(clampMusicVolume(7)).toBe(7);
+    expect(clampMusicVolume(8)).toBe(7);
     expect(clampMusicVolume(-1)).toBe(0);
   });
 
