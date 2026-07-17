@@ -21,22 +21,24 @@ const BIRTHDAY_MESSAGE =
   "Happy birthday, my bride. Eternal love, Jamie";
 
 /**
- * True from Glee's birthday (July 17, 2026) through the end of July, once per
- * device. The window (not a single day) means every device she opens in July
- * gets its own birthday moment; the claimed flag keeps it one-time per device.
- * After July 2026 the path goes dormant permanently.
+ * True during July 17–31 of any year, once per device per year.
+ * The window (not a single day) means every device Glee opens in July
+ * gets its own birthday moment; the per-year claimed flag keeps it
+ * one-time per device per calendar year so it recurs every July.
  */
 function isBirthdayBonusAvailable(): boolean {
   const now = new Date();
-  const start = new Date(2026, 6, 17); // July 17, 2026 00:00 local
-  const end = new Date(2026, 7, 1);    // August 1, 2026 00:00 local
-  return now >= start && now < end && !load("birthdayBonusClaimed", false);
+  const year = now.getFullYear();
+  const start = new Date(year, 6, 17); // July 17 00:00 local
+  const end   = new Date(year, 7, 1);  // August 1 00:00 local
+  return now >= start && now < end && !load(`birthdayBonusClaimed_${year}`, false);
 }
 
-/** Marks the birthday bonus as claimed and adds 1 000 coins to state. */
+/** Marks the birthday bonus as claimed and adds 10 000 coins to state. */
 function claimBirthdayBonus(state: ReturnType<typeof loadGameState>): void {
-  save("birthdayBonusClaimed", true);
-  state.balance += 1000;
+  const year = new Date().getFullYear();
+  save(`birthdayBonusClaimed_${year}`, true);
+  state.balance += 10000;
   save("balance", state.balance);
 }
 
