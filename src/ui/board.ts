@@ -235,19 +235,18 @@ export function renderBoard(
         <div class="companion-row">
           <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
             <span class="treat-jar-title">Treat Jar</span>
-            ${treatJarHtml(state)}
+            <div class="treat-chips-row">${treatJarHtml(state)}</div>
           </div>
           <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
-            <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(state.fireflyMeter)}</div>
-            <div class="jar-meter-copy">
-              <span class="jar-meter-kicker">Firefly Cascade</span>
+            <span class="jar-meter-kicker">Firefly Cascade</span>
+            <div class="jar-meter-body">
+              <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(state.fireflyMeter)}</div>
               <strong id="meter-count" class="jar-meter-count">${state.fireflyMeter} / 6</strong>
-              <small>Reach 6 · 6 free spins</small>
             </div>
           </div>
           <button id="askjamie-perch" aria-label="AskJamie — tap for daily bonus" class="askjamie-housing">
             <div class="askjamie-icon">${publicPicture("askjamie-avatar.jpg", "askjamie-picture")}</div>
-            <span>AskJamie</span>
+            <span class="askjamie-label">AskJamie</span>
             <div id="askjamie-bubble" class="askjamie-bubble" aria-hidden="true"></div>
           </button>
         </div>
