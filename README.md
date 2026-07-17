@@ -15,13 +15,15 @@ Glee-fully Chai Chasers is a free, original, mobile-first browser game of cascad
 The main game is a five-reel, four-row cascade board with 40 fixed paylines. Tap **SPARKLE!** to start a Chai Chase: winning symbols beam up, the reels settle, and the next cascade begins. Winning paths light up briefly, and an optional payline guide is available in Settings.
 
 - **Firefly Cascade meter:** reach six cascades in a spin to start free spins.
-- **Joey & Phoebe's Sparkle Wheel:** its three current modes are *We're Multiplying*, *Keepsake Constellation*, and *Iced Chai Wild Rain*. In *We're Multiplying*, one opening-result wild can carry a ×2, ×3, ×5, or ×10 badge and applies only to the lines that use it; cascade drops never create extra multiplier wilds.
-- **Keepsake Constellation:** a giant 2×2 keepsake can hold its place through a free-spin cascade chain while the surrounding board resolves.
+- **Joey & Phoebe's Sparkle Wheel:** its three current modes are *We're Multiplying*, *Moonlit Keepsake Trail*, and *Iced Chai Wild Rain*. In *We're Multiplying*, one opening-result wild can carry a ×2, ×3, ×5, or ×10 badge and applies only to the lines that use it; cascade drops never create extra multiplier wilds.
+- **Moonlit Keepsake Trail:** a 12-card memory match — six keepsake pairs dealt face down, up to two mismatches allowed — that awards 40 free spins once every pair is found.
 - **Treat Jar and cat pop-ins:** Chicken Comets and Salmon Stars can call in Phoebe; Joey saves his stronger assist for Bougie Bites.
 - **Treat Time:** Morning and Nighttime Treat Time sessions toss cat wilds onto the board before the cascades begin.
 - **Doorbell Panic:** a matching pair of doorbells opens a cat-powered free-spin bonus.
 - **Bold Chai:** a matching pair of chai pumps opens a 30-second iced-chai pump scene. Every completed 12-pump cup awards 3 free spins.
 - **UniGlee:** the rare rainbow butterfly opens the full multi-chapter marathon — 40, 60, or 80 free spins across Joey, Phoebe, and keepsake chapters, sized by which reel captures the butterfly.
+- **Birthday Reveal:** a one-time, date-gated splash moment live across all of July, every year — Jamie's own message to Glee plus a Glee-coin bonus, once per device per year.
+- **AskJamie perch:** tap once a day for a surprise coin top-up.
 
 New games begin with 500 Glee-coins and a 1-coin wager, with a friendly automatic refill when needed. The game keeps its balance, settings, Treat Jar, and progress on the device. It includes the official illustrated AskJamie perch, separate music and sound controls, reduced motion, accessible labels, and a reset option.
 
@@ -29,7 +31,7 @@ New games begin with 500 Glee-coins and a 1-coin wager, with a friendly automati
 
 These are approved directions, but they are not in the current build:
 
-- Birthday Reveal, daily bonus, milestone scenes, and the collection shelf.
+- Milestone scenes and the collection shelf.
 - UniGlee marathon comfort features: pause/resume, fast mode, and a skip-to-summary option.
 - Additional chapter-specific bonus presentation and the final music stems/mix.
 - Service-worker/offline verification, asset optimization, and the device-regression gallery.
