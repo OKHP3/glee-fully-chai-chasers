@@ -31,5 +31,5 @@ The current repository skill was not read. No source platform, external URL, PDF
 
 ## Errors
 
-- The initial read-only destination inspection reported that the `without_skill` directory did not yet exist. No files were changed by that check; the run directory was then created through the draft patch.
+- The initial read-only destination inspection reported that the `no-skill` directory did not yet exist. No files were changed by that check; the run directory was then created through the draft patch.
 - `python3` and `python` resolved to unavailable Microsoft Store aliases. The writer was then run successfully with the installed Python 3.12 executable discovered through the local runtime inventory.

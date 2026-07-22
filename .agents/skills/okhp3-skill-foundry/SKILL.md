@@ -114,29 +114,29 @@ Launch all 6 runs in the same turn. This is non-negotiable.
 
 Launching with-skill runs first and without-skill runs in a later turn creates a timing artifact: the without-skill subagent may observe state left by the with-skill run. Launch everything together.
 
-**Executor task format -- with_skill:**
+**Executor task format -- with-skill:**
 ```
 You are an AI coding assistant. Answer a developer question using a specialized skill.
 
 INSTRUCTIONS:
 1. Read the skill file at: <skill-path>/SKILL.md
 2. Use the knowledge from that skill to answer the question below
-3. Write your complete response to: <workspace>/eval-<N>/with_skill/outputs/response.md
-4. Write execution metrics to: <workspace>/eval-<N>/with_skill/outputs/metrics.json
+3. Write your complete response to: <workspace>/eval-<N>/with-skill/out/response.md
+4. Write execution metrics to: <workspace>/eval-<N>/with-skill/out/metrics.json
 
 USER QUESTION:
 <eval prompt>
 ```
 
-**Executor task format -- without_skill:**
+**Executor task format -- no-skill:**
 ```
 You are an AI coding assistant. Answer a developer question from general knowledge only.
 Do NOT read any skill files or SKILL.md files.
 
 INSTRUCTIONS:
 1. Answer the question below from your training knowledge only
-2. Write your complete response to: <workspace>/eval-<N>/without_skill/outputs/response.md
-3. Write execution metrics to: <workspace>/eval-<N>/without_skill/outputs/metrics.json
+2. Write your complete response to: <workspace>/eval-<N>/no-skill/out/response.md
+3. Write execution metrics to: <workspace>/eval-<N>/no-skill/out/metrics.json
 
 USER QUESTION:
 <eval prompt>
@@ -146,13 +146,13 @@ Use `startAsyncSubagent` for all 6 runs. Follow with a single `wait_for_backgrou
 
 Workspace layout:
 ```
-<skill-name>-workspace/iteration-1/
-  eval-1/with_skill/outputs/response.md
-  eval-1/with_skill/outputs/metrics.json
-  eval-1/with_skill/grading.json
-  eval-1/without_skill/outputs/response.md
-  eval-1/without_skill/outputs/metrics.json
-  eval-1/without_skill/grading.json
+<skill-name>-workspace/i1/
+  eval-1/with-skill/out/response.md
+  eval-1/with-skill/out/metrics.json
+  eval-1/with-skill/grading.json
+  eval-1/no-skill/out/response.md
+  eval-1/no-skill/out/metrics.json
+  eval-1/no-skill/grading.json
 ```
 
 ---
@@ -195,24 +195,24 @@ See `references/grading-schema.md` for the full schema.
 
 Aggregate after all 6 runs are graded.
 
-Compute per-configuration pass_rate means across all 3 evals. Compute the delta (with_skill mean minus without_skill mean). Write `benchmarks/benchmark.json`:
+Compute per-configuration pass_rate means across all 3 evals. Compute the delta (with-skill mean minus no-skill mean). Write `benchmarks/benchmark.json`:
 
 ```json
 {
   "metadata": { "skill_name": "...", "skill_version": "...", "timestamp": "...", "evals_run": [1,2,3], "note": "All 3 evals: LIVE runs" },
   "runs": [ ... ],
   "run_summary": {
-    "with_skill":    { "pass_rate": { "mean": 0.92, "stddev": 0.14, "min": 0.75, "max": 1.0 } },
-    "without_skill": { "pass_rate": { "mean": 0.25, "stddev": 0.22, "min": 0.0,  "max": 0.5  } },
+    "with-skill":    { "pass_rate": { "mean": 0.92, "stddev": 0.14, "min": 0.75, "max": 1.0 } },
+    "no-skill": { "pass_rate": { "mean": 0.25, "stddev": 0.22, "min": 0.0,  "max": 0.5  } },
     "delta":         { "pass_rate": "+0.67" }
   },
   "notes": [ "Key findings from the run set" ]
 }
 ```
 
-**Acceptance bar:** with_skill mean >= 0.9, delta >= 0.5. If either fails, proceed to Phase 7.
+**Acceptance bar:** with-skill mean >= 0.9, delta >= 0.5. If either fails, proceed to Phase 7.
 
-A with_skill score below 0.9 means the skill is not delivering its own content reliably. A delta below 0.5 means the skill is not providing meaningful uplift over what the LLM already knows.
+A with-skill score below 0.9 means the skill is not delivering its own content reliably. A delta below 0.5 means the skill is not providing meaningful uplift over what the LLM already knows.
 
 See `references/grading-schema.md` for the full benchmark.json schema.
 
@@ -232,7 +232,7 @@ Three fix types:
 
 After applying fixes, bump the patch version (1.0.0 -> 1.0.1 for content fixes, minor version 1.0.0 -> 1.1.0 for structural changes). Document the fix in the benchmark notes. Rerun only the failing evals (not all 6) unless the fix touches shared content.
 
-Stop iterating when: with_skill mean >= 0.9 AND delta >= 0.5 AND all failing expectations have documented fixes.
+Stop iterating when: with-skill mean >= 0.9 AND delta >= 0.5 AND all failing expectations have documented fixes.
 
 ---
 

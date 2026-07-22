@@ -76,7 +76,7 @@ Written per skill: `<skill>/benchmarks/benchmark.json`
     {
       "eval_id": 1,
       "eval_name": "descriptive-name",
-      "configuration": "with_skill",
+      "configuration": "with-skill",
       "run_number": 1,
       "result": {
         "pass_rate": 1.0,
@@ -95,7 +95,7 @@ Written per skill: `<skill>/benchmarks/benchmark.json`
     {
       "eval_id": 1,
       "eval_name": "descriptive-name",
-      "configuration": "without_skill",
+      "configuration": "no-skill",
       "run_number": 1,
       "result": {
         "pass_rate": 0.25,
@@ -111,12 +111,12 @@ Written per skill: `<skill>/benchmarks/benchmark.json`
   ],
 
   "run_summary": {
-    "with_skill": {
+    "with-skill": {
       "pass_rate": { "mean": 0.92, "stddev": 0.14, "min": 0.75, "max": 1.0 },
       "time_seconds": { "mean": null, "stddev": null, "min": null, "max": null },
       "tokens": { "mean": null, "stddev": null, "min": null, "max": null }
     },
-    "without_skill": {
+    "no-skill": {
       "pass_rate": { "mean": 0.25, "stddev": 0.22, "min": 0.0, "max": 0.5 },
       "time_seconds": { "mean": null, "stddev": null, "min": null, "max": null },
       "tokens": { "mean": null, "stddev": null, "min": null, "max": null }
@@ -131,7 +131,7 @@ Written per skill: `<skill>/benchmarks/benchmark.json`
   "notes": [
     "All 3 evals: LIVE delegation subagent runs",
     "Eval N: <specific finding or consequence>",
-    "workspace: .agents/skills/<name>-workspace/iteration-1/"
+    "workspace: .agents/skills/<name>-workspace/i1/"
   ]
 }
 ```
@@ -141,7 +141,7 @@ Written per skill: `<skill>/benchmarks/benchmark.json`
 | Field | Rule |
 |-------|------|
 | `metadata.note` | Must state whether runs are LIVE or contain analytical stubs. Stubs must be labeled. |
-| `runs` | with_skill run comes before without_skill run for the same eval_id. |
+| `runs` | with-skill run comes before no-skill run for the same eval_id. |
 | `run_summary.delta.pass_rate` | Formatted as `"+0.67"` or `"-0.12"` string. Not a float. |
 | `notes` | One note per finding. Write for future audit. Include workspace path. |
 
@@ -151,10 +151,10 @@ Written per skill: `<skill>/benchmarks/benchmark.json`
 
 | Signal | Threshold | Action if fails |
 |--------|-----------|-----------------|
-| `with_skill pass_rate mean` | >= 0.9 | Phase 7 fix loop |
+| `with-skill pass_rate mean` | >= 0.9 | Phase 7 fix loop |
 | `delta pass_rate` | >= 0.5 | Phase 7 fix loop or redesign expectations |
 
-A skill that meets both thresholds is production-ready. A skill that meets the with_skill threshold but not the delta is doing well internally but the expectations may be non-discriminating -- check the eval patterns.
+A skill that meets both thresholds is production-ready. A skill that meets the with-skill threshold but not the delta is doing well internally but the expectations may be non-discriminating -- check the eval patterns.
 
 ---
 
