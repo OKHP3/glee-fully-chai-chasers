@@ -25,7 +25,7 @@ Read these in order when the task touches product behavior, UI, content, or arch
 
 Historical handoffs, assessments, pasted prompts, and `attached_assets/` are context only. In particular, do not build from `docs/DESIGN-HANDOFF.md`, `docs/REPLIT-HANDOFF.md`, or `docs/REPLIT-IMPLEMENTATION-BRIEF.md` when they conflict with the canonical documents above.
 
-## Current implementation (verified 2026-07-13)
+## Current implementation (verified 2026-07-24)
 
 This is one Git repository and one Vite SPA; no nested project was found in scope. `HEAD` is a descendant of the protected integration baseline commit recorded in `docs/IMPLEMENTATION-BASELINE.md`.
 
@@ -75,9 +75,9 @@ npm run build     # tsc --noEmit, then Vite production build; currently passes
 npm run preview   # preview the production build on port 5000
 ```
 
-CI uses Node 22, `npm ci`, tests, and the production build. The Pages workflow also checks that private folders are absent and rejects configured brand strings from `dist/`; its spec-oracle job is deliberately kept visible-but-non-blocking so deploys stay fast (`SKIP_ORACLE=1` in the deploy job), not because the math is incomplete — the full oracle is green and locally `npm test` always runs it.
+CI uses Node 24, `npm ci`, tests, and the production build. The Pages workflow also checks that private folders are absent and rejects configured brand strings from `dist/`; its spec-oracle job is deliberately kept visible-but-non-blocking so deploys stay fast (`SKIP_ORACLE=1` in the deploy job), not because the math is incomplete — the full oracle is green and locally `npm test` always runs it.
 
-Validation status (Claude-verified 2026-07-17, S34): the seeded 200,000-spin oracle in `src/engine/simulation.test.ts` is **green** under the layered RTP model — base RTP ~59.7% (base + common bonuses target ~96.5% together; see `src/engine/paylines.ts`), any-win 1-in-3.16-ish, free spins ~1-in-150, 8+ cascade ~1-in-900, UniGlee real capture ~1-in-4,212 (S34; a separate, purely decorative, non-paying tease sighting fires far more often at ~1-in-850 and never triggers anything), cat pop-in ~1-in-30. UniGlee is intentionally excluded from the 95-98% band (S33) — its full 300/400/500-spin award is allowed to push full-game RTP to ~103% when it lands, since there's no real-money stake in this game. The oracle remains unweakened; any band changes reflect real, deliberate design changes (S33/S34), never a quiet loosening to dodge a regression. Any future engine change ships only with all six gates green. 155 tests total as of this validation.
+Validation status (verified 2026-07-24, S34): the seeded 200,000-spin oracle in `src/engine/simulation.test.ts` is **green** under the layered RTP model — base RTP ~59.7% (base + common bonuses target ~96.5% together; see `src/engine/paylines.ts`), any-win 1-in-3.16-ish, free spins ~1-in-150, 8+ cascade ~1-in-900, UniGlee real capture ~1-in-4,212 (S34; a separate, purely decorative, non-paying tease sighting fires far more often at ~1-in-850 and never triggers anything), cat pop-in ~1-in-30. UniGlee is intentionally excluded from the 95-98% band (S33) — its full 300/400/500-spin award is allowed to push full-game RTP to ~103% when it lands, since there's no real-money stake in this game. The oracle remains unweakened; any band changes reflect real, deliberate design changes (S33/S34), never a quiet loosening to dodge a regression. Any future engine change ships only with all six gates green. 155 tests passed in this validation.
 
 ## Safe collaboration rules
 
