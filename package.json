@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "assets:generate": "node scripts/generate-assets.mjs",
     "validate:assets": "node scripts/validate-assets.mjs",
-    "test": "vitest run",
+    "test": "vitest run --exclude .agents/skills/okhp3-skill-foundry/tests/validate-foundry-evidence.test.cjs && node --test .agents/skills/okhp3-skill-foundry/tests/validate-foundry-evidence.test.cjs",
     "test:watch": "vitest"
   },
   "devDependencies": {
