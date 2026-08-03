@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-const { test } = require('vitest');
+const test = require('node:test');
 
 const packageDir = path.resolve(__dirname, '..');
 const localMirror = path.resolve(packageDir, '..', '..', '.agents', 'skills', 'okhp3-skill-foundry');
