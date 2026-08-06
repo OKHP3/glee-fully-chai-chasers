@@ -11,5 +11,9 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Python generated artifacts
+__pycache__/
+*.py[cod]
+
 # Playwright CLI snapshots (test artifacts)
 .playwright-cli/

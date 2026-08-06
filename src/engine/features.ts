@@ -5,7 +5,7 @@
  * Vertical-slice note: this covers the pop-in decision + treat-consumption
  * rule (the part that's canon-load-bearing and testable). The richer
  * assist animations (Sparkle Sort blast, Drop-In Saucer, Bougie Boost) are
- * UI-layer follow-up work — see docs/REPLIT-HANDOFF.md.
+ * UI-layer follow-up work — see docs/IMPLEMENTATION-BASELINE.md.
  */
 import type { CatVisit, TreatKind } from "./types";
 import type { Rng } from "./rng";

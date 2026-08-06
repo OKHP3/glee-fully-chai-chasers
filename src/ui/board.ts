@@ -2,7 +2,7 @@
  * Main-board rendering & animation. Consumes engine `SpinResult`/`CascadeStep`
  * objects and animates them; owns zero game math (per src/ui/README.md contract).
  * Spec: docs/DESIGN-SPEC.md §3 (layout), §7 (free spins/wheel), §11 (animation).
- * Visual system: docs/prompts/DESIGN-AGENT-PROMPT.md / docs/DESIGN-HANDOFF.md.
+ * Visual system: docs/IMPLEMENTATION-BASELINE.md and the protected presentation baseline.
  *
  * Zero emoji on the shipped board — all symbols/cats/saucers/jar/wheel are
  * original inline SVG (src/ui/symbols.ts). The board is housed in an
