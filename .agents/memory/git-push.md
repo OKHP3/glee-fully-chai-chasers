@@ -3,28 +3,28 @@ name: Git push approach
 description: How to push to github.com/OKHP3/glee-fully-chai-chasers from this workspace.
 ---
 
-## Two modes — pick one, they conflict
+## Rule: never set credential.helper
 
-### Shell git push (user preference)
-The `GITHUB_PAT` secret is wired into git's credential helper:
-```bash
-git config credential.helper '!f() { echo "username=x-access-token"; echo "password=$GITHUB_PAT"; }; f'
-```
-This lives in `.git/config` (local, not committed). When it's set, shell `git push` works but the platform **blocks** the `gitPush` CodeExecution callback.
+Setting `git config credential.helper` in `.git/config` causes the Replit platform Git UI and the `gitPush` CodeExecution callback to both fail with "Unknown Git Error / UNKNOWN". The platform detects any credential.helper entry and blocks its own token from flowing through.
 
-### gitPush callback (agent fallback)
-If the credential helper is missing or the PAT expired, unset the helper first:
+If it was accidentally set, unset immediately:
 ```bash
 git config --unset credential.helper
 ```
-Then push via `gitPush({})` in CodeExecution. Re-apply the helper afterward if the user wants shell push back.
 
-**Why they conflict:** The platform detects any `credential.helper` entry and refuses `gitPush` to prevent token leakage via the helper subprocess.
+## How to push
 
-## Resetting after a PAT rotation
-1. User rotates PAT → asks for "UI to update GITHUB_PAT" → use `requestSecrets({ keys: ["GITHUB_PAT"] })`.
-2. Re-apply the credential helper: `git config credential.helper '!f() { echo "username=x-access-token"; echo "password=$GITHUB_PAT"; }; f'`
-3. Verify: `git push` should print `Everything up-to-date`.
+**Option 1 (preferred): Ask the agent** — calls `gitPush({})` in CodeExecution. Works reliably as long as credential.helper is not set.
+
+**Option 2: Replit Git panel UI** — works the same way; blocked if credential.helper is set.
+
+**Option 3 (shell) — DO NOT USE** — `git push` from the shell requires a credential.helper which breaks options 1 and 2. Shell git push is not compatible with this workspace setup.
+
+## PAT rotation
+When `GITHUB_PAT` is rotated:
+1. Use `requestSecrets({ keys: ["GITHUB_PAT"] })` in CodeExecution to prompt the user to update it.
+2. No git config changes needed — the platform injects the secret into `gitPush` automatically.
+3. Verify with `gitPush({})`.
 
 ## Pull / merge
 ```bash
