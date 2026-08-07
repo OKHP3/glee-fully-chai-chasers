@@ -86,4 +86,3 @@ Replit and other tools must pull the resulting `main` descendant before acceptin
 - `docs/DECISION-LOG.md` S17-S23
 - `docs/IMPLEMENTATION-BASELINE.md`
 - `docs/GAME-REALIGNMENT-2026-07-12.md`
-- `docs/REPLIT-HANDOFF.md` v3

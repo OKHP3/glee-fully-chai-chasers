@@ -23,7 +23,7 @@ Read these in order when the task touches product behavior, UI, content, or arch
 9. `docs/ASSET-CHECKLIST.md` — provenance and release inventory.
 10. `docs/ANALYTICS-PRIVACY.md` — the only permitted measurement policy.
 
-Historical handoffs, assessments, pasted prompts, and `attached_assets/` are context only. In particular, do not build from `docs/DESIGN-HANDOFF.md`, `docs/REPLIT-HANDOFF.md`, or `docs/REPLIT-IMPLEMENTATION-BRIEF.md` when they conflict with the canonical documents above.
+Historical handoffs, assessments, and pasted prompts are context only. Build from the canonical documents above and the current implementation baseline; do not treat retired checkpoint material as product authority.
 
 ## Current implementation (verified 2026-07-13)
 

@@ -134,12 +134,13 @@ the run (checked via workflow + browser console logs).
 **Verdict:** Workstreams C and D gates are green for this round's scope.
 Remaining presentation gaps (Sparkle Sort shatter visual, Giant Gnome/Chai
 Back bespoke effects, music loops, milestone scenes) are listed honestly in
-`docs/REPLIT-HANDOFF.md` v2 rather than faked.
+the retained implementation evidence rather than faked.
 
 ## Overall round summary
 
 3 validation cycles completed (A, B, C+D combined). `npx vitest run` final
 state: 8 files, 34 tests, 100% passing, `simulation.test.ts` oracle intact
 and never weakened. `npm run build` clean throughout. No console errors
-observed in any manual QA pass. See `docs/REPLIT-HANDOFF.md` v2 for the full
+observed in any manual QA pass. See `docs/IMPLEMENTATION-BASELINE.md` for the
+current protected integration state and the full
 file-by-file changelog and honestly-scoped follow-up list.

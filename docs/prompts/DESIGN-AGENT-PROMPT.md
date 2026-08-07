@@ -39,7 +39,7 @@ Study the vibe (text description — do not copy assets): a giant vivid night sc
 4. **The cabinet:** reel-window frame, marquee header, illustrated firefly-jar meter with fill states 0-8+, console-style bet bar, glowing SPARKLE! button with idle pulse and press states.
 5. **Celebration kit:** win-tier overlays (nice/big/huge), cascade beam-up polish, coin/star particle bursts (CSS, ≤30 nodes), TWELVE PUMPS! callout art, UniGlee butterfly-storm takeover, wheel restyled as an illustrated prize wheel with dimensional wedges.
 6. **App identity:** icon set (192/512/maskable) + splash art matching the game.
-7. **Handoff:** `docs/DESIGN-HANDOFF.md` — before/after screenshots per deliverable, asset inventory with provenance ("original, created this session" per item), weight report vs the 400KB budget.
+7. **Handoff:** `docs/IMPLEMENTATION-BASELINE.md` — preserve the protected presentation baseline, asset provenance, and bounded change record.
 
 ## Mandatory validation loop (minimum 3 full cycles — you are not done after one pass)
 
@@ -50,7 +50,7 @@ Study the vibe (text description — do not copy assets): a giant vivid night sc
    style?), CHARACTER (does personality live on screen?), CELEBRATION (do wins
    feel like events?), POLISH (would this survive an App Store listing page?).
 4. Anything under 8 → identify the exact deficiency, fix, re-shoot.
-5. Log every cycle in docs/DESIGN-HANDOFF.md: scores, deficiencies, fixes.
+5. Log every cycle in the current task handoff or decision record: scores, deficiencies, fixes.
 6. Final gate: npm run build clean; npm test still green (SKIP_ORACLE=1 npm test
    if the math workstream's oracle is still red — that's not yours to fix);
    no console errors; reduced-motion pass verified.

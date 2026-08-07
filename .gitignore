@@ -1,5 +1,9 @@
 # See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# Private material — never ships, never commits
+private-work/
+reference-photos/
+
 # compiled output
 dist
 tmp
@@ -41,6 +45,12 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Python generated artifacts
+__pycache__/
+*.py[cod]
+
+# Playwright CLI snapshots (test artifacts)
+.playwright-cli/
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
