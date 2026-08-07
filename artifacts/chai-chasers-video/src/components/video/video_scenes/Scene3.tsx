@@ -103,7 +103,7 @@ export function Scene3() {
             animate={phase >= 5 ? { opacity: 1, scale: 1, rotate: 10 } : { opacity: 0 }}
             transition={{ type: 'spring', bounce: 0.5, delay: 0.2 }}
             className="w-24 h-32 bg-contain bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/chai-cup.png')` }}
+            style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/chai-cup.jpg')` }}
           />
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.9 }}

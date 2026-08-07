@@ -1,8 +1,21 @@
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 interface BackgroundEffectsProps {
   currentScene: number;
 }
+
+// Stable random values computed once at module load — never re-computed during renders
+const FIREFLY_COUNT = 15;
+const FIREFLY_DATA = Array.from({ length: FIREFLY_COUNT }, () => ({
+  x0: Math.random() * 100,
+  y0: Math.random() * 100,
+  x1: Math.random() * 100,
+  y1: Math.random() * 100,
+  x2: Math.random() * 100,
+  y2: Math.random() * 100,
+  dur: 10 + Math.random() * 10,
+}));
 
 export function BackgroundEffects({ currentScene }: BackgroundEffectsProps) {
   // We use the full game splash as a parallax background for scene 1, 
@@ -37,23 +50,23 @@ export function BackgroundEffects({ currentScene }: BackgroundEffectsProps) {
         transition={{ duration: 4, ease: 'easeInOut' }}
       />
 
-      {/* Persistent Fireflies - low opacity, drifting randomly */}
+      {/* Persistent Fireflies - stable positions, no Math.random() during render */}
       <div className="absolute inset-0 opacity-20">
-        {[...Array(15)].map((_, i) => (
+        {FIREFLY_DATA.map((f, i) => (
           <motion.div
             key={i}
             className="absolute w-1.5 h-1.5 rounded-full bg-warning shadow-[0_0_8px_2px_rgba(245,158,11,0.8)]"
             initial={{
-              x: `${Math.random() * 100}vw`,
-              y: `${Math.random() * 100}vh`,
+              x: `${f.x0}vw`,
+              y: `${f.y0}vh`,
             }}
             animate={{
-              y: [`${Math.random() * 100}vh`, `${Math.random() * 100}vh`],
-              x: [`${Math.random() * 100}vw`, `${Math.random() * 100}vw`],
+              y: [`${f.y1}vh`, `${f.y2}vh`],
+              x: [`${f.x1}vw`, `${f.x2}vw`],
               opacity: [0.1, 0.8, 0.1],
             }}
             transition={{
-              duration: 10 + Math.random() * 10,
+              duration: f.dur,
               repeat: Infinity,
               ease: 'linear',
             }}
@@ -65,7 +78,7 @@ export function BackgroundEffects({ currentScene }: BackgroundEffectsProps) {
       <motion.div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-100"
         style={{
-          backgroundImage: `url('${import.meta.env.BASE_URL}images/glee-fully-game.png')`,
+          backgroundImage: `url('${import.meta.env.BASE_URL}images/glee-fully-game.jpg')`,
         }}
         animate={{
           scale: currentScene === 0 ? 1 : currentScene === 1 ? 1.2 : 1.3,

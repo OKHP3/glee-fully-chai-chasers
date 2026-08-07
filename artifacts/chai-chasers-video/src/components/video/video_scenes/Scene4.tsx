@@ -21,7 +21,7 @@ export function Scene4() {
       className="absolute inset-0 flex flex-col items-center justify-center z-10"
       {...sceneTransitions.splitHorizontal}
     >
-      <div className="absolute inset-0 bg-[#0a0a20]/80 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-[#0a0a20]/88" />
 
       {/* 3D Browser Window (Arcade Page) */}
       <motion.div
@@ -41,7 +41,7 @@ export function Scene4() {
           <div className="w-3 h-3 rounded-full bg-green-500" />
         </div>
         <img 
-          src={`${import.meta.env.BASE_URL}images/glee-fully-arcade.png`} 
+          src={`${import.meta.env.BASE_URL}images/glee-fully-arcade.jpg`} 
           alt="Arcade" 
           className="w-full object-cover border-none block" 
         />
@@ -54,7 +54,7 @@ export function Scene4() {
         animate={phase >= 2 ? { opacity: 1, scale: 1, rotate: 10 } : { opacity: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
-        <div className="bg-bg-light/90 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-2xl">
+        <div className="bg-bg-light/95 p-6 rounded-2xl border border-white/10 shadow-2xl">
           <p className="font-display font-bold text-lg text-white">REPLIT</p>
           <p className="font-display font-bold text-3xl text-gradient-uniglee uppercase tracking-wider">Designathon</p>
           <p className="text-slate-400 mt-2 font-mono text-sm">Built in public.</p>
@@ -64,7 +64,7 @@ export function Scene4() {
       {/* UniGlee Butterfly */}
       <motion.div
         className="absolute left-[20vw] bottom-[30vh] z-40 w-48 h-48 bg-contain bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/uniglee.png')` }}
+        style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/uniglee.jpg')` }}
         initial={{ opacity: 0, x: -150, y: 150, scale: 0.5 }}
         animate={
           phase >= 3 

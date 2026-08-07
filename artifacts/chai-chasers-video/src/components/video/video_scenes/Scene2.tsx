@@ -1,6 +1,14 @@
 import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+// Stable per-tile random values — computed once at module load, never during render
+const TILE_COUNT = 20;
+const TILE_DATA = Array.from({ length: TILE_COUNT }, () => ({
+  beamUp: Math.random() > 0.5,
+  dropDelay: Math.random() * 0.5,
+  beamDelay: Math.random() * 1.5,
+}));
 
 export function Scene2() {
   const [phase, setPhase] = useState(0);
@@ -24,7 +32,7 @@ export function Scene2() {
       className="absolute inset-0 flex items-center justify-center z-10"
       {...sceneTransitions.zoomThrough}
     >
-      <div className="absolute inset-0 bg-[#0a0a20]/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-[#0a0a20]/70" />
 
       {/* Hero SPARKLE Button */}
       <motion.div
@@ -44,7 +52,7 @@ export function Scene2() {
 
       {/* Cascading Board (Abstract Representation) */}
       <div className="absolute top-[20vh] w-[60vw] h-[50vh] grid grid-cols-5 gap-4 perspective-[1000px]">
-        {[...Array(20)].map((_, i) => (
+        {TILE_DATA.map((tile, i) => (
           <motion.div
             key={i}
             className="w-full h-full flex items-center justify-center rounded-xl glass-panel text-4xl"
@@ -55,8 +63,8 @@ export function Scene2() {
                     opacity: [0, 1, 0.8],
                     y: 0, 
                     rotateX: 0,
-                    // Cascade beam up effect if phase >= 4
-                    ...(phase >= 4 && Math.random() > 0.5 ? {
+                    // Cascade beam up effect if phase >= 4 — use stable per-tile flag
+                    ...(phase >= 4 && tile.beamUp ? {
                       y: -200,
                       opacity: 0,
                       scale: 1.5,
@@ -67,7 +75,7 @@ export function Scene2() {
             }
             transition={{ 
               duration: 0.8, 
-              delay: phase >= 4 ? Math.random() * 1.5 : Math.random() * 0.5,
+              delay: phase >= 4 ? tile.beamDelay : tile.dropDelay,
               ease: 'circOut'
             }}
           >
@@ -116,7 +124,7 @@ export function Scene2() {
           {/* Jar image overlay */}
           <div 
             className="absolute inset-0 bg-contain bg-center bg-no-repeat z-10"
-            style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/firefly-jar.png')` }}
+            style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/firefly-jar.jpg')` }}
           />
           {/* Fill meter */}
           <motion.div

@@ -1,6 +1,16 @@
 import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
 
+// Stable outro sparkle data computed once at module load
+const OUTRO_SPARKLES = Array.from({ length: 20 }, (_, i) => ({
+  width: Math.random() * 4 + 2,
+  left: `${Math.random() * 100}vw`,
+  top: `${Math.random() * 100}vh`,
+  color: i % 2 === 0 ? '#fbbf24' : '#d946ef',
+  duration: 2 + Math.random() * 2,
+  delay: Math.random() * 3,
+}));
+
 export function Scene5() {
   return (
     <motion.div
@@ -64,24 +74,24 @@ export function Scene5() {
         </motion.div>
       </div>
 
-      {/* Floating Sparkles for outro */}
-      {[...Array(20)].map((_, i) => (
+      {/* Floating Sparkles for outro — positions stable from module-level constants */}
+      {OUTRO_SPARKLES.map((s, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full"
           style={{
-            width: Math.random() * 4 + 2 + 'px',
-            height: Math.random() * 4 + 2 + 'px',
-            backgroundColor: i % 2 === 0 ? '#fbbf24' : '#d946ef',
-            left: `${Math.random() * 100}vw`,
-            top: `${Math.random() * 100}vh`,
+            width: s.width + 'px',
+            height: s.width + 'px',
+            backgroundColor: s.color,
+            left: s.left,
+            top: s.top,
           }}
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: [0, 1, 0], scale: [0, 1, 0], y: -50 }}
           transition={{ 
-            duration: 2 + Math.random() * 2,
+            duration: s.duration,
             repeat: Infinity,
-            delay: Math.random() * 3
+            delay: s.delay
           }}
         />
       ))}

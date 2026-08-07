@@ -1,6 +1,15 @@
 import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
 
+// Stable sparkle positions computed once at module load
+const SPARKLES = Array.from({ length: 8 }, () => ({
+  left: `${30 + Math.random() * 40}vw`,
+  bottom: `${20 + Math.random() * 40}vh`,
+  yTarget: -50 - Math.random() * 100,
+  duration: 2 + Math.random() * 2,
+  delay: 1.5 + Math.random() * 3,
+}));
+
 export function Scene1() {
   return (
     <motion.div
@@ -47,25 +56,25 @@ export function Scene1() {
         </motion.div>
       </div>
 
-      {/* Floating sparkles */}
-      {[...Array(8)].map((_, i) => (
+      {/* Floating sparkles — positions stable from module-level constants */}
+      {SPARKLES.map((s, i) => (
         <motion.div
           key={i}
           className="absolute w-2 h-2 bg-white rounded-full"
           style={{
-            left: `${30 + Math.random() * 40}vw`,
-            bottom: `${20 + Math.random() * 40}vh`,
+            left: s.left,
+            bottom: s.bottom,
             boxShadow: '0 0 10px 2px rgba(255,255,255,0.8)'
           }}
           initial={{ opacity: 0, scale: 0, y: 20 }}
           animate={{ 
             opacity: [0, 1, 0], 
             scale: [0, 1.5, 0],
-            y: -50 - Math.random() * 100
+            y: s.yTarget
           }}
           transition={{ 
-            duration: 2 + Math.random() * 2, 
-            delay: 1.5 + Math.random() * 3,
+            duration: s.duration, 
+            delay: s.delay,
             ease: 'easeOut'
           }}
         />
