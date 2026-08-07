@@ -46,6 +46,62 @@ export function wheelHeroArt(): string {
 }
 
 /**
+ * Mechanical face for the Sparkle Wheel. The three colored wedges remain
+ * visually broad, while nine gold pins divide them into three hidden landing
+ * zones apiece. The whole face rotates under the fixed pointer in the UI.
+ */
+export function wheelMechanicalSvg(): string {
+  const pins = Array.from({ length: 9 }, (_, index) => {
+    const angle = (-90 + index * 40) * (Math.PI / 180);
+    const x = 100 + Math.cos(angle) * 89;
+    const y = 100 + Math.sin(angle) * 89;
+    const boundary = index % 3 === 0;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${boundary ? 4.2 : 3}" class="wheel-pin${boundary ? " wheel-pin--major" : ""}"/>`;
+  }).join("");
+
+  return `<svg viewBox="0 0 200 200" class="wheel-mechanical-svg" aria-hidden="true">
+    <defs>
+      <linearGradient id="mechanicalTeal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a8f0e5"/><stop offset="100%" stop-color="#238d89"/></linearGradient>
+      <linearGradient id="mechanicalPink" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9ecb"/><stop offset="100%" stop-color="#a82c63"/></linearGradient>
+      <linearGradient id="mechanicalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff0b0"/><stop offset="100%" stop-color="#bd7d20"/></linearGradient>
+      <radialGradient id="mechanicalHub" cx="35%" cy="25%" r="75%"><stop offset="0%" stop-color="#fffdf5"/><stop offset="100%" stop-color="#f5d576"/></radialGradient>
+      <filter id="mechanicalShadow"><feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#090617" flood-opacity=".65"/></filter>
+    </defs>
+    <circle cx="100" cy="100" r="96" fill="#17102d" stroke="#fff4e0" stroke-width="3" filter="url(#mechanicalShadow)"/>
+    <g stroke="#17102d" stroke-width="2">
+      <path d="M100 100 L100 4 A96 96 0 0 1 183.1 148 Z" fill="url(#mechanicalTeal)"/>
+      <path d="M100 100 L183.1 148 A96 96 0 0 1 16.9 148 Z" fill="url(#mechanicalPink)"/>
+      <path d="M100 100 L16.9 148 A96 96 0 0 1 100 4 Z" fill="url(#mechanicalGold)"/>
+    </g>
+    <g class="wheel-icons" stroke="#17102d" stroke-width="2">
+      <g transform="translate(143 68)">
+        <circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/>
+        <path d="M-9-9 L9 9 M9-9 L-9 9" stroke="#fff4e0" stroke-width="6" stroke-linecap="round"/>
+        <path d="M0-17 L2-11 L8-9 L2-7 L0-1 L-2-7 L-8-9 L-2-11 Z" fill="#f5d576" stroke="none"/>
+      </g>
+      <g transform="translate(100 146)">
+        <circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/>
+        <rect x="-11" y="-12" width="14" height="19" rx="2" fill="#e8a5b8"/>
+        <rect x="-3" y="-7" width="14" height="19" rx="2" fill="#9fe8c5"/>
+        <path d="M0-2 Q4-8 8-3" fill="none" stroke="#fff4e0" stroke-linecap="round"/>
+        <circle cx="5" cy="-3" r="2" fill="#f5d576" stroke="none"/>
+      </g>
+      <g transform="translate(57 68)">
+        <circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/>
+        <path d="M-10-5 H10 L8 11 H-8 Z" fill="#9fe8c5"/>
+        <path d="M-7-5 C-7-16 8-16 8-5" fill="none" stroke="#f5d576" stroke-width="3"/>
+        <path d="M-2-18 L2-23" stroke="#fff4e0" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M-6 1 H6" stroke="#238d89" stroke-width="2"/>
+      </g>
+    </g>
+    <g class="wheel-pins">${pins}</g>
+    <circle cx="100" cy="100" r="23" fill="url(#mechanicalHub)" stroke="#17102d" stroke-width="3"/>
+    <circle cx="93" cy="92" r="6" fill="#fff" opacity=".52"/>
+    <path d="M92 108 H108" stroke="#17102d" stroke-width="3" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/**
  * Full-body cat sprites for pop-in moments — docs/DESIGN-SPEC.md §11, canon CANON.md.
  * pose: "strut" (entrance/idle), "eat" (fed a treat), "assist" (Joey boogie/help),
  * "unimpressed" (jar empty / wrong treat, exit tail-flick).

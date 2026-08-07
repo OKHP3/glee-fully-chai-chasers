@@ -41,7 +41,7 @@ import { collectTreat, consumeForVisit, settleTreatJar, TREAT_JAR_FREE_SPINS } f
 import { mulberry32, productionSeed } from "../engine/rng";
 import {
   runFreeSpinSession,
-  spinWheel,
+  spinWheelLanding,
   wheelWedgeLabel,
   type FreeSpinRoundResult,
   type FreeSpinSessionResult,
@@ -64,6 +64,7 @@ import {
   symbolSvg,
   catSprite,
   wheelHeroArt,
+  wheelMechanicalSvg,
   saucerSvg,
   gardenForegroundSvg,
   fireflyJarSvg,
@@ -1955,8 +1956,13 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
 
 function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWedge> {
   return new Promise((resolve) => {
-    const wedge = spinWheel(rng);
-    const finalDeg = 1080 + (({ multiplying: 30, keepsake_memory: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
+    const landing = spinWheelLanding(rng);
+    const wedge = landing.wedge;
+    // The visible three wedges each contain three hidden 40° landing zones.
+    // Rotate the selected sub-zone's centre beneath the fixed pointer.
+    const parentCentre = ({ multiplying: 60, keepsake_memory: 180, chai_back: 300 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 60;
+    const subzoneCentre = parentCentre + (landing.subzone - 1) * 40;
+    const finalDeg = 1080 + ((360 - subzoneCentre) % 360);
 
     const overlay = document.createElement("div");
     overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
@@ -1965,6 +1971,9 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
       <div class="wheel-stage">
         ${wheelHeroArt()}
         <div class="wheel-glow-ring"></div>
+        <div class="wheel-mechanical-face" style="--wheel-final-deg:${finalDeg}deg">
+          ${wheelMechanicalSvg()}
+        </div>
         <div id="wheel-ring" class="wheel-energy-ring" style="--wheel-final-deg:${finalDeg}deg">
           <span></span><span></span><span></span>
         </div>
