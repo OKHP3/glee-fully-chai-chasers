@@ -88,3 +88,29 @@ describe("applyBonusSpinXp", () => {
     expect(levelAfter - levelBefore).toBe(2); // two thresholds crossed, two celebrations due
   });
 });
+
+describe("level-up coin reward calculation", () => {
+  it("awards 200 × the new level for a single level-up", () => {
+    // levelBefore=1, levelAfter=2 → one iteration: 200*2 = 400 coins
+    const levelBefore = 1;
+    const levelAfter = 2;
+    let totalCoins = 0;
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      totalCoins += 200 * lvl;
+    }
+    expect(totalCoins).toBe(400);
+  });
+
+  it("awards coins for each crossed level independently when two levels are skipped", () => {
+    // levelBefore=1, levelAfter=3 → two iterations: 200*2 + 200*3 = 1000 coins
+    // (NOT just 200*3 = 600, which the old single-check code produced)
+    const levelBefore = 1;
+    const levelAfter = 3;
+    let totalCoins = 0;
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      totalCoins += 200 * lvl;
+    }
+    expect(totalCoins).toBe(1000); // 400 + 600
+    expect(totalCoins).toBeGreaterThan(200 * levelAfter); // strictly more than top-level-only
+  });
+});

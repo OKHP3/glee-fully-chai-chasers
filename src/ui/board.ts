@@ -725,13 +725,17 @@ async function runSpin(
   }
 
   if (levelAfter > levelBefore) {
-    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
-    const coinReward = 200 * levelAfter;
-    state.balance += coinReward;
     const chip = root.querySelector<HTMLElement>(".coin-chip");
-    if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
-    saveGameState(state);
-    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
+    // Loop so every crossed level fires its own celebration and grants its own
+    // coin reward — a two-level jump is now two distinct payouts, not one.
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
+      const coinReward = 200 * lvl;
+      state.balance += coinReward;
+      if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
+      saveGameState(state);
+      await showLevelUpCelebration(root, lvl, cat, coinReward);
+    }
   }
 
   if (result.unigleeTriggered) {
