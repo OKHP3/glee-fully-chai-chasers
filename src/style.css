@@ -30,7 +30,7 @@ body {
   font-variant-numeric: tabular-nums;
   min-height: 100dvh;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   overscroll-behavior-y: contain;
   background:
     radial-gradient(circle at 50% 8%, rgba(82, 180, 168, 0.16), transparent 32%),
