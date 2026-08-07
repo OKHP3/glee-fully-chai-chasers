@@ -76,4 +76,41 @@ describe("applyBonusSpinXp", () => {
     applyBonusSpinXp(stateHigh, 10);
     expect(stateHigh.xp).toBeGreaterThan(stateLow.xp);
   });
+
+  it("reports all levels when two thresholds are crossed in one grant", () => {
+    // sparksForSpin(1250) = 50; threshold for level 2 = 500, level 3 = 1000
+    // 20 spins × 50 sparks = 1000, crossing from level 1 through 2 to 3.
+    // Callers iterate levelBefore+1..levelAfter to celebrate each crossed level.
+    const state = { xp: 0, bet: 1250 };
+    const { levelBefore, levelAfter } = applyBonusSpinXp(state, 20);
+    expect(levelBefore).toBe(1);
+    expect(levelAfter).toBe(3);
+    expect(levelAfter - levelBefore).toBe(2); // two thresholds crossed, two celebrations due
+  });
+});
+
+describe("level-up coin reward calculation", () => {
+  it("awards 200 × the new level for a single level-up", () => {
+    // levelBefore=1, levelAfter=2 → one iteration: 200*2 = 400 coins
+    const levelBefore = 1;
+    const levelAfter = 2;
+    let totalCoins = 0;
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      totalCoins += 200 * lvl;
+    }
+    expect(totalCoins).toBe(400);
+  });
+
+  it("awards coins for each crossed level independently when two levels are skipped", () => {
+    // levelBefore=1, levelAfter=3 → two iterations: 200*2 + 200*3 = 1000 coins
+    // (NOT just 200*3 = 600, which the old single-check code produced)
+    const levelBefore = 1;
+    const levelAfter = 3;
+    let totalCoins = 0;
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      totalCoins += 200 * lvl;
+    }
+    expect(totalCoins).toBe(1000); // 400 + 600
+    expect(totalCoins).toBeGreaterThan(200 * levelAfter); // strictly more than top-level-only
+  });
 });

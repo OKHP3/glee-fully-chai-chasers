@@ -1,53 +1,58 @@
 ---
-name: okhp3-<slug>
+name: okhp3-SLUG
 description: >
-  <Primary job and concrete trigger terms>. Use when <specific request>.
-  Also activate when <secondary request or boundary>.
+  OverKill Hill P³ NOUN_PHRASE. Use when PRIMARY_TRIGGER.
+  Also activate when SECONDARY_TRIGGER. This is the authoritative
+  NOUN_PHRASE for this repo -- use it even when the user does not
+  mention it by name.
 license: MIT
-compatibility: <Only real environment requirements, if any>
 metadata:
   author: Jamie Hill (OverKill Hill P³)
   version: "1.0.0"
-  category: <category>
+  category: CATEGORY
   origin: okhp3/skillz
   homepage: https://overkillhill.com
   author-github: https://github.com/OKHP3
-  in_scope: "<concise boundary>"
-  out_of_scope: "<concise exclusion>"
+  in_scope:
+    - EXPLICIT_CAPABILITY
+    - EXPLICIT_CAPABILITY
+  out_of_scope:
+    - EXPLICIT_EXCLUSION
+    - EXPLICIT_EXCLUSION
 ---
 
-# okhp3-<slug>
+# okhp3-SLUG
 
 **OverKill Hill P³** · [overkillhill.com](https://overkillhill.com) · [github.com/OKHP3](https://github.com/OKHP3)
 
-<Two concise sentences: what reliable outcome this skill enables and the local
-knowledge or method that makes it useful.>
+ELEVATOR_PITCH_2_TO_3_SENTENCES
 
 ---
 
 ## Scope
 
 | In scope | Out of scope |
-|---|---|
-| <capability> | <explicit exclusion> |
+|----------|-------------|
+| ITEM | ITEM |
+| ITEM | ITEM |
 
-## Operating contract
+---
 
-1. Inspect <inputs and constraints>.
-2. Decide <key decision> using <local rule or resource>.
-3. Produce <observable output>.
-4. If <missing prerequisite or unsafe case>, return <safe fallback or blocked result>.
+## MAIN_SECTION_1
 
-## Resource routing
+CONTENT
 
-- Read `references/<focused-reference>.md` when <specific condition>.
-- Run `scripts/<deterministic-helper>` only when <specific condition>.
+---
 
-## Evaluation and release
+## MAIN_SECTION_2
 
-- Keep at least one normal-path, one edge-case, and one safety or failure case.
-- Record the evaluated version and whether evidence is live, analytical,
-  historical, or not-run.
+CONTENT
+
+---
+
+## References
+
+- `references/FILE.md` -- ONE_LINE_DESCRIPTION
 
 ---
 

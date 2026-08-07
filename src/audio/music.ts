@@ -471,6 +471,11 @@ export function setMusicVolume(volume: number): void {
   if (unigleeBus && audio) unigleeBus.gain.setTargetAtTime(musicVolume * 0.19, audio.currentTime, 0.025);
 }
 
+/** True while the 60-second base score is scheduled and playing. */
+export function isBaseMusicRunning(): boolean {
+  return running;
+}
+
 /** Stop all scheduled score voices immediately when the shared Sound toggle is off. */
 export function stopBaseMusic(): void {
   running = false;

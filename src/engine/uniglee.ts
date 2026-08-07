@@ -25,25 +25,15 @@ export const UNIGLEE_MIDDLE_SUB_BONUSES = [
 export const UNIGLEE_ACTIVE_REELS = [2, 3, 4] as const;
 
 /**
- * Per-reel independent capture odds (S34, 2026-07-17 — Jamie's 2,000/4,000/
- * 5,000 shape, scaled 4x rarer to land the combined rate near 1-in-4,500 so
- * the real trigger stays legendary against the much more common decorative
- * tease sighting in reels.ts): Reel 3 (index 2) 1-in-8,000 → 300 spins,
- * Reel 4 (index 3) 1-in-16,000 → 400 spins, Reel 5 (index 4) 1-in-20,000 →
- * 500 spins. Combined per-spin rate is their sum (~1 in 4,212).
+ * Per-reel independent capture odds: Reel 3 (index 2) 1-in-2,500 → 40 spins,
+ * Reel 4 (index 3) 1-in-4,000 → 60 spins, Reel 5 (index 4) 1-in-7,500 → 80
+ * spins. Combined per-spin rate is their sum (~1 in 1,277).
  */
 export const UNIGLEE_REEL_RATES: readonly [2 | 3 | 4, number][] = [
-  [2, 1 / 8000],
-  [3, 1 / 16000],
-  [4, 1 / 20000],
+  [2, 1 / 2500],
+  [3, 1 / 4000],
+  [4, 1 / 7500],
 ];
-
-/** Reel index -> initial marathon award, per the 2026-07-15 release contract. */
-const UNIGLEE_REEL_AWARDS: Readonly<Record<2 | 3 | 4, UniGleeAwardSpins>> = {
-  2: 300,
-  3: 400,
-  4: 500,
-};
 
 export const UNIGLEE_ACTIVE_RATE = UNIGLEE_REEL_RATES.reduce((sum, [, rate]) => sum + rate, 0);
 
@@ -101,7 +91,7 @@ export function placeUniGleeTrigger(rng: Rng, input: Grid, capturedReel?: 2 | 3 
       lineIndex,
       position: [reel, row],
       linePositions,
-      initialAwardSpins: UNIGLEE_REEL_AWARDS[reel],
+      initialAwardSpins: reel * 20 as UniGleeAwardSpins,
     },
   };
 }
@@ -118,7 +108,7 @@ export interface UniGleeSubBonusPlan {
 
 export interface UniGleeMarathonPlan {
   initialAwardSpins: UniGleeAwardSpins;
-  quarterSpins: 75 | 100 | 125;
+  quarterSpins: 10 | 15 | 20;
   /** Joey first, a seeded permutation of the middle three, Phoebe last. */
   order: readonly UniGleeSubBonusId[];
   baseSubBonuses: readonly UniGleeSubBonusPlan[];
