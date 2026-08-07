@@ -1,0 +1,78 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Privacy gate — no private assets may exist in the tree
+        run: |
+          if [ -d reference-photos ] || [ -d private-work ]; then
+            echo "::error::Private folders present in the committed tree. Aborting."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+      # Unit tests must pass to deploy; the spec oracle runs in its own
+      # visible-but-non-blocking job below so iterative builds can ship
+      # while Round-2 math tuning is in progress.
+      - run: npm test
+        env:
+          SKIP_ORACLE: "1"
+      - run: npm run validate:assets
+      - run: npm run build
+
+      - name: Brand-string gate — shipped bundle must be clean
+        run: |
+          if grep -riE "starbucks|tazo|swig ?life|orijen|cat man doo|moolah|sciplay|jackpot party" dist/; then
+            echo "::error::Brand string found in shipped bundle. See docs/IP-GUARDRAILS.md"
+            exit 1
+          fi
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  spec-oracle:
+    # Visible on every push, never blocks deploys. Green here = the math
+    # meets DESIGN-SPEC §4. Definition-of-done requires this job green.
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx vitest run src/engine/simulation.test.ts
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Doorbell">
+  <defs>
+    <linearGradient id="doorbellBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6c977"/><stop offset="48%" stop-color="#bd5b4d"/><stop offset="100%" stop-color="#522b67"/>
+    </linearGradient>
+    <linearGradient id="doorbellEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffdf9a"/><stop offset="100%" stop-color="#e66f88"/>
+    </linearGradient>
+    <radialGradient id="doorbellLens" cx="35%" cy="28%" r="75%">
+      <stop offset="0%" stop-color="#8b5fc4"/><stop offset="45%" stop-color="#30204e"/><stop offset="100%" stop-color="#120d29"/>
+    </radialGradient>
+    <radialGradient id="doorbellGrounding" cx="60%" cy="60%" r="60%">
+      <stop offset="0%" stop-color="#0c0620" stop-opacity="0.4"/><stop offset="100%" stop-color="#0c0620" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="doorbellSheen" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.75"/><stop offset="55%" stop-color="#fff" stop-opacity="0.22"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="24" cy="43" rx="15" ry="3.5" fill="url(#doorbellGrounding)"/>
+  <rect x="9.5" y="3.5" width="29" height="40" rx="8" fill="url(#doorbellBody)" stroke="#20163a" stroke-width="1.7"/>
+  <rect x="11.5" y="5.5" width="25" height="17" rx="6" fill="#17112f" stroke="url(#doorbellEdge)" stroke-width="1.15"/>
+  <circle cx="24" cy="14" r="7.1" fill="url(#doorbellLens)" stroke="#e77e9d" stroke-width="1"/>
+  <circle cx="24" cy="14" r="5" fill="none" stroke="#6d4c93" stroke-width=".9" opacity=".9"/>
+  <circle cx="24" cy="14" r="2.4" fill="#120d29" stroke="#f6c977" stroke-width=".7"/>
+  <circle cx="22.9" cy="12.8" r=".9" fill="#fff4e0" opacity=".85"/>
+  <circle cx="32.2" cy="18.7" r="1.1" fill="#9fe8c5" stroke="#20163a" stroke-width=".55"/>
+  <path d="M15 25.5h18" stroke="#f6c977" stroke-width="1.1" opacity=".6"/>
+  <circle cx="24" cy="33" r="8.2" fill="#4a2866" stroke="#20163a" stroke-width="1.3"/>
+  <circle cx="24" cy="33" r="6.7" fill="none" stroke="#9fe8c5" stroke-width="2.1"/>
+  <circle cx="24" cy="33" r="5.2" fill="#e28a58" stroke="#f8d58c" stroke-width=".9"/>
+  <path d="M20.6 33.8c2.3-2.8 5.4-2.8 7.1-.1-2.1-.5-4.2.4-5.5 2.1" fill="none" stroke="#fff4e0" stroke-width=".8" stroke-linecap="round" opacity=".75"/>
+  <path d="M8 31c-2-1.8-2-4.6.3-6.2M40 31c2-1.8 2-4.6-.3-6.2" fill="none" stroke="#e77e9d" stroke-width="1.35" stroke-linecap="round"/>
+  <path d="M13.3 39.5c2.6 1.4 5.2 2 7.7 2M34.7 39.5c-2.6 1.4-5.2 2-7.7 2" fill="none" stroke="#9fe8c5" stroke-width=".8" stroke-linecap="round" opacity=".8"/>
+  <path d="M14.4 27.3c-1.5-2.2-.1-4.4 2.1-4.7 1.4-.2 2.5.5 3.2 1.5-1.3-.3-2.4.1-3.1 1.1-.7 1-.9 1.8-2.2 2.1zM16.4 25.3c1.1-1.4 2.8-1.8 4.3-.8" fill="#f28bab" stroke="#20163a" stroke-width=".55"/>
+  <path d="M32 27.2l.7 1.4 1.4.7-1.4.7-.7 1.4-.7-1.4-1.4-.7 1.4-.7zM18 9.1l.5 1 .9.5-.9.5-.5 1-.5-1-.9-.5.9-.5z" fill="#fff4e0" opacity=".9"/>
+  <ellipse cx="16" cy="9" rx="8" ry="10" fill="url(#doorbellSheen)"/>
+</svg>

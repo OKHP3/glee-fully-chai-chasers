@@ -1,0 +1,4 @@
+# Normalize line endings so a Windows checkout doesn't show the entire repo
+# as "modified" just from CRLF/LF differences. Git stores everything as LF
+# internally; checkouts get the platform-native ending automatically.
+* text=auto eol=lf
