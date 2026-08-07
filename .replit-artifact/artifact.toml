@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Glee-fully Chai Chasers"
+description = "The original Glee-fully Chai Chasers browser game — a cozy collectible slot experience with Joey and Phoebe cats, cosmic chai, and original synthesized audio."
+version = "1.0.0"
+id = "chai-chasers-game"
+router = "path"
+
+[[services]]
+name = "web"
+paths = ["/"]
+localPort = 5000
+
+[services.development]
+run = "pnpm run dev"
+
+[services.production]
+build = ["pnpm", "run", "build"]
+serve = "static"
+publicDir = "dist"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "5000"
