@@ -96,11 +96,24 @@ function tone(freq: number, startOffset: number, duration: number, gainPeak: num
   osc.stop(start + duration + 0.05);
 }
 
-/** Chai Chase launch — warm invitation followed by a bright destination note. */
+/** Chai Chase launch — ascending invitation with a glassy firefly shimmer crown. */
 export function playChaiChaseStart(): void {
+  // Warm rising four-note call — slightly longer envelope for a richer arrival
   [392, 523.25, 659.25, 783.99].forEach((freq, i) => {
-    tone(freq, i * 0.08, 0.28, i === 3 ? 0.2 : 0.15, i < 2 ? "sine" : "triangle");
+    tone(freq, i * 0.09, 0.36, i === 3 ? 0.22 : 0.16, i < 2 ? "sine" : "triangle");
   });
+  // Three faint high sines: like light catching the air after the welcome
+  tone(1567.98, 0.42, 0.40, 0.052, "sine");
+  tone(1318.51, 0.48, 0.34, 0.040, "sine");
+  tone(2093.0,  0.54, 0.26, 0.022, "sine");
+}
+
+/** Brief sparkle burst played the moment a Chai Chase spin is initiated. */
+export function playSpinStart(): void {
+  tone(523.25, 0,    0.06, 0.07, "sine");
+  tone(659.25, 0.03, 0.06, 0.06, "sine");
+  tone(783.99, 0.06, 0.06, 0.05, "sine");
+  tone(1046.5, 0.09, 0.09, 0.04, "sine");
 }
 
 /** Soft reel-settle / cascade tick. */
@@ -113,19 +126,26 @@ export function playCascadeArpeggio(tier: number): void {
   const base = 261.63 * Math.pow(2, Math.min(tier, 8) / 12);
   [0, 4, 7].forEach((semitone, i) => {
     const freq = base * Math.pow(2, semitone / 12);
-    tone(freq, i * 0.05, 0.18, 0.15, "sine");
+    tone(freq, i * 0.05, 0.22, 0.15, "sine");
   });
+  // Quiet shimmer: octave-above-fifth crowns the chord like a sparkle catching light
+  tone(base * Math.pow(2, 19 / 12), 0.18, 0.16, 0.048, "sine");
 }
 
-/** Small win pluck. */
+/** Small win pluck — warm low anchor, bright pair, and a thin shimmer tail. */
 export function playWinPluck(): void {
-  tone(880, 0, 0.12, 0.2, "triangle");
-  tone(1108.73, 0.05, 0.15, 0.15, "triangle");
+  tone(440,     0,    0.26, 0.09, "sine");      // warm foundation
+  tone(880,     0.01, 0.16, 0.18, "triangle");  // bright pluck
+  tone(1108.73, 0.06, 0.18, 0.13, "triangle");  // partner note
+  tone(1318.51, 0.14, 0.14, 0.045, "sine");     // shimmer tail
 }
 
-/** Warm bonus fanfare (free spins / UniGlee). */
+/** Warm bonus fanfare (free spins / UniGlee) — triangle/sine mix, not sawtooth. */
 export function playBonusFanfare(): void {
-  [392, 523.25, 659.25, 783.99].forEach((freq, i) => tone(freq, i * 0.08, 0.35, 0.22, "sawtooth"));
+  [392, 523.25, 659.25, 783.99].forEach((freq, i) =>
+    tone(freq, i * 0.08, 0.40, 0.19, i % 2 === 0 ? "triangle" : "sine"));
+  // Shimmer crown above the chord
+  tone(1046.5, 0.36, 0.32, 0.09, "sine");
 }
 
 /** Joey's syncopated boogie signature — alert, selective, and a little smug. */
@@ -204,7 +224,11 @@ export function playTreatTimeCue(mode: "morning" | "nighttime"): void {
 /** A short, per-cast landing flourish; count stays capped to avoid fatigue. */
 export function playTreatLand(count: number): void {
   const landings = Math.min(Math.max(count, 2), 10);
-  [523.25, 659.25, 783.99].forEach((freq, i) => tone(freq, i * 0.045, 0.16, 0.08 + landings * 0.006, "triangle"));
+  // Soft initial thud — treat touching down before the sparkle rise
+  tone(196, 0, 0.07, 0.052, "sine");
+  // Ascending sparkle tones
+  [523.25, 659.25, 783.99].forEach((freq, i) =>
+    tone(freq, 0.03 + i * 0.05, 0.18, 0.08 + landings * 0.005, "triangle"));
 }
 
 /** One-shot Wild Chai Storm: warm amber lift, cool tumbler drops, bright settle. */
@@ -309,11 +333,16 @@ export function playLevelUpFanfare(): void {
   [261.63, 329.63].forEach((freq, i) => tone(freq, i * 0.06, 0.32, 0.1, "sine"));
 }
 
-/** AskJamie Wheel spin-up — a ratchety descending tick loop. */
+/** AskJamie Wheel spin — 10 airy taps decelerating to a soft landing chime. */
 export function playWheelTick(): void {
-  for (let i = 0; i < 14; i++) {
-    tone(440 - i * 6, i * 0.16, 0.05, 0.1, "square");
-  }
+  // Pre-computed cumulative offsets give a natural deceleration arc
+  const offsets = [0, 0.07, 0.15, 0.24, 0.34, 0.45, 0.57, 0.70, 0.84, 0.99];
+  offsets.forEach((t, i) => {
+    tone(659 - i * 13, t, 0.055, 0.062, i % 2 === 0 ? "sine" : "triangle");
+  });
+  // Landing chime: the wheel settles with a gentle shimmer
+  tone(523.25, 1.13, 0.28, 0.08, "sine");
+  tone(659.25, 1.16, 0.22, 0.05, "sine");
 }
 
 export { musicEnabled };

@@ -97,6 +97,7 @@ import {
   playUniGleeSting,
   playWinPluck,
   playWheelTick,
+  playSpinStart,
   playStrangerDangerPanic,
   SFX_VOLUME_MAX,
   setMusicEnabled,
@@ -482,6 +483,7 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
     if (!isUnlocked()) unlock();
     startBaseMusic();
     if (sparkleBtn.disabled) return;
+    playSpinStart();
     void runSpin(root, state, sparkleBtn);
   });
 }
