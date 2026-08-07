@@ -544,8 +544,27 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
     </div>`;
   root.querySelector(".cc-root")?.appendChild(page);
 
+  // ── Music preview ownership ───────────────────────────────────────────────
+  // musicPreviewOwned is true only when THIS preview session called
+  // startBaseMusic().  Every exit path (close, timeout, sound-off) must call
+  // stopMusicPreviewIfOwned() so we never stop music we didn't start, and
+  // never leave a stale timer that could cut off a later session.
   let musicPreviewTimer: number | undefined;
-  const close = () => { window.clearTimeout(musicPreviewTimer); page.remove(); };
+  let musicPreviewOwned = false;
+
+  const resetMusicPreviewBtn = () => {
+    const btn = page.querySelector<HTMLButtonElement>("#music-preview-btn");
+    if (btn) { btn.setAttribute("aria-pressed", "false"); btn.textContent = "▶"; }
+  };
+
+  const stopMusicPreviewIfOwned = () => {
+    window.clearTimeout(musicPreviewTimer);
+    musicPreviewTimer = undefined;
+    if (musicPreviewOwned) { stopBaseMusic(); musicPreviewOwned = false; }
+    resetMusicPreviewBtn();
+  };
+
+  const close = () => { stopMusicPreviewIfOwned(); page.remove(); };
   page.querySelector<HTMLButtonElement>(".page-close")?.addEventListener("click", close);
   page.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
   page.querySelectorAll<HTMLButtonElement>("[data-theme-option]").forEach((button) => {
@@ -565,6 +584,10 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 
   const soundToggle = page.querySelector<HTMLInputElement>("#settings-sound-toggle")!;
   soundToggle.addEventListener("change", () => {
+    // Tear down any active preview before touching the master toggle so the
+    // preview's scheduled stopBaseMusic() cannot affect subsequently restarted
+    // music and so musicPreviewOwned ownership is always consistent.
+    if (!soundToggle.checked) stopMusicPreviewIfOwned();
     state.soundOn = soundToggle.checked;
     setSfxEnabled(state.soundOn);
     setMusicEnabled(state.soundOn);
@@ -577,19 +600,34 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
   wireVolume(page, "sfx", (value) => { state.sfxVolume = value; setSfxVolume(value); }, () => saveGameState(state));
 
   // ── Sound preview buttons ─────────────────────────────────────────────────
-  // Music: plays 3 s of the base score then fades; no-ops if already running.
+  // Music preview — two cases:
+  //   Already running: music is audible right now; show a 3 s visual pulse so
+  //     the player knows they're hearing the live mix.  No audio graph change.
+  //   Not running: start the score, take ownership, auto-stop after 3 s.
   const musicPreviewBtn = page.querySelector<HTMLButtonElement>("#music-preview-btn")!;
   musicPreviewBtn.addEventListener("click", () => {
     if (!isUnlocked()) unlock();
-    if (!state.soundOn || isBaseMusicRunning()) return;
-    startBaseMusic();
+    if (!state.soundOn) return;
+
+    // Cancel any in-flight preview before starting a new one.
+    window.clearTimeout(musicPreviewTimer);
+    musicPreviewTimer = undefined;
+
+    if (!isBaseMusicRunning()) {
+      startBaseMusic();
+      musicPreviewOwned = true;
+    } else {
+      // Already audible — visual confirmation only; we do not own this session.
+      musicPreviewOwned = false;
+    }
+
     musicPreviewBtn.setAttribute("aria-pressed", "true");
     musicPreviewBtn.textContent = "■";
-    window.clearTimeout(musicPreviewTimer);
+
     musicPreviewTimer = window.setTimeout(() => {
-      stopBaseMusic();
-      musicPreviewBtn.setAttribute("aria-pressed", "false");
-      musicPreviewBtn.textContent = "▶";
+      musicPreviewTimer = undefined;
+      if (musicPreviewOwned) { stopBaseMusic(); musicPreviewOwned = false; }
+      resetMusicPreviewBtn();
     }, 3000);
   });
 
