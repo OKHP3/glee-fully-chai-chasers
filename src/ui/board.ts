@@ -105,7 +105,7 @@ import {
   setSfxVolume,
   unlock,
 } from "../audio/synth";
-import { MUSIC_VOLUME_MAX, setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
+import { isBaseMusicRunning, MUSIC_VOLUME_MAX, setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
 
 let statusTimeout: number | undefined;
 
@@ -544,7 +544,8 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
     </div>`;
   root.querySelector(".cc-root")?.appendChild(page);
 
-  const close = () => page.remove();
+  let musicPreviewTimer: number | undefined;
+  const close = () => { window.clearTimeout(musicPreviewTimer); page.remove(); };
   page.querySelector<HTMLButtonElement>(".page-close")?.addEventListener("click", close);
   page.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
   page.querySelectorAll<HTMLButtonElement>("[data-theme-option]").forEach((button) => {
@@ -574,6 +575,32 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 
   wireVolume(page, "music", (value) => { state.musicVolume = value; setMusicVolume(value); }, () => saveGameState(state));
   wireVolume(page, "sfx", (value) => { state.sfxVolume = value; setSfxVolume(value); }, () => saveGameState(state));
+
+  // ── Sound preview buttons ─────────────────────────────────────────────────
+  // Music: plays 3 s of the base score then fades; no-ops if already running.
+  const musicPreviewBtn = page.querySelector<HTMLButtonElement>("#music-preview-btn")!;
+  musicPreviewBtn.addEventListener("click", () => {
+    if (!isUnlocked()) unlock();
+    if (!state.soundOn || isBaseMusicRunning()) return;
+    startBaseMusic();
+    musicPreviewBtn.setAttribute("aria-pressed", "true");
+    musicPreviewBtn.textContent = "■";
+    window.clearTimeout(musicPreviewTimer);
+    musicPreviewTimer = window.setTimeout(() => {
+      stopBaseMusic();
+      musicPreviewBtn.setAttribute("aria-pressed", "false");
+      musicPreviewBtn.textContent = "▶";
+    }, 3000);
+  });
+
+  // SFX: plays a win pluck followed by a cascade arpeggio.
+  const sfxPreviewBtn = page.querySelector<HTMLButtonElement>("#sfx-preview-btn")!;
+  sfxPreviewBtn.addEventListener("click", () => {
+    if (!isUnlocked()) unlock();
+    if (!state.soundOn) return;
+    playWinPluck();
+    window.setTimeout(() => playCascadeArpeggio(0), 240);
+  });
 
   const reducedMotion = page.querySelector<HTMLInputElement>("#reduced-motion-toggle")!;
   reducedMotion.addEventListener("change", () => {
@@ -607,7 +634,11 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 function volumeControl(id: "music" | "sfx", label: string, value: number, help: string): string {
   const percent = Math.round(value * 100);
   const maxPercent = id === "music" ? MUSIC_VOLUME_MAX * 100 : SFX_VOLUME_MAX * 100;
-  return `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">(max)</output><input id="${id}-volume" type="range" min="0" max="${maxPercent}" value="${percent}" aria-label="${label} volume"/></label>`;
+  const previewLabel = id === "music" ? "Preview music (3 s)" : "Preview sound effects";
+  return `<div class="volume-row">` +
+    `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">(max)</output><input id="${id}-volume" type="range" min="0" max="${maxPercent}" value="${percent}" aria-label="${label} volume"/></label>` +
+    `<button type="button" class="volume-preview-btn" id="${id}-preview-btn" aria-label="${previewLabel}" aria-pressed="false">▶</button>` +
+    `</div>`;
 }
 
 function wireVolume(
