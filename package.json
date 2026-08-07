@@ -1,27 +1,19 @@
 {
-  "name": "glee-fully-chai-chasers",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "description": "A free, fan-made cascading-reels game starring Joey & Phoebe. Original art, fictional currency, real love.",
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "assets:generate": "node scripts/generate-assets.mjs",
-    "validate:assets": "node scripts/validate-assets.mjs",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+  },
+  "private": true,
+  "dependencies": {
+    "@replit/connectors-sdk": "^0.4.1"
   },
   "devDependencies": {
-    "@emnapi/core": "^1.11.2",
-    "@emnapi/runtime": "^1.11.2",
-    "@tailwindcss/vite": "^4.3.2",
-    "@types/node": "^26.1.1",
-    "sharp": "^0.35.3",
-    "tailwindcss": "^4.3.2",
-    "typescript": "^7.0.2",
-    "vite": "^8.1.4",
-    "vitest": "^4.1.10"
+    "prettier": "^3.9.6",
+    "typescript": "~5.9.3"
   }
 }
