@@ -1,0 +1,9 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "AuvzX5MdKN3V1T1a6Ivqw"
+uri = "file://artifacts/chai-chasers-video/public/audio/bg_music.mp3"
+type = "audio"
+title = "cozy lo-fi folk background music"
+description = "Generated music: Playful lo-fi indie-folk instrumental scoring a warm personal game reveal video. Acoustic guitar, gentle marimba, soft piano, light bells, brushed percussion, 88 BPM. Cozy Pacific-No…"
