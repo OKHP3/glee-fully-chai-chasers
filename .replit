@@ -30,10 +30,6 @@ waitForPort = 5000
 [workflows.workflow.metadata]
 outputType = "webview"
 
-[[ports]]
-localPort = 5000
-externalPort = 80
-
 [deployment]
 deploymentTarget = "static"
 build = ["npm", "run", "build"]
@@ -42,3 +38,7 @@ publicDir = "dist"
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 120000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
