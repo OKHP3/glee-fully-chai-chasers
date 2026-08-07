@@ -1,20 +1,36 @@
 ---
 name: Root-game artifact registration
-description: How the root Vite game was registered as a Replit artifact so it appears in the preview dropdown.
+description: How the root Vite game is registered as a Replit artifact and how its preview routing works.
 ---
 
-The game lives at the workspace root (not under `artifacts/<slug>/`), so the standard `createArtifact()` flow cannot be used.
+## Current setup (working)
 
-**Registration approach:**
-1. Write the desired TOML to `.replit-artifact/artifact.edit.toml` using WriteFile (artifact.toml writes are blocked by the platform).
-2. Seed the actual file via shell: `cp .replit-artifact/artifact.edit.toml .replit-artifact/artifact.toml`
-3. Validate and register: `verifyAndReplaceArtifactToml({ tempFilePath: "...artifact.edit.toml", artifactTomlPath: "...artifact.toml" })`
+The game source lives at the workspace root. It is exposed as a proper Replit artifact via a **shim package** at `artifacts/chai-chasers/`.
 
-**Key TOML fields for the root game:**
-- `kind = "web"`, `previewPath = "/"`, `localPort = 5000`
-- `run = "pnpm run dev"` (workspace root script, no `--filter` needed)
-- `PORT = "5000"` in `[services.env]` (vite.config.ts uses `strictPort: true`)
+- `artifacts/chai-chasers/package.json` — shim with `"dev": "cd ../.. && pnpm run dev"` and `"build": "cd ../.. && pnpm run build"`.
+- `artifacts/chai-chasers/.replit-artifact/artifact.toml` — kind=web, previewPath="/", localPort=18364, PORT=18364, BASE_PATH="/".
+- `artifacts/chai-chasers: web` workflow — runs the shim dev script, which cd's to root and starts Vite on PORT=18364.
 
-**Why:** `verifyAndReplaceArtifactToml` requires an existing file; WriteFile is blocked for artifact.toml; shell cp is the bridge.
+The root `vite.config.ts` reads `Number(process.env.PORT) || 5000` for the port, so the artifact-injected PORT=18364 is honoured. It also has `watch.ignored: ["**/.local/**", "**/node_modules/.pnpm/**"]` to prevent ENOSPC when four Vite instances run concurrently.
 
-**Post-registration:** The platform creates a managed `web` workflow. The old manually-configured `Start application` workflow must be removed (`removeWorkflow`) to avoid port 5000 conflicts. Kill any lingering process with `lsof -ti:5000 | xargs kill -9` if the new workflow fails on first start.
+## Why a shim under artifacts/ (not a root artifact)
+
+The application router only routes artifacts whose `artifactDir` is under `artifacts/`. A `.replit-artifact/artifact.toml` at the workspace root registers the artifact in the database but does NOT update the proxy routing table — `createArtifact()` (or the platform's internal flow when reading `artifacts/*/`) is what registers routing.
+
+**Key lesson:** `verifyAndReplaceArtifactToml()` at the workspace root = metadata only, no routing. `createArtifact()` at `artifacts/<slug>/` = metadata + routing.
+
+## Production config
+
+- `publicDir = "dist"` in artifact.toml (relative to workspace root — Vite's default output).
+- `build.base` in `vite.config.ts` is `/glee-fully-chai-chasers/` for production (GitHub Pages). If deploying via Replit instead, change `base` to `"/"` for the Replit static serve to work correctly.
+
+## ENOSPC fix
+
+Four concurrent Vite instances (game, video, mockup-sandbox, future) exhaust the system's inotify watch limit. Fixed by adding to root `vite.config.ts` server.watch.ignored:
+```typescript
+watch: { ignored: ["**/.local/**", "**/node_modules/.pnpm/**"] }
+```
+
+## Git push
+
+Always use the `gitPush` CodeExecution callback. Never set `git config credential.helper` — the platform detects it and blocks `gitPush`. If accidentally set: `git config --unset credential.helper`.
