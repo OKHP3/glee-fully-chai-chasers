@@ -2356,10 +2356,17 @@ function sleep(ms: number): Promise<void> {
  * occurred.  The celebration fires AFTER the bonus summary so it doesn't
  * interrupt the bonus-win reveal.
  */
-async function maybeLevelUpAfterBonus(
+export async function maybeLevelUpAfterBonus(
   root: HTMLElement,
   state: GameState,
   totalSpins: number,
+  /** Injectable for testing; defaults to the real animation. */
+  celebrateFn: (
+    root: HTMLElement,
+    lvl: number,
+    cat: "joey" | "phoebe",
+    coinReward: number,
+  ) => Promise<void> = showLevelUpCelebration,
 ): Promise<void> {
   const { levelBefore, levelAfter } = applyBonusSpinXp(state, totalSpins);
   if (levelAfter > levelBefore) {
@@ -2372,7 +2379,7 @@ async function maybeLevelUpAfterBonus(
       state.balance += coinReward;
       if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
       saveGameState(state);
-      await showLevelUpCelebration(root, lvl, cat, coinReward);
+      await celebrateFn(root, lvl, cat, coinReward);
     }
   } else {
     saveGameState(state);
