@@ -41,6 +41,16 @@ const WHEEL_WEIGHTS: Array<[WheelWedge, number]> = [
 /** A successful memory bonus hands off to ordinary free spins without a wedge modifier. */
 export type FreeSpinMode = "standard" | WheelWedge;
 
+/**
+ * A physical wheel landing: one of the three bonus wedges plus one of the
+ * three hidden sub-zones inside that wedge. The sub-zone changes presentation
+ * only; it does not change the parent wedge's probability.
+ */
+export interface WheelLanding {
+  wedge: WheelWedge;
+  subzone: 0 | 1 | 2;
+}
+
 /** Spins the AskJamie wheel — one modifier per bonus (docs §7). */
 export function spinWheel(rng: Rng): WheelWedge {
   const total = WHEEL_WEIGHTS.reduce((s, [, w]) => s + w, 0);
@@ -50,6 +60,13 @@ export function spinWheel(rng: Rng): WheelWedge {
     roll -= w;
   }
   return WHEEL_WEIGHTS[0][0];
+}
+
+/** Spins the weighted wedge, then chooses one of its three mechanical zones. */
+export function spinWheelLanding(rng: Rng): WheelLanding {
+  const wedge = spinWheel(rng);
+  const subzone = Math.min(2, Math.floor(rng() * 3)) as 0 | 1 | 2;
+  return { wedge, subzone };
 }
 
 /**
