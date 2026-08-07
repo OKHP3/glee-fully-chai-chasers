@@ -1,19 +1,18 @@
 {
-  "name": "workspace",
-  "version": "0.0.0",
-  "license": "MIT",
+  "name": "glee-fully-chai-chasers",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A free, fan-made cascading-reels game starring Joey & Phoebe. Original art, fictional currency, real love.",
   "scripts": {
-    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
     "dev": "vite",
-    "test": "vitest run",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+    "test": "vitest run src",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "assets:generate": "node scripts/generate-assets.mjs",
+    "validate:assets": "node scripts/validate-assets.mjs",
+    "test:watch": "vitest"
   },
   "private": true,
-  "dependencies": {
-    "@replit/connectors-sdk": "^0.4.1"
-  },
   "devDependencies": {
     "@emnapi/core": "^1.11.2",
     "@emnapi/runtime": "^1.11.2",
