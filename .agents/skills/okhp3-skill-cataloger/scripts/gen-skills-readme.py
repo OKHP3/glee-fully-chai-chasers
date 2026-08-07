@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gen-skills-readme.py — okhp3-skill-cataloger v1.6.1
+gen-skills-readme.py — okhp3-skill-cataloger v1.4.0
 OverKill Hill P³ · https://overkillhill.com · https://github.com/OKHP3
 =======================================================
 Bundled with the okhp3-skill-cataloger Agent Skill.
@@ -21,26 +21,12 @@ Two modes of operation:
     Writes FAMILY.md inside each discovered family directory.
     Writes the Families table in README.md (requires markers in place).
     Writes .catalog-meta.json at repo root on every successful run.
-    Use in distribution repos (skillz). In an application repo it may produce an
-    empty distribution index, so prefer catalog mode unless root families exist.
+    Use in distribution repos (skillz). No-op in application repos.
     $ python3 scripts/gen-skills-readme.py --full
     $ python3 scripts/gen-skills-readme.py --full --no-family-md
     $ python3 scripts/gen-skills-readme.py --full --no-absorb-readme
 
 No external dependencies. Python 3.9+ only.
-
-What changed in v1.6.1 vs v1.6.0:
-  - Normalize generated catalog output to one final newline.
-
-What changed in v1.7.0 vs v1.6.1:
-  - Exclude root skills/ publication mirrors from full distribution indexing.
-
-What changed in v1.6.0 vs v1.5.0:
-  - Configured UTF-8 stdout and stderr so warning output remains portable in Windows consoles.
-
-What changed in v1.5.0 vs v1.4.0:
-  - Clarified catalog/full-index contracts and safe dry-run/check behavior in the skill docs.
-  - Kept generator behavior deterministic; no live benchmark claims are added.
 
 What changed in v1.4.0 vs v1.3.0:
   - FAMILY.md now has a free-form bio section between the title and
@@ -91,14 +77,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Windows consoles can default to cp1252, while catalog warnings intentionally
-# include Unicode status glyphs. Keep stdout/stderr portable for interactive use.
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
-if hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8")
-
-CATALOGER_VERSION = "1.7.0"
+CATALOGER_VERSION = "1.4.0"
 OKHP3_HOMEPAGE    = "https://overkillhill.com"
 OKHP3_GITHUB      = "https://github.com/OKHP3"
 
@@ -115,15 +94,9 @@ FAMILY_INVENTORY_END   = "<!-- FAMILY_INVENTORY_END -->"
 FAMILIES_TABLE_START = "<!-- FAMILIES_TABLE_START -->"
 FAMILIES_TABLE_END   = "<!-- FAMILIES_TABLE_END -->"
 
-
-def display_timestamp(value: datetime) -> str:
-    """Format a human timestamp without POSIX-only %-d directives."""
-    return f"{value.strftime('%B')} {value.day}, {value.strftime('%Y at %H:%M UTC')}"
-
 # Directories excluded from root scan in --full mode
 FULL_SKIP = frozenset({
     ".git", ".github", ".agents", ".claude", ".vscode",
-    "skills",
     "node_modules", "__pycache__", ".venv", "venv",
     "dist", "build", "coverage", ".nyc_output", "attached_assets",
     "docs",
@@ -374,7 +347,7 @@ def _build_family_inventory(skills: list[dict], now_disp: str) -> str:
     ]
     for s in sorted(skills, key=lambda x: x["name"]):
         flag = "⚠️ " if s["name_mismatch"] else ""
-        link = f"[{s['name']}]({s['dir_name'].replace(chr(92), '/')}/SKILL.md)"
+        link = f"[{s['name']}]({s['dir_name']}/SKILL.md)"
         rows.append(f"| {flag}{link} | {s['description']} | {s['version']} |")
     return "\n".join(rows)
 
@@ -424,12 +397,11 @@ def write_family_md(
 
     now      = datetime.now(timezone.utc)
     now_iso  = now.strftime("%Y-%m-%dT%H:%M:%SZ")
-    now_disp = display_timestamp(now)
+    now_disp = now.strftime("%B %-d, %Y at %H:%M UTC")
     n        = len(skills)
 
     bio     = ""
     summary = extract_family_summary(family_dir, skills)
-    display_name: str | None = None
 
     absorb_this_run = False
 
@@ -438,12 +410,6 @@ def write_family_md(
             existing_text = family_md.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
             existing_text = ""
-
-        # Preserve display_name from existing frontmatter so user-set
-        # capitalisation overrides are never silently dropped on regeneration.
-        existing_fm = parse_frontmatter(family_md)
-        if "display_name" in existing_fm:
-            display_name = existing_fm["display_name"]
 
         # Preserve bio: everything between the title line and FAMILY_SUMMARY_START
         title_m = re.search(r"^# .+\n", existing_text, re.MULTILINE)
@@ -477,11 +443,9 @@ def write_family_md(
     name = family_dir.name
 
     bio_section = f"\n{bio}\n\n" if bio else "\n"
-    display_name_line = f"display_name: {display_name}\n" if display_name else ""
     new_content = (
         f"---\n"
         f"family: {name}\n"
-        f"{display_name_line}"
         f"skill_count: {n}\n"
         f"generated_by: okhp3-skill-cataloger v{CATALOGER_VERSION}\n"
         f"generated_at: {now_iso}\n"
@@ -681,7 +645,7 @@ def _project_table(skills: list[dict]) -> str:
     ]
     for s in sorted(skills, key=lambda x: x["name"]):
         flag = " ⚠️" if s["name_mismatch"] else ""
-        link = f"[{s['name']}]({s['path'].replace(chr(92), '/')})"
+        link = f"[{s['name']}]({s['path']})"
         rows.append(f"| {link}{flag} | {s['description']} | {s['version']} | {s['category']} |")
     return "\n".join(rows)
 
@@ -702,7 +666,7 @@ def _library_sections(skills: list[dict]) -> str:
             "|---|---|---|",
         ] + [
             f"| {'⚠️ ' if s['name_mismatch'] else ''}"
-            f"[{s['name']}]({s['path'].replace(chr(92), '/')}) "
+            f"[{s['name']}]({s['path']}) "
             f"| {s['description']} | {s['version']} |"
             for s in items
         ] + [""]
@@ -712,7 +676,7 @@ def _library_sections(skills: list[dict]) -> str:
 def build_block(skills: list[dict], mode: str, full: bool = False) -> str:
     now      = datetime.now(timezone.utc)
     now_iso  = now.strftime("%Y-%m-%d %H:%M UTC")
-    now_disp = display_timestamp(now)
+    now_disp = now.strftime("%B %-d, %Y at %H:%M UTC")
     n        = len(skills)
     sw       = "skill" if n == 1 else "skills"
     cats     = len({s["category"] for s in skills})
@@ -770,7 +734,7 @@ def inject_strict(readme: Path, block: str) -> tuple[bool, str]:
             f"  {START_MARKER}\n"
             f"  {END_MARKER}"
         )
-    new = (content[:s] + block + "\n" + content[e + len(END_MARKER):]).rstrip() + "\n"
+    new = content[:s] + block + "\n" + content[e + len(END_MARKER):]
     return new != content, new
 
 
@@ -783,9 +747,9 @@ def inject_soft(output: Path, block: str) -> tuple[bool, str]:
     if START_MARKER in original and END_MARKER in original:
         s = original.find(START_MARKER)
         e = original.find(END_MARKER)
-        new = (original[:s] + block + "\n" + original[e + len(END_MARKER):]).rstrip() + "\n"
+        new = original[:s] + block + "\n" + original[e + len(END_MARKER):]
     else:
-        new = ((original.rstrip() + "\n\n" if original.strip() else "") + block).rstrip() + "\n"
+        new = (original.rstrip() + "\n\n" if original.strip() else "") + block + "\n"
     return new != original, new
 
 
@@ -1012,7 +976,7 @@ def main() -> int:
     # ── Write Families table into root README.md ──────────────────────────────
     if args.full:
         families_list = discover_all_families(scan_root, skills)
-        now_disp = display_timestamp(datetime.now(timezone.utc))
+        now_disp = datetime.now(timezone.utc).strftime("%B %-d, %Y at %H:%M UTC")
         fam_block = build_families_table(families_list, now_disp)
         fam_changed, fam_content = inject_families_table(output, fam_block)
         if fam_changed:

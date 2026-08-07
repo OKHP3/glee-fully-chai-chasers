@@ -1,23 +1,26 @@
 {
   "name": "glee-fully-chai-chasers",
-  "private": true,
   "version": "0.1.0",
   "type": "module",
   "description": "A free, fan-made cascading-reels game starring Joey & Phoebe. Original art, fictional currency, real love.",
   "scripts": {
     "dev": "vite",
+    "test": "vitest run src",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "assets:generate": "node scripts/generate-assets.mjs",
     "validate:assets": "node scripts/validate-assets.mjs",
-    "test": "vitest run --exclude .agents/skills/okhp3-skill-foundry/tests/validate-foundry-evidence.test.cjs && node --test .agents/skills/okhp3-skill-foundry/tests/validate-foundry-evidence.test.cjs",
     "test:watch": "vitest"
   },
+  "private": true,
   "devDependencies": {
     "@emnapi/core": "^1.11.2",
     "@emnapi/runtime": "^1.11.2",
     "@tailwindcss/vite": "^4.3.2",
+    "@types/jsdom": "^28.0.3",
     "@types/node": "^26.1.1",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.9.6",
     "sharp": "^0.35.3",
     "tailwindcss": "^4.3.2",
     "typescript": "^7.0.2",

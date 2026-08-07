@@ -95,9 +95,9 @@ import {
   playTreatTimeCue,
   playLevelUpFanfare,
   playUniGleeSting,
-  playUniGleeTease,
   playWinPluck,
   playWheelTick,
+  playSpinStart,
   playStrangerDangerPanic,
   SFX_VOLUME_MAX,
   setMusicEnabled,
@@ -105,7 +105,7 @@ import {
   setSfxVolume,
   unlock,
 } from "../audio/synth";
-import { MUSIC_VOLUME_MAX, setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
+import { isBaseMusicRunning, MUSIC_VOLUME_MAX, setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
 
 let statusTimeout: number | undefined;
 
@@ -482,7 +482,11 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
   sparkleBtn.addEventListener("click", () => {
     if (!isUnlocked()) unlock();
     startBaseMusic();
+    // Guard order is intentional: playSpinStart() must come AFTER the
+    // sparkleBtn.disabled return so the chime cannot fire while the reel
+    // is mid-spin or locked. Do not move this call above the guard.
     if (sparkleBtn.disabled) return;
+    playSpinStart();
     void runSpin(root, state, sparkleBtn);
   });
 }
@@ -543,7 +547,27 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
     </div>`;
   root.querySelector(".cc-root")?.appendChild(page);
 
-  const close = () => page.remove();
+  // ── Music preview ownership ───────────────────────────────────────────────
+  // musicPreviewOwned is true only when THIS preview session called
+  // startBaseMusic().  Every exit path (close, timeout, sound-off) must call
+  // stopMusicPreviewIfOwned() so we never stop music we didn't start, and
+  // never leave a stale timer that could cut off a later session.
+  let musicPreviewTimer: number | undefined;
+  let musicPreviewOwned = false;
+
+  const resetMusicPreviewBtn = () => {
+    const btn = page.querySelector<HTMLButtonElement>("#music-preview-btn");
+    if (btn) { btn.setAttribute("aria-pressed", "false"); btn.textContent = "▶"; }
+  };
+
+  const stopMusicPreviewIfOwned = () => {
+    window.clearTimeout(musicPreviewTimer);
+    musicPreviewTimer = undefined;
+    if (musicPreviewOwned) { stopBaseMusic(); musicPreviewOwned = false; }
+    resetMusicPreviewBtn();
+  };
+
+  const close = () => { stopMusicPreviewIfOwned(); page.remove(); };
   page.querySelector<HTMLButtonElement>(".page-close")?.addEventListener("click", close);
   page.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
   page.querySelectorAll<HTMLButtonElement>("[data-theme-option]").forEach((button) => {
@@ -563,6 +587,10 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 
   const soundToggle = page.querySelector<HTMLInputElement>("#settings-sound-toggle")!;
   soundToggle.addEventListener("change", () => {
+    // Tear down any active preview before touching the master toggle so the
+    // preview's scheduled stopBaseMusic() cannot affect subsequently restarted
+    // music and so musicPreviewOwned ownership is always consistent.
+    if (!soundToggle.checked) stopMusicPreviewIfOwned();
     state.soundOn = soundToggle.checked;
     setSfxEnabled(state.soundOn);
     setMusicEnabled(state.soundOn);
@@ -573,6 +601,47 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 
   wireVolume(page, "music", (value) => { state.musicVolume = value; setMusicVolume(value); }, () => saveGameState(state));
   wireVolume(page, "sfx", (value) => { state.sfxVolume = value; setSfxVolume(value); }, () => saveGameState(state));
+
+  // ── Sound preview buttons ─────────────────────────────────────────────────
+  // Music preview — two cases:
+  //   Already running: music is audible right now; show a 3 s visual pulse so
+  //     the player knows they're hearing the live mix.  No audio graph change.
+  //   Not running: start the score, take ownership, auto-stop after 3 s.
+  const musicPreviewBtn = page.querySelector<HTMLButtonElement>("#music-preview-btn")!;
+  musicPreviewBtn.addEventListener("click", () => {
+    if (!isUnlocked()) unlock();
+    if (!state.soundOn) return;
+
+    // Cancel any in-flight preview before starting a new one.
+    window.clearTimeout(musicPreviewTimer);
+    musicPreviewTimer = undefined;
+
+    if (!isBaseMusicRunning()) {
+      startBaseMusic();
+      musicPreviewOwned = true;
+    } else {
+      // Already audible — visual confirmation only; we do not own this session.
+      musicPreviewOwned = false;
+    }
+
+    musicPreviewBtn.setAttribute("aria-pressed", "true");
+    musicPreviewBtn.textContent = "■";
+
+    musicPreviewTimer = window.setTimeout(() => {
+      musicPreviewTimer = undefined;
+      if (musicPreviewOwned) { stopBaseMusic(); musicPreviewOwned = false; }
+      resetMusicPreviewBtn();
+    }, 3000);
+  });
+
+  // SFX: plays a win pluck followed by a cascade arpeggio.
+  const sfxPreviewBtn = page.querySelector<HTMLButtonElement>("#sfx-preview-btn")!;
+  sfxPreviewBtn.addEventListener("click", () => {
+    if (!isUnlocked()) unlock();
+    if (!state.soundOn) return;
+    playWinPluck();
+    window.setTimeout(() => playCascadeArpeggio(0), 240);
+  });
 
   const reducedMotion = page.querySelector<HTMLInputElement>("#reduced-motion-toggle")!;
   reducedMotion.addEventListener("change", () => {
@@ -606,7 +675,11 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
 function volumeControl(id: "music" | "sfx", label: string, value: number, help: string): string {
   const percent = Math.round(value * 100);
   const maxPercent = id === "music" ? MUSIC_VOLUME_MAX * 100 : SFX_VOLUME_MAX * 100;
-  return `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">(max)</output><input id="${id}-volume" type="range" min="0" max="${maxPercent}" value="${percent}" aria-label="${label} volume"/></label>`;
+  const previewLabel = id === "music" ? "Preview music (3 s)" : "Preview sound effects";
+  return `<div class="volume-row">` +
+    `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">(max)</output><input id="${id}-volume" type="range" min="0" max="${maxPercent}" value="${percent}" aria-label="${label} volume"/></label>` +
+    `<button type="button" class="volume-preview-btn" id="${id}-preview-btn" aria-label="${previewLabel}" aria-pressed="false">▶</button>` +
+    `</div>`;
 }
 
 function wireVolume(
@@ -703,7 +776,7 @@ async function runSpin(
     spinsSincePopIn: state.spinsSincePopIn,
   });
 
-  await animateSteps(root, result.steps, state.bet, result.unigleeTriggered);
+  await animateSteps(root, result.steps);
 
   let boldChaiSpinsAwarded = 0;
 
@@ -724,18 +797,22 @@ async function runSpin(
   }
 
   if (levelAfter > levelBefore) {
-    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
-    const coinReward = 200 * levelAfter;
-    state.balance += coinReward;
     const chip = root.querySelector<HTMLElement>(".coin-chip");
-    if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
-    saveGameState(state);
-    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
+    // Loop so every crossed level fires its own celebration and grants its own
+    // coin reward — a two-level jump is now two distinct payouts, not one.
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
+      const coinReward = 200 * lvl;
+      state.balance += coinReward;
+      if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
+      saveGameState(state);
+      await showLevelUpCelebration(root, lvl, cat, coinReward);
+    }
   }
 
   if (result.unigleeTriggered) {
     playUniGleeSting();
-    const award = result.unigleeTrigger?.initialAwardSpins ?? 300;
+    const award = result.unigleeTrigger?.initialAwardSpins ?? 40;
     startUniGleeMusic();
     await showUnigleeTakeover(root, result.unigleeTrigger, award);
     await runUniGleeMarathonBonus(root, state, award, seed ^ 0x51f15e5d);
@@ -1186,55 +1263,11 @@ function showDoorbellPanic(
   });
 }
 
-/**
- * `unigleeTriggered` gates the tease cue only: a real capture gets its own,
- * much bigger playUniGleeSting fanfare later in the spin handler, so this
- * function must never play both for the same "uniglee" cell.
- */
-/**
- * Cascade step pacing (Option A, 2026-07-17 — see docs/DECISION-LOG.md).
- * Previously every step advanced on a flat 480ms timer regardless of
- * whether it won, so a win's flash/beam got overwritten by the next
- * step's render before a player could read what happened. Dwell now
- * scales with the step's own payout (relative to bet) so bigger hits
- * hold the screen longer; empty steps stay brisk to preserve tension.
- * Tuned by feel, not data — revisit once Option A ships to players.
- */
-const STEP_DELAY_NO_WIN_MS = 340;
-const STEP_DELAY_WIN_SMALL_MS = 700;
-const STEP_DELAY_WIN_BIG_MS = 1000;
-const STEP_DELAY_WIN_HUGE_MS = 1350;
-const REDUCED_MOTION_DELAY_SCALE = 0.5;
-const REDUCED_MOTION_DELAY_FLOOR_MS = 160;
-
-function stepDwellMs(step: CascadeStep, bet: number, reduced: boolean): number {
-  const stepWin = step.wins.reduce((sum, win) => sum + win.payout, 0);
-  const ratio = bet > 0 ? stepWin / bet : 0;
-  let ms = STEP_DELAY_NO_WIN_MS;
-  if (stepWin > 0) {
-    ms = ratio >= 15 ? STEP_DELAY_WIN_HUGE_MS : ratio >= 5 ? STEP_DELAY_WIN_BIG_MS : STEP_DELAY_WIN_SMALL_MS;
-  }
-  if (!reduced) return ms;
-  return Math.max(REDUCED_MOTION_DELAY_FLOOR_MS, Math.round(ms * REDUCED_MOTION_DELAY_SCALE));
-}
-
-/** Human-readable label for a step's win callout, e.g. "Wild Chai x4 — Line 12 — +180". */
-function stepWinCallout(step: CascadeStep): string {
-  const best = [...step.wins].sort((a, b) => b.payout - a.payout)[0];
-  const label = best.symbol.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const total = step.wins.reduce((sum, win) => sum + win.payout, 0);
-  const extra = step.wins.length > 1 ? ` (+${step.wins.length - 1} more line${step.wins.length > 2 ? "s" : ""})` : "";
-  return `${label} x${best.count} — Line ${best.lineIndex + 1}${extra} — +${total.toLocaleString()} coins`;
-}
-
-function animateSteps(root: HTMLElement, steps: CascadeStep[], bet: number, unigleeTriggered = false): Promise<void> {
+function animateSteps(root: HTMLElement, steps: CascadeStep[]): Promise<void> {
   return new Promise((resolve) => {
     const grid = root.querySelector<HTMLDivElement>("#reel-grid")!;
-    const reduced = (root.querySelector(".cc-root")?.getAttribute("data-reduced-motion") === "true")
-      || (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
     let i = 0;
     let doorbellRang = false;
-    let uniGleeTeaseSighted = false;
 
     const next = () => {
       if (i >= steps.length) {
@@ -1247,10 +1280,6 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[], bet: number, unig
         playDoorbellRing();
         doorbellRang = true;
       }
-      if (!unigleeTriggered && !uniGleeTeaseSighted && step.grid.flat().some((cell) => cell.symbol === "uniglee")) {
-        playUniGleeTease();
-        uniGleeTeaseSighted = true;
-      }
       grid.querySelectorAll<HTMLElement>(".cell").forEach((cell, index) => {
         if (i === 0) {
           cell.classList.add("symbol-pop");
@@ -1260,8 +1289,6 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[], bet: number, unig
         cell.classList.add("beam-drop");
       });
       updateJar(root, step.meterAfter);
-
-      const dwell = stepDwellMs(step, bet, reduced);
 
       if (step.wins.length > 0) {
         const winningCells = new Set<HTMLDivElement>();
@@ -1277,17 +1304,16 @@ function animateSteps(root: HTMLElement, steps: CascadeStep[], bet: number, unig
             }
           }
         }
-        setStatus(root, stepWinCallout(step));
         window.setTimeout(() => {
           winningCells.forEach((cell) => cell.classList.add("beam-up"));
-        }, Math.min(220, Math.round(dwell * 0.3)));
+        }, 220);
         playWinPluck();
       } else {
         playCascadeTick();
       }
 
       i++;
-      window.setTimeout(next, dwell);
+      window.setTimeout(next, 480);
     };
 
     next();
@@ -1478,6 +1504,9 @@ async function runUniGleeMarathonBonus(
       chapter.session.bestCascade,
     );
     saveGameState(state);
+    // Credit XP after each chapter so level-ups (and their coin rewards) are
+    // shown immediately — not batched into one silent grant after the summary.
+    await maybeLevelUpAfterBonus(root, state, chapter.totalSpins);
   }
 
   const lapQuest = await runLapQuestChapter(root, state, mulberry32(seed ^ 0x6a09e667));
@@ -1485,10 +1514,10 @@ async function runUniGleeMarathonBonus(
     totalWin += lapQuest.totalWin;
     totalSpins += lapQuest.totalSpins;
     totalRetriggers += lapQuest.retriggers;
+    await maybeLevelUpAfterBonus(root, state, lapQuest.totalSpins);
   }
   await showUniGleeSummary(root, award, totalWin, totalSpins, totalRetriggers);
   setStatus(root, `UNI-GLEE complete · +${totalWin.toLocaleString()} coins · ${totalSpins} spins played`);
-  await maybeLevelUpAfterBonus(root, state, totalSpins);
 }
 
 function showUniGleeSummary(
@@ -2327,20 +2356,31 @@ function sleep(ms: number): Promise<void> {
  * occurred.  The celebration fires AFTER the bonus summary so it doesn't
  * interrupt the bonus-win reveal.
  */
-async function maybeLevelUpAfterBonus(
+export async function maybeLevelUpAfterBonus(
   root: HTMLElement,
   state: GameState,
   totalSpins: number,
+  /** Injectable for testing; defaults to the real animation. */
+  celebrateFn: (
+    root: HTMLElement,
+    lvl: number,
+    cat: "joey" | "phoebe",
+    coinReward: number,
+  ) => Promise<void> = showLevelUpCelebration,
 ): Promise<void> {
   const { levelBefore, levelAfter } = applyBonusSpinXp(state, totalSpins);
   if (levelAfter > levelBefore) {
-    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
-    const coinReward = 200 * levelAfter;
-    state.balance += coinReward;
     const chip = root.querySelector<HTMLElement>(".coin-chip");
-    if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
-    saveGameState(state);
-    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
+    // Celebrate each crossed level sequentially so no intermediate level-up
+    // (and its coin reward) is silently skipped.
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
+      const coinReward = 200 * lvl;
+      state.balance += coinReward;
+      if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
+      saveGameState(state);
+      await celebrateFn(root, lvl, cat, coinReward);
+    }
   } else {
     saveGameState(state);
   }

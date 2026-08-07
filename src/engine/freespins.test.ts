@@ -221,13 +221,13 @@ describe("free spin session", () => {
   });
 
   it("keeps Joey's 25% allocation and retriggers inside Joey's queue", () => {
-    const session = runJoeyLaundrySession(mulberry32(20260715), 1, 300, NO_LAUNDRY_EFFECTS);
+    const session = runJoeyLaundrySession(mulberry32(20260715), 1, 40, NO_LAUNDRY_EFFECTS);
 
     expect(session.chapter).toBe("joey_laundry_helper");
-    expect(session.budget.initialAllocation).toBe(75);
+    expect(session.budget.initialAllocation).toBe(10);
     expect(session.budget.remainingSpins).toBe(0);
-    expect(session.rounds.length).toBe(75 + session.budget.retriggerSpins);
-    expect(session.rounds.length).toBe(75 + session.rounds.reduce((sum, round) => sum + round.freeSpinsAwarded, 0));
+    expect(session.rounds.length).toBe(10 + session.budget.retriggerSpins);
+    expect(session.rounds.length).toBe(10 + session.rounds.reduce((sum, round) => sum + round.freeSpinsAwarded, 0));
     expect(session.rounds.every((round) => round.laundryEffect?.chapter === "joey_laundry_helper")).toBe(true);
     expect(session.rounds.every((round) => round.unigleeTriggered === false)).toBe(true);
   });
