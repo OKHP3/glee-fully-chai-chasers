@@ -59,3 +59,52 @@ describe("playLevelUpFanfare sfxEnabled guard", () => {
     expect(createOscillator).toHaveBeenCalled();
   });
 });
+
+describe("playSpinStart sfxEnabled guard", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.resetModules();
+  });
+
+  it("creates no oscillators when sfxEnabled is false, creates oscillators when true", async () => {
+    const createOscillator = vi.fn(() => ({
+      type: "sine" as OscillatorType,
+      frequency: { value: 440 },
+      connect: vi.fn().mockReturnThis(),
+      start: vi.fn(),
+      stop: vi.fn(),
+    }));
+    const gainNode = {
+      gain: {
+        setValueAtTime: vi.fn(),
+        linearRampToValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn(),
+        setTargetAtTime: vi.fn(),
+      },
+      connect: vi.fn().mockReturnThis(),
+    };
+    const mockCtx = {
+      createOscillator,
+      createGain: vi.fn(() => gainNode),
+      currentTime: 0,
+      state: "running" as AudioContextState,
+      destination: {} as AudioDestinationNode,
+      resume: vi.fn().mockResolvedValue(undefined),
+    };
+
+    function FakeAudioContext() { return mockCtx; }
+    vi.stubGlobal("window", { AudioContext: FakeAudioContext });
+
+    vi.resetModules();
+    const synth = await import("./synth");
+    synth.unlock();
+
+    synth.setSfxEnabled(false);
+    synth.playSpinStart();
+    expect(createOscillator).not.toHaveBeenCalled();
+
+    synth.setSfxEnabled(true);
+    synth.playSpinStart();
+    expect(createOscillator).toHaveBeenCalled();
+  });
+});

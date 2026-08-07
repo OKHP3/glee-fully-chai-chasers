@@ -482,6 +482,9 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
   sparkleBtn.addEventListener("click", () => {
     if (!isUnlocked()) unlock();
     startBaseMusic();
+    // Guard order is intentional: playSpinStart() must come AFTER the
+    // sparkleBtn.disabled return so the chime cannot fire while the reel
+    // is mid-spin or locked. Do not move this call above the guard.
     if (sparkleBtn.disabled) return;
     playSpinStart();
     void runSpin(root, state, sparkleBtn);
