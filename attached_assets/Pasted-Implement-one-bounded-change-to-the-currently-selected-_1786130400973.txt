@@ -1,0 +1,18 @@
+Implement one bounded change to the currently selected footer only: add the “Ice Notes” passive iced-chai almanac card in the empty lower cabinet space below the existing bet/SPARKLE controls.
+
+Visual/content:
+- Keep all existing footer controls, their order, sizing, and behavior unchanged. The card is read-only cabinet dressing, not a button, counter, progress meter, game mechanic, purchase surface, ad, or telemetry.
+- Use a small original decorative CSS/inline-SVG-style icon (no downloaded/generated asset), an “Ice Notes” eyebrow, an ingredient name, and one short original flavor note. Use a fixed in-code set such as Cardamom, Black Tea, Ginger, Star Anise, Oat Milk, Raw Cane Sugar, and Ice. Keep copy clearly atmospheric/original rather than making health or product claims. Iced chai only; no steam, hot chai, mugs, brands, logos, or outside-game toolbox language.
+- Match the existing protected midnight-violet cabinet art and retro-bright palette. Use a restrained teal/mint top accent and a subtle frosted/paper-like dark surface; do not redesign the board, symbols, controls, or asset atlas.
+
+Behavior and responsive requirements:
+- Advance the note once after a spin has fully settled, never on an autonomous timer.
+- Hide the card completely when viewport height is under 600px (including 320×568); do not introduce a collapsed affordance.
+- At 390×844, target about 88px of card height with icon/name on one line and the note below. At 768×1024, target about 128px, preserving attachment to the controls/cabinet rather than spanning the page.
+- Respect prefers-reduced-motion: the usual small transition may be a brief horizontal dissolve, but reduced motion must swap instantly.
+- Keep the icon decorative (aria-hidden) and expose an aria-label such as “Chai ingredient note”. Announce changed content with aria-live=polite only after a user-initiated spin settles. Meet 4.5:1 text contrast and keep the note at least 14px.
+
+Guardrails:
+- Do not change src/engine, math, RTP, spin result types, reel weights, payout behavior, analytics, public assets, or protected board/symbol styling beyond the footer addition.
+- Do not publish, push, sync to GitHub, commit, or add external dependencies.
+- Run the existing test suite and production build. Inspect the completed preview at 320×568, 390×844, and 768×1024, including reduced motion and a normal spin. Then report the changed files, test/build results, and any limitation in this conversation.
