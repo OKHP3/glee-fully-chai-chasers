@@ -3,16 +3,16 @@ name: Git push approach
 description: How to push to github.com/OKHP3/glee-fully-chai-chasers from this workspace.
 ---
 
-Shell `git push` is now the standard approach. The credential helper is configured with:
+Always push via the `gitPush` CodeExecution callback. Never configure `credential.helper` in `.git/config` — the platform detects it and blocks `gitPush` with "credential helpers could access the bearer token".
 
+If `gitPush` fails after a credential helper was accidentally set:
+```bash
+git config --unset credential.helper
 ```
-git config credential.helper '!f() { echo "username=x-access-token"; echo "password=$GITHUB_PAT"; }; f'
-```
+Then use `gitPush` again.
 
-`GITHUB_PAT` is stored as a Replit Secret and is injected into the environment automatically. The config lives in `.git/config` (local, not committed), so it must be re-applied if `.git` is ever recreated.
+**Why:** Replit injects a short-lived HTTPS credential that expires quickly; the platform's managed token (used by `gitPush`) is always fresh and authoritative. Configuring credential.helper conflicts with the platform's token injection.
 
-**Why:** Replit injects a short-lived HTTPS credential that expires; the GITHUB_PAT secret is persistent and controlled by the workspace owner.
+**How to apply:** After any commit, call `gitPush({})` in CodeExecution. Pull from shell with `git fetch && git merge origin/main -X ours --allow-unrelated-histories`; set `git config user.email/name` first if identity is blank.
 
-**How to apply:** If `git push` fails with "Invalid username or token", re-run the git config command above, or use the `gitPush` CodeExecution callback as a fallback.
-
-**Merge strategy (unchanged):** `git merge origin/main -X ours --allow-unrelated-histories` when histories diverge. Set `git config user.email/name` first if git identity is blank.
+**Merge strategy (unchanged):** `git merge origin/main -X ours --allow-unrelated-histories` when histories diverge.
