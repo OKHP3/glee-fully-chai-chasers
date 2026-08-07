@@ -1428,6 +1428,9 @@ async function runUniGleeMarathonBonus(
       chapter.session.bestCascade,
     );
     saveGameState(state);
+    // Credit XP after each chapter so level-ups (and their coin rewards) are
+    // shown immediately — not batched into one silent grant after the summary.
+    await maybeLevelUpAfterBonus(root, state, chapter.totalSpins);
   }
 
   const lapQuest = await runLapQuestChapter(root, state, mulberry32(seed ^ 0x6a09e667));
@@ -1435,10 +1438,10 @@ async function runUniGleeMarathonBonus(
     totalWin += lapQuest.totalWin;
     totalSpins += lapQuest.totalSpins;
     totalRetriggers += lapQuest.retriggers;
+    await maybeLevelUpAfterBonus(root, state, lapQuest.totalSpins);
   }
   await showUniGleeSummary(root, award, totalWin, totalSpins, totalRetriggers);
   setStatus(root, `UNI-GLEE complete · +${totalWin.toLocaleString()} coins · ${totalSpins} spins played`);
-  await maybeLevelUpAfterBonus(root, state, totalSpins);
 }
 
 function showUniGleeSummary(
@@ -2284,13 +2287,17 @@ async function maybeLevelUpAfterBonus(
 ): Promise<void> {
   const { levelBefore, levelAfter } = applyBonusSpinXp(state, totalSpins);
   if (levelAfter > levelBefore) {
-    const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
-    const coinReward = 200 * levelAfter;
-    state.balance += coinReward;
     const chip = root.querySelector<HTMLElement>(".coin-chip");
-    if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
-    saveGameState(state);
-    await showLevelUpCelebration(root, levelAfter, cat, coinReward);
+    // Celebrate each crossed level sequentially so no intermediate level-up
+    // (and its coin reward) is silently skipped.
+    for (let lvl = levelBefore + 1; lvl <= levelAfter; lvl++) {
+      const cat: "joey" | "phoebe" = Math.random() < 0.5 ? "joey" : "phoebe";
+      const coinReward = 200 * lvl;
+      state.balance += coinReward;
+      if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
+      saveGameState(state);
+      await showLevelUpCelebration(root, lvl, cat, coinReward);
+    }
   } else {
     saveGameState(state);
   }
