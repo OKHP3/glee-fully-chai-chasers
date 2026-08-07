@@ -1,6 +1,6 @@
 kind = "video"
 previewPath = "/chai-chasers-video/"
-title = "Glee-fully Chai Chasers — Designathon Video"
+title = "Glee-fully Chai Chasers — Video"
 description = "A 45-second 16:9 animated build-in-public video for the original browser game Glee-fully Chai Chasers. Features the cosmic Pacific-Northwest visual world, real gameplay concepts (Sparkle, cascades, Firefly Cascade, Treat Jar, UniGlee), Replit Design context, and an end card with the public game URL. Built for a Designathon showcase."
 version = "1.0.0"
 id = "artifacts/chai-chasers-video"

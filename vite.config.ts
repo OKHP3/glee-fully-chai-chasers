@@ -9,13 +9,16 @@ export default defineConfig({
   build: { target: "es2020" },
   server: {
     host: "0.0.0.0",
-    port: 5000,
+    port: Number(process.env.PORT) || 5000,
     strictPort: true,
     allowedHosts: true,
+    watch: {
+      ignored: ["**/.local/**", "**/node_modules/.pnpm/**"],
+    },
   },
   preview: {
     host: "0.0.0.0",
-    port: 5000,
+    port: Number(process.env.PORT) || 5000,
     strictPort: true,
     allowedHosts: true,
   },
