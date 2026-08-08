@@ -1,5 +1,3 @@
-**DRAFT — DO NOT PUBLISH BEFORE 2026-07-17**
-
 # The story behind Glee-fully Chai Chasers
 
 ## The idea

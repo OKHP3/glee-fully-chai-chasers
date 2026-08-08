@@ -55,5 +55,6 @@ __pycache__/
 .github/instructions/nx.instructions.md
 
 # Replit
+attached_assets/
 .cache/
 .local/
