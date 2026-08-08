@@ -107,61 +107,28 @@ import {
   unlock,
 } from "../audio/synth";
 import { isBaseMusicRunning, MUSIC_VOLUME_MAX, setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
+import { ICE_NOTES, nextIceNoteIndex } from "./ice-notes";
 
 let statusTimeout: number | undefined;
+let iceNoteIdx = Math.floor(Math.random() * ICE_NOTES.length);
 
-// ── Ice Notes almanac ─────────────────────────────────────────────────────
-// Passive cabinet card — read-only, advances once per settled spin, no game math.
-
-const ICE_NOTES = [
-  {
-    name: "Cardamom",
-    icon: `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="ice-notes-icon"><ellipse cx="10" cy="10" rx="5" ry="7.5" stroke="var(--cc-mint)" stroke-width="1.4" fill="rgba(159,232,197,0.10)"/><line x1="10" y1="2.5" x2="10" y2="17.5" stroke="var(--cc-mint)" stroke-width="0.8" opacity="0.6"/><line x1="7.2" y1="4" x2="7.2" y2="16" stroke="var(--cc-mint)" stroke-width="0.8" opacity="0.4"/><line x1="12.8" y1="4" x2="12.8" y2="16" stroke="var(--cc-mint)" stroke-width="0.8" opacity="0.4"/></svg>`,
-    note: "The flavour lives in the papery hull surrounding each tiny seed — the seeds themselves carry far less.",
-  },
-  {
-    name: "Black Tea",
-    icon: `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="ice-notes-icon"><path d="M10 2 C14 5 16 10 13 16 C11 19 9 19 7 16 C4 10 6 5 10 2Z" stroke="var(--cc-mint)" stroke-width="1.3" fill="rgba(159,232,197,0.10)"/><line x1="10" y1="4" x2="10" y2="17" stroke="var(--cc-mint)" stroke-width="0.8" opacity="0.6"/></svg>`,
-    note: "Steeping longer deepens colour before taste — most of the flavour extracts within the first two minutes.",
-  },
-  {
-    name: "Ginger",
-    icon: `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="ice-notes-icon"><path d="M4 13 Q7 11 10 11 Q13 11 16 8" stroke="var(--cc-butter)" stroke-width="2" stroke-linecap="round"/><path d="M10 11 Q11 8 13 6" stroke="var(--cc-butter)" stroke-width="1.5" stroke-linecap="round"/><path d="M10 11 Q9 14 7 15.5" stroke="var(--cc-butter)" stroke-width="1.5" stroke-linecap="round"/><circle cx="4" cy="13" r="1.5" fill="var(--cc-butter)" opacity="0.7"/><circle cx="16" cy="8" r="1.5" fill="var(--cc-butter)" opacity="0.7"/><circle cx="13" cy="6" r="1.5" fill="var(--cc-butter)" opacity="0.7"/><circle cx="7" cy="15.5" r="1.5" fill="var(--cc-butter)" opacity="0.7"/></svg>`,
-    note: "A rhizome, not a root — it grows sideways underground, branching outward joint by joint through each season.",
-  },
-  {
-    name: "Star Anise",
-    icon: `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="ice-notes-icon"><circle cx="10" cy="10" r="2" fill="var(--cc-butter)" opacity="0.9"/><g stroke="var(--cc-butter)" stroke-width="1.3" stroke-linecap="round" opacity="0.8"><line x1="10" y1="3" x2="10" y2="8"/><line x1="10" y1="12" x2="10" y2="17"/><line x1="3" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="17" y2="10"/><line x1="5.2" y1="5.2" x2="8.6" y2="8.6"/><line x1="11.4" y1="11.4" x2="14.8" y2="14.8"/><line x1="14.8" y1="5.2" x2="11.4" y2="8.6"/><line x1="8.6" y1="11.4" x2="5.2" y2="14.8"/></g></svg>`,
-    note: "Technically a fruit — each of its eight points holds one shiny seed and a small pocket of sweet, fragrant oil.",
-  },
-  {
-    name: "Oat Milk",
-    icon: `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="ice-notes-icon"><path d="M10 3 C10 3 15.5 9.5 15.5 13 A5.5 5.5 0 0 1 4.5 13 C4.5 9.5 10 3 10 3Z" stroke="var(--cc-mint)" stroke-width="1.3" fill="rgba(159,232,197,0.10)"/><ellipse cx="8.2" cy="12" rx="1" ry="2" fill="rgba(255,255,255,0.18)" transform="rotate(-20 8.2 12)"/></svg>`,
-    note: "Made by soaking rolled oats in cold water and straining — the creamy colour comes from the suspended starches.",
-  },
-  {
-    name: "Raw Cane Sugar",
-    icon: `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="ice-notes-icon"><polygon points="10,2 16.2,5.8 16.2,13.2 10,17 3.8,13.2 3.8,5.8" stroke="var(--cc-butter)" stroke-width="1.3" fill="rgba(245,213,118,0.10)"/><line x1="10" y1="5" x2="10" y2="14" stroke="var(--cc-butter)" stroke-width="0.7" opacity="0.45"/><line x1="6.5" y1="7" x2="13.5" y2="11.5" stroke="var(--cc-butter)" stroke-width="0.7" opacity="0.45"/><line x1="13.5" y1="7" x2="6.5" y2="11.5" stroke="var(--cc-butter)" stroke-width="0.7" opacity="0.45"/></svg>`,
-    note: "Molasses is what makes it golden — refining removes the molasses, while raw sugar keeps a trace of it behind.",
-  },
-  {
-    name: "Ice",
-    icon: `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="ice-notes-icon"><rect x="4" y="6" width="12" height="11" rx="2" stroke="#a8d8f0" stroke-width="1.3" fill="rgba(168,216,240,0.10)"/><path d="M4 9.5 L16 9.5M4 13 L16 13" stroke="#a8d8f0" stroke-width="0.7" opacity="0.45"/><path d="M8 6 L8 17M12 6 L12 17" stroke="#a8d8f0" stroke-width="0.7" opacity="0.45"/><path d="M5.5 4 L10 6 L14.5 4" stroke="#a8d8f0" stroke-width="1" stroke-linejoin="round" opacity="0.7"/></svg>`,
-    note: "Chai poured over a full glass of ice keeps drawing flavour for the first few minutes of slow, cold steep.",
-  },
-] as const;
-
-let iceNoteIdx = 0;
-
-function iceNotesBodyHtml(idx: number): string {
-  const note = ICE_NOTES[idx % ICE_NOTES.length];
+function iceNotesBodyHtml(index: number): string {
+  const note = ICE_NOTES[index];
   return `
     <p class="ice-notes-eyebrow">ICE NOTES</p>
     <div class="ice-notes-header">
-      ${note.icon}
-      <span class="ice-notes-name">${note.name}</span>
+      <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true">
+        <path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor" />
+      </svg>
+      <span class="ice-notes-name">${note.ingredient}</span>
     </div>
-    <p class="ice-notes-text">${note.note}</p>
+    <p class="ice-notes-text">${note.fact}</p>
+    <dl class="ice-notes-profile">
+      <div><dt>Flavor</dt><dd>${note.flavor}</dd></div>
+      <div><dt>Chai role</dt><dd>${note.chaiRole}</dd></div>
+      <div><dt>Source</dt><dd>${note.source}</dd></div>
+      <div><dt>Gathering</dt><dd>${note.harvest}</dd></div>
+    </dl>
   `;
 }
 
@@ -170,13 +137,13 @@ function iceNotesCardHtml(): string {
 }
 
 async function advanceIceNote(root: HTMLElement): Promise<void> {
-  iceNoteIdx = (iceNoteIdx + 1) % ICE_NOTES.length;
+  iceNoteIdx = nextIceNoteIndex(iceNoteIdx);
   const card = root.querySelector<HTMLElement>("#ice-notes-card");
   if (!card) return;
   const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
   if (!reduced) {
     card.classList.add("ice-notes-card--fading");
-    await new Promise<void>(r => setTimeout(r, 200));
+    await new Promise<void>((resolve) => setTimeout(resolve, 200));
   }
   card.innerHTML = iceNotesBodyHtml(iceNoteIdx);
   if (!reduced) card.classList.remove("ice-notes-card--fading");
