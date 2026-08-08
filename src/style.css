@@ -1398,23 +1398,20 @@ body {
   50% { filter: brightness(1.25); }
 }
 
-/* ── Ice Notes almanac card ──────────────────────────────────────────────── */
-/* Read-only atmospheric cabinet panel; advances once per settled spin.       */
-/* Hidden below 600px viewport height (e.g. 320×568). No game mechanic.       */
-
+/* Read-only Ice Notes footer: atmospheric ingredient almanac, never game math. */
 .ice-notes-card {
   margin: 0 8px 6px;
-  padding: 10px 12px 10px;
-  border-radius: 14px;
-  border-top: 2px solid rgba(159, 232, 197, 0.38);
-  background: rgba(26, 20, 58, 0.70);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  padding: 10px 12px;
+  min-height: 88px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 5px;
-  min-height: 88px;
-  box-sizing: border-box;
+  border-top: 2px solid rgba(159, 232, 197, 0.38);
+  border-radius: 14px;
+  background: rgba(26, 20, 58, 0.70);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   opacity: 1;
   transition: opacity 200ms ease;
 }
@@ -1422,59 +1419,58 @@ body {
 
 .ice-notes-eyebrow {
   margin: 0;
+  color: var(--cc-mint);
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--cc-mint);
-  opacity: 0.72;
   line-height: 1;
+  letter-spacing: 0.16em;
+  opacity: 0.72;
 }
 
-.ice-notes-header {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+.ice-notes-header { display: flex; align-items: center; gap: 7px; }
+
+.ice-notes-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--cc-mint); }
+
+.ice-notes-name { color: var(--cc-butter); font-size: 15px; font-weight: 700; line-height: 1.1; }
+
+.ice-notes-text { margin: 0; color: rgba(245, 213, 118, 0.82); font-size: 14px; line-height: 1.4; }
+
+.ice-notes-profile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 10px;
+  margin: 1px 0 0;
 }
 
-.ice-notes-icon {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-}
+.ice-notes-profile div { min-width: 0; }
 
-.ice-notes-name {
-  font-size: 15px;
+.ice-notes-profile dt {
+  color: var(--cc-mint);
+  font-size: 8px;
   font-weight: 700;
-  color: var(--cc-butter);
+  letter-spacing: 0.08em;
   line-height: 1.1;
+  text-transform: uppercase;
+  opacity: 0.75;
 }
 
-.ice-notes-text {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: rgba(245, 213, 118, 0.82);
+.ice-notes-profile dd {
+  margin: 1px 0 0;
+  color: rgba(245, 213, 118, 0.9);
+  font-size: 10px;
+  line-height: 1.2;
 }
-
-/* Hide entirely when there is not enough vertical room (e.g. 320×568). */
 @media (max-height: 599px) {
   .ice-notes-card { display: none; }
 }
 
-/* Wider/taller viewports get a slightly roomier card. */
 @media (min-width: 600px) {
-  .ice-notes-card {
-    min-height: 128px;
-    padding: 14px 16px;
-    gap: 8px;
-  }
+  .ice-notes-card { min-height: 128px; padding: 14px 16px; gap: 8px; }
   .ice-notes-name { font-size: 17px; }
   .ice-notes-text { font-size: 15px; }
-  .ice-notes-icon { width: 27px; height: 27px; }
+  .ice-notes-icon { width: 22px; height: 22px; }
+  .ice-notes-profile dd { font-size: 11px; }
 }
-
-/* Honour the user's motion preference — swap note content instantly. */
 @media (prefers-reduced-motion: reduce) {
   .ice-notes-card { transition: none; }
 }
