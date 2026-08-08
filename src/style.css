@@ -30,7 +30,7 @@ body {
   font-variant-numeric: tabular-nums;
   min-height: 100dvh;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   overscroll-behavior-y: contain;
   background:
     radial-gradient(circle at 50% 8%, rgba(82, 180, 168, 0.16), transparent 32%),
@@ -1398,6 +1398,83 @@ body {
   50% { filter: brightness(1.25); }
 }
 
+/* Read-only Ice Notes footer: atmospheric ingredient almanac, never game math. */
+.ice-notes-card {
+  margin: 0 8px 6px;
+  padding: 10px 12px;
+  min-height: 88px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-top: 2px solid rgba(159, 232, 197, 0.38);
+  border-radius: 14px;
+  background: rgba(26, 20, 58, 0.70);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 1;
+  transition: opacity 200ms ease;
+}
+.ice-notes-card--fading { opacity: 0; }
+
+.ice-notes-eyebrow {
+  margin: 0;
+  color: var(--cc-mint);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  opacity: 0.72;
+}
+
+.ice-notes-header { display: flex; align-items: center; gap: 7px; }
+
+.ice-notes-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--cc-mint); }
+
+.ice-notes-name { color: var(--cc-butter); font-size: 15px; font-weight: 700; line-height: 1.1; }
+
+.ice-notes-text { margin: 0; color: rgba(245, 213, 118, 0.82); font-size: 14px; line-height: 1.4; }
+
+.ice-notes-profile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 10px;
+  margin: 1px 0 0;
+}
+
+.ice-notes-profile div { min-width: 0; }
+
+.ice-notes-profile dt {
+  color: var(--cc-mint);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.ice-notes-profile dd {
+  margin: 1px 0 0;
+  color: rgba(245, 213, 118, 0.9);
+  font-size: 10px;
+  line-height: 1.2;
+}
+@media (max-height: 599px) {
+  .ice-notes-card { display: none; }
+}
+
+@media (min-width: 600px) {
+  .ice-notes-card { min-height: 128px; padding: 14px 16px; gap: 8px; }
+  .ice-notes-name { font-size: 17px; }
+  .ice-notes-text { font-size: 15px; }
+  .ice-notes-icon { width: 22px; height: 22px; }
+  .ice-notes-profile dd { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ice-notes-card { transition: none; }
+}
+
 .settings-row {
   padding: 0 16px max(10px, env(safe-area-inset-bottom));
   text-align: center;
@@ -2186,6 +2263,22 @@ body {
   box-shadow: 0 20px 54px rgba(0,0,0,.55), 0 0 42px rgba(107,214,201,.14);
 }
 .wheel-hero-picture { position: absolute; inset: 0; z-index: 2; display: block; }
+.wheel-mechanical-face {
+  position: absolute;
+  z-index: 4;
+  left: 27%;
+  top: 31%;
+  width: 46%;
+  height: 61%;
+  transform-origin: center;
+  animation: wheel-spin-out 2.4s cubic-bezier(0.15, 0.7, 0.25, 1) forwards;
+  filter: drop-shadow(0 5px 8px rgba(9, 6, 23, .38));
+  pointer-events: none;
+}
+.wheel-mechanical-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.wheel-pin { fill: #f5d576; stroke: #17102d; stroke-width: 1.5; }
+.wheel-pin--major { fill: #fff4e0; stroke: #bd7d20; stroke-width: 2; }
+.wheel-icons { pointer-events: none; }
 .wheel-glow-ring {
   position: absolute;
   z-index: 0;
@@ -2214,7 +2307,7 @@ body {
 
 .wheel-energy-ring {
   position: absolute;
-  z-index: 3;
+  z-index: 5;
   left: 26.5%;
   top: 29%;
   width: 47%;

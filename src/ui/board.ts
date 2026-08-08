@@ -41,7 +41,7 @@ import { collectTreat, consumeForVisit, settleTreatJar, TREAT_JAR_FREE_SPINS } f
 import { mulberry32, productionSeed } from "../engine/rng";
 import {
   runFreeSpinSession,
-  spinWheel,
+  spinWheelLanding,
   wheelWedgeLabel,
   type FreeSpinRoundResult,
   type FreeSpinSessionResult,
@@ -64,6 +64,7 @@ import {
   symbolSvg,
   catSprite,
   wheelHeroArt,
+  wheelMechanicalSvg,
   saucerSvg,
   gardenForegroundSvg,
   fireflyJarSvg,
@@ -106,8 +107,47 @@ import {
   unlock,
 } from "../audio/synth";
 import { isBaseMusicRunning, MUSIC_VOLUME_MAX, setBoldChaiUrgency, setMusicVolume, startBaseMusic, startUniGleeMusic, stopBaseMusic, stopUniGleeMusic } from "../audio/music";
+import { ICE_NOTES, nextIceNoteIndex } from "./ice-notes";
 
 let statusTimeout: number | undefined;
+let iceNoteIdx = Math.floor(Math.random() * ICE_NOTES.length);
+
+function iceNotesBodyHtml(index: number): string {
+  const note = ICE_NOTES[index];
+  return `
+    <p class="ice-notes-eyebrow">ICE NOTES</p>
+    <div class="ice-notes-header">
+      <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true">
+        <path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor" />
+      </svg>
+      <span class="ice-notes-name">${note.ingredient}</span>
+    </div>
+    <p class="ice-notes-text">${note.fact}</p>
+    <dl class="ice-notes-profile">
+      <div><dt>Flavor</dt><dd>${note.flavor}</dd></div>
+      <div><dt>Chai role</dt><dd>${note.chaiRole}</dd></div>
+      <div><dt>Source</dt><dd>${note.source}</dd></div>
+      <div><dt>Gathering</dt><dd>${note.harvest}</dd></div>
+    </dl>
+  `;
+}
+
+function iceNotesCardHtml(): string {
+  return `<aside id="ice-notes-card" class="ice-notes-card" aria-label="Chai ingredient note" aria-live="polite">${iceNotesBodyHtml(iceNoteIdx)}</aside>`;
+}
+
+async function advanceIceNote(root: HTMLElement): Promise<void> {
+  iceNoteIdx = nextIceNoteIndex(iceNoteIdx);
+  const card = root.querySelector<HTMLElement>("#ice-notes-card");
+  if (!card) return;
+  const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+  if (!reduced) {
+    card.classList.add("ice-notes-card--fading");
+    await new Promise<void>((resolve) => setTimeout(resolve, 200));
+  }
+  card.innerHTML = iceNotesBodyHtml(iceNoteIdx);
+  if (!reduced) card.classList.remove("ice-notes-card--fading");
+}
 
 function publicAsset(fileName: string): string {
   return `${import.meta.env.BASE_URL}assets/${fileName}`;
@@ -264,6 +304,8 @@ export function renderBoard(
             <span>SPARKLE!</span>
           </button>
         </footer>
+
+        ${iceNotesCardHtml()}
 
       </div>
     </div>
@@ -850,21 +892,25 @@ async function runSpin(
     if (result.doorbellPanic) await runDoorbellPanic(root, state, result.freeSpinsAwarded);
     else await runWheelAndFreeSpins(root, state, result.freeSpinsAwarded);
     if (treatJarSpinsAwarded > 0) await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
+    await advanceIceNote(root);
     return;
   }
 
   if (boldChaiSpinsAwarded > 0) {
     await runBoldChaiFreeSpins(root, state, boldChaiSpinsAwarded);
     if (treatJarSpinsAwarded > 0) await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
+    await advanceIceNote(root);
     return;
   }
 
   if (treatJarSpinsAwarded > 0) {
     await runTreatJarFreeSpins(root, state, treatJarSpinsAwarded, treatJarAwards);
+    await advanceIceNote(root);
     return;
   }
 
   if (!result.treatTimeBonus) renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
+  await advanceIceNote(root);
 }
 
 /** Runs the dedicated Bold Chai scene inside the existing cabinet footprint. */
@@ -1877,8 +1923,13 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
 
 function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWedge> {
   return new Promise((resolve) => {
-    const wedge = spinWheel(rng);
-    const finalDeg = 1080 + (({ multiplying: 30, keepsake_memory: 150, chai_back: 270, doorbell_panic: 0 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 0);
+    const landing = spinWheelLanding(rng);
+    const wedge = landing.wedge;
+    // The visible three wedges each contain three hidden 40° landing zones.
+    // Rotate the selected sub-zone's centre beneath the fixed pointer.
+    const parentCentre = ({ multiplying: 60, keepsake_memory: 180, chai_back: 300 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 60;
+    const subzoneCentre = parentCentre + (landing.subzone - 1) * 40;
+    const finalDeg = 1080 + ((360 - subzoneCentre) % 360);
 
     const overlay = document.createElement("div");
     overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
@@ -1887,6 +1938,9 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
       <div class="wheel-stage">
         ${wheelHeroArt()}
         <div class="wheel-glow-ring"></div>
+        <div class="wheel-mechanical-face" style="--wheel-final-deg:${finalDeg}deg">
+          ${wheelMechanicalSvg()}
+        </div>
         <div id="wheel-ring" class="wheel-energy-ring" style="--wheel-final-deg:${finalDeg}deg">
           <span></span><span></span><span></span>
         </div>

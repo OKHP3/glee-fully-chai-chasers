@@ -8,6 +8,7 @@ import {
   spinFreeRound,
   spinJoeyLaundryRound,
   spinWheel,
+  spinWheelLanding,
   wheelWedgeLabel,
   type FreeSpinMode,
 } from "./freespins";
@@ -27,6 +28,17 @@ describe("AskJamie wheel", () => {
       expect(["multiplying", "keepsake_memory", "chai_back"]).toContain(wedge);
       expect(wheelWedgeLabel(wedge).length).toBeGreaterThan(0);
     }
+  });
+
+  it("keeps the parent wedge odds separate from the three physical sub-zones", () => {
+    const sequence = (...values: number[]) => {
+      let index = 0;
+      return () => values[Math.min(index++, values.length - 1)];
+    };
+
+    expect(spinWheelLanding(sequence(0.1, 0))).toEqual({ wedge: "multiplying", subzone: 0 });
+    expect(spinWheelLanding(sequence(0.5, 0.34))).toEqual({ wedge: "keepsake_memory", subzone: 1 });
+    expect(spinWheelLanding(sequence(0.9, 0.99))).toEqual({ wedge: "chai_back", subzone: 2 });
   });
 });
 
