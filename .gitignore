@@ -58,3 +58,6 @@ __pycache__/
 attached_assets/
 .cache/
 .local/
+
+# Scratch area for files this mount will not let us delete (git lock files on the Mac clone); safe to remove in Finder
+_to_delete/
