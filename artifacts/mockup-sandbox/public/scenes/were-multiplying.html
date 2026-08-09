@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>We're Multiplying — Free Spins Board — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<!--
+  were-multiplying (Part B scene #3):
+  Free-spin board under the "multiplying" wheel wedge (40/100 weight).
+  Banner: kicker "We're Multiplying", title "Free Spins".
+  One cell gains .multiplier-wild + span.multiplier-badge.
+  Reel placement: ×3 → reel index 2 (zero-based), random row (row 1 shown).
+  Status: "×3 wild on reel 3!" (1-based label in copy).
+  Background: #bg-layer gains .aurora for the aurora ribbon uplift.
+  (Distinct from uniglee-act-were-multiplying.html which is the UniGlee chapter version.)
+-->
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <div class="cc-shell">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
+      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
+      <div id="marquee-status" class="marquee-status">We're Multiplying · Spin 2 of 9</div>
+    </header>
+    <!-- Bonus banner: We're Multiplying kicker, Free Spins title -->
+    <div id="bonus-banner" class="bonus-banner bonus-banner--active" aria-live="polite">
+      <div class="bonus-banner-heading">
+        <span class="bonus-banner-kicker">We're Multiplying</span>
+        <strong class="bonus-banner-title">Free Spins</strong>
+      </div>
+      <div class="bonus-banner-stats">Spin <span id="fs-index">2</span> of <span id="fs-total">9</span> · Round win: <span id="fs-round-win">840</span></div>
+    </div>
+    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>4</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>2</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>0</span></div></div></div>
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- Free-spin panel: section.free-spins-panel; We're Multiplying variant -->
+      <section class="free-spins-panel text-amber-100" aria-label="We're Multiplying bonus spins">
+        <div id="fs-grid" class="reel-grid" role="img" aria-label="Free spin reel board">
+          <!-- Reel 0 -->
+          <div class="reel-col" data-reel="0">
+            <div class="cell" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+            <div class="cell" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div>
+            <div class="cell" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
+            <div class="cell" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+          </div>
+          <!-- Reel 1 -->
+          <div class="reel-col" data-reel="1">
+            <div class="cell win-flash" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+            <div class="cell win-flash" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+            <div class="cell" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
+            <div class="cell" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+          </div>
+          <!-- Reel 2: ×3 multiplier wild lands here (reel index 2, row 1) -->
+          <!-- wild_joey from special-symbol-atlas col 1 row 0 -->
+          <div class="reel-col" data-reel="2">
+            <div class="cell win-flash" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+            <div class="cell multiplier-wild" data-row="1" data-symbol="wild_joey">
+              <!-- wild_joey: special-symbol-atlas col 1 row 0, atlas is 4-wide × 2-tall → 400% 200%, position 33.33% 0% -->
+              <span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span>
+              <span class="multiplier-badge" aria-label="3 times wild">×3</span>
+            </div>
+            <div class="cell" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
+            <div class="cell" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
+          </div>
+          <!-- Reel 3 -->
+          <div class="reel-col" data-reel="3">
+            <div class="cell win-flash" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+            <div class="cell" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+            <div class="cell" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+            <div class="cell" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
+          </div>
+          <!-- Reel 4 -->
+          <div class="reel-col" data-reel="4">
+            <div class="cell" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div>
+            <div class="cell" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+            <div class="cell" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+            <div class="cell" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
+          </div>
+        </div>
+        <!-- Status: "×3 wild on reel 3!" (1-based) -->
+        <div id="fs-status" class="status-line" aria-live="polite">×3 wild on reel 3!</div>
+      </section>
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:60%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">We're Multiplying · 2 / 9 spins · +840 coins</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+  </div>
+</div>
+</body>
+</html>
