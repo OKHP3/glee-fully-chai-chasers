@@ -380,7 +380,7 @@ body {
     gap: 7px;
     text-align: center;
   }
-  .chai-splash__step-label { max-width: 80px; font-size: 10px; }
+  .chai-splash__step-label { font-size: 10px; white-space: nowrap; }
   .chai-splash__orb { width: 22rem; height: 22rem; top: 5%; right: -20%; }
 }
 
