@@ -1,56 +1,46 @@
+const base = import.meta.env.BASE_URL;
+
 export default function Slide04Gameplay() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden"
       style={{ background: 'linear-gradient(150deg, #0D0722 0%, #18093C 100%)' }}
     >
-      {/* Mint glow right */}
+      {/* Right decorative zone: reel symbol grid */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 42% 55% at 82% 48%, rgba(94,212,196,0.08) 0%, transparent 65%)',
-        }}
-      />
-
-      {/* Right decorative zone: ghost stat */}
-      <div
-        className="absolute top-0 right-0 bottom-0 flex flex-col items-center justify-center overflow-hidden"
-        style={{ width: '34%' }}
+        className="absolute top-0 right-0 bottom-0 flex items-center justify-center overflow-hidden"
+        style={{ width: '40%' }}
       >
+        {/* Soft edge vignette so image fades into the bg */}
         <div
-          className="font-display"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            fontSize: '11vw',
-            fontWeight: 900,
-            lineHeight: 1,
-            letterSpacing: '-0.04em',
-            color: 'rgba(94,212,196,0.09)',
-            userSelect: 'none',
-            pointerEvents: 'none',
+            background:
+              'linear-gradient(90deg, #0D0722 0%, rgba(13,7,34,0.5) 18%, transparent 40%), ' +
+              'linear-gradient(0deg, #0D0722 0%, rgba(13,7,34,0.4) 12%, transparent 30%), ' +
+              'linear-gradient(180deg, #0D0722 0%, rgba(13,7,34,0.4) 12%, transparent 30%)',
+            zIndex: 2,
           }}
-        >
-          5×4
-        </div>
-        <div
-          className="font-body"
+        />
+        <img
+          src={`${base}standard-symbol-atlas.png`}
+          alt="Game reel symbols"
           style={{
-            fontSize: '1.5vw',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            fontWeight: 600,
-            color: 'rgba(94,212,196,0.2)',
-            marginTop: '0.5vh',
+            width: '38vw',
+            height: '38vw',
+            objectFit: 'cover',
+            mixBlendMode: 'screen',
+            opacity: 0.45,
+            position: 'relative',
+            zIndex: 1,
           }}
-        >
-          reel grid
-        </div>
+        />
       </div>
 
       {/* Left content */}
       <div
         className="absolute top-0 left-0 bottom-0 flex flex-col justify-center"
-        style={{ width: '68%', paddingLeft: '8vw', paddingRight: '3vw' }}
+        style={{ width: '58%', paddingLeft: '8vw', paddingRight: '2vw' }}
       >
         <div
           className="font-body text-accent"
