@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Moonlit Keepsake Trail — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <div class="cc-shell">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
+      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
+      <div class="marquee-status">Moonlit Keepsake Trail · Find all 6 pairs</div>
+    </header>
+    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>7</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>1</span></div></div></div>
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- Keepsake Memory scene — sits inside .cabinet-frame, hides the reel-grid -->
+      <section class="keepsake-memory-scene" aria-label="Moonlit Keepsake Trail memory bonus">
+        <div class="keepsake-trail-backdrop" aria-hidden="true">
+          <svg viewBox="0 0 500 320" preserveAspectRatio="none" style="width:100%;height:100%;position:absolute;inset:0">
+            <defs><linearGradient id="ktf" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#573c78"/><stop offset=".55" stop-color="#29204f"/><stop offset="1" stop-color="#171335"/></linearGradient></defs>
+            <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="#11102b" stroke-width="92" opacity=".58"/>
+            <path d="M-22 304C90 255 83 182 196 190s104 86 194 42 54-119 132-173" fill="none" stroke="#2e1f56" stroke-width="60" opacity=".45"/>
+          </svg>
+        </div>
+        <div class="keepsake-memory-header">
+          <strong>MOONLIT KEEPSAKE TRAIL</strong>
+          <span>Six keepsakes. Twelve stops. One path to follow.</span>
+        </div>
+        <div class="keepsake-memory-status" id="keepsake-memory-status" aria-live="polite">A keepsake is glowing. Find its match.</div>
+        <div class="keepsake-memory-grid" id="keepsake-memory-grid" role="group" aria-label="Twelve keepsake memory cards">
+          <!-- Row 1: cards 0-5 -->
+          <button type="button" class="keepsake-memory-card-button is-matched" data-card-index="0" aria-label="Tumbler matched"><span class="keepsake-memory-card is-revealed"><span class="keepsake-card-face keepsake-card-back" aria-hidden="true"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button is-matched" data-card-index="1" aria-label="Tumbler matched"><span class="keepsake-memory-card is-revealed"><span class="keepsake-card-face keepsake-card-back" aria-hidden="true"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button is-active" data-card-index="2" aria-label="Butterfly revealed"><span class="keepsake-memory-card is-revealed"><span class="keepsake-card-face keepsake-card-back" aria-hidden="true"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="3" aria-label="Hidden card 4"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back" aria-hidden="true"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="4" aria-label="Hidden card 5"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back" aria-hidden="true"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="5" aria-label="Hidden card 6"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back" aria-hidden="true"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></span></span></button>
+          <!-- Row 2: cards 6-11 -->
+          <button type="button" class="keepsake-memory-card-button" data-card-index="6"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="7"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="8"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="9"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="10"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></span></span></button>
+          <button type="button" class="keepsake-memory-card-button" data-card-index="11"><span class="keepsake-memory-card"><span class="keepsake-card-face keepsake-card-back"></span><span class="keepsake-card-face keepsake-card-front"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('/assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></span></span></button>
+        </div>
+        <div class="keepsake-memory-footer">
+          <span id="keepsake-memory-pairs">Pairs 1 / 6</span>
+          <span class="keepsake-mismatch-track" id="keepsake-memory-fails" aria-label="Mismatches 0 of 2">
+            <b>Mismatches</b>
+            <i data-strike="0" aria-label="First mismatch unused"></i>
+            <i data-strike="1" aria-label="Second mismatch unused"></i>
+            <em>0 / 2</em>
+          </span>
+        </div>
+      </section>
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:60%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">Moonlit Keepsake Trail · 1 pair found · Choose next keepsake</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+  </div>
+</div>
+</body>
+</html>
