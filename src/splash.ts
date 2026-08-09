@@ -87,6 +87,15 @@ export function renderSplash(
         </picture>
       </section>
 
+      <footer class="chai-splash__credit" role="contentinfo">
+        <span>OverKill&nbsp;Hill&nbsp;P&sup3;&trade; &middot; Built&nbsp;with&nbsp;<a
+          href="https://replit.com/refer/overkillhillp3/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="chai-splash__credit-replit"
+        >Replit</a></span>
+      </footer>
+
       <section class="chai-splash__content">
         <div class="chai-splash__inner">
           <p class="chai-splash__eyebrow">A cozy cosmic collectible game</p>

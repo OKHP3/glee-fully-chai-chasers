@@ -917,6 +917,47 @@ const STYLES = `
   .hiw-stat__num        { font-size: 1.4rem; }
   .hiw-sym-grid         { grid-template-columns: 1fr 1fr; }
 }
+
+/* Footer */
+.hiw-footer {
+  border-top: 1px solid var(--hiw-border);
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: .5rem;
+  font-size: .72rem;
+  color: var(--hiw-muted);
+}
+.hiw-footer__built {
+  white-space: nowrap;
+}
+.hiw-footer__replit {
+  color: #FF3C00;
+  text-decoration: none;
+  font-weight: 700;
+}
+.hiw-footer__replit:hover,
+.hiw-footer__replit:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+.hiw-footer__copy {
+  text-align: center;
+  white-space: nowrap;
+}
+.hiw-footer__right {
+  text-align: right;
+}
+@media (max-width: 480px) {
+  .hiw-footer {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: .3rem;
+  }
+  .hiw-footer__right { text-align: center; }
+}
 </style>`;
 
 /* ------------------------------------------------------------------ */
@@ -956,6 +997,20 @@ export function renderHowItWorks(container: HTMLElement): void {
       <div class="hiw-win-scene">
         ${sceneThumb('win-celebration.html', 'Win celebration overlay')}
       </div>
+      <footer class="hiw-footer" role="contentinfo">
+        <span class="hiw-footer__built">
+          Built with&nbsp;<a
+            href="https://replit.com/refer/overkillhillp3/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hiw-footer__replit"
+          >Replit</a>
+        </span>
+        <span class="hiw-footer__copy">
+          &copy; ${new Date().getFullYear()} OverKill&nbsp;Hill&nbsp;P&sup3;&trade;
+        </span>
+        <span class="hiw-footer__right">All&nbsp;rights&nbsp;reserved</span>
+      </footer>
     </div>`;
 
   container.appendChild(overlay);
