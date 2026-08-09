@@ -1918,13 +1918,14 @@ body {
   inset: 0;
   z-index: 40;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
   pointer-events: none;
 }
 
 .cat-popin-inner {
-  margin-bottom: 96px;
+  /* Position just below the marquee header, above the top reel row */
+  margin-top: clamp(52px, 9dvh, 80px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1938,8 +1939,8 @@ body {
 }
 
 @keyframes cat-hop-in {
-  0% { transform: translateY(120%) scale(0.8); opacity: 0; }
-  60% { transform: translateY(-8%) scale(1.05); opacity: 1; }
+  0% { transform: translateY(-120%) scale(0.8); opacity: 0; }
+  60% { transform: translateY(6%) scale(1.05); opacity: 1; }
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
