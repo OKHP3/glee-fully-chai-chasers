@@ -120,9 +120,8 @@ function iceNotesBodyHtml(index: number): string {
       <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true">
         <path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor" />
       </svg>
-      <span class="ice-notes-name">${note.ingredient}</span>
+      <span class="ice-notes-name-group"><span class="ice-notes-name">${note.ingredient}</span> <span class="ice-notes-text">${note.fact}</span></span>
     </div>
-    <p class="ice-notes-text">${note.fact}</p>
     <dl class="ice-notes-profile">
       <div><dt>Flavor</dt><dd>${note.flavor}</dd></div>
       <div><dt>Chai role</dt><dd>${note.chaiRole}</dd></div>
