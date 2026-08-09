@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 640" role="img" aria-labelledby="title desc">
+  <title id="title">Empty clear iced chai cup</title>
+  <desc id="desc">Clear plastic cup with ice, ready to receive layered chai fill artwork.</desc>
+  <defs>
+    <linearGradient id="emptyGlass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4e0" stop-opacity=".38"/><stop offset=".52" stop-color="#b9efff" stop-opacity=".16"/><stop offset="1" stop-color="#8ec9ff" stop-opacity=".3"/></linearGradient>
+    <linearGradient id="emptyIce" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d6fff0" stop-opacity=".9"/><stop offset="1" stop-color="#8ec9ff" stop-opacity=".58"/></linearGradient>
+  </defs>
+  <g stroke="#321738" stroke-linejoin="round">
+    <ellipse cx="240" cy="454" rx="136" ry="30" fill="#fff4e0" fill-opacity=".24" stroke-width="7"/>
+    <path d="M105 454h270l-24 139c-4 25-25 43-50 43h-122c-25 0-46-18-50-43z" fill="url(#emptyGlass)" stroke-width="7"/>
+    <path d="M122 473h236l-20 112c-3 18-17 30-35 30H177c-18 0-32-12-35-30z" fill="#fff4e0" fill-opacity=".06" stroke="none"/>
+    <path d="M129 479l-13 105c-3 23 15 42 37 42" fill="none" stroke="#fff4e0" stroke-width="8" stroke-linecap="round" opacity=".62"/>
+    <path d="M351 485l-18 105" fill="none" stroke="#d6fff0" stroke-width="6" stroke-linecap="round" opacity=".7"/>
+    <path d="M158 464l32 16-8 32-35-17z" fill="url(#emptyIce)" stroke-width="4"/>
+    <path d="M214 458l36 8-7 34-37-5z" fill="url(#emptyIce)" stroke-width="4"/>
+    <path d="M274 461l39-10 16 31-37 18z" fill="url(#emptyIce)" stroke-width="4"/>
+    <path d="M177 475l-13 16M233 471l-12 18M298 464l-12 25" stroke="#fff4e0" stroke-width="4" opacity=".8"/>
+    <ellipse cx="240" cy="455" rx="116" ry="17" fill="none" stroke="#d6fff0" stroke-width="4" opacity=".8"/>
+  </g>
+</svg>
