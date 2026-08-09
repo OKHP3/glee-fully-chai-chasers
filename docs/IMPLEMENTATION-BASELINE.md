@@ -172,11 +172,25 @@ Re-measured on this commit, not quoted from another document. Every figure carri
 | Oracle: 8+ cascade mega | 1 in 980 | same |
 | Oracle: UniGlee capture | 1 in 1,370 | same |
 | Oracle: cat pop-in | 1 in 32.3 | same |
-| Full-game RTP | 97.56% over 210,000 paid spins, seeds 1 to 7 | `for s in 1 2 3 4 5 6 7; do npx tsx scripts/sim-agent.ts a$s $s 30000; done` |
-| Full-game RTP, per-seed range | 95.13% to 101.47% | same |
+| Full-game RTP | **98.70%** over 2,000,000 paid spins, seeds 1 to 40 | `for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done` |
+| Full-game RTP, 95% confidence interval | 97.93% to 99.47% | same |
+| Full-game RTP, per-seed sd | 2.49 | same |
+| Full-game RTP, per-seed span | 94.16% to 106.78% | same |
+| Seeds inside the documented 95% to 98% band | 10 of 40 | same |
+| Base layer contribution | 61.05% | same |
+| Bonus layer contribution | 37.65% | same |
 | Capped bonus sessions | 0 | same |
 
-The base oracle measures the base game only. Full-game RTP requires the sim-agent fleet, and the fleet figure is seed-sensitive, so seeds are recorded above.
+Per-bonus RTP contribution over the same fleet: firefly free spins 10.64% (We're Multiplying 5.21%, Moonlit Keepsake Trail 4.28%, Iced Chai Wild Rain 1.15%), UniGlee 7.47% at 1 in 1,229, doorbell panic 4.98%, morning treat time 4.44%, treat jar 4.32%, nighttime treat time 3.87%, bold chai 1.93%.
+
+The base oracle measures the base game only. Full-game RTP requires the sim-agent fleet.
+
+**Two caveats travel with 98.70% and must not be dropped when it is quoted.**
+
+1. **It is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%. The entire confidence interval sits above 98%, and only 10 of 40 seeds land in band. This is a documentation-accuracy question, not a player-facing defect, because the game uses fictional Glee-coins with no purchase, wager, or cash-out. Open as **D8** in `docs/DECISION-LOG.md`. Do not retune the engine to chase the band without Jamie's ruling.
+2. **It assumes a perfect player.** The harness models both interactive bonuses at their ceiling: Bold Chai Pump at a steady six pumps per second for the full 30-second window (`scripts/sim-agent.ts` lines 72 to 79), and the Moonlit Keepsake Trail always completed by a perfect-memory player who always collects the 40-spin handoff (line 183). 98.70% is a generous-play ceiling. Real play sits below it by an unmeasured amount, because no realistic-play variant of the harness exists yet.
+
+Earlier readings of 95.66% and 97.56%, both over seven seeds, were small-sample noise. At a per-seed sd of 2.49, seven seeds cannot resolve a band 3 points wide. Do not restate them.
 
 ### 9.4 Corrections to §4's "planned or only partially visualized" list
 
@@ -196,6 +210,7 @@ The base oracle measures the base game only. Full-game RTP requires the sim-agen
 These are recorded so no tool treats them as settled. None of them is a code defect and none was "fixed" by editing a ruling.
 
 - **UniGlee award size.** S30 and `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` say 300/400/500 initial free spins. The engine awards 40/60/80 (`src/engine/uniglee.ts` line 94, typed in `src/engine/laundry.ts` line 21). Open as **D7** in `docs/DECISION-LOG.md`. Do not change either side until Jamie rules.
+- **Full-game RTP is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%; the converged fleet measures 98.70% with a 95% CI of 97.93% to 99.47%, and only 10 of 40 seeds land in band. The figure also assumes a perfect player on the two interactive bonuses. Open as **D8** in `docs/DECISION-LOG.md`. Documentation-accuracy question, not a player-facing defect. Do not retune to chase the band without a ruling.
 - **Decision numbering.** Two settled rows both carry the label S30. Recorded as a numbering errata note in `docs/DECISION-LOG.md`; both rulings stand and nothing was renumbered.
 - **UniGlee tease mechanic.** The live public page describes a decorative sighting at ~1/850 and a real capture at ~1/4,212, citing decisions S33 and S34 that do not exist. The engine implements neither. Open as **D6**.
 - **`lib/` and `artifacts/`.** Replit workspace scaffolding that nothing under `src/` imports and that never reaches `dist/`. Not implementation guidance. Whether they stay in the repository is an open cleanup item.

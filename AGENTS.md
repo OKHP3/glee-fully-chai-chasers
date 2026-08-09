@@ -112,13 +112,32 @@ Every figure below was produced by running the stated command on this tree, not 
 
 The seeded 200,000-spin oracle in `src/engine/simulation.test.ts` is **green** on all six gates. Note that it measures the **base game only**, at a base RTP near 61%. It does not measure bonus-session RTP, so it cannot by itself confirm the full-game band.
 
-Full-game RTP comes from a second harness, `scripts/sim-agent.ts`, which plays every bonus through the same engine entry points `src/ui/board.ts` uses. Measured 2026-08-09 across 210,000 paid spins on seeds 1 through 7:
+Full-game RTP comes from a second harness, `scripts/sim-agent.ts`, which plays every bonus through the same engine entry points `src/ui/board.ts` uses. Converged figure measured 2026-08-09 across **2,000,000 paid spins**, seeds 1 through 40 at 50,000 spins each:
 
 ```bash
-for s in 1 2 3 4 5 6 7; do npx tsx scripts/sim-agent.ts a$s $s 30000; done
+for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done
 ```
 
-Full-game RTP **97.56%**, inside the 95% to 98% band. Base layer contributes 61.15%, the bonus layer 36.41%. Per-seed totals ran 95.13% to 101.47%, and zero sessions hit the runaway cap. That spread is the honest variance of a game whose rarest event is worth roughly six points of RTP by itself, which also means the fleet figure is seed-sensitive: `README.md` and `content/AUDIT-2026-08-09.md` report 95.66% from a seven-seed fleet whose seeds were never written down. Both figures are in band and neither is wrong, but only a run whose seeds are recorded is reproducible. That is why the rule at the bottom of this file exists.
+| Measure | Value |
+|---|---|
+| Full-game RTP | **98.70%** |
+| 95% confidence interval | 97.93% to 99.47% |
+| Per-seed standard deviation | 2.49 |
+| Per-seed span | 94.16% to 106.78% |
+| Seeds inside the documented 95% to 98% band | **10 of 40** |
+| Base layer contribution | 61.05% |
+| Bonus layer contribution | 37.65% |
+| Capped bonus sessions (runaway check) | 0 |
+
+Per-bonus RTP contribution over the same fleet: firefly free spins 10.64% (We're Multiplying 5.21%, Moonlit Keepsake Trail 4.28%, Iced Chai Wild Rain 1.15%), UniGlee 7.47% at 1 in 1,229, doorbell panic 4.98%, morning treat time 4.44%, treat jar 4.32%, nighttime treat time 3.87%, bold chai 1.93%.
+
+**Two things about this number matter more than the number itself.**
+
+**It is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%. The converged measurement is 98.70%, and the whole confidence interval sits above 98%. Only 10 of 40 seeds land in band. This is a documentation-accuracy problem, not a player-facing defect: the game uses fictional Glee-coins only, with no purchase, wager, or cash-out. It is open as **D8** in `docs/DECISION-LOG.md`. Do not retune the engine to chase the band without Jamie's ruling.
+
+**It assumes a perfect player.** `scripts/sim-agent.ts` models the two interactive bonuses at their ceiling: Bold Chai Pump receives a steady six pumps per second for the entire 30-second window (`scripts/sim-agent.ts` lines 72 to 79), and the Moonlit Keepsake Trail is played by a perfect-memory player who always completes all six pairs and always collects the 40-spin handoff (line 183). **98.70% is therefore a generous-play ceiling. Real play sits below it**, by an amount nobody has measured, because no realistic-play variant of the harness exists yet. Any full-game RTP claim that omits this player model is incomplete.
+
+For the record, this figure replaced two earlier small-sample readings that were both noise: 95.66% over seven unrecorded seeds, and 97.56% over seven recorded seeds. Neither was wrong so much as under-powered. Seven seeds at a per-seed sd of 2.49 cannot resolve a band 3 points wide.
 
 The Moonlit Keepsake Trail feature is covered by the full suite; its human-success-dependent 40-spin handoff remains documented as a combined-RTP consideration. The oracle remains unweakened; do not modify its thresholds, widen its bands, or skip a gate. Any future engine change ships only with all six gates green plus a fresh sim-agent fleet reading.
 
@@ -143,6 +162,10 @@ The Moonlit Keepsake Trail feature is covered by the full suite; its human-succe
 **Never quote a metric from another document in this repository. Re-run it and cite the command.**
 
 That is the whole lesson of the 2026-08 accuracy cleanup. RTP figures, event frequencies, test counts, and spin counts were copied from document to document until five artifacts agreed with each other and none of them agreed with the code. A number that came from another Markdown file is not evidence, no matter how many files repeat it. If you are about to write a percentage, a frequency, or a test count into any file in this repository, run the command that produces it, quote today's output, and record the command and the date next to the number. If a figure depends on random seeds, record the seeds too. If you cannot re-run it, say so and mark the figure as unverified rather than restating it as fact.
+
+**Any RTP or event-frequency figure must ship with the command and the seed range that produced it, and any full-game RTP claim must additionally state its player model.**
+
+This episode is the worked example, so here it is in full. The full-game RTP was reported as 96.1% with no source, then 95.66% over seven seeds nobody wrote down, then 97.56% over seven recorded seeds. All three were quoted as settled fact. The converged value over 2,000,000 spins on seeds 1 to 40 is 98.70%, which is **outside the band every one of those figures was used to confirm**, and it holds only under a perfect-play model for the two interactive bonuses. Three rounds of confident restatement, and the first genuinely powered measurement moved the answer out of band. A seven-seed sample against a per-seed sd of 2.49 was never capable of resolving a 3-point band, but nothing in the documents said so, because none of them recorded sample size, seeds, or player model. Record all three, every time.
 
 The same applies in reverse: when the code and a document disagree, the code is what players experience, but the document may record a real ruling. Do not silently change either one. Note the delta with the source line, and raise it as an open decision for Jamie.
 

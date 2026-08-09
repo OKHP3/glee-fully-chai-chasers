@@ -36,8 +36,12 @@ What is stale is the **simulation gate figure**. The "moved from 93.54% RTP to 9
 | Item | Documented above | Re-measured 2026-08-09 | Command |
 |---|---|---|---|
 | Seeded oracle RTP | 95.91% | **61.08%**, and the oracle is now understood as a **base-game-only** measurement | `npx vitest run src/engine/simulation.test.ts --reporter=verbose` |
-| Full-game RTP, all bonuses played | not measured at the time | **97.56%** over 210,000 paid spins, seeds 1 to 7, per-seed range 95.13% to 101.47% | `for s in 1 2 3 4 5 6 7; do npx tsx scripts/sim-agent.ts a$s $s 30000; done` |
+| Full-game RTP, all bonuses played | not measured at the time | **98.70%** over 2,000,000 paid spins, seeds 1 to 40, 95% CI 97.93% to 99.47%, per-seed span 94.16% to 106.78% | `for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done` |
 
-The confusion worth naming: the pre-retune 95.91% was read as a whole-game figure, but the oracle in `src/engine/simulation.test.ts` only ever measured the base game. Full-game RTP requires `scripts/sim-agent.ts`, which plays every bonus through the same engine entry points `src/ui/board.ts` uses. The approved 95.5% to 96.5% band in this contract should be read against the fleet figure, not the oracle. The current fleet reading is inside the wider 95% to 98% band the project now uses.
+The confusion worth naming: the pre-retune 95.91% was read as a whole-game figure, but the oracle in `src/engine/simulation.test.ts` only ever measured the base game. Full-game RTP requires `scripts/sim-agent.ts`, which plays every bonus through the same engine entry points `src/ui/board.ts` uses.
+
+This contract's approved 95.5% to 96.5% band should therefore be read against the fleet figure, not the oracle, and **the fleet figure does not meet it**. At 98.70% with the whole confidence interval above 98%, the full game now sits above both this contract's band and the project's wider 95% to 98% band. That gap is open as **D8** in `docs/DECISION-LOG.md` and is a documentation-accuracy question, not a player-facing defect. Note also that 98.70% assumes a perfect player on the two interactive bonuses, so it is a generous-play ceiling rather than an expected value.
+
+The Handbag Wild is not the cause. It is one of the smaller contributors, and the fleet attributes the largest shares to firefly free spins at 10.64% and UniGlee at 7.47%. Do not retune this symbol in response to D8 without Jamie's ruling and a fresh fleet measurement.
 
 The tuning contract above is otherwise intact. Any future change to the late-reel location, the 85% landing gate, or the multiplier distribution must still be simulation-backed and must not weaken the oracle.
