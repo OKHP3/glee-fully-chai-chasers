@@ -55,6 +55,12 @@ Style anchor for ALL raster art: "retro-bright mid-century cartoon, flat colors 
 - Consistency rule: generate each character's full pose sheet in a single generation; regenerate whole sheet, never single poses.
 - Reference photos: describe markings in words from `private-work/photo-triage.md` notes. Do NOT upload Glee photos to any external service.
 
+## Produced media
+
+| Asset | Spec | Owner | Provenance | Status |
+|---|---|---|---|---|
+| Chai Chasers showcase video | 45-second 16:9 animated build-in-public promo; 5 scenes; React + Framer Motion export from Replit Design (Chai-Chasers-Showcase project) | Replit Agent + Jamie Hill, 2026-08-07 | original; all source images original (see rows above); background music original (lo-fi folk, generated) | ☑ `artifacts/chai-chasers-video/public/chai-chasers-showcase.mp4` |
+
 ## Provenance audit (release gate)
 
 - [ ] Every shipped file traceable to a row above

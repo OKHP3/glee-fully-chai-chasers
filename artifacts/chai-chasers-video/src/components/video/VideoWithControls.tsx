@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronDown, ChevronUp, Repeat, Volume2, VolumeX } from 'lucide-react';
+import { ChevronDown, ChevronUp, Download, Repeat, Volume2, VolumeX } from 'lucide-react';
+
+const VIDEO_FILE = `${import.meta.env.BASE_URL}chai-chasers-showcase.mp4`;
 import VideoTemplate, { SCENE_DURATIONS } from './VideoTemplate';
 import { useSceneControls } from './useSceneControls';
 
@@ -18,6 +20,7 @@ interface ControlBarProps {
   onToggleMute: () => void;
   onJumpTo: (index: number) => void;
   onToggleCollapsed: () => void;
+  downloadHref: string;
 }
 
 function ProgressSegments({
@@ -83,6 +86,7 @@ function ControlBar({
   onToggleMute,
   onJumpTo,
   onToggleCollapsed,
+  downloadHref,
 }: ControlBarProps) {
   return (
     <div
@@ -120,6 +124,16 @@ function ControlBar({
       >
         {muted ? <VolumeX className="w-8 h-8" /> : <Volume2 className="w-8 h-8" />}
       </button>
+
+      <a
+        href={downloadHref}
+        download="chai-chasers-showcase.mp4"
+        className="w-14 h-14 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors rounded-lg shrink-0"
+        title="Download MP4"
+        aria-label="Download MP4"
+      >
+        <Download className="w-8 h-8" />
+      </a>
 
       <div className="w-px self-stretch bg-white/15" aria-hidden="true" />
 
@@ -200,8 +214,23 @@ export default function VideoWithControls() {
 
   const barVisible = !collapsed || hovering || tapPinned;
 
-  // Export path: no props, preserves recording markers
-  if (!isIframed) return <VideoTemplate />;
+  // Export path: direct browser view (not iframed) — show animation with a download button
+  if (!isIframed) {
+    return (
+      <div className="relative w-full h-screen">
+        <VideoTemplate />
+        <a
+          href={VIDEO_FILE}
+          download="chai-chasers-showcase.mp4"
+          className="absolute top-4 right-4 z-50 flex items-center gap-2 bg-black/50 hover:bg-black/70 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          aria-label="Download MP4"
+        >
+          <Download className="w-4 h-4" />
+          Download MP4
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-screen">
@@ -235,6 +264,7 @@ export default function VideoWithControls() {
           onToggleMute={() => setMuted(m => !m)}
           onJumpTo={jumpTo}
           onToggleCollapsed={handleToggleCollapsed}
+          downloadHref={VIDEO_FILE}
         />
       </div>
     </div>
