@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, readdirSync, writeFileSync } from "fs";
 import path from "path";
 import glob from "fast-glob";
 import chokidar from "chokidar";
@@ -153,6 +153,29 @@ export function mockupPreviewPlugin(): Plugin {
         if (isMockupFile(file)) {
           void onFileAddedOrRemoved();
         }
+      });
+
+      // ── Scenes listing endpoint ────────────────────────────────────────────
+      // Returns a sorted JSON array of every .html filename under public/scenes/
+      // at request-time so no restart is needed when new scenes are added.
+      viteServer.middlewares.use((req, res, next) => {
+        const requestUrl = new URL(req.url ?? "/", "http://127.0.0.1");
+        if (req.method === "GET" && requestUrl.pathname.endsWith("/api/scenes")) {
+          const scenesDir = path.join(root, "public", "scenes");
+          try {
+            const files = readdirSync(scenesDir)
+              .filter((f) => f.endsWith(".html"))
+              .sort();
+            res.setHeader("Content-Type", "application/json");
+            res.setHeader("Cache-Control", "no-store");
+            res.end(JSON.stringify(files));
+          } catch {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: "Could not read scenes directory" }));
+          }
+          return;
+        }
+        next();
       });
 
       viteServer.middlewares.use((req, res, next) => {
