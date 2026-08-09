@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Splash — Standard — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#070d20}</style>
+</head>
+<body>
+<!-- #1 splash-standard: default boot screen, showBirthday=false -->
+<div class="chai-splash" style="min-height:900px;height:900px">
+  <div class="chai-splash__orb"></div>
+  <section class="chai-splash__art" aria-label="Joey and Phoebe under a cosmic chai sky">
+    <picture class="askjamie-picture">
+      <source type="image/webp" srcset="../assets/optimized/chai-chase-splash.webp"/>
+      <img src="../assets/chai-chase-splash.png" alt="Illustrated cats Joey and Phoebe with cosmic iced chai treasures"/>
+    </picture>
+  </section>
+  <footer class="chai-splash__credit" role="contentinfo">
+    <span>OverKill&nbsp;Hill&nbsp;P&#179;&trade; &middot; Built&nbsp;with&nbsp;<a
+      href="https://replit.com/refer/overkillhillp3/"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="chai-splash__credit-replit"
+    >Replit</a></span>
+  </footer>
+  <section class="chai-splash__content">
+    <div class="chai-splash__inner">
+      <p class="chai-splash__eyebrow">A cozy cosmic collectible game</p>
+      <h1 class="chai-splash-title">Glee-fully<br>Chai Chasers</h1>
+      <p class="chai-splash__hook">Chase sparkling treasures with Joey and Phoebe while building the perfect iced chai.</p>
+      <div class="chai-splash__actions">
+        <button class="chai-splash__primary" type="button">Start the Chai Chase</button>
+        <button class="chai-splash__secondary" type="button">How it works ↗</button>
+      </div>
+      <div class="chai-splash__loop" aria-label="The three-step chai chase loop">
+        <div class="chai-splash__step">
+          <span class="chai-splash__step-icon">✦</span>
+          <span class="chai-splash__step-label">Sparkle</span>
+        </div>
+        <span class="chai-splash__connector" aria-hidden="true"></span>
+        <div class="chai-splash__step">
+          <span class="chai-splash__step-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.2 10.5c-1.7.2-3.3-1.8-2.8-3.4.4-1.4 1.8-1.8 2.8-.7.8.9.8 2.9 0 4.1Zm7.6 0c1.7.2 3.3-1.8 2.8-3.4-.4-1.4-1.8-1.8-2.8-.7-.8.9-.8 2.9 0 4.1ZM5.7 14c-1.3-.9-3.3-.2-3.4 1.4-.1 1.3 1.3 2.2 2.5 1.7 1.1-.4 1.8-2.3.9-3.1Zm12.6 0c1.3-.9 3.3-.2 3.4 1.4.1 1.3-1.3 2.2-2.5 1.7-1.1-.4-1.8-2.3-.9-3.1Zm-6.3-1.8c-2.8 0-5.5 2.4-5.1 5 .3 2.2 3 2.2 5.1 1.2 2.1 1 4.8 1 5.1-1.2.4-2.6-2.3-5-5.1-5Z"/></svg>
+          </span>
+          <span class="chai-splash__step-label">Collect treats</span>
+        </div>
+        <span class="chai-splash__connector" aria-hidden="true"></span>
+        <div class="chai-splash__step">
+          <span class="chai-splash__step-icon">★</span>
+          <span class="chai-splash__step-label">Grow the Cascade</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
