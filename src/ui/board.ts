@@ -524,6 +524,18 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
   wireAskJamie(root, state);
 
   sparkleBtn.addEventListener("click", () => {
+    // SPARKLE doubles as a universal overlay-dismisser. While any summary
+    // overlay is open the overlays re-enable this button so these checks
+    // can fire. Always check before running a spin.
+    const continueBtn = root.querySelector<HTMLButtonElement>(
+      "#bonus-continue, #uniglee-summary-continue",
+    );
+    if (continueBtn) { continueBtn.click(); return; }
+    const levelUpOverlay = root.querySelector<HTMLElement>(
+      ".levelup-overlay:not(.levelup-overlay--out)",
+    );
+    if (levelUpOverlay) { levelUpOverlay.click(); return; }
+
     if (!isUnlocked()) unlock();
     startBaseMusic();
     // Guard order is intentional: playSpinStart() must come AFTER the
@@ -1594,16 +1606,13 @@ function showUniGleeSummary(
     playBonusFanfare();
 
     const continueBtn = overlay.querySelector<HTMLButtonElement>("#uniglee-summary-continue");
+    // Re-enable SPARKLE so the wireControls handler can detect this overlay
+    // and use it as an alternative dismiss path. The button is still disabled
+    // for spinning because runSpin has not returned yet.
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
-    const onSparkle = (e: Event) => {
-      if (!sparkleBtn?.contains(e.target as Node)) return;
-      e.stopImmediatePropagation();
-      continueBtn?.click();
-    };
-    root.addEventListener("click", onSparkle, { capture: true });
+    if (sparkleBtn) sparkleBtn.disabled = false;
 
     continueBtn?.addEventListener("click", () => {
-      root.removeEventListener("click", onSparkle, { capture: true });
       overlay.remove();
       resolve();
     }, { once: true });
@@ -2407,16 +2416,13 @@ function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: numbe
     playBonusFanfare();
 
     const continueBtn = overlay.querySelector<HTMLButtonElement>("#bonus-continue")!;
+    // Re-enable SPARKLE so the wireControls handler can detect this overlay
+    // and use it as an alternative dismiss path. The button is still disabled
+    // for spinning because runSpin has not returned yet.
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
-    const onSparkle = (e: Event) => {
-      if (!sparkleBtn?.contains(e.target as Node)) return;
-      e.stopImmediatePropagation();
-      continueBtn.click();
-    };
-    root.addEventListener("click", onSparkle, { capture: true });
+    if (sparkleBtn) sparkleBtn.disabled = false;
 
     continueBtn.addEventListener("click", () => {
-      root.removeEventListener("click", onSparkle, { capture: true });
       overlay.remove();
       resolve();
     }, { once: true });
@@ -2515,26 +2521,22 @@ function showLevelUpCelebration(
 
     root.appendChild(overlay);
 
+    // Re-enable SPARKLE so the wireControls handler can detect the
+    // level-up overlay and route clicks to dismiss() via overlay.click().
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
+    if (sparkleBtn) sparkleBtn.disabled = false;
 
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
-      root.removeEventListener("click", onSparkle, { capture: true });
       overlay.classList.add("levelup-overlay--out");
       overlay.addEventListener("animationend", () => {
         overlay.remove();
         resolve();
       }, { once: true });
     };
-    const onSparkle = (e: Event) => {
-      if (!sparkleBtn?.contains(e.target as Node)) return;
-      e.stopImmediatePropagation();
-      dismiss();
-    };
 
-    root.addEventListener("click", onSparkle, { capture: true });
     overlay.addEventListener("click", dismiss, { once: true });
     window.setTimeout(dismiss, 3600);
   });
