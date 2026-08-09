@@ -22,8 +22,12 @@ export const TREAT_TIME_WILD_RANGE = { min: 0, max: 4 } as const;
 
 /**
  * Rolls a Treat Time trigger. With the default "either" mode, the two
- * frequencies remain independently readable: 1/100 morning and 1/300
+ * frequencies remain independently readable: 1/250 morning and 1/500
  * nighttime, with the rarer mode taking precedence if its slice lands.
+ *
+ * Comment corrected 2026-08-09: it previously read 1/100 and 1/300, which
+ * were the pre-retune rates. The constants above are authoritative and were
+ * not changed.
  */
 export function rollTreatTimeTrigger(
   rng: Rng,
