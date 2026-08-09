@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
 import { useEffect, useMemo, useState } from 'react';
+import standardAtlas from '@game-assets/atlases/standard-symbol-atlas.webp';
 
 // Stable per-tile random values — computed once at module load, never during render
 const TILE_COUNT = 20;
@@ -9,6 +10,16 @@ const TILE_DATA = Array.from({ length: TILE_COUNT }, () => ({
   dropDelay: Math.random() * 0.5,
   beamDelay: Math.random() * 1.5,
 }));
+
+// Coordinates mirror src/ui/asset-manifest.ts. The reel is intentionally
+// rendered from the production atlas, never from emoji or placeholder art.
+const BOARD_SYMBOLS = [
+  [0, 0], [1, 0], [2, 0], [3, 0],
+  [0, 1], [1, 1], [2, 1], [3, 1],
+  [0, 2], [1, 2], [2, 2], [3, 2],
+  [0, 3], [1, 3], [2, 3], [3, 3],
+  [0, 1], [1, 0], [2, 3], [3, 0],
+] as const;
 
 export function Scene2() {
   const [phase, setPhase] = useState(0);
@@ -24,8 +35,6 @@ export function Scene2() {
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
-
-  const symbols = ['☕', '🧶', '🦋', '📼', '✨', '🐾', '🔮', '🌟'];
 
   return (
     <motion.div
@@ -50,7 +59,7 @@ export function Scene2() {
         </motion.div>
       </motion.div>
 
-      {/* Cascading Board (Abstract Representation) */}
+      {/* Production-symbol board: a visual shorthand for the live 5×4 game. */}
       <div className="absolute top-[20vh] w-[60vw] h-[50vh] grid grid-cols-5 gap-4 perspective-[1000px]">
         {TILE_DATA.map((tile, i) => (
           <motion.div
@@ -79,7 +88,15 @@ export function Scene2() {
               ease: 'circOut'
             }}
           >
-            {symbols[i % symbols.length]}
+            <span
+              className="w-[78%] h-[78%] bg-no-repeat rounded-lg drop-shadow-[0_3px_4px_rgba(0,0,0,0.42)]"
+              style={{
+                backgroundImage: `url(${standardAtlas})`,
+                backgroundSize: '400% 400%',
+                backgroundPosition: `${(BOARD_SYMBOLS[i][0] / 3) * 100}% ${(BOARD_SYMBOLS[i][1] / 3) * 100}%`,
+              }}
+              aria-hidden="true"
+            />
           </motion.div>
         ))}
       </div>

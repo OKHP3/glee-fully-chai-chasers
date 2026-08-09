@@ -1,6 +1,24 @@
 import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
 import { useEffect, useState } from 'react';
+import wheelHeroArt from '@game-assets/optimized/joey-phoebe-wheel.webp';
+import standardAtlas from '@game-assets/atlases/standard-symbol-atlas.webp';
+import specialAtlas from '@game-assets/atlases/special-symbol-atlas.webp';
+
+function TreatPouch({ column, title }: { column: number; title: string }) {
+  return (
+    <span
+      className="block w-14 h-14 bg-no-repeat shrink-0"
+      style={{
+        backgroundImage: `url(${standardAtlas})`,
+        backgroundSize: '400% 400%',
+        backgroundPosition: `${(column / 3) * 100}% 100%`,
+      }}
+      aria-label={title}
+      role="img"
+    />
+  );
+}
 
 export function Scene3() {
   const [phase, setPhase] = useState(0);
@@ -40,7 +58,7 @@ export function Scene3() {
             animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="text-4xl">🐟</div>
+            <TreatPouch column={0} title="Chicken Comets and Salmon Stars" />
             <div>
               <p className="font-bold text-xl text-white">Chicken Comets & Salmon Stars</p>
               <p className="text-slate-300">Phoebe will help for anything!</p>
@@ -53,7 +71,7 @@ export function Scene3() {
             animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="text-4xl">🥩</div>
+            <TreatPouch column={2} title="Bougie Bites" />
             <div>
               <p className="font-bold text-xl text-primary">Bougie Bites</p>
               <p className="text-slate-300">Joey holds out for the good stuff.</p>
@@ -74,26 +92,19 @@ export function Scene3() {
           <span className="text-gradient-magenta text-5xl">Sparkle Wheel</span>
         </h3>
         
-        <div className="relative w-[30vh] h-[30vh]">
-          {/* Wheel */}
+        <div className="relative w-[42vh] h-[34vh] flex items-center justify-center">
+          {/* The production wheel already includes Joey and Phoebe on its rim.
+              Only the surrounding light chase moves, so the cats never spin. */}
           <motion.div
-            className="absolute inset-0 rounded-full border-8 border-white/10"
-            style={{ 
-              background: 'conic-gradient(from 0deg, var(--color-primary) 0 120deg, var(--color-accent) 120deg 240deg, var(--color-success) 240deg 360deg)',
-              boxShadow: '0 0 50px rgba(217, 70, 239, 0.4)'
-            }}
-            animate={
-              phase >= 4 
-                ? { rotate: [0, 1080 + 120] } // Spins 3 times + lands on accent
-                : { rotate: 0 }
-            }
+            className="absolute w-[25vh] h-[25vh] rounded-full border-4 border-dashed border-primary/80"
+            animate={phase >= 4 ? { rotate: 360 } : { rotate: 0 }}
             transition={{ duration: 2.5, ease: [0.2, 0.8, 0.2, 1] }}
           />
-          {/* Center Hub */}
-          <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-bg-dark border-4 border-white z-10" />
-          
-          {/* Pointer */}
-          <div className="absolute top-[-20px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[30px] border-t-white z-20" />
+          <img
+            src={wheelHeroArt}
+            alt="Joey and Phoebe perched on the Sparkle Wheel"
+            className="relative z-10 w-full h-full object-contain drop-shadow-[0_0_28px_rgba(217,70,239,0.45)]"
+          />
         </div>
 
         {/* Results */}
@@ -103,7 +114,7 @@ export function Scene3() {
             animate={phase >= 5 ? { opacity: 1, scale: 1, rotate: 10 } : { opacity: 0 }}
             transition={{ type: 'spring', bounce: 0.5, delay: 0.2 }}
             className="w-24 h-32 bg-contain bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/chai-cup.jpg')` }}
+            style={{ backgroundImage: `url(${specialAtlas})`, backgroundSize: '400% 200%', backgroundPosition: '0% 100%' }}
           />
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.9 }}

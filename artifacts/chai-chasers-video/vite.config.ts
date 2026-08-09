@@ -56,6 +56,10 @@ export default defineConfig({
         '..',
         'attached_assets',
       ),
+      // The promotion reel deliberately reuses the current game's approved
+      // production art. This prevents a second, stale asset set from becoming
+      // a visual source of truth.
+      '@game-assets': path.resolve(import.meta.dirname, '..', '..', 'public', 'assets'),
     },
   },
   css: {

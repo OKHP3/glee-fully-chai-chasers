@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
 import { useEffect, useState } from 'react';
+import socialPreview from '@game-assets/optimized/social-preview.webp';
 
 export function Scene4() {
   const [phase, setPhase] = useState(0);
@@ -23,7 +24,7 @@ export function Scene4() {
     >
       <div className="absolute inset-0 bg-[#0a0a20]/88" />
 
-      {/* 3D Browser Window (Arcade Page) */}
+      {/* Current production social preview, not the earlier Arcade-page screenshot. */}
       <motion.div
         className="absolute top-[15vh] w-[60vw] rounded-xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] border border-white/20 z-20"
         initial={{ opacity: 0, y: 100, rotateX: 30, transformPerspective: 1000 }}
@@ -41,8 +42,8 @@ export function Scene4() {
           <div className="w-3 h-3 rounded-full bg-green-500" />
         </div>
         <img 
-          src={`${import.meta.env.BASE_URL}images/glee-fully-arcade.jpg`} 
-          alt="Arcade" 
+          src={socialPreview}
+          alt="Glee-fully Chai Chasers"
           className="w-full object-cover border-none block" 
         />
       </motion.div>
