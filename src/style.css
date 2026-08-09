@@ -28,9 +28,8 @@ body {
 
 .cc-root {
   font-variant-numeric: tabular-nums;
-  min-height: 100dvh;
-  overflow-x: hidden;
-  overflow-y: hidden;
+  height: 100dvh;
+  overflow: hidden;
   overscroll-behavior-y: contain;
   background:
     radial-gradient(circle at 50% 8%, rgba(82, 180, 168, 0.16), transparent 32%),
@@ -40,7 +39,7 @@ body {
 .cc-shell {
   width: min(100%, 560px);
   min-width: 0;
-  min-height: 100dvh;
+  height: 100%;
   margin: 0 auto;
   padding-top: env(safe-area-inset-top, 0px);
   padding-left: max(0px, env(safe-area-inset-left));
@@ -760,6 +759,7 @@ body {
 
 .marquee {
   position: relative;
+  flex-shrink: 0;
   margin: 8px 10px 0;
   padding: 6px 10px 8px;
   border-radius: 14px;
@@ -917,7 +917,8 @@ body {
 .cabinet-shell {
   width: calc(100% - 20px);
   margin: 8px auto 0;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   border-radius: 20px;
@@ -1180,6 +1181,7 @@ body {
   justify-content: space-between;
   gap: 6px;
   min-height: 52px;
+  flex-shrink: 0;
   margin: 6px 12px 0;
 }
 
@@ -1313,6 +1315,7 @@ body {
 
 .status-line {
   min-height: 1.4rem;
+  flex-shrink: 0;
   padding: 2px 16px;
   text-align: center;
   font-size: 13px;
@@ -1327,6 +1330,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
   margin: 4px 8px 4px;
   padding: 8px 8px;
   border-radius: 16px;
@@ -2444,7 +2448,7 @@ body {
 }
 
 @media (max-height: 720px) {
-  .cc-shell { min-height: 100%; }
+  .cc-shell { height: 100%; }
   .marquee { margin-top: 5px; }
   .cabinet-shell { margin-top: 5px; }
   .companion-row { min-height: 46px; margin-top: 4px; }
@@ -2454,7 +2458,7 @@ body {
 @media (min-width: 600px) {
   .cc-root { padding: 16px; }
   .cc-shell {
-    min-height: calc(100dvh - 32px);
+    height: calc(100dvh - 32px);
     border: 1px solid rgba(245, 213, 118, 0.16);
     border-radius: 24px;
     overflow: hidden;
@@ -2465,9 +2469,20 @@ body {
 
 @media (min-width: 900px) {
   .cc-root { padding: clamp(24px, 4vw, 56px); }
-  .cc-shell { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
+  .cc-shell { height: calc(100dvh - clamp(48px, 8vw, 112px)); }
   .chai-splash { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
   .chai-splash__content { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
+}
+
+/* --- Short-viewport progressive disclosure ---
+   Hide lower-priority UI sections as height shrinks so the bet console
+   (coin balance, bet stepper, SPARKLE! button) is always reachable.     */
+@media (max-height: 480px) {
+  .companion-row { display: none; }
+  .status-line   { display: none; }
+}
+@media (max-height: 360px) {
+  .marquee .marquee-bulbs { display: none; }
 }
 
 /* ------------------------------------------------------------------ */
