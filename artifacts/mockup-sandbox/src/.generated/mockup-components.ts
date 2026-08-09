@@ -6,7 +6,6 @@ export const modules: ModuleMap = {
   "./components/mockups/design-system/SystemShowcase.tsx": () => import("../components/mockups/design-system/SystemShowcase.tsx"),
   "./components/mockups/gameplay-direction/Desktop.tsx": () => import("../components/mockups/gameplay-direction/Desktop.tsx"),
   "./components/mockups/gameplay-direction/Mobile.tsx": () => import("../components/mockups/gameplay-direction/Mobile.tsx"),
-  "./components/mockups/progress-feedback/Playful.tsx": () => import("../components/mockups/progress-feedback/Playful.tsx"),
   "./components/mockups/scenes/JoeyLaundryCombinedStrike.tsx": () => import("../components/mockups/scenes/JoeyLaundryCombinedStrike.tsx"),
   "./components/mockups/scenes/JoeyLaundryPawStrike.tsx": () => import("../components/mockups/scenes/JoeyLaundryPawStrike.tsx"),
   "./components/mockups/scenes/JoeyLaundrySockDrop.tsx": () => import("../components/mockups/scenes/JoeyLaundrySockDrop.tsx"),
@@ -20,5 +19,6 @@ export const modules: ModuleMap = {
   "./components/mockups/scenes/UnigleeActWereMultiplying.tsx": () => import("../components/mockups/scenes/UnigleeActWereMultiplying.tsx"),
   "./components/mockups/scenes/UnigleeChapterBanner.tsx": () => import("../components/mockups/scenes/UnigleeChapterBanner.tsx"),
   "./components/mockups/scenes/UnigleeMarathonLevelup.tsx": () => import("../components/mockups/scenes/UnigleeMarathonLevelup.tsx"),
+  "./components/mockups/progress-feedback/Playful.tsx": () => import("../components/mockups/progress-feedback/Playful.tsx"),
   "./components/mockups/storybook-opening/Desktop.tsx": () => import("../components/mockups/storybook-opening/Desktop.tsx")
 };
