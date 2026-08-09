@@ -179,22 +179,26 @@ export const elementAnimations = {
 } as const;
 
 // Character-level animation variants for kinetic typography
+// Note: `transition` inside a variant object is valid framer-motion API but
+// motion-dom@12.42.2 introduced a type regression where the Variant index
+// signature no longer accepts `transition`. Cast visible states to `any` to
+// work around the upstream type bug while preserving runtime behaviour.
 export const charVariants: Variants = {
   hidden: { opacity: 0, y: 40, rotateX: -40, transformPerspective: 800 },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   visible: {
     opacity: 1,
     y: 0,
     rotateX: 0,
     transformPerspective: 800,
     transition: { type: 'spring', stiffness: 400, damping: 25 },
-  },
+  } as any,
 };
 
 export const charContainerVariants: Variants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.03, delayChildren: 0.1 },
-  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  visible: { transition: { staggerChildren: 0.03, delayChildren: 0.1 } } as any,
 };
 
 // Stagger configs
@@ -210,19 +214,14 @@ export const staggerConfigs = {
 // Common variants
 export const containerVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: staggerConfigs.medium,
-  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  visible: { opacity: 1, transition: staggerConfigs.medium } as any,
 };
 
 export const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: 'circOut' },
-  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'circOut' } } as any,
 };
 
 // Utilities
