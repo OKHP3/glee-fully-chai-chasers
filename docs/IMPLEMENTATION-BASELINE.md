@@ -56,6 +56,8 @@ Do not broadly regenerate, replace, or roll back the following without Jamie's e
 
 ## 4. Running-state matrix
 
+> **Superseded 2026-08-09.** This matrix reflects the state on 2026-07-12 and is retained as history. For what is actually shipped today, read **§9, the 2026-08-09 running-state refresh**, at the end of this document. Section 9 supersedes this section only. Sections 1 through 3 remain in force.
+
 ### Implemented and integrated
 
 - 5×4, 40-line cascade engine and simulation-validated fictional Glee-coin economy
@@ -123,3 +125,77 @@ Never exchange entire source trees between Claude, Codex, and Replit. Exchange n
 ## 8. Repository hygiene note
 
 `dist_old_1783751579/` is a historical build artifact, not source and not a rollback candidate. `attached_assets/` contains empty paste placeholders and is not instruction input. Both should be removed in a dedicated cleanup change after Jamie reviews the deletion. No tool may treat either directory as current implementation guidance.
+
+## 9. 2026-08-09 running-state refresh
+
+**Status:** current running state. **Date:** 2026-08-09. **Basis commit:** `234ea74` on `main`.
+**Scope:** this section supersedes **§4 only**. Sections 1 through 3 remain in force unchanged, including the authority table and the protected-baseline list, with the one addition recorded below. Sections 5 through 8 remain in force.
+
+Added under the governance rule in this repository's own guidance: do not silently replace a settled document, add a dated section. Section 4 is left intact as the 2026-07-12 record.
+
+### 9.1 Addition to the protected presentation surface (§3)
+
+Three files have joined the protected presentation surface since §3 was written. Treat them exactly as the §3 list is treated: bounded improvement only, never wholesale regeneration or rollback from an older checkpoint, and never without Jamie's approval plus an iPhone-size comparison.
+
+- `src/splash.ts` (splash screen, audio-unlock gate, and the July birthday window; the `BIRTHDAY_MESSAGE` constant is Jamie's own words and is edited by nobody but him)
+- `src/ui/ice-notes.ts` (the in-game note deck and its copy)
+- `src/ui/lap-quest-ledge.ts` (Phoebe's Lap Quest interactive ledge, timing, and phases)
+
+The rest of §3 is unchanged.
+
+### 9.2 Shipped since 2026-07-12
+
+Everything listed in §4 as implemented remains implemented. The following shipped on top of it.
+
+- **Joey's Laundry Helper.** `src/engine/laundry.ts`. Opening-grid chapter modifiers with sock-drop and paw-strike rolls and weighted multipliers. Ships as UniGlee act 1.
+- **Phoebe's Lap Quest.** `src/engine/lap-quest.ts`, `src/engine/lap-quest-session.ts`, `src/ui/lap-quest-ledge.ts`. Interactive petting ledge with grace, active, and ending phases, a Joey interrupt, and additive spins and coins. Ships as the final UniGlee act.
+- **The playable UniGlee five-act marathon.** `src/engine/uniglee.ts`, `src/engine/uniglee-marathon.ts`. Reel-activated trigger on active reels, Laundry first, a seeded shuffle of We're Multiplying / Keepsake Collection / Nighttime Treat Time in the middle, Lap Quest last, quarter allocations, act-local retriggers, and a per-act termination ceiling. §4 listed the marathon as visualized only.
+- **The Chai Sparks XP and wager-ladder economy.** `src/engine/economy.ts`. Wager levels 1 / 2 / 5 / 10 / 25 / 50 with the sixth gated behind player level 12, a 500-coin start, a 500-coin bust-proof refill, XP per spin, and XP-driven player levels. §4 listed only "persistent balance, XP, settings".
+- **The splash and birthday-window flow.** `src/splash.ts`. Audio-unlock gate plus a birthday block that runs July 17 to 31 of any year and grants 10,000 Glee-coins once per device per calendar year. This directly changes §4's "Birthday Reveal" line: see 9.4.
+- **Ice Notes.** `src/ui/ice-notes.ts`. The rotating in-game note deck.
+- **Theme control and separate music and SFX volumes.** `src/state.ts`, persisted alongside balance, bet, XP, and Treat Jar.
+- **The in-game paytable page.** `openPaytablePage` in `src/ui/board.ts`. Symbol guide, the 40-fixed-line explanation, and line-bet multiples.
+- **Doorbell Panic, Bold Chai Pump, Keepsake Constellation, and Handbag Wild** are all shipped engine features with test coverage.
+- **Repository posture.** A threat model (`docs/threat-model.md`), an ADR practice (`docs/adr/`), a promoted skill (`skills/okhp3-skill-promotion/`), a full-game RTP harness (`scripts/sim-agent.ts`), and a supply-chain posture in `pnpm-workspace.yaml`.
+
+### 9.3 Verified engineering state
+
+Re-measured on this commit, not quoted from another document. Every figure carries the command that produced it.
+
+| Check | Result | Command |
+|---|---|---|
+| Test suite | 170 tests, 24 files, all passing | `npx vitest run src` |
+| Type check and production build | Clean | `npm run build` |
+| Oracle: base RTP | 61.08% | `npx vitest run src/engine/simulation.test.ts --reporter=verbose` |
+| Oracle: any-win rate | 1 in 3.15 | same |
+| Oracle: free-spin trigger | 1 in 151 | same |
+| Oracle: 8+ cascade mega | 1 in 980 | same |
+| Oracle: UniGlee capture | 1 in 1,370 | same |
+| Oracle: cat pop-in | 1 in 32.3 | same |
+| Full-game RTP | 97.56% over 210,000 paid spins, seeds 1 to 7 | `for s in 1 2 3 4 5 6 7; do npx tsx scripts/sim-agent.ts a$s $s 30000; done` |
+| Full-game RTP, per-seed range | 95.13% to 101.47% | same |
+| Capped bonus sessions | 0 | same |
+
+The base oracle measures the base game only. Full-game RTP requires the sim-agent fleet, and the fleet figure is seed-sensitive, so seeds are recorded above.
+
+### 9.4 Corrections to §4's "planned or only partially visualized" list
+
+| §4 entry | Correct status as of 2026-08-09 |
+|---|---|
+| Birthday Reveal | **Partly shipped.** The birthday message and the 10,000-coin grant are live on the splash, gated to July 17 to 31 and claimable once per device per year (`src/splash.ts`). Only the Birthday Reveal **scene** is unshipped. Do not describe the birthday feature as unshipped. |
+| One-shot literal Wild Chai Storm, "RTP release gate remains pending" | **Shipped and gated green.** The oracle and the sim-agent fleet both pass. |
+| Approved production AskJamie avatar integration | **Shipped** per S27. |
+| Bold Chai Bonus keepsake pick shelf | Still unshipped as a pick shelf. The Bold Chai Pump engine (`src/engine/bold-chai-pump.ts`) is shipped and is a different mechanic. |
+| Removal of legacy system-wide twelve mechanics | Still open. S32 makes twelve an explicit, contained exception for the Moonlit Keepsake Trail only. Do not expand it. |
+| Daily Bonus Wheel, milestone scenes, collection shelf | Still unshipped. |
+| Production music loops and final mix, service-worker/offline verification, asset-size optimization, device-regression gallery | Still open. |
+| In-flight UniGlee reload persistence and fast/skip controls | Still open, as the marathon contract states. |
+
+### 9.5 Known documentation deltas, not resolved here
+
+These are recorded so no tool treats them as settled. None of them is a code defect and none was "fixed" by editing a ruling.
+
+- **UniGlee award size.** S30 and `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` say 300/400/500 initial free spins. The engine awards 40/60/80 (`src/engine/uniglee.ts` line 94, typed in `src/engine/laundry.ts` line 21). Open as **D7** in `docs/DECISION-LOG.md`. Do not change either side until Jamie rules.
+- **Decision numbering.** Two settled rows both carry the label S30. Recorded as a numbering errata note in `docs/DECISION-LOG.md`; both rulings stand and nothing was renumbered.
+- **UniGlee tease mechanic.** The live public page describes a decorative sighting at ~1/850 and a real capture at ~1/4,212, citing decisions S33 and S34 that do not exist. The engine implements neither. Open as **D6**.
+- **`lib/` and `artifacts/`.** Replit workspace scaffolding that nothing under `src/` imports and that never reaches `dist/`. Not implementation guidance. Whether they stay in the repository is an open cleanup item.
