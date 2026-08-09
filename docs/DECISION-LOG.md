@@ -4,9 +4,72 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 
 ## Open decisions
 
-*(none — D1-D5 ruled by Jamie 2026-07-10; raise new ones as D6+)*
+D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table as S8 through S12. The two decisions below were raised on 2026-08-09 by the accuracy audit (`content/AUDIT-2026-08-09.md`) and are awaiting Jamie's ruling. Both are written so a one-word answer settles them.
+
+### D6. Was the UniGlee tease and rarity redesign ever ruled?
+
+**Raised:** 2026-08-09, by Claude, during the accuracy audit. **Owner:** Jamie. **Status:** open.
+
+The live overkillhill.com project page was patched on 2026-07-17 describing a UniGlee redesign in two parts: a decorative "sighting" or tease that a player sees often at roughly 1 in 850 spins, and a real capture that is much rarer at roughly 1 in 4,212 spins. `content/PRD-OVERKILLHILL-PROJECT-PAGE-PATCH-2.md` attributes that copy to decisions **S33** and **S34**. Neither S33 nor S34 exists in this log, which ends at S32.
+
+**The code implements neither half of it.**
+
+| Page claim | Shipped reality | Evidence |
+|---|---|---|
+| Real capture at ~1 in 4,212 | Three independent per-reel rolls at 1/2,500, 1/4,000 and 1/7,500, combining to ~1 in 1,277 | `src/engine/uniglee.ts` lines 32 to 38, `UNIGLEE_REEL_RATES` and `UNIGLEE_ACTIVE_RATE` |
+| Decorative sighting at ~1 in 850 | No such mechanic exists anywhere. `grep -rn "tease\|sighting" src/` returns zero hits. The only 850 in the engine tree is an oracle upper bound on the real capture rate, not a tease rate | `src/engine/simulation.test.ts` line 95 |
+| The butterfly "shows itself often but is only truly caught" rarely | The engine enforces the opposite. `placeUniGleeTrigger` deliberately makes the trigger land line-valid "so the event cannot be a decorative, non-paying-looking scatter" | `src/engine/uniglee.ts`, `placeUniGleeTrigger` |
+| Measured rate | 1 in 1,370 on the seeded oracle, against a spec target of ~1 in 1,277 | `npx vitest run src/engine/simulation.test.ts --reporter=verbose`; `docs/DESIGN-SPEC.md` line 85 |
+
+**Ruling needed. One word is enough.**
+
+- **(i) "Ruled."** The redesign was a real decision that simply never reached the engine. Log it here as settled S33 and S34 dated 2026-07-17, and open a simulation-gated engine task to build the tease mechanic and re-rate the capture. The public page becomes accurate once the engine catches up.
+- **(ii) "Withdrawn."** It was a proposal that got dropped before it was ruled. Record it here as withdrawn and dated, and correct the public page to the shipped 1-in-1,277 behavior.
+
+**Note for Jamie:** the live page currently asserts option (i) as present-tense fact about the shipped game. Until this is ruled, the page describes a mechanic the game does not have, and the page's own acceptance criterion ("a reader who fact-checks the page against the repo finds zero stale claims") fails.
+
+### D7. UniGlee award size: is it 300/400/500 or 40/60/80?
+
+**Raised:** 2026-08-09, by Claude, during the accuracy audit. **Owner:** Jamie. **Status:** open.
+
+A settled decision, its own structural contract, and the shipped engine disagree about how many free spins a UniGlee capture awards.
+
+| Source | Award | Evidence |
+|---|---|---|
+| S30, 2026-07-15, this log | 300 / 400 / 500 initial free spins | settled row S30 dated 2026-07-15 below |
+| Structural contract | 300 / 400 / 500, tabulated by activating reel | `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` lines 9 to 15 |
+| Shipped engine | 40 / 60 / 80 | `src/engine/uniglee.ts` line 94: `initialAwardSpins: reel * 20 as UniGleeAwardSpins`, over active reels 2, 3 and 4 |
+| Shipped type | 40 / 60 / 80, enforced at the type level | `src/engine/laundry.ts` line 21 types `UniGleeAwardSpins` as the union of 40, 60 and 80 |
+| README and both public pages | 40 / 60 / 80 | `README.md` line 31 |
+
+Either the engine diverged from a live ruling, or S30 was superseded during the 2026-07 RTP retune without a log entry. Every artifact except S30 and its contract now says 40/60/80, which suggests the second, but this log is the only place that can settle it.
+
+The stakes are quantified. UniGlee at 40/60/80 already contributes roughly six points of full-game RTP on its own and is the single largest source of per-seed RTP variance in the sim fleet.
+
+**Ruling needed. One word is enough.**
+
+- **(i) "Code."** 40/60/80 is canon. Add a dated superseding decision here, and append dated notes to S30 and to `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` rather than editing the original rulings. No engine work.
+- **(ii) "S30."** 300/400/500 is canon. Open a simulation-gated engine task to raise the award, and re-measure full-game RTP before anything ships. A 7.5x increase on the largest bonus will not stay inside the 95% to 98% band without compensating changes elsewhere, and that compensation is itself an engine decision.
 
 ## Settled decisions
+
+> ### Numbering errata (recorded 2026-08-09, nothing renumbered)
+>
+> Two settled rows below both carry the label **S30**:
+>
+> - **S30, 2026-07-14, Handbag Wild.** Rare non-cat late-reel wild carrying a randomized x3 / x5 / x10 line multiplier. Contract: `docs/HANDBAG-WILD-2026-07-14.md`.
+> - **S30, 2026-07-15, UniGlee marathon structure.** Reel-activated trigger, fixed five-act order, quarter allocations. Contract: `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md`.
+>
+> **Both decisions stand exactly as ruled.** This is a label collision, not a conflict of substance: the two rulings govern different mechanics and neither amends the other. This log's standing rule is never to delete history, and external artifacts already cite these IDs, so **no ID has been changed and no row has been moved**.
+>
+> **Proposed canonical renumbering. NOT APPLIED. Awaiting Jamie's approval.**
+>
+> - The earlier-dated row, `S30, 2026-07-14, Handbag Wild`, keeps **S30**. It is the first ruling to use the number and it is the one its own contract document cites.
+> - The later row, `S30, 2026-07-15, UniGlee marathon structure`, is re-labelled to the next free number rather than shifting S31 and S32. That keeps every other settled ID stable.
+> - The re-labelled row would carry an inline `(was S30, relabelled 2026-08-09)` marker so the retired ID stays searchable, matching the existing `S8 (was D1)` convention already used in this table.
+> - If Jamie prefers the opposite assignment, the same shape applies with the two rows swapped.
+>
+> **Which number to use is blocked on D6.** D6 asks whether S33 and S34 already exist as rulings that were made but never logged. If D6 is ruled "withdrawn", the UniGlee row becomes **S33**. If D6 is ruled "ruled", S33 and S34 are already spoken for and the UniGlee row becomes **S35**. Rule D6 first, then apply this renumbering to whatever number is genuinely free.
 
 | # | Date | Decision | Rationale |
 |---|---|---|---|
