@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Doorbell Panic — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <div class="cc-shell">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span><span class="marquee-bulb" style="--blink-delay:.35s"></span><span class="marquee-bulb" style="--blink-delay:.42s"></span><span class="marquee-bulb" style="--blink-delay:.49s"></span><span class="marquee-bulb" style="--blink-delay:.56s"></span><span class="marquee-bulb" style="--blink-delay:.63s"></span></div>
+      <div class="marquee-row">
+        <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+        <button class="chrome-btn" aria-label="Symbol guide"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/><path d="M5 4.5v15M9 8h6M9 12h6"/></svg></button>
+        <button class="chrome-btn" aria-label="Settings"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/></svg></button>
+      </div>
+      <div class="marquee-status" aria-live="polite">DOORBELL! Joey &amp; Phoebe fled!</div>
+    </header>
+    <div class="sidebar-left">
+      <div id="treat-jar" class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%" aria-hidden="true"></span></span>3</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%" aria-hidden="true"></span></span>7</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%" aria-hidden="true"></span></span>1</span></div></div>
+    </div>
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
+        <div class="reel-col" data-reel="0">
+          <div class="cell doorbell-ringing" data-reel="0" data-row="0"><img class="symbol-asset symbol-asset--vector" src="../assets/symbols/doorbell.svg" alt="" aria-hidden="true"></div>
+          <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%" aria-hidden="true"></span></div>
+          <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%" aria-hidden="true"></span></div>
+          <div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%" aria-hidden="true"></span></div>
+        </div>
+        <div class="reel-col" data-reel="1">
+          <div class="cell doorbell-ringing" data-reel="1" data-row="0"><img class="symbol-asset symbol-asset--vector" src="../assets/symbols/doorbell.svg" alt="" aria-hidden="true"></div>
+          <div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%" aria-hidden="true"></span></div>
+          <div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%" aria-hidden="true"></span></div>
+          <div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%" aria-hidden="true"></span></div>
+        </div>
+        <div class="reel-col" data-reel="2"><div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%" aria-hidden="true"></span></div><div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%" aria-hidden="true"></span></div><div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%" aria-hidden="true"></span></div><div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%" aria-hidden="true"></span></div></div>
+        <div class="reel-col" data-reel="3"><div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%" aria-hidden="true"></span></div><div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%" aria-hidden="true"></span></div><div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%" aria-hidden="true"></span></div><div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%" aria-hidden="true"></span></div></div>
+        <div class="reel-col" data-reel="4"><div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%" aria-hidden="true"></span></div><div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%" aria-hidden="true"></span></div><div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%" aria-hidden="true"></span></div><div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%" aria-hidden="true"></span></div></div>
+      </div>
+      <!-- Doorbell Panic overlay — class matches exactly what board.ts appends to .cc-root -->
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:35%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">DOORBELL PANIC — 8 free spins incoming!</div><div class="bet-console"><button class="bet-adj-btn">−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn">+</button></div></div>
+  </div>
+  <!-- Doorbell Panic banner (appended to .cc-root in game, shown persistent here) -->
+  <div class="doorbell-panic-banner" style="animation:none;opacity:1">
+    <div class="doorbell-panic-bell"><img class="symbol-asset symbol-asset--vector" src="../assets/symbols/doorbell.svg" alt="" aria-hidden="true"></div>
+    <div class="doorbell-panic-title">DOORBELL PANIC!</div>
+    <div class="doorbell-panic-sub">Joey &amp; Phoebe fled into 8 free spins!</div>
+  </div>
+</div>
+</body>
+</html>

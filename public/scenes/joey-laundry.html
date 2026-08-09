@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Joey's Laundry Helper — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <!-- Joey Laundry Helper overlay — class="joey-laundry-overlay" appended to .cc-root -->
+  <div class="joey-laundry-overlay" role="region" aria-label="Joey's Laundry Helper sub-bonus" style="position:absolute;inset:0;z-index:10">
+    <div class="night-garden aurora" aria-hidden="true" style="position:absolute;inset:0"></div>
+    <div style="position:relative;z-index:10;height:100%;width:100%;display:flex;flex-direction:column" class="cc-shell free-spins-shell joey-laundry-shell">
+      <header class="marquee joey-laundry-header">
+        <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
+        <div class="marquee-row">
+          <span class="level-chip">UniGlee · Chapter 1</span>
+          <h1 class="marquee-title">Joey's Laundry Helper</h1>
+        </div>
+      </header>
+      <div class="jar-meter joey-laundry-meter">
+        <div class="jar-meter-text">Laundry spin <span id="laundry-index">3</span> of <span id="laundry-total">10</span> · Round win: <span id="laundry-round-win">1,240</span></div>
+      </div>
+      <main class="cabinet-frame joey-laundry-cabinet">
+        <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+        <!-- Joey perched on top of the active reel -->
+        <div class="joey-laundry-perch" aria-hidden="true">
+          <span class="cat-pop-asset cat-pop-asset--joey cat-pop-asset--assist" style="background-image:url('../assets/joey-phoebe-wilds.png');background-image:image-set(url('../assets/optimized/joey-phoebe-wilds.webp') type('image/webp'),url('../assets/joey-phoebe-wilds.png') type('image/png'));background-position:0% 50%" role="img" aria-label="Joey"></span>
+        </div>
+        <!-- 3-reel laundry grid: reel 0 is all Joey wilds (sock drop), reels 1-2 normal -->
+        <div id="laundry-grid" class="reel-grid" role="img" aria-label="Laundry reel board">
+          <div class="reel-col" data-reel="0">
+            <div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
+            <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
+            <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
+            <div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
+          </div>
+          <div class="reel-col" data-reel="1">
+            <div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+            <div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+            <div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+            <div class="cell win-flash" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
+          </div>
+          <div class="reel-col" data-reel="2">
+            <div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+            <div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+            <div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
+            <div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
+          </div>
+        </div>
+      </main>
+      <div id="laundry-status" class="status-line" aria-live="polite">Joey's Laundry Helper · Sock drop! Reel 1 all Joey wilds · +1,240 coins</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -7,7 +7,13 @@
  * server is not reachable (e.g. GitHub Pages visitors).
  */
 
-const SCENE_ROOT = '/__mockup/scenes';
+// In production (GitHub Pages) the game ships its own copies of the scene files
+// under BASE_URL/scenes/.  In development the mockup-sandbox dev server is
+// running at /__mockup so we keep pointing there to preserve the live-reload
+// authoring workflow.
+const SCENE_ROOT = import.meta.env.PROD
+  ? `${import.meta.env.BASE_URL}scenes`
+  : '/__mockup/scenes';
 
 /* ------------------------------------------------------------------ */
 /*  Scene iframe helper                                                 */

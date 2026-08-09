@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Phoebe's Lap Quest — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <div class="cc-shell lap-quest-mode">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
+      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
+      <div id="marquee-status" class="marquee-status">Phoebe's Lap Quest</div>
+    </header>
+    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>7</span></div></div></div>
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- Lap Quest choice overlay — class="lap-quest-overlay" appended to .cc-root -->
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:55%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">Phoebe's Lap Quest · choose her cozy spot</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+  </div>
+  <!-- Lap Quest choice dialog — appended to .cc-root in game -->
+  <div class="lap-quest-overlay" role="dialog" aria-modal="true" aria-labelledby="lap-quest-title" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:20">
+    <div class="lap-quest-panel">
+      <div class="lap-quest-cat" aria-hidden="true">
+        <span class="cat-pop-asset cat-pop-asset--phoebe cat-pop-asset--strut" style="background-image:url('../assets/joey-phoebe-wilds.png');background-image:image-set(url('../assets/optimized/joey-phoebe-wilds.webp') type('image/webp'),url('../assets/joey-phoebe-wilds.png') type('image/png'));background-position:100% 50%" role="img" aria-label="Phoebe"></span>
+      </div>
+      <h2 id="lap-quest-title" class="lap-quest-title">Phoebe's Lap Quest</h2>
+      <p class="lap-quest-copy">Phoebe is conducting a comfort survey. Which cozy place should she investigate?</p>
+      <div class="lap-quest-choices" role="group" aria-label="Choose Phoebe's cozy place">
+        <button type="button" class="lap-quest-choice" data-lap-spot="window_perch">
+          <span class="lap-quest-choice-spark" aria-hidden="true">✦</span>
+          <strong>Window Perch</strong>
+          <small> Phoebe-approved comfort</small>
+        </button>
+        <button type="button" class="lap-quest-choice" data-lap-spot="blanket_nest">
+          <span class="lap-quest-choice-spark" aria-hidden="true">✦</span>
+          <strong>Blanket Nest</strong>
+          <small> Phoebe-approved comfort</small>
+        </button>
+        <button type="button" class="lap-quest-choice" data-lap-spot="moonlit_cushion">
+          <span class="lap-quest-choice-spark" aria-hidden="true">✦</span>
+          <strong>Moonlit Cushion</strong>
+          <small> Phoebe-approved comfort</small>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

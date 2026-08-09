@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Bold Chai Pump — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <div class="cc-shell">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span><span class="marquee-bulb" style="--blink-delay:.35s"></span><span class="marquee-bulb" style="--blink-delay:.42s"></span><span class="marquee-bulb" style="--blink-delay:.49s"></span><span class="marquee-bulb" style="--blink-delay:.56s"></span><span class="marquee-bulb" style="--blink-delay:.63s"></span></div>
+      <div class="marquee-row">
+        <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+        <button class="chrome-btn" aria-label="Symbol guide"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/><path d="M5 4.5v15M9 8h6M9 12h6"/></svg></button>
+      </div>
+      <div class="marquee-status">BOLD CHAI! — Barista mode</div>
+    </header>
+    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%" aria-hidden="true"></span></span>3</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%" aria-hidden="true"></span></span>7</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%" aria-hidden="true"></span></span>1</span></div></div></div>
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- Bold Chai Pump overlay: class="bonus-cabinet-overlay" rendered inside .cabinet-frame -->
+      <div class="bonus-cabinet-overlay" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+        <div class="bold-chai-headline"><strong>BOLD CHAI!</strong><span>Barista mode · 12 pumps per strong chai</span></div>
+        <div class="bold-chai-timer" aria-live="polite"><span id="bold-chai-seconds">18.4</span><small>seconds</small></div>
+        <div class="bold-chai-workbench">
+          <div class="bold-chai-layered-art" aria-hidden="true" style="position:relative;width:180px;height:260px;display:flex;align-items:center;justify-content:center">
+            <img class="bold-chai-layer" src="../assets/bold-chai/pump-body.svg" alt="" style="position:absolute;width:100%;height:100%" onerror="this.style.display='none'"/>
+            <img class="bold-chai-layer" id="bold-chai-plunger" src="../assets/bold-chai/plunger-up.svg" alt="" style="position:absolute;width:100%;height:100%" onerror="this.style.display='none'"/>
+            <img class="bold-chai-layer" src="../assets/bold-chai/spout.svg" alt="" style="position:absolute;width:100%;height:100%" onerror="this.style.display='none'"/>
+            <img class="bold-chai-layer bold-chai-fill" id="bold-chai-fill" src="../assets/bold-chai/fill-06.svg" alt="" style="position:absolute;width:100%;height:100%" onerror="this.style.display='none'"/>
+            <!-- Fallback visual when assets not found -->
+            <div style="width:80px;height:180px;border:3px solid #f2c84b;border-radius:8px;background:linear-gradient(0deg,rgba(244,123,63,0.8) 50%,rgba(18,23,63,0.6) 50%);display:flex;align-items:center;justify-content:center;font-size:32px">☕</div>
+          </div>
+          <div class="bold-chai-pump-count" aria-label="7 of 12 pumps completed">
+            <span class="bold-chai-pump-done">7</span><span class="bold-chai-pump-sep">/</span><span class="bold-chai-pump-total">12</span>
+            <div style="display:flex;gap:4px;margin-top:8px">${Array.from({length:12},(_,i)=>`<span style="width:12px;height:12px;border-radius:50%;background:${i<7?'#f47b3f':'rgba(255,255,255,0.2)'}"></span>`).join('')}</div>
+          </div>
+        </div>
+        <button class="bold-chai-pump-btn sparkle-btn" aria-label="Pump the chai press" style="font-size:20px;padding:12px 40px">PUMP!</button>
+        <div class="bold-chai-spin-award">Completion awards <strong>8 free spins</strong></div>
+      </div>
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:50%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">Bold Chai Pump · 7 of 12 pumps · 18.4s remaining</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+  </div>
+</div>
+</body>
+</html>
