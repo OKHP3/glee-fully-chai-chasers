@@ -1595,11 +1595,15 @@ function showUniGleeSummary(
 
     const continueBtn = overlay.querySelector<HTMLButtonElement>("#uniglee-summary-continue");
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
-    const onSparkle = (e: Event) => { e.stopImmediatePropagation(); continueBtn?.click(); };
-    sparkleBtn?.addEventListener("click", onSparkle, { capture: true });
+    const onSparkle = (e: Event) => {
+      if (!sparkleBtn?.contains(e.target as Node)) return;
+      e.stopImmediatePropagation();
+      continueBtn?.click();
+    };
+    root.addEventListener("click", onSparkle, { capture: true });
 
     continueBtn?.addEventListener("click", () => {
-      sparkleBtn?.removeEventListener("click", onSparkle, { capture: true });
+      root.removeEventListener("click", onSparkle, { capture: true });
       overlay.remove();
       resolve();
     }, { once: true });
@@ -2404,11 +2408,15 @@ function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: numbe
 
     const continueBtn = overlay.querySelector<HTMLButtonElement>("#bonus-continue")!;
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
-    const onSparkle = (e: Event) => { e.stopImmediatePropagation(); continueBtn.click(); };
-    sparkleBtn?.addEventListener("click", onSparkle, { capture: true });
+    const onSparkle = (e: Event) => {
+      if (!sparkleBtn?.contains(e.target as Node)) return;
+      e.stopImmediatePropagation();
+      continueBtn.click();
+    };
+    root.addEventListener("click", onSparkle, { capture: true });
 
     continueBtn.addEventListener("click", () => {
-      sparkleBtn?.removeEventListener("click", onSparkle, { capture: true });
+      root.removeEventListener("click", onSparkle, { capture: true });
       overlay.remove();
       resolve();
     }, { once: true });
@@ -2513,16 +2521,20 @@ function showLevelUpCelebration(
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
-      sparkleBtn?.removeEventListener("click", onSparkle, { capture: true });
+      root.removeEventListener("click", onSparkle, { capture: true });
       overlay.classList.add("levelup-overlay--out");
       overlay.addEventListener("animationend", () => {
         overlay.remove();
         resolve();
       }, { once: true });
     };
-    const onSparkle = (e: Event) => { e.stopImmediatePropagation(); dismiss(); };
+    const onSparkle = (e: Event) => {
+      if (!sparkleBtn?.contains(e.target as Node)) return;
+      e.stopImmediatePropagation();
+      dismiss();
+    };
 
-    sparkleBtn?.addEventListener("click", onSparkle, { capture: true });
+    root.addEventListener("click", onSparkle, { capture: true });
     overlay.addEventListener("click", dismiss, { once: true });
     window.setTimeout(dismiss, 3600);
   });
