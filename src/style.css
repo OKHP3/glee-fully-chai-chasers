@@ -294,6 +294,7 @@ body {
 .chai-splash__loop {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   margin-top: 44px;
 }
