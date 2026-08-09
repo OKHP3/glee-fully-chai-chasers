@@ -2527,11 +2527,55 @@ body {
 @media (min-width: 900px) {
   .cc-root { padding: clamp(24px, 4vw, 56px); }
   .cc-shell {
-    /* Grow the panel up to 640px on wide screens so the symbols scale
-       with the available real estate, not just the mobile-first 560px cap. */
-    width: min(100%, 640px);
+    /* Two-column layout: game area (~640px) | ice-notes side panel (216px) */
+    width: min(100%, 868px);
     height: calc(100dvh - clamp(48px, 8vw, 112px));
+    /* Override Tailwind flex-col — grid gives us the side-panel slot */
+    display: grid !important;
+    grid-template:
+      "header    header" auto
+      "cabinet   notes"  1fr
+      "companion notes"  auto
+      "status    notes"  auto
+      "bet       notes"  auto
+      / 1fr 216px;
+    column-gap: 12px;
   }
+  /* Assign each direct child to its grid area */
+  .cc-shell .marquee       { grid-area: header; }
+  .cc-shell .cabinet-shell { grid-area: cabinet; }
+  .cc-shell .companion-row { grid-area: companion; }
+  .cc-shell .status-line   { grid-area: status; }
+  .cc-shell .bet-console   { grid-area: bet; }
+
+  /* ── Ice notes side panel ─────────────────────────────────────────── */
+  /* Becomes a tall card on the right instead of a fixed-height bottom bar. */
+  .cc-shell .ice-notes-card {
+    grid-area: notes;
+    height: auto;           /* override the 128px fixed height */
+    margin: 8px 0 0;
+    align-self: stretch;    /* fill the full side-panel height */
+    border-radius: 16px;
+    /* Clear the top-only border accent; the card is now a full side panel */
+    border-top: none;
+    border: 2px solid rgba(159, 232, 197, 0.28);
+  }
+  /* Show the full ingredient name + fact — no 2-line clamp in a tall panel */
+  .cc-shell .ice-notes-name-group {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    white-space: normal;
+  }
+  /* Give the profile grid comfortable breathing room above it */
+  .cc-shell .ice-notes-profile {
+    margin-top: 14px;
+    /* Larger label/value type in the wider card */
+    font-size: 1.05em;
+  }
+  .cc-shell .ice-notes-profile dt { font-size: 9px; }
+  .cc-shell .ice-notes-profile dd { font-size: 12px; }
+
   .chai-splash { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
   .chai-splash__content { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
 }
