@@ -1590,10 +1590,17 @@ function showUniGleeSummary(
       <button id="uniglee-summary-continue" class="sparkle-btn">Return to the chase</button>`;
     root.querySelector(".cc-root")?.appendChild(overlay);
     playBonusFanfare();
-    overlay.querySelector<HTMLButtonElement>("#uniglee-summary-continue")?.addEventListener("click", () => {
+
+    const continueBtn = overlay.querySelector<HTMLButtonElement>("#uniglee-summary-continue");
+    const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
+    const onSparkle = () => continueBtn?.click();
+    sparkleBtn?.addEventListener("click", onSparkle);
+
+    continueBtn?.addEventListener("click", () => {
+      sparkleBtn?.removeEventListener("click", onSparkle);
       overlay.remove();
       resolve();
-    });
+    }, { once: true });
   });
 }
 
@@ -2392,10 +2399,17 @@ function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: numbe
     const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;
     host.appendChild(overlay);
     playBonusFanfare();
-    overlay.querySelector("#bonus-continue")?.addEventListener("click", () => {
+
+    const continueBtn = overlay.querySelector<HTMLButtonElement>("#bonus-continue")!;
+    const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
+    const onSparkle = () => continueBtn.click();
+    sparkleBtn?.addEventListener("click", onSparkle);
+
+    continueBtn.addEventListener("click", () => {
+      sparkleBtn?.removeEventListener("click", onSparkle);
       overlay.remove();
       resolve();
-    });
+    }, { once: true });
   });
 }
 
@@ -2491,10 +2505,13 @@ function showLevelUpCelebration(
 
     root.appendChild(overlay);
 
+    const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
+
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
+      sparkleBtn?.removeEventListener("click", dismiss);
       overlay.classList.add("levelup-overlay--out");
       overlay.addEventListener("animationend", () => {
         overlay.remove();
@@ -2502,6 +2519,7 @@ function showLevelUpCelebration(
       }, { once: true });
     };
 
+    sparkleBtn?.addEventListener("click", dismiss);
     overlay.addEventListener("click", dismiss, { once: true });
     window.setTimeout(dismiss, 3600);
   });
