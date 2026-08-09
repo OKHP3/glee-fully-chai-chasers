@@ -1313,6 +1313,13 @@ body {
 .aj-link:hover { background: rgba(159, 232, 197, .22); color: #c8f5e0; }
 .aj-link:focus-visible { outline: 2px solid var(--cc-mint); outline-offset: 3px; }
 
+/* Messages now appear in the marquee header; the old status row is kept in
+   the DOM for aria-live but occupies no space. */
+#status-line {
+  min-height: 0;
+  padding: 0;
+}
+
 .status-line {
   min-height: 1.4rem;
   flex-shrink: 0;
@@ -1320,6 +1327,26 @@ body {
   text-align: center;
   font-size: 13px;
   color: rgba(255, 226, 158, 0.95);
+}
+
+/* Win / status message rendered in the marquee header. */
+.marquee-status {
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 226, 158, 0.95);
+  line-height: 1.3;
+  padding: 0 10px;
+  transition: max-height 220ms ease, opacity 220ms ease, padding-top 220ms ease;
+  padding-top: 0;
+}
+.marquee-status:not(:empty) {
+  max-height: 3em;
+  opacity: 1;
+  padding-top: 5px;
 }
 
 /* ------------------------------------------------------------------ */

@@ -256,6 +256,7 @@ export function renderBoard(
               </svg>
             </button>
           </div>
+          <div id="marquee-status" class="marquee-status" aria-live="polite"></div>
         </header>
 
         <div class="cabinet-shell">
@@ -423,7 +424,7 @@ export function renderGridHtml(
 }
 
 function setStatus(root: HTMLElement, message: string): void {
-  const el = root.querySelector<HTMLDivElement>("#status-line")!;
+  const el = root.querySelector<HTMLDivElement>("#marquee-status")!;
   el.textContent = message;
   window.clearTimeout(statusTimeout);
   statusTimeout = window.setTimeout(() => {
@@ -1620,7 +1621,7 @@ export async function runLapQuestChapter(
     interruptAtMs: 15_000 + Math.floor(rng() * 75_001),
     reducedMotion: state.reducedMotion,
     onPet: ({ petCount }) => {
-      const status = root.querySelector<HTMLElement>("#status-line");
+      const status = root.querySelector<HTMLElement>("#marquee-status");
       if (status) status.textContent = `Phoebe's Lap Quest · ${petCount} gentle pet${petCount === 1 ? "" : "s"}`;
     },
   });
@@ -1728,7 +1729,7 @@ function showLapQuestReveal(root: HTMLElement, round: LapQuestRoundResult): Prom
 
 async function playLapQuestRound(root: HTMLElement, round: LapQuestRoundResult): Promise<void> {
   const grid = root.querySelector<HTMLDivElement>("#reel-grid");
-  const status = root.querySelector<HTMLElement>("#status-line");
+  const status = root.querySelector<HTMLElement>("#marquee-status");
   const shell = root.querySelector<HTMLElement>(".cc-shell");
   if (!grid || !status) return;
 
@@ -1818,7 +1819,7 @@ async function playTreatTimeOnMainBoard(
 ): Promise<void> {
   const grid = root.querySelector<HTMLDivElement>("#reel-grid");
   const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
-  const status = root.querySelector<HTMLElement>("#status-line");
+  const status = root.querySelector<HTMLElement>("#marquee-status");
   const shell = root.querySelector<HTMLElement>(".cc-shell");
   if (!grid || !cabinet || !status) return;
 
