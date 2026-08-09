@@ -2673,6 +2673,103 @@ body {
   .companion-row { display: none; }
   .status-line   { display: none; }
 }
+
+/* Short landscape phones need a different hierarchy, not a shorter portrait
+   stack. Keep the complete 5 x 4 cabinet visible on the left and move the
+   compact header, companion meters, and bet console into a control rail. */
+@media (min-width: 600px) and (max-width: 899px) and (max-height: 480px) {
+  .cc-root { padding: 6px 8px; }
+
+  .cc-shell {
+    width: min(100%, 820px);
+    height: calc(100dvh - 12px);
+    display: grid !important;
+    grid-template:
+      "cabinet header" auto
+      "cabinet companion" 1fr
+      "cabinet bet" auto
+      / minmax(0, 1fr) clamp(280px, 38vw, 320px);
+    gap: 6px 8px;
+    border-radius: 18px;
+  }
+
+  .cc-shell .marquee {
+    grid-area: header;
+    align-self: start;
+    margin: 0;
+    padding: 5px 7px 6px;
+  }
+  .cc-shell .marquee-bulbs { display: none; }
+  .cc-shell .marquee-row { gap: 5px; }
+  .cc-shell .marquee-title { font-size: 15px; line-height: 1.05; }
+  .cc-shell .chrome-btn { min-width: 44px; min-height: 44px; }
+
+  .cc-shell .cabinet-shell {
+    grid-area: cabinet;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+  .cc-shell .bonus-banner { min-height: 56px; padding: 4px 8px 5px; }
+  .cc-shell .level-chip--cabinet { top: 6px; left: 8px; }
+  .cc-shell .cabinet-frame {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    padding: 6px;
+  }
+  .cc-shell .reel-grid { gap: 3px; padding: 5px; }
+  .cc-shell .reel-col { gap: 3px; }
+
+  .cc-shell .companion-row {
+    grid-area: companion;
+    display: flex;
+    align-self: center;
+    width: 100%;
+    min-height: 46px;
+    margin: 0;
+    gap: 4px;
+  }
+  .cc-shell .treat-jar-housing { gap: 2px; padding: 4px 5px; }
+  .cc-shell .treat-jar-title { font-size: 8px; }
+  .cc-shell .treat-chips-row { gap: 2px; }
+  .cc-shell .treat-icon { width: 20px; height: 20px; }
+  .cc-shell .jar-meter--inline { gap: 1px; padding: 3px 5px; }
+  .cc-shell .jar-meter--inline .jar-meter-kicker { font-size: 8px; }
+  .cc-shell .jar-meter--inline .jar-meter-icon { width: 26px; height: 24px; }
+  .cc-shell .askjamie-icon { width: 36px; height: 36px; }
+  .cc-shell .askjamie-label { display: none; }
+
+  .cc-shell .bet-console {
+    grid-area: bet;
+    display: grid;
+    grid-template-columns: 44px 30px 44px minmax(108px, 1fr);
+    grid-template-rows: auto 58px;
+    gap: 6px;
+    margin: 0;
+    padding: 7px;
+  }
+  .cc-shell .bet-console > .coin-chip {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .cc-shell .bet-console > .flex-1 { display: none; }
+  .cc-shell .bet-console > #bet-down { grid-column: 1; grid-row: 2; }
+  .cc-shell .bet-console > .bet-display { grid-column: 2; grid-row: 2; }
+  .cc-shell .bet-console > #bet-up { grid-column: 3; grid-row: 2; }
+  .cc-shell .bet-console > .sparkle-btn {
+    grid-column: 4;
+    grid-row: 2;
+    min-width: 0;
+    min-height: 58px;
+    margin-left: 0;
+    padding-inline: 8px;
+    font-size: 16px;
+  }
+}
+
 @media (max-height: 360px) {
   .marquee .marquee-bulbs { display: none; }
 }
