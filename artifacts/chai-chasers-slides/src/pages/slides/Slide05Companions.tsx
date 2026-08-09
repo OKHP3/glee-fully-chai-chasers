@@ -69,7 +69,7 @@ export default function Slide05Companions() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '1.9vw', lineHeight: 1.55 }}>
-            Joey (tuxedo cat) and Phoebe (calico) arrive randomly in a flying saucer
+            Joey (gray, slender) and Phoebe (tuxedo, full-figured) arrive randomly in a flying saucer
           </div>
         </div>
         <div className="flex items-start" style={{ gap: '1.2vw', marginBottom: '2.2vh' }}>
@@ -87,7 +87,7 @@ export default function Slide05Companions() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '1.9vw', lineHeight: 1.55 }}>
-            Each companion has a distinct voice: Joey is enthusiastic, Phoebe is wry
+            Joey is a discerning gourmand — bougie tastes, expensive treats only. Phoebe is quantity-first and happily eats anything
           </div>
         </div>
         <div className="flex items-start" style={{ gap: '1.2vw' }}>

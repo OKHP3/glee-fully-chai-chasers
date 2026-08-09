@@ -1,62 +1,37 @@
+const base = import.meta.env.BASE_URL;
+
 export default function Slide06Uniglee() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden"
       style={{ background: 'linear-gradient(140deg, #0D0722 0%, #150830 55%, #0B0620 100%)' }}
     >
-      {/* Teal glow right */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse 48% 58% at 78% 45%, rgba(94,212,196,0.1) 0%, rgba(242,200,75,0.05) 45%, transparent 65%)',
-        }}
-      />
-
-      {/* Right decorative zone: concentric rings + ghost letter */}
+      {/* Right decorative zone: UniGlee butterfly */}
       <div
         className="absolute top-0 right-0 bottom-0 flex items-center justify-center overflow-hidden"
-        style={{ width: '34%' }}
+        style={{ width: '40%' }}
       >
+        {/* Soft radial glow behind butterfly */}
         <div
-          className="font-display"
+          className="absolute"
           style={{
-            fontSize: '20vw',
-            fontWeight: 900,
-            color: 'rgba(94,212,196,0.055)',
-            lineHeight: 1,
-            userSelect: 'none',
+            width: '38vw',
+            height: '38vw',
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(180,100,255,0.18) 0%, rgba(94,212,196,0.08) 45%, transparent 70%)',
             pointerEvents: 'none',
-            position: 'absolute',
-          }}
-        >
-          U
-        </div>
-        <div
-          style={{
-            position: 'absolute',
-            width: '26vw',
-            height: '26vw',
-            borderRadius: '50%',
-            border: '1px solid rgba(94,212,196,0.1)',
           }}
         />
-        <div
+        <img
+          src={`${base}uniglee.png`}
+          alt="UniGlee butterfly"
           style={{
-            position: 'absolute',
-            width: '18vw',
-            height: '18vw',
-            borderRadius: '50%',
-            border: '1px solid rgba(242,200,75,0.08)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            width: '10vw',
-            height: '10vw',
-            borderRadius: '50%',
-            border: '1px solid rgba(94,212,196,0.12)',
+            width: '32vw',
+            height: '32vw',
+            objectFit: 'contain',
+            mixBlendMode: 'screen',
+            position: 'relative',
+            filter: 'brightness(1.1) saturate(1.2)',
           }}
         />
       </div>
