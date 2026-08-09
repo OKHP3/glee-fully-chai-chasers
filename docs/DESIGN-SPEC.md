@@ -102,7 +102,7 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 | **Double Sparkle** | Next free-spin award from the ladder is doubled |
 | **Facts-on-Facts** | During free spins, wilds carry coin prizes (collected on beam-up) |
 
-**The UniGlee 🦋🌈** (~1/400): screen dims to deep violet, a rainbow butterfly crosses the board trailing stardust, and the full package lands: Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts. Near-guaranteed monster bonus. This is the legend, the story she tells other people. First UniGlee unlocks the Butterfly Burst scene permanently (§10).
+**The UniGlee 🦋🌈** (~1 in 1,277) [editorial correction 2026-08-09: this prose read "(~1/400)", which contradicted the frequency table in §4 of this same document. **§4 is authoritative for all event frequencies.** The engine rolls three independent per-reel captures at 1/2,500, 1/4,000 and 1/7,500, summing to ~1 in 1,277: see `src/engine/uniglee.ts` lines 32 to 38. Measured 1 in 1,370 on the seeded oracle. Prose corrected; no frequency, weight, or gate was changed]: screen dims to deep violet, a rainbow butterfly crosses the board trailing stardust, and the full package lands: Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts. Near-guaranteed monster bonus. This is the legend, the story she tells other people. First UniGlee unlocks the Butterfly Burst scene permanently (§10).
 
 ## 6. The Treat Jar & Cat Pop-Ins (signature system)
 
