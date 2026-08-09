@@ -47,25 +47,64 @@ const KEYFRAMES = `
 @keyframes gd-rise     { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 `;
 
+// ─── Atlas sprite helpers ──────────────────────────────────────────────────────
+const STD_ATLAS = "/__mockup/assets/atlases/standard-symbol-atlas.png";
+const SPC_ATLAS = "/__mockup/assets/atlases/special-symbol-atlas.png";
+
+/** Compute background-position for a 4-col atlas. */
+function bp(col: number, totalCols: number, row: number, totalRows: number) {
+  const x = totalCols === 1 ? 0 : (col / (totalCols - 1)) * 100;
+  const y = totalRows === 1 ? 0 : (row / (totalRows - 1)) * 100;
+  return `${x.toFixed(2)}% ${y.toFixed(2)}%`;
+}
+
+/** Inline atlas sprite rendered as a sized div. */
+function Sprite({ atlas, col, row, totalCols, totalRows, size = 52 }:
+  { atlas: string; col: number; row: number; totalCols: number; totalRows: number; size?: number }) {
+  return (
+    <span style={{
+      display: "inline-block",
+      width: size, height: size, flexShrink: 0,
+      backgroundImage: `url('${atlas}')`,
+      backgroundSize: `${totalCols * 100}% ${totalRows * 100}%`,
+      backgroundPosition: bp(col, totalCols, row, totalRows),
+      backgroundRepeat: "no-repeat",
+      imageRendering: "auto",
+    }} aria-hidden="true" />
+  );
+}
+
+function StdSprite({ col, row, size }: { col: number; row: number; size?: number }) {
+  return <Sprite atlas={STD_ATLAS} col={col} row={row} totalCols={4} totalRows={4} size={size} />;
+}
+function SpcSprite({ col, row, size }: { col: number; row: number; size?: number }) {
+  return <Sprite atlas={SPC_ATLAS} col={col} row={row} totalCols={4} totalRows={2} size={size} />;
+}
+
 // ─── Symbol definitions ────────────────────────────────────────────────────────
-type Sym = "cup"|"leaf"|"moon"|"bell"|"crystal"|"spark"|"wild"|"uni";
-const SYM: Record<Sym,{label:string; color:string; bg:string}> = {
-  cup:     { label:"☕",  color:"#f2c84b", bg:"rgba(242,200,75,0.12)"  },
-  leaf:    { label:"🍃",  color:"#5ed4c4", bg:"rgba(94,212,196,0.10)"  },
-  moon:    { label:"🌙",  color:"#b8a0f5", bg:"rgba(184,160,245,0.10)" },
-  bell:    { label:"🔔",  color:"#f5c86a", bg:"rgba(245,200,106,0.10)" },
-  crystal: { label:"💎",  color:"#82d8ff", bg:"rgba(130,216,255,0.10)" },
-  spark:   { label:"✦",   color:"#f2c84b", bg:"rgba(242,200,75,0.08)"  },
-  wild:    { label:"🐱",  color:"#f47b3f", bg:"rgba(244,123,63,0.14)"  },
-  uni:     { label:"🦋",  color:"#d4a4ff", bg:"rgba(212,164,255,0.12)" },
+// Maps demo symbol names → real atlas positions from src/ui/asset-manifest.ts
+type Sym = "tumbler"|"butterfly"|"crystal"|"chai"|"candle"|"yarn"|"wild_chai"|"uniglee";
+
+const SYM: Record<Sym, {
+  color: string; bg: string; isSpecial?: boolean;
+  col: number; row: number;
+}> = {
+  tumbler:    { col:0, row:0, color:"#f2c84b", bg:"rgba(242,200,75,0.12)" },   // standard
+  butterfly:  { col:1, row:0, color:"#5ed4c4", bg:"rgba(94,212,196,0.10)"  },
+  crystal:    { col:3, row:0, color:"#82d8ff", bg:"rgba(130,216,255,0.10)" },
+  chai:       { col:0, row:1, color:"#b8a0f5", bg:"rgba(184,160,245,0.10)" },
+  candle:     { col:1, row:1, color:"#f5c86a", bg:"rgba(245,200,106,0.10)" },
+  yarn:       { col:3, row:2, color:"#f2c84b", bg:"rgba(242,200,75,0.08)"  },
+  wild_chai:  { col:0, row:1, color:"#f47b3f", bg:"rgba(244,123,63,0.14)", isSpecial:true  },  // special atlas
+  uniglee:    { col:0, row:0, color:"#d4a4ff", bg:"rgba(212,164,255,0.12)", isSpecial:true },  // special atlas
 };
 
 type Row5 = [Sym,Sym,Sym,Sym,Sym];
 const GRID: Row5[] = [
-  ["leaf",    "moon",    "spark",   "bell",    "crystal"],
-  ["cup",     "cup",     "cup",     "cup",     "cup"   ], // ← WIN ROW
-  ["moon",    "leaf",    "wild",    "moon",    "spark" ],
-  ["bell",    "crystal", "spark",   "cup",     "moon"  ],
+  ["butterfly", "chai",    "yarn",    "candle",  "crystal" ],
+  ["tumbler",   "tumbler", "tumbler", "tumbler", "tumbler" ], // ← WIN ROW
+  ["chai",      "butterfly","wild_chai","chai",   "yarn"    ],
+  ["candle",    "crystal", "yarn",    "tumbler", "chai"    ],
 ];
 const WIN_ROW  = 1;
 const MULT_COL = 3; // ×3 multiplier badge on this win-row cell
@@ -91,7 +130,9 @@ function StarField() {
 
 function ReelCell({ sym, winRow, isMultCell }: { sym:Sym; winRow:boolean; isMultCell:boolean }) {
   const s = SYM[sym];
-  const isWild = sym==="wild";
+  const isWild = sym === "wild_chai";
+  const isUni  = sym === "uniglee";
+  const label  = isWild ? "WILD CHAI" : isUni ? "UNIGLEE" : sym.replace("_"," ").toUpperCase();
   return (
     <div style={{
       position:"relative",
@@ -101,7 +142,7 @@ function ReelCell({ sym, winRow, isMultCell }: { sym:Sym; winRow:boolean; isMult
       borderRadius:12,
       display:"flex", flexDirection:"column",
       alignItems:"center", justifyContent:"center",
-      gap:4,
+      gap:2,
       animation: winRow ? "gd-shimmer 2s ease-in-out infinite" : undefined,
       transition:"background .2s",
       overflow:"hidden",
@@ -109,15 +150,17 @@ function ReelCell({ sym, winRow, isMultCell }: { sym:Sym; winRow:boolean; isMult
       {/* win row inner glow */}
       {winRow && <div style={{position:"absolute",inset:0,borderRadius:12,background:"radial-gradient(circle at 50% 60%, rgba(242,200,75,0.12), transparent 70%)",pointerEvents:"none"}} />}
 
-      <span style={{fontSize:38,lineHeight:1,filter:winRow?"drop-shadow(0 0 8px "+s.color+"99)":undefined}}>
-        {s.label}
-      </span>
+      {/* Atlas sprite */}
+      <div style={{filter: winRow ? `drop-shadow(0 0 8px ${s.color}99)` : undefined, flexShrink:0}}>
+        {s.isSpecial
+          ? <SpcSprite col={s.col} row={s.row} size={56} />
+          : <StdSprite col={s.col} row={s.row} size={56} />}
+      </div>
+
       <span style={{
-        fontSize:9.5, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase",
+        fontSize:9, fontWeight:700, letterSpacing:"0.10em", textTransform:"uppercase",
         color: winRow ? C.gold : C.muted,
-      }}>
-        {sym==="wild"?"WILD CHAI":sym==="uni"?"UNIGLEE":sym.toUpperCase()}
-      </span>
+      }}>{label}</span>
 
       {/* WILD badge */}
       {isWild && (
@@ -172,11 +215,13 @@ function TopHud() {
       {/* Logo wordmark */}
       <div style={{display:"flex",alignItems:"center",gap:10,flex:"0 0 auto"}}>
         <div style={{
-          width:32,height:32,borderRadius:8,
+          width:34,height:34,borderRadius:8,
           background:`linear-gradient(135deg,${C.mint},${C.gold})`,
           display:"flex",alignItems:"center",justifyContent:"center",
-          fontSize:18, fontWeight:800,
-        }}>☕</div>
+          overflow:"hidden",
+        }}>
+          <StdSprite col={0} row={0} size={34} />
+        </div>
         <span style={{
           fontFamily:"'Baloo 2',system-ui,sans-serif",
           fontSize:17, fontWeight:800, color:C.cream, letterSpacing:"-.02em",
@@ -191,7 +236,7 @@ function TopHud() {
       <div style={{width:1,height:24,background:C.border}} />
       <HudChip label="SPARKS" value="1,240" accent={C.gold} icon="★" />
       <div style={{width:1,height:24,background:C.border}} />
-      <HudChip label="BALANCE" value="840 coins" accent={C.cream} icon="🪙" bold />
+      <HudChip label="BALANCE" value="840 coins" accent={C.cream} icon="◈" bold />
 
       {/* Settings icon */}
       <button style={{
@@ -439,10 +484,11 @@ function ProgressBar({fill, accent, bg}: {fill:number; accent:string; bg:string}
 }
 
 function RightPanel() {
+  // treat_chicken=std col0 row3 | treat_salmon=std col1 row3 | treat_bougie=std col2 row3
   const treats = [
-    { name:"Chicken Comets", icon:"🍗", count:2, max:5, fill:0.4,  accent:"#f5c86a", bg:"#c8922a" },
-    { name:"Salmon Stars",   icon:"🐟", count:4, max:5, fill:0.8,  accent:"#82d8ff", bg:"#3a90cc" },
-    { name:"Bougie Bites",   icon:"💎", count:1, max:5, fill:0.2,  accent:"#d4a4ff", bg:"#8854d0" },
+    { name:"Chicken Comets", col:0, row:3, count:2, max:5, fill:0.4, accent:"#f5c86a", bg:"#c8922a" },
+    { name:"Salmon Stars",   col:1, row:3, count:4, max:5, fill:0.8, accent:"#82d8ff", bg:"#3a90cc" },
+    { name:"Bougie Bites",   col:2, row:3, count:1, max:5, fill:0.2, accent:"#d4a4ff", bg:"#8854d0" },
   ];
   const fireflyCount = 4;
   const fireflyMax   = 6;
@@ -504,7 +550,7 @@ function RightPanel() {
               <div key={t.name}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:5}}>
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
-                    <span style={{fontSize:16}}>{t.icon}</span>
+                    <StdSprite col={t.col} row={t.row} size={28} />
                     <div>
                       <div style={{fontSize:10.5,fontWeight:700,color:C.cream}}>{t.name}</div>
                     </div>
@@ -561,7 +607,7 @@ function RightPanel() {
                   display:"flex",alignItems:"center",justifyContent:"center",
                   fontSize:12,
                 }}>
-                  {lit ? "✨" : ""}
+                  {lit ? <span style={{fontSize:10}}>✦</span> : null}
                 </div>
               );
             })}
@@ -581,7 +627,10 @@ function RightPanel() {
           border:"1px solid rgba(212,164,255,0.22)",
           borderRadius:12,
         }}>
-          <div style={{fontSize:10,fontWeight:700,color:"#d4a4ff",marginBottom:4}}>🦋 UniGlee Capture</div>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+            <SpcSprite col={0} row={0} size={20} />
+            <span style={{fontSize:10,fontWeight:700,color:"#d4a4ff"}}>UniGlee Capture</span>
+          </div>
           <div style={{fontSize:10,color:C.creamDim,lineHeight:1.5}}>
             Land UniGlee on reels 3–5 to unlock a{" "}
             <span style={{color:"#d4a4ff",fontWeight:700}}>Spin Marathon</span>.
@@ -649,7 +698,7 @@ function BetConsole() {
       <div style={{textAlign:"right",flex:"0 0 auto"}}>
         <div style={{fontSize:8.5,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase"}}>Balance</div>
         <div style={{fontSize:20,fontWeight:800,color:C.cream,fontFamily:"'Baloo 2',system-ui,sans-serif"}}>
-          🪙 840
+          840 <span style={{fontSize:13,color:C.gold}}>coins</span>
         </div>
       </div>
 

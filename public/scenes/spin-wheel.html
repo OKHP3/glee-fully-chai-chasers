@@ -2,81 +2,120 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=390">
 <title>Joey &amp; Phoebe Sparkle Wheel — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>html,body{margin:0;padding:0;width:390px;overflow:hidden}</style>
 </head>
 <body>
-<div class="cc-root">
-  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
-  <div class="cc-shell">
+<div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden cc-root" data-theme="dark" data-reduced-motion="false">
+  <div class="night-garden" id="bg-layer">
+    <div class="aurora-ribbons"><span></span><span></span><span></span></div>
+    <div class="star star-fast" style="top:4%;left:3%;animation-delay:0s"></div>
+    <div class="star star-slow" style="top:21%;left:44%;animation-delay:0.5s"></div>
+    <div class="star star-slow" style="top:38%;left:85%;animation-delay:1s"></div>
+    <div class="firefly" style="top:45%;left:8%;animation-delay:0s"></div>
+    <div class="firefly" style="top:73%;left:52%;animation-delay:2.8s"></div>
+  </div>
+  <div class="relative z-10 h-full w-full flex flex-col cc-shell">
     <header class="marquee">
-      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
-      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
-      <div class="marquee-status">Free Spins! — Sparkle the wheel</div>
-    </header>
-    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>7</span></div></div></div>
-    <main class="cabinet-frame">
-      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
-      <!-- Wheel screen: class="bonus-cabinet-overlay wheel-scrim text-amber-100" appended to .cabinet-frame -->
-      <div class="bonus-cabinet-overlay wheel-scrim text-amber-100">
-        <h2 class="wheel-heading"><span>Free Spins!</span> Joey &amp; Phoebe's Sparkle Wheel</h2>
-        <div class="wheel-stage">
-          <picture class="wheel-hero-picture">
-            <source type="image/webp" srcset="/assets/optimized/joey-phoebe-wheel.webp"/>
-            <img class="wheel-hero-art" src="../assets/joey-phoebe-wheel.png" alt="Joey and Phoebe perched on the free-spin wheel"/>
-          </picture>
-          <div class="wheel-glow-ring"></div>
-          <div class="wheel-mechanical-face" style="--wheel-final-deg:420deg">
-            <svg viewBox="0 0 200 200" class="wheel-mechanical-svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="mechanicalTeal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a8f0e5"/><stop offset="100%" stop-color="#238d89"/></linearGradient>
-                <linearGradient id="mechanicalPink" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9ecb"/><stop offset="100%" stop-color="#a82c63"/></linearGradient>
-                <linearGradient id="mechanicalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff0b0"/><stop offset="100%" stop-color="#bd7d20"/></linearGradient>
-                <radialGradient id="mechanicalHub" cx="35%" cy="25%" r="75%"><stop offset="0%" stop-color="#fffdf5"/><stop offset="100%" stop-color="#f5d576"/></radialGradient>
-                <filter id="mechanicalShadow"><feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#090617" flood-opacity=".65"/></filter>
-              </defs>
-              <circle cx="100" cy="100" r="96" fill="#17102d" stroke="#fff4e0" stroke-width="3" filter="url(#mechanicalShadow)"/>
-              <g stroke="#17102d" stroke-width="2">
-                <path d="M100 100 L100 4 A96 96 0 0 1 183.1 148 Z" fill="url(#mechanicalTeal)"/>
-                <path d="M100 100 L183.1 148 A96 96 0 0 1 16.9 148 Z" fill="url(#mechanicalPink)"/>
-                <path d="M100 100 L16.9 148 A96 96 0 0 1 100 4 Z" fill="url(#mechanicalGold)"/>
-              </g>
-              <g class="wheel-icons" stroke="#17102d" stroke-width="2">
-                <g transform="translate(143 68)"><circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/><path d="M-9-9 L9 9 M9-9 L-9 9" stroke="#fff4e0" stroke-width="6" stroke-linecap="round"/><path d="M0-17 L2-11 L8-9 L2-7 L0-1 L-2-7 L-8-9 L-2-11 Z" fill="#f5d576" stroke="none"/></g>
-                <g transform="translate(100 146)"><circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/><rect x="-11" y="-12" width="14" height="19" rx="2" fill="#e8a5b8"/><rect x="-3" y="-7" width="14" height="19" rx="2" fill="#9fe8c5"/><path d="M0-2 Q4-8 8-3" fill="none" stroke="#fff4e0" stroke-linecap="round"/><circle cx="5" cy="-3" r="2" fill="#f5d576" stroke="none"/></g>
-                <g transform="translate(57 68)"><circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/><path d="M-10-5 H10 L8 11 H-8 Z" fill="#9fe8c5"/><path d="M-7-5 C-7-16 8-16 8-5" fill="none" stroke="#f5d576" stroke-width="3"/><path d="M-2-18 L2-23" stroke="#fff4e0" stroke-width="2.5" stroke-linecap="round"/><path d="M-6 1 H6" stroke="#238d89" stroke-width="2"/></g>
-              </g>
-              <g class="wheel-pins">
-                <circle cx="100.0" cy="4.0" r="4.2" class="wheel-pin wheel-pin--major"/>
-                <circle cx="161.3" cy="37.1" r="3" class="wheel-pin"/>
-                <circle cx="192.2" cy="110.5" r="3" class="wheel-pin"/>
-                <circle cx="183.1" cy="148.0" r="4.2" class="wheel-pin wheel-pin--major"/>
-                <circle cx="130.2" cy="178.4" r="3" class="wheel-pin"/>
-                <circle cx="69.8" cy="178.4" r="3" class="wheel-pin"/>
-                <circle cx="16.9" cy="148.0" r="4.2" class="wheel-pin wheel-pin--major"/>
-                <circle cx="7.8" cy="110.5" r="3" class="wheel-pin"/>
-                <circle cx="38.7" cy="37.1" r="3" class="wheel-pin"/>
-              </g>
-              <circle cx="100" cy="100" r="23" fill="url(#mechanicalHub)" stroke="#17102d" stroke-width="3"/>
-              <circle cx="93" cy="92" r="6" fill="#fff" opacity=".52"/>
-              <path d="M92 108 H108" stroke="#17102d" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div id="wheel-ring" class="wheel-energy-ring" style="--wheel-final-deg:420deg"><span></span><span></span><span></span></div>
-          <div class="wheel-pointer"></div>
-        </div>
-        <div class="wheel-legends" aria-hidden="true">
-          <span><b>We're Multiplying</b> Extra sparkle</span>
-          <span><b>Moonlit Keepsake Trail</b> memory match</span>
-          <span><b>Iced Chai</b> wild rain</span>
-        </div>
-        <p id="wheel-result" class="text-center font-semibold" style="min-height:1.5rem"></p>
+      <div class="marquee-bulbs" aria-hidden="true"><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span></div>
+      <div class="marquee-row">
+        <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+        <button class="chrome-btn" aria-label="Open symbol guide and game rules" title="Symbol guide"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/><path d="M5 4.5v15M9 8h6M9 12h6"/></svg></button>
+        <button class="chrome-btn" aria-label="How it works guide" title="How it works"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.5M12 11.5v5"/></svg></button>
+        <button class="chrome-btn" aria-label="Settings"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/></svg></button>
       </div>
-    </main>
-    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:80%"></div></div></div>
-    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">Free Spins unlocked · Spin the wheel!</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+      <div class="marquee-status" aria-live="polite">Free Spins! — Sparkle the wheel</div>
+    </header>
+    <div class="cabinet-shell">
+      <div id="bonus-banner" class="bonus-banner" aria-live="polite"><span class="level-chip level-chip--cabinet">Lvl 4<em>Wheel Bonus</em></span></div>
+      <div class="cabinet-shell-divider"></div>
+      <main class="cabinet-frame">
+        <span class="ornament ornament-tl"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span><span class="ornament ornament-tr"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span><span class="ornament ornament-bl"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span><span class="ornament ornament-br"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span>
+        <div class="bonus-cabinet-overlay wheel-scrim text-amber-100">
+          <h2 class="wheel-heading"><span>Free Spins!</span> Joey &amp; Phoebe's Sparkle Wheel</h2>
+          <div class="wheel-stage">
+            <picture class="wheel-hero-picture">
+              <source type="image/webp" srcset="../assets/optimized/joey-phoebe-wheel.webp"/>
+              <img class="wheel-hero-art" src="../assets/joey-phoebe-wheel.png" alt="Joey and Phoebe perched on the free-spin wheel"/>
+            </picture>
+            <div class="wheel-glow-ring"></div>
+            <div class="wheel-mechanical-face" style="--wheel-final-deg:420deg">
+              <svg viewBox="0 0 200 200" class="wheel-mechanical-svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="mechanicalTeal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a8f0e5"/><stop offset="100%" stop-color="#238d89"/></linearGradient>
+                  <linearGradient id="mechanicalPink" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9ecb"/><stop offset="100%" stop-color="#a82c63"/></linearGradient>
+                  <linearGradient id="mechanicalGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff0b0"/><stop offset="100%" stop-color="#bd7d20"/></linearGradient>
+                  <radialGradient id="mechanicalHub" cx="35%" cy="25%" r="75%"><stop offset="0%" stop-color="#fffdf5"/><stop offset="100%" stop-color="#f5d576"/></radialGradient>
+                  <filter id="mechanicalShadow"><feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#090617" flood-opacity=".65"/></filter>
+                </defs>
+                <circle cx="100" cy="100" r="96" fill="#17102d" stroke="#fff4e0" stroke-width="3" filter="url(#mechanicalShadow)"/>
+                <g stroke="#17102d" stroke-width="2">
+                  <path d="M100 100 L100 4 A96 96 0 0 1 183.1 148 Z" fill="url(#mechanicalTeal)"/>
+                  <path d="M100 100 L183.1 148 A96 96 0 0 1 16.9 148 Z" fill="url(#mechanicalPink)"/>
+                  <path d="M100 100 L16.9 148 A96 96 0 0 1 100 4 Z" fill="url(#mechanicalGold)"/>
+                </g>
+                <g class="wheel-icons" stroke="#17102d" stroke-width="2">
+                  <g transform="translate(143 68)"><circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/><path d="M-9-9 L9 9 M9-9 L-9 9" stroke="#fff4e0" stroke-width="6" stroke-linecap="round"/><path d="M0-17 L2-11 L8-9 L2-7 L0-1 L-2-7 L-8-9 L-2-11 Z" fill="#f5d576" stroke="none"/></g>
+                  <g transform="translate(100 146)"><circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/><rect x="-11" y="-12" width="14" height="19" rx="2" fill="#e8a5b8"/><rect x="-3" y="-7" width="14" height="19" rx="2" fill="#9fe8c5"/></g>
+                  <g transform="translate(57 68)"><circle r="22" fill="#17102d" fill-opacity=".58" stroke="#fff4e0" stroke-opacity=".72"/><path d="M-10-5 H10 L8 11 H-8 Z" fill="#9fe8c5"/><path d="M-7-5 C-7-16 8-16 8-5" fill="none" stroke="#f5d576" stroke-width="3"/></g>
+                </g>
+                <g class="wheel-pins">
+                  <circle cx="100.0" cy="4.0" r="4.2" class="wheel-pin wheel-pin--major"/>
+                  <circle cx="183.1" cy="148.0" r="4.2" class="wheel-pin wheel-pin--major"/>
+                  <circle cx="16.9" cy="148.0" r="4.2" class="wheel-pin wheel-pin--major"/>
+                </g>
+                <circle cx="100" cy="100" r="23" fill="url(#mechanicalHub)" stroke="#17102d" stroke-width="3"/>
+              </svg>
+            </div>
+            <div id="wheel-ring" class="wheel-energy-ring" style="--wheel-final-deg:420deg"><span></span><span></span><span></span></div>
+            <div class="wheel-pointer"></div>
+          </div>
+          <div class="wheel-legends" aria-hidden="true">
+            <span><b>We're Multiplying</b> Extra sparkle</span>
+            <span><b>Moonlit Keepsake Trail</b> memory match</span>
+            <span><b>Iced Chai</b> wild rain</span>
+          </div>
+          <p id="wheel-result" class="text-center font-semibold" style="min-height:1.5rem"></p>
+        </div>
+      </main>
+    </div>
+    <div class="companion-row">
+      <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
+        <span class="treat-jar-title">Treat Jar</span>
+        <div class="treat-chips-row">
+          <span title="Chicken Comets" class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%" aria-hidden="true"></span></span>3</span>
+          <span title="Salmon Stars" class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%" aria-hidden="true"></span></span>7</span>
+        </div>
+      </div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">5 / 6</strong></div>
+      </div>
+      <button aria-label="AskJamie — tap for daily bonus" class="askjamie-housing">
+        <div class="askjamie-icon"><picture><source srcset="../assets/optimized/askjamie-avatar.webp" type="image/webp"><img src="../assets/askjamie-avatar.jpg" alt="" class="askjamie-picture" aria-hidden="true"></picture></div>
+        <span class="askjamie-label">AskJamie</span>
+      </button>
+    </div>
+    <div id="status-line" class="status-line" aria-live="polite">Free Spins unlocked · Spin the wheel!</div>
+    <footer class="bet-console">
+      <div class="coin-chip" aria-label="Glee-coin balance">12,480<em>coins</em></div>
+      <div class="flex-1"></div>
+      <button class="chrome-btn" aria-label="Decrease bet" disabled>−</button>
+      <span class="bet-display">50</span>
+      <button class="chrome-btn" aria-label="Increase bet" disabled>+</button>
+      <button id="sparkle-btn" class="sparkle-btn" disabled><span>SPARKLE!</span></button>
+    </footer>
+    <aside id="ice-notes-card" class="ice-notes-card" aria-label="Chai ingredient note">
+      <p class="ice-notes-eyebrow">ICE NOTES</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vanilla</span> <span class="ice-notes-text">A gentle sweetness that rounds out the spice mix and adds creamy depth.</span></span>
+        </div>
+      </div>
+    </aside>
   </div>
 </div>
 </body>

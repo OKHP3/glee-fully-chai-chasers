@@ -82,7 +82,30 @@ export function SystemShowcase(){
       {/* ── BRAND HEADER ── */}
       <header style={{height:64,display:"flex",alignItems:"center",padding:"0 32px",background:`linear-gradient(180deg,${C.night} 0%,rgba(7,13,32,.92) 100%)`,borderBottom:`1px solid ${C.border}`,gap:16,flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{width:36,height:36,borderRadius:9,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>☕</div>
+          <div style={{width:36,height:36,borderRadius:9,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <svg viewBox="0 0 28 36" width={22} height={28} aria-hidden="true">
+                {/* Cup body */}
+                <path d="M5 8 L7 34 H21 L23 8 Z" fill="#0f1535" stroke="#5ed4c4" strokeWidth="1.4" strokeLinejoin="round"/>
+                {/* Iced chai fill — amber-teal gradient */}
+                <path d="M6.2 14 L7.4 32 H20.6 L21.8 14 Z" fill="url(#dsIce)"/>
+                {/* Ice cubes */}
+                <rect x="9" y="18" width="5" height="5" rx="1" fill="rgba(255,255,255,.3)" stroke="rgba(255,255,255,.5)" strokeWidth=".6"/>
+                <rect x="14.5" y="20" width="4" height="4" rx="1" fill="rgba(255,255,255,.25)" stroke="rgba(255,255,255,.45)" strokeWidth=".6"/>
+                {/* Straw */}
+                <rect x="17" y="3" width="2" height="22" rx="1" fill="#f47b3f"/>
+                {/* Lid */}
+                <rect x="4" y="6" width="20" height="3.5" rx="1.5" fill="#5ed4c4" opacity=".9"/>
+                {/* Dome top */}
+                <ellipse cx="14" cy="6" rx="10" ry="2" fill="#82e8dc"/>
+                <defs>
+                  <linearGradient id="dsIce" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f2c84b" stopOpacity=".85"/>
+                    <stop offset="55%" stopColor="#c07530" stopOpacity=".9"/>
+                    <stop offset="100%" stopColor="#6b3a12" stopOpacity=".95"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
           <div>
             <div style={{fontFamily:"'Baloo 2',system-ui,sans-serif",fontSize:16,fontWeight:800,color:C.cream,lineHeight:1}}>Chai Chasers</div>
             <div style={{fontSize:10,fontWeight:700,color:C.gold,letterSpacing:"0.05em"}}>Retro-Bright Midnight PNW</div>
@@ -185,10 +208,55 @@ export function SystemShowcase(){
           <div style={{padding:"14px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:12}}>
             <div style={{fontSize:9,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:10}}>Reel Cells</div>
             <div style={{display:"flex",gap:6}}>
-              {[{s:"☕",l:"CUP",win:true},{s:"🍃",l:"LEAF",win:false},{s:"🐱",l:"WILD",wild:true,win:false}].map((c,i)=>(
+              {/* Tumbler (top symbol), Butterfly, Cat Wild */}
+              {[
+                {win:true, label:"TUMBLER", content:(
+                  <svg viewBox="0 0 28 38" width={28} height={34} aria-hidden="true">
+                    <defs>
+                      <linearGradient id="rcIce" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f2c84b" stopOpacity=".9"/>
+                        <stop offset="50%" stopColor="#c07530" stopOpacity=".95"/>
+                        <stop offset="100%" stopColor="#6b3a12"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M4 8 L6.5 36 H21.5 L24 8 Z" fill="#0f1535" stroke="#5ed4c4" strokeWidth="1.3" strokeLinejoin="round"/>
+                    <path d="M5.4 15 L7.2 34 H20.8 L22.6 15 Z" fill="url(#rcIce)"/>
+                    <rect x="8" y="19" width="5" height="5" rx="1" fill="rgba(255,255,255,.28)" stroke="rgba(255,255,255,.45)" strokeWidth=".6"/>
+                    <rect x="14" y="21" width="4" height="4" rx="1" fill="rgba(255,255,255,.22)" strokeWidth=".6"/>
+                    <rect x="18" y="3" width="2" height="22" rx="1" fill="#f47b3f"/>
+                    <rect x="3" y="6" width="22" height="3.5" rx="1.5" fill="#5ed4c4" opacity=".9"/>
+                    <ellipse cx="14" cy="6" rx="11" ry="2" fill="#82e8dc"/>
+                  </svg>
+                ), wild:false},
+                {win:false, label:"BUTTERFLY", content:(
+                  <svg viewBox="0 0 36 32" width={34} height={30} aria-hidden="true">
+                    <ellipse cx="10" cy="14" rx="9" ry="6" fill="#a8ff78" opacity=".82" transform="rotate(-20,10,14)"/>
+                    <ellipse cx="10" cy="22" rx="6" ry="4" fill="#5ed4c4" opacity=".75" transform="rotate(15,10,22)"/>
+                    <ellipse cx="26" cy="14" rx="9" ry="6" fill="#a8ff78" opacity=".82" transform="rotate(20,26,14)"/>
+                    <ellipse cx="26" cy="22" rx="6" ry="4" fill="#5ed4c4" opacity=".75" transform="rotate(-15,26,22)"/>
+                    <ellipse cx="18" cy="17" rx="2" ry="8" fill="#7c3aed"/>
+                    <line x1="18" y1="10" x2="12" y2="4" stroke="#f2c84b" strokeWidth="1.2" strokeLinecap="round"/>
+                    <line x1="18" y1="10" x2="24" y2="4" stroke="#f2c84b" strokeWidth="1.2" strokeLinecap="round"/>
+                  </svg>
+                ), wild:false},
+                {win:false, label:"WILD", content:(
+                  <svg viewBox="0 0 36 32" width={34} height={30} aria-hidden="true">
+                    <ellipse cx="18" cy="18" rx="13" ry="11" fill="#1a1040" stroke="#e8a0b4" strokeWidth="1.2"/>
+                    <ellipse cx="13" cy="15" rx="3.5" ry="4" fill="#f0e8ff" opacity=".9"/>
+                    <ellipse cx="23" cy="15" rx="3.5" ry="4" fill="#f0e8ff" opacity=".9"/>
+                    <ellipse cx="13" cy="15" rx="1.5" ry="2.5" fill="#7c3aed"/>
+                    <ellipse cx="23" cy="15" rx="1.5" ry="2.5" fill="#7c3aed"/>
+                    <path d="M14 22 Q18 25 22 22" fill="none" stroke="#e8a0b4" strokeWidth="1.2" strokeLinecap="round"/>
+                    <line x1="6" y1="13" x2="1" y2="11" stroke="#e8a0b4" strokeWidth=".8" strokeLinecap="round"/>
+                    <line x1="6" y1="15" x2="1" y2="15" stroke="#e8a0b4" strokeWidth=".8" strokeLinecap="round"/>
+                    <line x1="30" y1="13" x2="35" y2="11" stroke="#e8a0b4" strokeWidth=".8" strokeLinecap="round"/>
+                    <line x1="30" y1="15" x2="35" y2="15" stroke="#e8a0b4" strokeWidth=".8" strokeLinecap="round"/>
+                  </svg>
+                ), wild:true},
+              ].map((c,i)=>(
                 <div key={i} style={{width:70,height:82,background:c.win?"rgba(242,200,75,.1)":C.panel,border:`1.5px solid ${c.win?"rgba(242,200,75,.55)":C.border}`,borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,position:"relative"}}>
-                  <span style={{fontSize:26}}>{c.s}</span>
-                  <span style={{fontSize:8,fontWeight:700,color:c.win?C.gold:C.muted,letterSpacing:"0.1em",textTransform:"uppercase"}}>{c.l}</span>
+                  {c.content}
+                  <span style={{fontSize:8,fontWeight:700,color:c.win?C.gold:C.muted,letterSpacing:"0.1em",textTransform:"uppercase"}}>{c.label}</span>
                   {c.wild&&<div style={{position:"absolute",top:4,left:4,padding:"1px 5px",borderRadius:5,background:C.orange,color:C.cream,fontSize:7,fontWeight:800}}>WILD</div>}
                   {c.win&&<div style={{position:"absolute",bottom:3,width:5,height:5,borderRadius:"50%",background:C.gold,animation:"ds-pulse 1.2s infinite"}}/>}
                 </div>

@@ -7,6 +7,7 @@ export const modules: ModuleMap = {
   "./components/mockups/gameplay-direction/Desktop.tsx": () => import("../components/mockups/gameplay-direction/Desktop.tsx"),
   "./components/mockups/gameplay-direction/Mobile.tsx": () => import("../components/mockups/gameplay-direction/Mobile.tsx"),
   "./components/mockups/progress-feedback/Playful.tsx": () => import("../components/mockups/progress-feedback/Playful.tsx"),
+  "./components/mockups/storybook-opening/Desktop.tsx": () => import("../components/mockups/storybook-opening/Desktop.tsx"),
   "./components/mockups/scenes/BoardAskjamieBubble.tsx": () => import("../components/mockups/scenes/BoardAskjamieBubble.tsx"),
   "./components/mockups/scenes/BoldChaiFreeSpins.tsx": () => import("../components/mockups/scenes/BoldChaiFreeSpins.tsx"),
   "./components/mockups/scenes/BonusSummary.tsx": () => import("../components/mockups/scenes/BonusSummary.tsx"),
@@ -51,6 +52,5 @@ export const modules: ModuleMap = {
   "./components/mockups/scenes/UnigleeMarathonLevelup.tsx": () => import("../components/mockups/scenes/UnigleeMarathonLevelup.tsx"),
   "./components/mockups/scenes/WinCelebrationBig.tsx": () => import("../components/mockups/scenes/WinCelebrationBig.tsx"),
   "./components/mockups/scenes/WinCelebrationNice.tsx": () => import("../components/mockups/scenes/WinCelebrationNice.tsx"),
-  "./components/mockups/scenes/WinStatusOnly.tsx": () => import("../components/mockups/scenes/WinStatusOnly.tsx"),
-  "./components/mockups/storybook-opening/Desktop.tsx": () => import("../components/mockups/storybook-opening/Desktop.tsx")
+  "./components/mockups/scenes/WinStatusOnly.tsx": () => import("../components/mockups/scenes/WinStatusOnly.tsx")
 };
