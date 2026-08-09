@@ -2560,6 +2560,13 @@ body {
     border-top: none;
     border: 2px solid rgba(159, 232, 197, 0.28);
   }
+  /* Eyebrow label — a little more presence in the tall panel */
+  .cc-shell .ice-notes-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    margin-bottom: 10px;
+    opacity: 0.85;
+  }
   /* Show the full ingredient name + fact — no 2-line clamp in a tall panel */
   .cc-shell .ice-notes-name-group {
     display: block;
@@ -2567,14 +2574,36 @@ body {
     overflow: visible;
     white-space: normal;
   }
-  /* Give the profile grid comfortable breathing room above it */
-  .cc-shell .ice-notes-profile {
-    margin-top: 14px;
-    /* Larger label/value type in the wider card */
-    font-size: 1.05em;
+  /* Ingredient name on its own line */
+  .cc-shell .ice-notes-name {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 6px;
   }
-  .cc-shell .ice-notes-profile dt { font-size: 9px; }
-  .cc-shell .ice-notes-profile dd { font-size: 12px; }
+  /* Fact text on its own lines below the name */
+  .cc-shell .ice-notes-text {
+    display: block;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  /* Profile: single-column stack so each of the four fields has its own row */
+  .cc-shell .ice-notes-profile {
+    grid-template-columns: 1fr;
+    gap: 12px 0;
+    margin-top: 16px;
+  }
+  /* Each field: stack the label above its value */
+  .cc-shell .ice-notes-profile div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .cc-shell .ice-notes-profile dt {
+    font-size: 10px;
+    letter-spacing: 0.10em;
+    opacity: 0.85;
+  }
+  .cc-shell .ice-notes-profile dd { font-size: 14px; line-height: 1.35; }
 
   .chai-splash { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
   .chai-splash__content { min-height: calc(100dvh - clamp(48px, 8vw, 112px)); }
