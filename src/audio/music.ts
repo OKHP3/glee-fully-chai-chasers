@@ -27,74 +27,16 @@ const UNIGLEE_BAR_SECONDS = UNIGLEE_BEAT_SECONDS * 4;
 /** 48 original synthesized bars: long enough to keep a marathon from feeling like a 15-second loop. */
 export const UNIGLEE_SCORE_DURATION_SECONDS = UNIGLEE_BAR_SECONDS * 48;
 
-type ScoreBar = Readonly<{
-  pad: readonly number[];
-  bass: number;
-}>;
-
-// A five-phrase night-drive form: soft electric-piano harmony, a low pulse,
-// and a sparse, upward-looking lead. MIDI pitches keep the score readable
-// without embedding any external score or audio material.
-const SCORE: readonly ScoreBar[] = [
-  { pad: [52, 55, 59, 66], bass: 40 },
-  { pad: [48, 52, 55, 62], bass: 36 },
-  { pad: [50, 55, 59, 64], bass: 38 },
-  { pad: [50, 57, 62, 64], bass: 38 },
-  { pad: [52, 55, 59, 66], bass: 40 },
-  { pad: [45, 48, 52, 59], bass: 33 },
-  { pad: [48, 52, 55, 62], bass: 36 },
-  { pad: [47, 54, 59, 64], bass: 35 },
-  { pad: [50, 55, 59, 64], bass: 38 },
-  { pad: [50, 57, 62, 64], bass: 38 },
-  { pad: [52, 55, 59, 62], bass: 40 },
-  { pad: [48, 52, 55, 62], bass: 36 },
-  { pad: [45, 48, 52, 57], bass: 33 },
-  { pad: [47, 50, 54, 57], bass: 35 },
-  { pad: [48, 52, 55, 59], bass: 36 },
-  { pad: [47, 54, 59, 63], bass: 35 },
-  { pad: [52, 55, 59, 66], bass: 40 },
-  { pad: [50, 57, 62, 64], bass: 38 },
-  { pad: [48, 52, 55, 62], bass: 36 },
-  { pad: [52, 55, 59, 66], bass: 40 },
-];
-
-type LeadNote = Readonly<{ bar: number; beat: number; midi: number; length: number }>;
-
-const LEAD: readonly LeadNote[] = [
-  { bar: 0, beat: 0, midi: 76, length: 0.7 },
-  { bar: 0, beat: 1.5, midi: 79, length: 0.45 },
-  { bar: 0, beat: 2.25, midi: 71, length: 0.4 },
-  { bar: 0, beat: 3, midi: 78, length: 0.75 },
-  { bar: 2, beat: 0.5, midi: 74, length: 0.55 },
-  { bar: 2, beat: 1.5, midi: 71, length: 0.4 },
-  { bar: 3, beat: 2.5, midi: 76, length: 0.8 },
-  { bar: 5, beat: 0.25, midi: 72, length: 0.55 },
-  { bar: 5, beat: 1.25, midi: 76, length: 0.42 },
-  { bar: 6, beat: 2, midi: 79, length: 0.58 },
-  { bar: 7, beat: 3, midi: 78, length: 0.7 },
-  { bar: 8, beat: 0, midi: 74, length: 0.55 },
-  { bar: 9, beat: 1.5, midi: 78, length: 0.45 },
-  { bar: 10, beat: 2.25, midi: 83, length: 0.75 },
-  { bar: 12, beat: 0.5, midi: 76, length: 0.5 },
-  { bar: 13, beat: 2, midi: 74, length: 0.4 },
-  { bar: 14, beat: 3, midi: 79, length: 0.8 },
-  { bar: 16, beat: 0, midi: 76, length: 0.52 },
-  { bar: 17, beat: 1.5, midi: 74, length: 0.42 },
-  { bar: 18, beat: 2, midi: 71, length: 0.48 },
-  { bar: 19, beat: 3, midi: 76, length: 0.9 },
-];
 
 type ScheduledSource = OscillatorNode | AudioBufferSourceNode;
 
-let musicBus: GainNode | undefined;
+let baseMusicEl: HTMLAudioElement | undefined;
 let urgencyBus: GainNode | undefined;
 let running = false;
 let urgencyRunning = false;
 let unigleeRunning = false;
 let boldChaiUrgencyEnabled = false;
 let musicVolume = 4.0;
-let cycleStart = 0;
-let loopTimer: number | undefined;
 let urgencyCycleStart = 0;
 let urgencyLoopTimer: number | undefined;
 let unigleeLoopTimer: number | undefined;
@@ -169,44 +111,6 @@ function scheduleBrush(
   source.stop(start + duration + 0.02);
 }
 
-function scheduleCycle(start: number): void {
-  const audio = getAudioContext();
-  if (!audio || !musicBus) return;
-
-  SCORE.forEach((bar, index) => {
-    const barStart = start + index * BAR_SECONDS;
-
-    // Soft, slightly uneven electric-piano-like chord layer.
-    bar.pad.forEach((midi, voice) => {
-      scheduleOscillator(audio, frequency(midi), barStart + voice * 0.012, BAR_SECONDS * 0.9, 0.022, "triangle", 0.12);
-    });
-
-    // Low fifth pulse: warm enough for the garden, with a small grunge edge.
-    scheduleOscillator(audio, frequency(bar.bass), barStart, BEAT_SECONDS * 1.45, 0.034, "sawtooth", 0.025);
-    scheduleOscillator(audio, frequency(bar.bass + 7), barStart + BEAT_SECONDS * 2, BEAT_SECONDS * 1.15, 0.024, "triangle", 0.025);
-
-    // A restrained brushed backbeat that leaves clear space for cascade cues.
-    scheduleBrush(audio, barStart + BEAT_SECONDS, 1_850);
-    scheduleBrush(audio, barStart + BEAT_SECONDS * 3, 2_150);
-
-    // Aurora sparkle at each barline, varied enough to avoid a mechanical tick.
-    if (index % 2 === 0) {
-      scheduleOscillator(audio, frequency(88 + (index % 3) * 2), barStart + BEAT_SECONDS * 3.5, 0.42, 0.012, "sine", 0.01);
-    }
-  });
-
-  LEAD.forEach((note) => {
-    scheduleOscillator(
-      audio,
-      frequency(note.midi),
-      start + note.bar * BAR_SECONDS + note.beat * BEAT_SECONDS,
-      note.length * BEAT_SECONDS,
-      0.04,
-      "triangle",
-      0.018,
-    );
-  });
-}
 
 /** Edgy, faster UniGlee marathon score: bright suspended chords, octave bass,
  * offbeat synthesized brushes, and a non-repeating 48-bar contour. */
@@ -386,7 +290,7 @@ function scheduleFollowingUrgencyCycle(): void {
 
 function startUrgencyLayer(start: number): void {
   const audio = getAudioContext();
-  if (!audio || !musicBus || urgencyRunning) return;
+  if (!audio || urgencyRunning) return;
 
   urgencyBus = audio.createGain();
   urgencyBus.gain.setValueAtTime(0.0001, audio.currentTime);
@@ -423,29 +327,19 @@ function stopUrgencyLayer(): void {
   if (busToDisconnect) window.setTimeout(() => busToDisconnect.disconnect(), 150);
 }
 
-function scheduleFollowingCycle(): void {
-  const audio = getAudioContext();
-  if (!running || !audio) return;
-  cycleStart += BASE_SCORE_DURATION_SECONDS;
-  scheduleCycle(cycleStart);
-  const wakeAt = Math.max(30, (cycleStart - audio.currentTime - 0.5) * 1_000);
-  loopTimer = window.setTimeout(scheduleFollowingCycle, wakeAt);
-}
-
-/** Start the 60-second base score beneath game effects after a user gesture. */
+/** Start the MP3 base score for the standard game after a user gesture.
+ *  The UniGlee marathon and urgency layer remain synthesized. */
 export function startBaseMusic(): void {
-  const audio = getAudioContext();
-  if (!audio || !musicEnabled || running) return;
-
-  musicBus = audio.createGain();
-  musicBus.gain.setValueAtTime(0.0001, audio.currentTime);
-  musicBus.gain.linearRampToValueAtTime(musicVolume * 0.14, audio.currentTime + 0.45);
-  musicBus.connect(audio.destination);
+  if (!musicEnabled || running) return;
+  if (!baseMusicEl) {
+    baseMusicEl = new Audio(`${import.meta.env.BASE_URL}audio/bg_music.mp3`);
+    baseMusicEl.loop = true;
+  }
+  baseMusicEl.volume = Math.min(1, musicVolume * 0.14);
+  void baseMusicEl.play().catch(() => { /* autoplay blocked; next gesture will retry */ });
   running = true;
-  cycleStart = audio.currentTime + 0.06;
-  scheduleCycle(cycleStart);
-  if (boldChaiUrgencyEnabled) startUrgencyLayer(cycleStart);
-  loopTimer = window.setTimeout(scheduleFollowingCycle, Math.max(30, (BASE_SCORE_DURATION_SECONDS - 0.5) * 1_000));
+  const audio = getAudioContext();
+  if (boldChaiUrgencyEnabled && audio) startUrgencyLayer(audio.currentTime + 0.06);
 }
 
 /**
@@ -462,11 +356,11 @@ export function setBoldChaiUrgency(enabled: boolean): void {
   }
 }
 
-/** Set the music mix (0–3); changes take effect immediately while playing. */
+/** Set the music mix (0–7); changes take effect immediately while playing. */
 export function setMusicVolume(volume: number): void {
   musicVolume = clampMusicVolume(volume);
+  if (baseMusicEl) baseMusicEl.volume = Math.min(1, musicVolume * 0.14);
   const audio = getAudioContext();
-  if (musicBus && audio) musicBus.gain.setTargetAtTime(musicVolume * 0.14, audio.currentTime, 0.025);
   if (urgencyBus && audio) urgencyBus.gain.setTargetAtTime(musicVolume * 0.075, audio.currentTime, 0.025);
   if (unigleeBus && audio) unigleeBus.gain.setTargetAtTime(musicVolume * 0.19, audio.currentTime, 0.025);
 }
@@ -476,26 +370,14 @@ export function isBaseMusicRunning(): boolean {
   return running;
 }
 
-/** Stop all scheduled score voices immediately when the shared Sound toggle is off. */
+/** Stop all music immediately when the shared Sound toggle is off. */
 export function stopBaseMusic(): void {
   running = false;
   stopUniGleeMusic();
   stopUrgencyLayer();
-  if (loopTimer !== undefined) {
-    window.clearTimeout(loopTimer);
-    loopTimer = undefined;
-  }
-  const audio = getAudioContext();
-  if (musicBus && audio) musicBus.gain.setTargetAtTime(0.0001, audio.currentTime, 0.02);
-  for (const source of scheduledSources) {
-    try {
-      source.stop((audio?.currentTime ?? 0) + 0.08);
-    } catch {
-      // A source can have ended between the loop and stop call.
-    }
+  if (baseMusicEl) {
+    baseMusicEl.pause();
+    baseMusicEl.currentTime = 0;
   }
   scheduledSources.clear();
-  const busToDisconnect = musicBus;
-  musicBus = undefined;
-  if (busToDisconnect) window.setTimeout(() => busToDisconnect.disconnect(), 120);
 }
