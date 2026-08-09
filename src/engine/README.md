@@ -1,20 +1,7 @@
-# src/engine — pure game math
+# `src/engine` — pure game math
 
-Zero DOM imports. Everything deterministic under a seeded RNG. Vitest coverage required before UI consumes a module.
+The engine is the tested, browser-DOM-free heart of Glee-fully Chai Chasers. It owns deterministic RNG, five-by-four reel generation, 40-payline evaluation, cascades, free spins, specialty wilds, the Treat Jar and cat visits, Doorbell Panic, Treat Time, Bold Chai, Moonlit Keepsake Trail, and the UniGlee marathon.
 
-| Module | Responsibility | Status |
-|---|---|---|
-| `types.ts` | Shared types, free-spin ladder, config | ☑ stub |
-| `rng.ts` | Seedable mulberry32, weighted pick | ☑ ready |
-| `reels.ts` | Reel strips (symbol weights per reel), spin → Grid, gravity refill | ☐ TODO |
-| `paylines.ts` | 40 fixed lines, left-to-right evaluation, wild substitution, paytable | ☐ TODO |
-| `cascade.ts` | Cascade loop: evaluate → remove → refill → repeat; meter; specialty-wild queue (one per dead board, extras queue) | ☐ TODO |
-| `features.ts` | Cat visits (Phoebe any-treat / Joey bougie-only, pity weighting), UniGlee package, wheel modifiers, Chai Bonus pick math | ☐ TODO |
-| `economy.ts` | Balance/bet/win in Sparks, automatic refill trigger, XP/levels, daily bonus gating | ☐ TODO |
+UI code consumes typed engine results; it does not calculate payouts, weights, or feature outcomes. Keep engine changes simulation-backed and preserve the release-oracle thresholds in `simulation.test.ts`.
 
-Required tests (see docs/DESIGN-SPEC.md §5):
-- payline evaluation against hand-computed grids
-- cascade ladder awards exact FREE_SPIN_LADDER values incl. double_sparkle
-- 1M-spin RTP simulation within ±0.5% of targetRtp
-- treat-jar rules: Joey never assists without bougie treat; Phoebe assists with any
-- balance can never strand below one max bet (refill invariant)
+Run `npm test` for the full engine and UI suite, then `npm run build` before integrating an engine change.

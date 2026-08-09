@@ -1,7 +1,7 @@
-# src/ui — rendering & animation (no game math here)
+# `src/ui` — rendering and interaction
 
-Owner: pending D2 (vanilla TS vs React) in docs/DECISION-LOG.md. Do not start until settled.
+The UI is vanilla TypeScript and owns DOM rendering, controls, overlays, accessibility labels, animation timing, and reduced-motion presentation. It consumes typed results from `src/engine/` and must not own game math, payout rules, symbol weights, or RNG.
 
-Contract with the engine: UI consumes `SpinResult`/`CascadeStep` objects and animates them; it never computes wins, weights, or randomness. Animation rules: transform/opacity only, `will-change` on reels, 60fps on iPhone, honor `prefers-reduced-motion` (fades replace drops), touch targets ≥48px, aria-live announcements for wins.
+Key surfaces include the splash/audio unlock, mobile-first cabinet board, cascade choreography, wheel, cat pop-ins, Treat Jar, Ice Notes, bonus staging, settings, and persisted-state controls. Preserve the protected presentation baseline described in `docs/IMPLEMENTATION-BASELINE.md`; use bounded improvements rather than broad regeneration of board, symbol, CSS, or production-art files.
 
-Screens: splash (audio unlock), main board (reels + meter + Treat Jar + bet bar), wheel, Chai Bonus shelf, daily wheel, birthday reveal, settings/reset.
+For UI changes, run `npm test` and `npm run build`, then inspect an iPhone-sized viewport, reduced motion, mute behavior, and browser console.
