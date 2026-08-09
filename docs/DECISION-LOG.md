@@ -51,6 +51,39 @@ The stakes are quantified. UniGlee at 40/60/80 already contributes roughly six p
 - **(i) "Code."** 40/60/80 is canon. Add a dated superseding decision here, and append dated notes to S30 and to `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` rather than editing the original rulings. No engine work.
 - **(ii) "S30."** 300/400/500 is canon. Open a simulation-gated engine task to raise the award, and re-measure full-game RTP before anything ships. A 7.5x increase on the largest bonus will not stay inside the 95% to 98% band without compensating changes elsewhere, and that compensation is itself an engine decision.
 
+**Ties to D8.** The 2,000,000-spin fleet attributes **7.47 points of RTP to UniGlee alone**, the largest share of any bonus, at the current 40/60/80 award. The game is already measuring above band. D7 option (ii) would multiply the biggest contributor in a game that is already too generous, so **D7 and D8 should be ruled together**.
+
+### D8. The documented RTP band does not match the measured game, and it never stated a player model
+
+**Raised:** 2026-08-09, by Claude, after the converged simulation fleet. **Owner:** Jamie. **Status:** open.
+
+`docs/DESIGN-SPEC.md` §4 records an overall RTP target of "~96.5% (95-98% band)". The measured full game does not meet it.
+
+| Measure | Value | Source |
+|---|---|---|
+| Documented band | 95% to 98%, target ~96.5% | `docs/DESIGN-SPEC.md` §4 |
+| Measured full-game RTP | **98.70%** | 2,000,000 paid spins, seeds 1 to 40 at 50,000 each |
+| 95% confidence interval | 97.93% to 99.47% | same |
+| Per-seed standard deviation | 2.49 | same |
+| Per-seed span | 94.16% to 106.78% | same |
+| Seeds landing inside the documented band | **10 of 40** | same |
+| Base layer / bonus layer | 61.05% / 37.65% | same |
+| Largest contributors | firefly free spins 10.64%, UniGlee 7.47%, doorbell panic 4.98% | same |
+
+Reproduce with `for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done`.
+
+The entire confidence interval sits above 98%. This is not sampling noise: earlier seven-seed readings of 95.66% and 97.56% appeared to confirm the band, but at a per-seed sd of 2.49 a seven-seed sample cannot resolve a band 3 points wide. The first adequately powered measurement puts the game out of band.
+
+**A second problem sits underneath the first: the band never stated a player model.** `scripts/sim-agent.ts` plays both interactive bonuses at their ceiling. Bold Chai Pump receives a steady six pumps per second for the entire 30-second window (lines 72 to 79), and the Moonlit Keepsake Trail is played by a perfect-memory player who always completes all six pairs and always collects the 40-spin handoff (line 183). So **98.70% is a generous-play ceiling, not an expected value.** Real play sits below it by an amount nobody has measured, because no realistic-play variant of the harness exists. A single RTP number without a stated player model cannot be checked by anyone, which is how three successive figures went unchallenged.
+
+**Ruling needed. One word is enough.**
+
+- **(i) "Restate."** Declare the 95% to 98% figure as base game plus common bonuses only, and publish the full-game figure separately with its player model attached. Documentation change only, no engine work.
+- **(ii) "Model."** Keep one combined band but define the assumed player in the spec, and add a realistic-play variant to `scripts/sim-agent.ts` so both the ceiling and the expected value are measurable. Tooling work, no engine retune.
+- **(iii) "Retune."** Bring the full game back inside 95% to 98%. This means making a birthday gift measurably stingier, and it runs against Principle 4, "Generous by Design." If chosen, it is simulation-gated engine work and should be ruled together with D7.
+
+**This is a documentation-accuracy question, not a player-facing defect.** The game uses fictional Glee-coins only, with no purchase, wager, cash-out, or odds claim, so a player is not harmed by the game paying better than a document predicted. Nothing needs to ship urgently. What is not acceptable is continuing to publish 95% to 98% as a verified figure while the measured value sits outside it.
+
 ## Settled decisions
 
 > ### Numbering errata (recorded 2026-08-09, nothing renumbered)
