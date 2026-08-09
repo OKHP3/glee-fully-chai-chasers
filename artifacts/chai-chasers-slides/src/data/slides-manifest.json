@@ -1,0 +1,98 @@
+[
+  {
+    "id": "c4f9a3e7-2b15-4d8c-91e6-7a3d4b2c8f01",
+    "position": 1,
+    "title": "Glee-fully Chai Chasers",
+    "filepath": "src/pages/slides/Slide01Cover.tsx",
+    "description": "Cover slide — portfolio presentation for Glee-fully Chai Chasers",
+    "speakerNotes": ""
+  },
+  {
+    "id": "8b2e7f4a-c319-4a2d-b0e5-3d6c82a1f902",
+    "position": 2,
+    "title": "The Project",
+    "filepath": "src/pages/slides/Slide02Project.tsx",
+    "description": "Project overview — what it is and why it was built",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1d5c8b7-e43a-4e81-9c6b-2d8e17c4a303",
+    "position": 3,
+    "title": "Visual Design System",
+    "filepath": "src/pages/slides/Slide03VisualDesign.tsx",
+    "description": "Design system overview — palette, symbols, and visual language",
+    "speakerNotes": ""
+  },
+  {
+    "id": "6a2f8d4c-3e9b-4a17-b5d3-8c1e42f9d804",
+    "position": 4,
+    "title": "Gameplay Loop",
+    "filepath": "src/pages/slides/Slide04Gameplay.tsx",
+    "description": "Core gameplay mechanics — reels, paylines, bet system, RTP",
+    "speakerNotes": ""
+  },
+  {
+    "id": "d3a8e5b7-6f2c-4d93-a8b1-5e7c39d2b505",
+    "position": 5,
+    "title": "Companion Characters",
+    "filepath": "src/pages/slides/Slide05Companions.tsx",
+    "description": "Joey and Phoebe companion system — arrival, poses, and interactions",
+    "speakerNotes": ""
+  },
+  {
+    "id": "9c4a1f6e-2d7b-4c85-b9a4-3f6d18e1c906",
+    "position": 6,
+    "title": "UniGlee — The Bonus Round",
+    "filepath": "src/pages/slides/Slide06Uniglee.tsx",
+    "description": "UniGlee bonus round — butterfly trigger, free spins, and narrative skin",
+    "speakerNotes": ""
+  },
+  {
+    "id": "5b9e3a2c-7f1d-4b62-a3e7-6d2c85f4b307",
+    "position": 7,
+    "title": "Ice Notes — Chai Education",
+    "filepath": "src/pages/slides/Slide07IceNotes.tsx",
+    "description": "Ice Notes educational panel — ingredient cards, profiles, responsive layout",
+    "speakerNotes": ""
+  },
+  {
+    "id": "2e7f4a6d-9c3b-4e18-b6a2-4d9c71e8a808",
+    "position": 8,
+    "title": "Progression & Rewards",
+    "filepath": "src/pages/slides/Slide08Progression.tsx",
+    "description": "Game progression — Sparks XP, level-ups, Treat Jar, and Firefly Cascade",
+    "speakerNotes": ""
+  },
+  {
+    "id": "7a9d3c8f-1b7e-4a34-c2d9-7e5b28f3c009",
+    "position": 9,
+    "title": "Responsive Engineering",
+    "filepath": "src/pages/slides/Slide09Responsive.tsx",
+    "description": "Responsive layout approach across 360px, 600px, and 900px+ breakpoints",
+    "speakerNotes": ""
+  },
+  {
+    "id": "4f4b2e7a-8d6c-4f51-b8e1-2a3d96c7e510",
+    "position": 10,
+    "title": "Technical Architecture",
+    "filepath": "src/pages/slides/Slide10Architecture.tsx",
+    "description": "Tech stack — TypeScript, Vite, SVG assets, pnpm monorepo",
+    "speakerNotes": ""
+  },
+  {
+    "id": "1c7a5d9b-3f8e-4c27-a9b4-5e8d13f2b111",
+    "position": 11,
+    "title": "Craft Details",
+    "filepath": "src/pages/slides/Slide11Craft.tsx",
+    "description": "Micro-interaction highlights — SPARKLE, cat animations, cross-fades",
+    "speakerNotes": ""
+  },
+  {
+    "id": "8d1e8c4f-6a2b-4d93-b7a5-3c9e74b8d512",
+    "position": 12,
+    "title": "What I Built",
+    "filepath": "src/pages/slides/Slide12WhatIBuilt.tsx",
+    "description": "Closing slide — summary of the complete project",
+    "speakerNotes": ""
+  }
+]
