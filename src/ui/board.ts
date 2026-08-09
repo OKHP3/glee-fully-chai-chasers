@@ -836,7 +836,12 @@ async function runSpin(
   state.balance -= state.bet;
   sparkleBtn.disabled = true;
   sparkleBtn.classList.add("is-spinning");
+  // Prevent the HIW guide from opening mid-spin: an open overlay sits at
+  // z-index 9999 and would hide any bonus overlay appended during the spin.
+  const hiwBtnAtStart = root.querySelector<HTMLButtonElement>("#hiw-btn");
+  if (hiwBtnAtStart) hiwBtnAtStart.disabled = true;
 
+  try {
   const seed = productionSeed();
   let treatJarSpinsAwarded = state.pendingTreatJarSpins;
   state.pendingTreatJarSpins = 0;
@@ -946,6 +951,16 @@ async function runSpin(
 
   if (!result.treatTimeBonus) renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
   await advanceIceNote(root);
+  } finally {
+    // Re-enable the HIW button on every exit path. Most paths end with
+    // renderBoard() which recreates the DOM, making this a no-op on the now-
+    // detached old element. The finally block guards exception paths and any
+    // future path that skips renderBoard(), so the guide is never stranded
+    // disabled after a spin.
+    if (hiwBtnAtStart) hiwBtnAtStart.disabled = false;
+    const hiwBtnCurrent = root.querySelector<HTMLButtonElement>("#hiw-btn");
+    if (hiwBtnCurrent) hiwBtnCurrent.disabled = false;
+  }
 }
 
 /** Runs the dedicated Bold Chai scene inside the existing cabinet footprint. */
@@ -1632,6 +1647,10 @@ function showUniGleeSummary(
     // for spinning because runSpin has not returned yet.
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
     if (sparkleBtn) sparkleBtn.disabled = false;
+    // Restore HIW access during the summary pause — the spin is settled enough
+    // that no bonus overlay can appear while the player reads this screen.
+    const hiwBtnSummary = root.querySelector<HTMLButtonElement>("#hiw-btn");
+    if (hiwBtnSummary) hiwBtnSummary.disabled = false;
 
     continueBtn?.addEventListener("click", () => {
       overlay.remove();
@@ -2442,6 +2461,10 @@ function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: numbe
     // for spinning because runSpin has not returned yet.
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
     if (sparkleBtn) sparkleBtn.disabled = false;
+    // Restore HIW access during the summary pause — no bonus overlay can appear
+    // while the player is reading this screen.
+    const hiwBtnSummary2 = root.querySelector<HTMLButtonElement>("#hiw-btn");
+    if (hiwBtnSummary2) hiwBtnSummary2.disabled = false;
 
     continueBtn.addEventListener("click", () => {
       overlay.remove();
@@ -2546,6 +2569,10 @@ function showLevelUpCelebration(
     // level-up overlay and route clicks to dismiss() via overlay.click().
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
     if (sparkleBtn) sparkleBtn.disabled = false;
+    // Restore HIW access during the level-up pause — no bonus overlay can
+    // appear while the player is viewing the celebration screen.
+    const hiwBtnLevelUp = root.querySelector<HTMLButtonElement>("#hiw-btn");
+    if (hiwBtnLevelUp) hiwBtnLevelUp.disabled = false;
 
     let dismissed = false;
     const dismiss = () => {
