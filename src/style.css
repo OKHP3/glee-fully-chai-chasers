@@ -362,11 +362,18 @@ body {
   .chai-splash__primary { font-size: clamp(17px, 4.8vw, 20px); }
   .chai-splash__secondary { justify-self: center; }
   .chai-splash__loop {
-    justify-content: space-between;
-    gap: 5px;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
     margin-top: 28px;
   }
-  .chai-splash__connector { display: none; }
+  .chai-splash__connector {
+    /* restore on mobile — align with the 29 px circle by offsetting half its height */
+    display: block;
+    width: 18px;
+    flex: 0 0 18px;
+    margin-top: 14px;
+  }
   .chai-splash__step {
     display: grid;
     justify-items: center;
