@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Settings — Start Fresh Confirmation — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root" data-theme="dark" data-reduced-motion="false">
+  <div class="night-garden" id="bg-layer" aria-hidden="true"><div class="aurora-ribbons"><span></span><span></span><span></span></div></div>
+  <div class="cc-shell" style="opacity:0.18;pointer-events:none">
+    <header class="marquee"><div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div></header>
+    <div class="cabinet-shell"><main class="cabinet-frame"></main></div>
+  </div>
+  <!-- #24 settings-start-fresh: Start Fresh confirmation modal over settings -->
+  <section class="game-page settings-page" role="dialog" aria-modal="true" aria-labelledby="settings-title" style="opacity:0.4;pointer-events:none">
+    <div class="game-page-topbar">
+      <button class="page-close chrome-btn">←</button>
+      <div><p class="page-eyebrow">YOUR CHAI CHASE</p><h2 id="settings-title">Settings</h2></div>
+      <span class="page-top-spacer" aria-hidden="true"></span>
+    </div>
+    <div class="game-page-scroll">
+      <section class="settings-card"><h3>Look &amp; feel</h3></section>
+      <section class="settings-card"><h3>Sound</h3></section>
+      <section class="settings-card settings-card--compact"><h3>Reduce motion</h3></section>
+      <section class="settings-card settings-card--compact"><h3>Payline guide</h3></section>
+      <section class="settings-card about-card"><h3>About this gift</h3></section>
+      <button class="reset-progress-btn">Start fresh</button>
+    </div>
+  </section>
+  <!-- Confirmation dialog layer -->
+  <div role="dialog" aria-modal="true" aria-labelledby="reset-confirm-title" style="position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(6,8,26,.72);backdrop-filter:blur(4px)">
+    <div class="settings-card" style="max-width:480px;width:100%;padding:28px 28px 24px;gap:16px;display:flex;flex-direction:column">
+      <h2 id="reset-confirm-title" style="font-family:'Baloo Display','Arial Black',sans-serif;font-size:22px;color:#fff4e0;margin:0">Start fresh?</h2>
+      <p style="color:rgba(255,244,224,.78);font-size:14px;line-height:1.5;margin:0">This will wipe your coin balance, level progress, and settings — exactly as if you opened the game for the first time. Your treat jar and cascade meter will reset too.</p>
+      <p style="color:rgba(255,244,224,.56);font-size:12px;margin:0">This cannot be undone.</p>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="reset-progress-btn" style="flex:1">Yes, start fresh</button>
+        <button class="chrome-btn" style="flex:1;padding:12px 16px;font-size:15px">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

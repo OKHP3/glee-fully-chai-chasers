@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Settings — Payline Guide — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root" data-theme="dark" data-reduced-motion="false">
+  <div class="night-garden" id="bg-layer" aria-hidden="true"><div class="aurora-ribbons"><span></span><span></span><span></span></div></div>
+  <div class="cc-shell" style="opacity:0.18;pointer-events:none">
+    <header class="marquee"><div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div></header>
+    <div class="cabinet-shell"><main class="cabinet-frame"></main></div>
+  </div>
+  <!-- #22 settings-payline-guide: Payline Guide toggle ON -->
+  <section class="game-page settings-page" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="game-page-topbar">
+      <button class="page-close chrome-btn" aria-label="Close settings">←</button>
+      <div><p class="page-eyebrow">YOUR CHAI CHASE</p><h2 id="settings-title">Settings</h2></div>
+      <span class="page-top-spacer" aria-hidden="true"></span>
+    </div>
+    <div class="game-page-scroll">
+      <section class="settings-card" style="opacity:0.5">
+        <h3>Look &amp; feel</h3>
+        <div class="theme-choice" role="radiogroup" aria-label="Appearance">
+          <button type="button" class="theme-option is-selected" data-theme-option="system" role="radio" aria-checked="true"><span class="theme-swatch theme-swatch--system" aria-hidden="true"></span>System</button>
+          <button type="button" class="theme-option" data-theme-option="dark" role="radio" aria-checked="false"><span class="theme-swatch theme-swatch--dark" aria-hidden="true"></span>Dark</button>
+          <button type="button" class="theme-option" data-theme-option="light" role="radio" aria-checked="false"><span class="theme-swatch theme-swatch--light" aria-hidden="true"></span>Light</button>
+        </div>
+      </section>
+      <section class="settings-card" style="opacity:0.5">
+        <div class="settings-heading-row">
+          <div><h3>Sound</h3></div>
+          <label class="sound-switch"><input type="checkbox" checked/><span aria-hidden="true"></span><b>On</b></label>
+        </div>
+      </section>
+      <section class="settings-card settings-card--compact" style="opacity:0.5">
+        <div><h3>Reduce motion</h3></div>
+        <label class="sound-switch"><input type="checkbox"/><span aria-hidden="true"></span><b>Off</b></label>
+      </section>
+      <!-- Payline guide highlighted + toggled ON -->
+      <section class="settings-card settings-card--compact" style="border-color:rgba(245,213,118,.6);box-shadow:0 0 0 2px rgba(245,213,118,.18)">
+        <div><h3>Payline guide</h3><p class="settings-help">Show all 40 paylines faintly on the resting board. Winning lines still glow after every win.</p></div>
+        <label class="sound-switch"><input type="checkbox" checked/><span aria-hidden="true"></span><b>On</b></label>
+      </section>
+      <section class="settings-card about-card" style="opacity:0.5">
+        <h3>About this gift</h3>
+        <p>A cozy, original Chai Chase for Glee — fictional Glee-coins only.</p>
+      </section>
+      <button class="reset-progress-btn" style="opacity:0.5">Start fresh</button>
+    </div>
+  </section>
+</div>
+</body>
+</html>
