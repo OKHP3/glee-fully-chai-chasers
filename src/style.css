@@ -865,6 +865,8 @@ body {
   color: #4a3060;
   opacity: 1;
 }
+/* Hide the chip when the bonus banner is displaying its own free-spin content */
+.bonus-banner--active .level-chip--cabinet { display: none; }
 
 .chrome-btn {
   min-width: 48px;
