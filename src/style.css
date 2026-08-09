@@ -848,16 +848,22 @@ body {
   font-size: 9px;
   opacity: 0.7;
 }
-/* Level chip repositioned inside the cabinet frame (dark playing area) */
+/* Level chip repositioned inside the bonus-banner (dark area above the reels) */
 .level-chip--cabinet {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 12px;
   z-index: 5;
-  background: rgba(0, 0, 0, 0.48);
-  border-color: rgba(159, 232, 197, 0.35);
+  /* Inverted palette — butter pill on dark purple so it pops */
+  background: rgba(245, 213, 118, 0.92);
+  border-color: rgba(245, 213, 118, 0.6);
+  color: #2d1f4c;
   font-size: 10px;
-  padding: 3px 8px;
+  padding: 3px 9px;
+}
+.level-chip--cabinet em {
+  color: #4a3060;
+  opacity: 1;
 }
 
 .chrome-btn {
@@ -881,6 +887,7 @@ body {
 /* ── Bonus banner (above cabinet, filled only during a bonus) ── */
 .bonus-banner {
   display: block;
+  position: relative;   /* anchor for the absolutely-positioned level chip */
   min-height: 68px;
   padding: 5px 12px 6px;
   /* transparent / idle — holds space inside the cabinet-shell */
@@ -2604,6 +2611,10 @@ body {
     border-top: none;
     border: 2px solid rgba(159, 232, 197, 0.28);
   }
+  /* Title left-aligns at wide layout so it reads as centered over the game
+     column (col 1), not centered across the full shell including the side panel */
+  .cc-shell .marquee-title { text-align: left; }
+
   /* Eyebrow label — a little more presence in the tall panel */
   .cc-shell .ice-notes-eyebrow {
     font-size: 11px;

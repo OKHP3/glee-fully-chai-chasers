@@ -261,14 +261,15 @@ export function renderBoard(
         </header>
 
         <div class="cabinet-shell">
-          <div id="bonus-banner" class="bonus-banner" aria-live="polite"></div>
+          <div id="bonus-banner" class="bonus-banner" aria-live="polite">
+            <span class="level-chip level-chip--cabinet" aria-label="Player level">Lvl ${level.level}<em>${level.into}/${level.span} Sparks</em></span>
+          </div>
           <div class="cabinet-shell-divider"></div>
           <main class="cabinet-frame">
             <span class="ornament ornament-tl">${miniStar()}</span>
             <span class="ornament ornament-tr">${miniStar()}</span>
             <span class="ornament ornament-bl">${miniStar()}</span>
             <span class="ornament ornament-br">${miniStar()}</span>
-            <span class="level-chip level-chip--cabinet" aria-label="Player level">Lvl ${level.level}<em>${level.into}/${level.span} Sparks</em></span>
             <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
               ${renderGridHtml(settledGrid, undefined, state.paylineGuideOn)}
             </div>
