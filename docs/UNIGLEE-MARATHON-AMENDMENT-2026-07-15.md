@@ -72,3 +72,25 @@ Browser reload persistence for an in-flight marathon and a user-facing fast-mode
 - Lap Quest extras reconcile into total spins and total Glee-coins;
 - pause/resume, fast mode, skip-to-summary, and reload persistence are deterministic for a later marathon-controls pass;
 - the full 96% ±0.5 RTP oracle and all repository tests remain green.
+
+---
+
+## Implementation delta as of 2026-08-09
+
+**This note records a divergence. It does not rewrite the 2026-07-15 ruling or S30 above, which stand as ruled.**
+
+| Item | Documented above | Shipped in code | Source |
+|---|---|---|---|
+| Initial award, activating reel 3 | 300 free spins | **40** | `src/engine/uniglee.ts` line 94, `initialAwardSpins: reel * 20 as UniGleeAwardSpins` |
+| Initial award, activating reel 4 | 400 free spins | **60** | same |
+| Initial award, activating reel 5 | 500 free spins | **80** | same |
+| Permitted award values | 300, 400, 500 | **40, 60, 80**, enforced at the type level | `src/engine/laundry.ts` line 21, `UniGleeAwardSpins` |
+| Each of acts 1 to 4 | 75 / 100 / 125 | **10 / 15 / 20** | `baseLaundryAllocation` in `src/engine/laundry.ts` line 23 |
+
+The engine's internal reel indices are 2, 3 and 4 for the display reels 3, 4 and 5, which is why `reel * 20` yields 40, 60 and 80.
+
+**This is open as D7 in `docs/DECISION-LOG.md`.** Either the engine diverged from this ruling, or this ruling was superseded during the 2026-07 RTP retune without a log entry. Every other artifact in the project, including `README.md` and both public pages, states 40/60/80, which points to the second, but only Jamie can settle it. Do not change the engine and do not edit this contract's award table until D7 is ruled.
+
+Everything else in this contract matches the engine and remains accurate: the reel-activated line-valid trigger, Joey's Laundry Helper always first, the seeded middle shuffle of We're Multiplying / Keepsake Collection / Nighttime Treat Time, Phoebe's Lap Quest always last and additive, act-local retriggers, the quarter allocation rule itself, the release defaults for Laundry, and the per-act termination ceiling.
+
+On the required gates above: the trigger frequency is now genuinely simulated rather than inferred from the old `1/400` gate. Measured 2026-08-09 at 1 in 1,370 on the seeded oracle against a spec target of ~1 in 1,277 (`npx vitest run src/engine/simulation.test.ts --reporter=verbose`; `src/engine/uniglee.ts` lines 32 to 38). The full suite is green at 170 tests across 24 files, and the full-game fleet measures 97.56% across 210,000 paid spins on seeds 1 to 7.

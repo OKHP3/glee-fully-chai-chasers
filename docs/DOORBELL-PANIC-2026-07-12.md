@@ -30,3 +30,28 @@ The trigger, blocker behavior, award roll, and panic wild placement are pure Typ
 - A same-payline first/second-reel pair awards an integer from 5 through 20.
 - Panic rounds contain 3–6 injected Joey/Phoebe wilds and remain finite/non-negative.
 - Existing cascade/free-spin tests and the production build remain green.
+
+---
+
+## Implementation delta as of 2026-08-09
+
+**This note records a divergence. It does not rewrite the 2026-07-12 ruling or S24 above, which stand as ruled.**
+
+| Item | Documented above | Shipped in code | Source |
+|---|---|---|---|
+| Free spins awarded by the trigger | random **5 to 20** | random **3 to 6** | `src/engine/cascade.ts` lines 234 to 237, `rollDoorbellFreeSpins` |
+
+The shipped function is explicit about why, and attributes the change to the RTP retune in an inline comment:
+
+```ts
+export function rollDoorbellFreeSpins(rng: Rng): number {
+  // 2026-07 RTP retune: 3-6 spins (was 5-20).
+  return 3 + Math.floor(rng() * 4);
+}
+```
+
+That comment is the only surviving record of the decision. There is no corresponding row in `docs/DECISION-LOG.md`, so the change was made in code during the retune and never logged. It is recorded here so the contract and the engine stop silently disagreeing.
+
+The rest of this contract still matches the engine. Doorbells remain reels 1 and 2 only, a lone doorbell still pays nothing and still blocks, the paired same-payline trigger still bypasses the wheel, and panic rounds still preload 3 to 6 Joey and Phoebe wilds onto payline coordinates. Note that the award range and the injected-wild count are now the same 3 to 6 range but remain two independent rolls; do not collapse them.
+
+The acceptance check above reading "a same-payline first/second-reel pair awards an integer from 5 through 20" is stale and would fail against the shipped engine. Doorbell Panic contributes roughly five points of full-game RTP at 3 to 6 spins. Restoring 5 to 20 is a simulation-gated engine task, not a documentation fix.
