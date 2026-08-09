@@ -1,10 +1,11 @@
 /**
  * How It Works — full-screen interactive guide overlay.
  *
- * Rendered as an absolute overlay on top of the splash screen so the
- * splash stays alive underneath. Scene previews are loaded from the
- * mockup-sandbox at /__mockup/scenes/; they silently hide if that
- * server is not reachable (e.g. GitHub Pages visitors).
+ * Opened from the splash screen ("How it works ↗" link) and from the
+ * game board toolbar (ⓘ button, #hiw-btn). Appended to the caller's
+ * container element and rendered as a fixed overlay (z-index 9999).
+ * Scene previews point at the mockup-sandbox in dev and at the game's
+ * own public/scenes/ directory in production (GitHub Pages).
  */
 
 // In production (GitHub Pages) the game ships its own copies of the scene files

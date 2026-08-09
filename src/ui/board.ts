@@ -57,6 +57,7 @@ import {
   type LapQuestRoundResult,
 } from "../engine/lap-quest";
 import { mountLapQuestLedge } from "./lap-quest-ledge";
+import { renderHowItWorks } from "./how-it-works";
 import { beginKeepsakeMemory, createKeepsakeMemory, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
 import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState, load, save } from "../state";
@@ -248,6 +249,12 @@ export function renderBoard(
               <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#f5d576" stroke-width="1.8" aria-hidden="true">
                 <path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/>
                 <path d="M5 4.5v15M9 8h6M9 12h6"/>
+              </svg>
+            </button>
+            <button id="hiw-btn" class="chrome-btn" aria-label="How it works guide" title="How it works">
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#f5d576" stroke-width="1.8" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 8v.5M12 11.5v5"/>
               </svg>
             </button>
             <button id="settings-btn" class="chrome-btn" aria-label="Settings">
@@ -501,6 +508,7 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
   const betDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
   const settingsBtn = root.querySelector<HTMLButtonElement>("#settings-btn")!;
   const paytableBtn = root.querySelector<HTMLButtonElement>("#paytable-btn")!;
+  const hiwBtn = root.querySelector<HTMLButtonElement>("#hiw-btn")!;
 
   betUp.addEventListener("click", () => {
     const idx = bets.indexOf(state.bet);
@@ -522,6 +530,7 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
 
   settingsBtn.addEventListener("click", () => openSettingsPage(root, state));
   paytableBtn.addEventListener("click", () => openPaytablePage(root));
+  hiwBtn.addEventListener("click", () => renderHowItWorks(root));
   wireAskJamie(root, state);
 
   sparkleBtn.addEventListener("click", () => {
