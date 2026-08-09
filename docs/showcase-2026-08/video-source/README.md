@@ -1,7 +1,7 @@
-# Designathon video source backup
+# Showcase video source backup
 
 This directory is an additive backup of the Replit Design animation project
-**Glee-fully Chai Chasers — Designathon Video**, retrieved on 2026-08-07.
+**Glee-fully Chai Chasers — Showcase Video**, retrieved on 2026-08-07.
 It is not part of the shipped game bundle and does not change `public/assets/`.
 
 ## Scope and provenance
