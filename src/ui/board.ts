@@ -115,7 +115,6 @@ let iceNoteIdx = Math.floor(Math.random() * ICE_NOTES.length);
 function iceNotesBodyHtml(index: number): string {
   const note = ICE_NOTES[index];
   return `
-    <p class="ice-notes-eyebrow">ICE NOTES</p>
     <div class="ice-notes-header">
       <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true">
         <path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor" />
@@ -132,20 +131,23 @@ function iceNotesBodyHtml(index: number): string {
 }
 
 function iceNotesCardHtml(): string {
-  return `<aside id="ice-notes-card" class="ice-notes-card" aria-label="Chai ingredient note" aria-live="polite">${iceNotesBodyHtml(iceNoteIdx)}</aside>`;
+  return `<aside id="ice-notes-card" class="ice-notes-card" aria-label="Chai ingredient note">
+    <p class="ice-notes-eyebrow">ICE NOTES</p>
+    <div class="ice-notes-body" aria-live="polite">${iceNotesBodyHtml(iceNoteIdx)}</div>
+  </aside>`;
 }
 
 async function advanceIceNote(root: HTMLElement): Promise<void> {
   iceNoteIdx = nextIceNoteIndex(iceNoteIdx);
-  const card = root.querySelector<HTMLElement>("#ice-notes-card");
-  if (!card) return;
+  const body = root.querySelector<HTMLElement>("#ice-notes-card .ice-notes-body");
+  if (!body) return;
   const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
   if (!reduced) {
-    card.classList.add("ice-notes-card--fading");
+    body.classList.add("ice-notes-body--fading");
     await new Promise<void>((resolve) => setTimeout(resolve, 200));
   }
-  card.innerHTML = iceNotesBodyHtml(iceNoteIdx);
-  if (!reduced) card.classList.remove("ice-notes-card--fading");
+  body.innerHTML = iceNotesBodyHtml(iceNoteIdx);
+  if (!reduced) body.classList.remove("ice-notes-body--fading");
 }
 
 function publicAsset(fileName: string): string {
@@ -1593,11 +1595,11 @@ function showUniGleeSummary(
 
     const continueBtn = overlay.querySelector<HTMLButtonElement>("#uniglee-summary-continue");
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
-    const onSparkle = () => continueBtn?.click();
-    sparkleBtn?.addEventListener("click", onSparkle);
+    const onSparkle = (e: Event) => { e.stopImmediatePropagation(); continueBtn?.click(); };
+    sparkleBtn?.addEventListener("click", onSparkle, { capture: true });
 
     continueBtn?.addEventListener("click", () => {
-      sparkleBtn?.removeEventListener("click", onSparkle);
+      sparkleBtn?.removeEventListener("click", onSparkle, { capture: true });
       overlay.remove();
       resolve();
     }, { once: true });
@@ -2402,11 +2404,11 @@ function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: numbe
 
     const continueBtn = overlay.querySelector<HTMLButtonElement>("#bonus-continue")!;
     const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn");
-    const onSparkle = () => continueBtn.click();
-    sparkleBtn?.addEventListener("click", onSparkle);
+    const onSparkle = (e: Event) => { e.stopImmediatePropagation(); continueBtn.click(); };
+    sparkleBtn?.addEventListener("click", onSparkle, { capture: true });
 
     continueBtn.addEventListener("click", () => {
-      sparkleBtn?.removeEventListener("click", onSparkle);
+      sparkleBtn?.removeEventListener("click", onSparkle, { capture: true });
       overlay.remove();
       resolve();
     }, { once: true });
@@ -2511,15 +2513,16 @@ function showLevelUpCelebration(
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
-      sparkleBtn?.removeEventListener("click", dismiss);
+      sparkleBtn?.removeEventListener("click", onSparkle, { capture: true });
       overlay.classList.add("levelup-overlay--out");
       overlay.addEventListener("animationend", () => {
         overlay.remove();
         resolve();
       }, { once: true });
     };
+    const onSparkle = (e: Event) => { e.stopImmediatePropagation(); dismiss(); };
 
-    sparkleBtn?.addEventListener("click", dismiss);
+    sparkleBtn?.addEventListener("click", onSparkle, { capture: true });
     overlay.addEventListener("click", dismiss, { once: true });
     window.setTimeout(dismiss, 3600);
   });

@@ -1444,10 +1444,18 @@ body {
   background: rgba(26, 20, 58, 0.70);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+}
+
+/* Inner content wrapper — only this fades; card shell (background, eyebrow) stays put. */
+.ice-notes-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   opacity: 1;
   transition: opacity 200ms ease;
 }
-.ice-notes-card--fading { opacity: 0; }
+.ice-notes-body--fading { opacity: 0; }
 
 .ice-notes-eyebrow {
   margin: 0;
@@ -1518,7 +1526,7 @@ body {
   .ice-notes-profile dd { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ice-notes-card { transition: none; }
+  .ice-notes-body { transition: none; }
 }
 
 .settings-row {
