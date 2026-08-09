@@ -322,10 +322,18 @@ body {
   line-height: 1.2;
 }
 .chai-splash__connector {
-  width: 24px;
+  width: 28px;
   height: 1px;
-  flex: 0 0 24px;
-  background: rgba(65, 184, 183, .3);
+  flex: 0 0 28px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 18%,
+    rgba(65, 184, 183, .38) 18%,
+    rgba(65, 184, 183, .38) 82%,
+    transparent 82%,
+    transparent 100%
+  );
 }
 
 /* ── Mobile: art-first stacking (≤ 767px) ── */
