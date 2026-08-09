@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Doorbell Panic Free Spins — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <div class="cc-shell">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
+      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
+      <div id="marquee-status" class="marquee-status">Doorbell Panic · Spin 2 of 4</div>
+    </header>
+    <!-- #54 doorbell-panic-free-spins: Panic Spins cabinet with bell interval + cat wilds -->
+    <div id="bonus-banner" class="bonus-banner bonus-banner--active" aria-live="polite">
+      <div class="bonus-banner-heading">
+        <span class="bonus-banner-kicker">Doorbell Panic</span>
+        <strong class="bonus-banner-title">Panic Spins</strong>
+      </div>
+      <div class="bonus-banner-stats">Spin <span id="fs-index">2</span> of <span id="fs-total">4</span> · Round win: <span id="fs-round-win">1,080</span></div>
+    </div>
+    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>7</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>1</span></div></div></div>
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- Panic Spins panel — .panic-grid on #fs-grid; cat wilds placed by panicStartingGrid -->
+      <section class="free-spins-panel text-amber-100" aria-label="Doorbell Panic bonus spins">
+        <div id="fs-grid" class="reel-grid panic-grid" role="img" aria-label="Free spin reel board">
+          <!-- Reel 0: wild_joey at row 0 -->
+          <div class="reel-col" data-reel="0">
+            <div class="cell" data-reel="0" data-row="0" data-symbol="wild_joey" style="animation:panic-wild-land 420ms cubic-bezier(.34,1.56,.64,1) both">
+              <span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span>
+            </div>
+            <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div>
+            <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+            <div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+          </div>
+          <!-- Reel 1: wild_phoebe at row 2 -->
+          <div class="reel-col" data-reel="1">
+            <div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+            <div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
+            <div class="cell" data-reel="1" data-row="2" data-symbol="wild_phoebe" style="animation:panic-wild-land 420ms 90ms cubic-bezier(.34,1.56,.64,1) both">
+              <span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:66.67% 0%"></span>
+            </div>
+            <div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
+          </div>
+          <!-- Reel 2 -->
+          <div class="reel-col" data-reel="2"><div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div><div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div><div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div><div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div></div>
+          <!-- Reel 3: wild_joey at row 1 -->
+          <div class="reel-col" data-reel="3">
+            <div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+            <div class="cell" data-reel="3" data-row="1" data-symbol="wild_joey" style="animation:panic-wild-land 420ms 180ms cubic-bezier(.34,1.56,.64,1) both">
+              <span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span>
+            </div>
+            <div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+            <div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+          </div>
+          <!-- Reel 4 -->
+          <div class="reel-col" data-reel="4"><div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div><div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div><div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div></div>
+        </div>
+        <div id="fs-status" class="status-line" aria-live="polite">DOORBELL PANIC! 3 flying wild cats!</div>
+      </section>
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:35%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">Doorbell Panic · Panic Spins · 2 / 4 · 3 cat wilds</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+  </div>
+</div>
+</body>
+</html>

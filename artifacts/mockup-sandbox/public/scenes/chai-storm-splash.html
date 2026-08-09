@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Wild Chai Storm Splash — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
+  <div class="cc-shell">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
+      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
+      <div id="marquee-status" class="marquee-status">Iced Chai Wild Rain · Spin 1 of 9</div>
+    </header>
+    <!-- Bonus banner for chai_back session -->
+    <div id="bonus-banner" class="bonus-banner bonus-banner--active" aria-live="polite">
+      <div class="bonus-banner-heading">
+        <span class="bonus-banner-kicker">Iced Chai Wild Rain</span>
+        <strong class="bonus-banner-title">Free Spins</strong>
+      </div>
+      <div class="bonus-banner-stats">Spin <span id="fs-index">1</span> of <span id="fs-total">9</span> · Round win: <span id="fs-round-win">0</span></div>
+    </div>
+    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>1</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>4</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>0</span></div></div></div>
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- #47 chai-storm-splash: div.chai-storm-splash appended to .free-spins-panel -->
+      <section class="free-spins-panel text-amber-100" aria-label="Iced Chai Wild Rain bonus spins" style="position:relative">
+        <div id="fs-grid" class="reel-grid" role="img" aria-label="Free spin reel board">
+          <div class="reel-col" data-reel="0"><div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div><div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div></div>
+          <div class="reel-col" data-reel="1"><div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div><div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div><div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div><div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div></div>
+          <div class="reel-col" data-reel="2"><div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div><div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div><div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div><div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div></div>
+          <div class="reel-col" data-reel="3"><div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div><div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div><div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div></div>
+          <div class="reel-col" data-reel="4"><div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div><div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div><div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div></div>
+        </div>
+        <div id="fs-status" class="status-line" aria-live="polite"></div>
+        <!-- chai-storm-splash overlay: appended to .free-spins-panel at round-0 start -->
+        <div class="chai-storm-splash" style="animation:none;opacity:1">
+          <div class="chai-storm-drops" aria-hidden="true">
+            <span class="chai-storm-drop" style="--drop-left:0%;--drop-delay:0.00s;--drop-duration:0.80s;--drop-size:5px"></span>
+            <span class="chai-storm-drop" style="--drop-left:37%;--drop-delay:0.07s;--drop-duration:0.92s;--drop-size:7px"></span>
+            <span class="chai-storm-drop" style="--drop-left:74%;--drop-delay:0.14s;--drop-duration:1.04s;--drop-size:9px"></span>
+            <span class="chai-storm-drop" style="--drop-left:11%;--drop-delay:0.21s;--drop-duration:1.16s;--drop-size:11px"></span>
+            <span class="chai-storm-drop" style="--drop-left:48%;--drop-delay:0.28s;--drop-duration:1.28s;--drop-size:5px"></span>
+            <span class="chai-storm-drop" style="--drop-left:85%;--drop-delay:0.35s;--drop-duration:0.80s;--drop-size:7px"></span>
+            <span class="chai-storm-drop" style="--drop-left:22%;--drop-delay:0.43s;--drop-duration:0.92s;--drop-size:9px"></span>
+            <span class="chai-storm-drop" style="--drop-left:59%;--drop-delay:0.50s;--drop-duration:1.04s;--drop-size:11px"></span>
+            <span class="chai-storm-drop" style="--drop-left:96%;--drop-delay:0.57s;--drop-duration:1.16s;--drop-size:5px"></span>
+            <span class="chai-storm-drop" style="--drop-left:33%;--drop-delay:0.64s;--drop-duration:1.28s;--drop-size:7px"></span>
+            <span class="chai-storm-drop" style="--drop-left:70%;--drop-delay:0.71s;--drop-duration:0.80s;--drop-size:9px"></span>
+            <span class="chai-storm-drop" style="--drop-left:7%;--drop-delay:0.78s;--drop-duration:0.92s;--drop-size:11px"></span>
+            <span class="chai-storm-drop" style="--drop-left:44%;--drop-delay:0.05s;--drop-duration:1.04s;--drop-size:5px"></span>
+            <span class="chai-storm-drop" style="--drop-left:81%;--drop-delay:0.12s;--drop-duration:1.16s;--drop-size:7px"></span>
+            <span class="chai-storm-drop" style="--drop-left:18%;--drop-delay:0.19s;--drop-duration:1.28s;--drop-size:9px"></span>
+            <span class="chai-storm-drop" style="--drop-left:55%;--drop-delay:0.27s;--drop-duration:0.80s;--drop-size:11px"></span>
+            <span class="chai-storm-drop" style="--drop-left:92%;--drop-delay:0.34s;--drop-duration:0.92s;--drop-size:5px"></span>
+            <span class="chai-storm-drop" style="--drop-left:29%;--drop-delay:0.41s;--drop-duration:1.04s;--drop-size:7px"></span>
+            <span class="chai-storm-drop" style="--drop-left:66%;--drop-delay:0.48s;--drop-duration:1.16s;--drop-size:9px"></span>
+            <span class="chai-storm-drop" style="--drop-left:3%;--drop-delay:0.55s;--drop-duration:1.28s;--drop-size:11px"></span>
+            <span class="chai-storm-drop" style="--drop-left:40%;--drop-delay:0.62s;--drop-duration:0.80s;--drop-size:5px"></span>
+            <span class="chai-storm-drop" style="--drop-left:77%;--drop-delay:0.69s;--drop-duration:0.92s;--drop-size:7px"></span>
+            <span class="chai-storm-drop" style="--drop-left:14%;--drop-delay:0.76s;--drop-duration:1.04s;--drop-size:9px"></span>
+            <span class="chai-storm-drop" style="--drop-left:51%;--drop-delay:0.03s;--drop-duration:1.16s;--drop-size:11px"></span>
+            <span class="chai-storm-drop" style="--drop-left:88%;--drop-delay:0.10s;--drop-duration:1.28s;--drop-size:5px"></span>
+            <span class="chai-storm-drop" style="--drop-left:25%;--drop-delay:0.18s;--drop-duration:0.80s;--drop-size:7px"></span>
+            <span class="chai-storm-drop" style="--drop-left:62%;--drop-delay:0.25s;--drop-duration:0.92s;--drop-size:9px"></span>
+            <span class="chai-storm-drop" style="--drop-left:99%;--drop-delay:0.32s;--drop-duration:1.04s;--drop-size:11px"></span>
+          </div>
+          <div class="chai-storm-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="chai-storm-copy" role="status" aria-live="assertive">
+            <div class="chai-storm-kicker">AskJamie pours the sky open</div>
+            <h2>WILD CHAI STORM</h2>
+            <p>Chai storm! Chai storm!</p>
+            <small>4 mermaid cups are becoming wild chai.</small>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:40%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 3</span><div class="status-line">Iced Chai Wild Rain — storm converting 4 cells</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Treat Time Main Board — Chai Chasers Design Review</title>
+<link rel="stylesheet" href="../game-style.css">
+<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+</head>
+<body>
+<div class="cc-root">
+  <div id="bg-layer" class="night-garden" aria-hidden="true"></div>
+  <div class="cc-shell treat-time-main-mode">
+    <header class="marquee">
+      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
+      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
+      <div id="marquee-status" class="marquee-status">Morning Treat Time · Spin 2 of 6</div>
+    </header>
+    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>10</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>5</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>2</span></div></div></div>
+    <main class="cabinet-frame treat-time-cabinet">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- #52 treat-time-main-board: #reel-grid stays visible; treat-time wilds already landed -->
+      <!-- cast-layer div removed after animation; show post-cast grid with treat wilds in place -->
+      <div id="reel-grid" class="reel-grid" role="img" aria-label="Treat Time reel board">
+        <!-- Reel 0 -->
+        <div class="reel-col" data-reel="0">
+          <div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+          <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div>
+          <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+          <!-- treat wild (chicken → wild_phoebe) -->
+          <div class="cell treat-time-wild-land" data-reel="0" data-row="3" data-symbol="wild_phoebe">
+            <span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:66.67% 0%"></span>
+          </div>
+        </div>
+        <!-- Reel 1 -->
+        <div class="reel-col" data-reel="1">
+          <div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+          <!-- treat wild (chicken → wild_phoebe) -->
+          <div class="cell treat-time-wild-land" data-reel="1" data-row="1" data-symbol="wild_phoebe">
+            <span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:66.67% 0%"></span>
+          </div>
+          <div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+          <div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
+        </div>
+        <!-- Reel 2 -->
+        <div class="reel-col" data-reel="2">
+          <div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+          <div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+          <div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
+          <div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
+        </div>
+        <!-- Reel 3 -->
+        <div class="reel-col" data-reel="3">
+          <div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+          <div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+          <!-- treat wild (chicken → wild_phoebe) -->
+          <div class="cell treat-time-wild-land" data-reel="3" data-row="2" data-symbol="wild_phoebe">
+            <span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:66.67% 0%"></span>
+          </div>
+          <div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+        </div>
+        <!-- Reel 4 -->
+        <div class="reel-col" data-reel="4">
+          <div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div>
+          <div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+          <div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
+          <div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+        </div>
+      </div>
+    </main>
+    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:50%"></div></div></div>
+    <div class="hud-row"><span class="level-chip">Level 2</span><div class="status-line">Morning Treat Time · Spin 2 of 6 · 3 chicken wilds landed</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+  </div>
+</div>
+</body>
+</html>
