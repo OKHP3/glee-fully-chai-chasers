@@ -243,7 +243,6 @@ export function renderBoard(
         <header class="marquee">
           <div class="marquee-bulbs" aria-hidden="true">${bulbRow()}</div>
           <div class="marquee-row">
-            <span class="level-chip" aria-label="Player level">Lvl ${level.level}<em>${level.into}/${level.span} Sparks</em></span>
             <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
             <button id="paytable-btn" class="chrome-btn" aria-label="Open symbol guide and game rules" title="Symbol guide">
               <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#f5d576" stroke-width="1.8" aria-hidden="true">
@@ -269,6 +268,7 @@ export function renderBoard(
             <span class="ornament ornament-tr">${miniStar()}</span>
             <span class="ornament ornament-bl">${miniStar()}</span>
             <span class="ornament ornament-br">${miniStar()}</span>
+            <span class="level-chip level-chip--cabinet" aria-label="Player level">Lvl ${level.level}<em>${level.into}/${level.span} Sparks</em></span>
             <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
               ${renderGridHtml(settledGrid, undefined, state.paylineGuideOn)}
             </div>
@@ -524,6 +524,17 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
   wireAskJamie(root, state);
 
   sparkleBtn.addEventListener("click", () => {
+    // Elegant title shimmer — fires on every SPARKLE press.
+    const titleEl = root.querySelector<HTMLElement>(".marquee-title");
+    if (titleEl) {
+      titleEl.classList.remove("marquee-title--shimmer");
+      void titleEl.offsetWidth; // force reflow so animation restarts cleanly
+      titleEl.classList.add("marquee-title--shimmer");
+      titleEl.addEventListener("animationend", () => {
+        titleEl.classList.remove("marquee-title--shimmer");
+      }, { once: true });
+    }
+
     // SPARKLE doubles as a universal overlay-dismisser. While any summary
     // overlay is open the overlays re-enable this button so these checks
     // can fire. Always check before running a spin.
