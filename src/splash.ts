@@ -67,6 +67,8 @@ export function renderSplash(
        </div>`
     : "";
 
+  const PAW_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.2 10.5c-1.7.2-3.3-1.8-2.8-3.4.4-1.4 1.8-1.8 2.8-.7.8.9.8 2.9 0 4.1Zm7.6 0c1.7.2 3.3-1.8 2.8-3.4-.4-1.4-1.8-1.8-2.8-.7-.8.9-.8 2.9 0 4.1ZM5.7 14c-1.3-.9-3.3-.2-3.4 1.4-.1 1.3 1.3 2.2 2.5 1.7 1.1-.4 1.8-2.3.9-3.1Zm12.6 0c1.3-.9 3.3-.2 3.4 1.4.1 1.3-1.3 2.2-2.5 1.7-1.1-.4-1.8-2.3-.9-3.1Zm-6.3-1.8c-2.8 0-5.5 2.4-5.1 5 .3 2.2 3 2.2 5.1 1.2 2.1 1 4.8 1 5.1-1.2.4-2.6-2.3-5-5.1-5Z"/></svg>`;
+
   // Use a relative path for the base URL so tests (where import.meta.env.BASE_URL
   // is "/") and production both resolve the asset correctly.
   const base = typeof import.meta !== "undefined" && import.meta.env?.BASE_URL
@@ -111,6 +113,22 @@ export function renderSplash(
             <button class="chai-splash__secondary" type="button" id="chai-how-it-works-btn">
               How it works ↗
             </button>
+          </div>
+          <div class="chai-splash__loop" aria-label="The three-step chai chase loop">
+            <div class="chai-splash__step">
+              <span class="chai-splash__step-icon">✦</span>
+              <span class="chai-splash__step-label">Sparkle</span>
+            </div>
+            <span class="chai-splash__connector" aria-hidden="true"></span>
+            <div class="chai-splash__step">
+              <span class="chai-splash__step-icon">${PAW_SVG}</span>
+              <span class="chai-splash__step-label">Collect treats</span>
+            </div>
+            <span class="chai-splash__connector" aria-hidden="true"></span>
+            <div class="chai-splash__step">
+              <span class="chai-splash__step-icon">★</span>
+              <span class="chai-splash__step-label">Grow the Cascade</span>
+            </div>
           </div>
         </div>
       </section>
