@@ -46,7 +46,7 @@ Reverts Patch 2 Change 2b. The full-game figure is now measured end to end rathe
 
 - **Section:** "What It Does" → card titled "A simulation oracle as the definition of done."
 - **FIND (exact):** ` The legendary event above is deliberately excluded from that figure: there's no real money in this game, so its rare, generous payout is allowed to push measured full-game RTP to roughly 103% on the runs where it lands.`
-- **REPLACE (exact):** ` A second harness plays every bonus end to end through the same engine entry points the UI uses. Across 210,000 paid spins on seven independent seeds it measures full-game RTP at 95.66%, with per-seed results running from 90.7% to 100.4%. That spread is the honest variance of a game whose rarest event is worth about six points of RTP by itself.`
+- **REPLACE (exact):** ` A second harness plays every bonus end to end through the same engine entry points the UI uses. Across 2,000,000 paid spins on forty seeds it measures full-game RTP at 98.70%, assuming a perfect player on the two interactive bonuses. Per-seed results run from 94.2% to 106.8%, because the rarest event is worth about 7.5 points of RTP by itself. A seven-seed sample of the same engine returned 95.66%, which is precisely why the figure now ships with its seed list attached.`
 
 ### Change 3. Oracle card, what the oracle actually asserts
 
@@ -97,7 +97,7 @@ The oracle asserts the layered model's base leg, not a total. Its base gate is 6
 | Commits since ship | 152 |
 | Tests, ship week to today | 149 → 170 |
 | Bonus chapters added | 5 |
-| Full-game RTP, re-measured | 95.66% |
+| Full-game RTP, re-measured | 98.70% over 2,000,000 spins |
 
 ## 4. Validation loop (both cycles required)
 
