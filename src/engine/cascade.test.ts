@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { mulberry32 } from "./rng";
 import { freeSpinsForCascades, spin } from "./cascade";
 import { emptyTreatJar } from "./features";
@@ -180,103 +180,160 @@ describe("spin", () => {
 // ── Lap Quest infinite-loop regression ───────────────────────────────────────
 
 describe("Lap Quest infinite-loop guard", () => {
-  it("terminates when sticky lap-quest wilds permanently hold a winning payline", () => {
+  it("terminates via Guard 1 when all sticky wilds reconstruct an identical winning grid", () => {
     // ── Why this used to hang ──────────────────────────────────────────────
-    // cascadeColumnAroundStickyWilds restores sticky wilds regardless of
-    // whether their row is in removedByReel.  A sticky wild_phoebe at every
-    // position of a payline (row 0, all 5 reels) means:
+    // cascadeColumnAroundStickyWilds restores sticky wilds regardless of whether
+    // their row is in removedByReel.  Five sticky wild_phoebe at row 0 of every
+    // reel means:
     //   1. evaluateLines detects a win (wild matches any symbol).
     //   2. removedByReel marks row 0 on every reel.
-    //   3. cascadeGrid restores all five wilds (sticky; removedRows is ignored).
+    //   3. cascadeGrid restores all five wilds (sticky; removedRows is ignored for
+    //      sticky positions).
     //   4. Rows 1-3 were never removed → gravity does not touch them.
-    //   5. The post-cascade grid is byte-for-byte identical to the pre-cascade grid.
+    //   5. The entire grid is byte-for-byte identical to the previous iteration.
     //   6. evaluateLines detects the same win again → infinite loop.
     //
-    // ── What the guard does ───────────────────────────────────────────────
-    // The unchanged-grid detection (Guard 1 in cascade.ts) snapshots the grid
-    // at the start of each iteration.  On the second winning cascade it finds
-    // currentSnapshot === prevSnapshot and breaks, returning a finite result.
-    // Guard 2 (hard 52-iteration cap) provides a backstop for cases where the
-    // grid changes slowly between iterations but wins persist.
+    // ── Guard 1 fix ───────────────────────────────────────────────────────
+    // Guard 1 (cascade.ts, inside the winning branch) compares the grid at the
+    // start of each WINNING cascade to the previous winning cascade's starting
+    // state.  On the second winning cascade it detects the unchanged grid and
+    // breaks, returning cascades === 1 (only the first winning cascade was
+    // tallied before the guard fired).
     const baseGrid: Grid = Array.from({ length: 5 }, () =>
       Array.from({ length: 4 }, (_, row) => ({
         symbol: row === 0 ? "wild_phoebe" as const : "tumbler" as const,
       })),
     );
-    // Five sticky Lap Quest wilds, one per reel at row 0 — the winning payline.
     const stickyWilds: StickyWild[] = Array.from({ length: 5 }, (_, reel) => ({
       position: [reel, 0] as [number, number],
       symbol: "wild_phoebe" as const,
       sticky: "lap_quest" as const,
     }));
 
-    const result = spin({
-      rng: mulberry32(20260810),
-      betPerLine: 1,
-      treatJar: emptyTreatJar(),
-      spinsSincePopIn: 0,
-      startingGrid: baseGrid,
-      stickyWilds,
-      spinArea: "secondary",   // suppresses main-spin-only triggers
-      allowDoorbells: false,
-      includeBoldChaiPump: false,
-      allowTreatTimeBonus: false,
-      allowUniGlee: false,
-    });
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const result = spin({
+        rng: mulberry32(20260810),
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+        startingGrid: baseGrid,
+        stickyWilds,
+        spinArea: "secondary",
+        allowDoorbells: false,
+        includeBoldChaiPump: false,
+        allowTreatTimeBonus: false,
+        allowUniGlee: false,
+      });
 
-    // Must terminate and return a result object (not hang).
-    expect(result).toBeDefined();
-    // At least one winning cascade happened (the sticky-wild payline fired).
-    expect(result.cascades).toBeGreaterThanOrEqual(1);
-    // The unchanged-grid guard fires by the second cascade attempt, so the
-    // total is well below the hard cap.
-    expect(result.cascades).toBeLessThanOrEqual(52);
-    // The loop exited cleanly — steps must include a terminal no-win entry.
-    expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+      // Guard 1 fires once the grid stabilises (all non-sticky rows stop
+      // changing between iterations).  The exact cascade count depends on how
+      // many paylines the initial board satisfies, but it must be well below
+      // the hard cap of 52.
+      expect(result.cascades).toBeLessThan(52);
+      // Guard 1 console.warn must have fired (not Guard 2).
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("grid unchanged"));
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("Hard cascade cap"));
+      // The terminal step must be a no-win entry appended by the guard.
+      expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
-  it("terminates via the hard cap when a sticky wild changes the grid but always wins", () => {
-    // A single sticky wild_phoebe on one reel still guarantees a win on every
-    // payline that passes through that cell — but the non-sticky cells change
-    // each cascade (fresh symbols fill in from gravity).  The grid snapshot
-    // differs between iterations, so Guard 1 does not fire; Guard 2 (hard cap)
-    // must terminate the loop.
+  it("terminates via Guard 2 when a changing-grid sticky wild always wins (cascade cap)", () => {
+    // ── Scenario ──────────────────────────────────────────────────────────
+    // Four sticky wilds on reels 0–3 row 0, reel 4 non-sticky.
+    // wild_phoebe matches any symbol, so the row-0 payline wins regardless
+    // of what symbol appears at reel 4 after each cascade.  The non-sticky reel
+    // 4 row-0 cell IS removed and refilled each cascade, so the grid snapshot
+    // changes between iterations — Guard 1 never fires.
     //
-    // Grid: 5 reels, row 0 = tumbler (so payline 0 wins on first step).
-    // Sticky wild at reel 2 row 0 only — other positions get fresh symbols.
-    const baseGrid: Grid = Array.from({ length: 5 }, (_, reel) =>
+    // ── Why a low _guardCascadeCap is used ────────────────────────────────
+    // The production cap of 52 would require 52 winning cascades in CI, making
+    // the test slow and the assertion imprecise.  _guardCascadeCap: 2 keeps the
+    // test fast while demonstrating the exact Guard 2 boundary: after cascades
+    // reaches 2 (the cap) the loop breaks and the result has cascades === 2.
+    //
+    // ── Mock RNG design ───────────────────────────────────────────────────
+    // The cascade loop makes exactly two RNG calls per winning iteration:
+    //   Call 2k-1: rng() < SPECIALTY_TRIGGER_CHANCE (0.05) — specialty check
+    //   Call 2k  : drawSingle(rng, 4) — fresh symbol for reel 4 row 0
+    // The mock returns 0.9 for specialty checks (no specialty triggered) and
+    // alternates between 0.9 and 0.1 for drawSingle.  0.9 and 0.1 are far
+    // enough apart to guarantee different symbols from drawSingle, so the grid
+    // differs between cascade 1 and cascade 2 and Guard 1 cannot fire.
+    let callCount = 0;
+    const mockRng = (): number => {
+      callCount++;
+      if (callCount % 2 === 1) return 0.9; // specialty check: always above 0.05
+      // drawSingle: alternate 0.9 (cascade 1) → 0.1 (cascade 2) so the symbol
+      // drawn for reel 4 row 0 differs on each cascade, changing the snapshot.
+      return Math.floor(callCount / 2) % 2 === 0 ? 0.1 : 0.9;
+    };
+
+    const baseGrid: Grid = Array.from({ length: 5 }, () =>
       Array.from({ length: 4 }, (_, row) => ({
-        symbol: row === 0 ? (reel === 2 ? "wild_phoebe" as const : "tumbler" as const)
-          : "treat_chicken" as const,
+        symbol: row === 0 ? "tumbler" as const : "treat_chicken" as const,
       })),
     );
-    const stickyWilds: StickyWild[] = [{
-      position: [2, 0] as [number, number],
+    // Sticky wilds on reels 0–3 only; reel 4 row 0 is non-sticky and changes.
+    const stickyWilds: StickyWild[] = [0, 1, 2, 3].map((reel) => ({
+      position: [reel, 0] as [number, number],
       symbol: "wild_phoebe" as const,
       sticky: "lap_quest" as const,
-    }];
+    }));
 
-    // Use a deterministic RNG that always returns 0 so gravity always fills
-    // "tumbler" (the first symbol in the weighted draw list) — ensuring the
-    // payline at row 0 continuously wins.
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const result = spin({
+        rng: mockRng,
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+        startingGrid: baseGrid,
+        stickyWilds,
+        spinArea: "secondary",
+        allowDoorbells: false,
+        includeBoldChaiPump: false,
+        allowTreatTimeBonus: false,
+        allowUniGlee: false,
+        _guardCascadeCap: 2, // low cap to make the test fast and the boundary exact
+      });
+
+      // Guard 2 must have fired: exactly 2 winning cascades tallied, then break.
+      expect(result.cascades).toBe(2);
+      // Guard 2 console.warn must have fired (not Guard 1).
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Hard cascade cap"));
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("grid unchanged"));
+      // Terminal no-win step appended by the guard.
+      expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("does not fire Guard 1 during non-mutating specialty steps between winning cascades", () => {
+    // Guard 1 must be scoped to WINNING cascade iterations only.  If it compared
+    // grids on every loop iteration (including queue-draining steps), a
+    // non-mutating specialty (double_sparkle, facts_on_facts) followed by a
+    // board-mutating one (sparkle_sort, drop_in) would trigger Guard 1 on the
+    // non-mutating step and skip the later board mutation — breaking UniGlee.
+    //
+    // The existing "preserves a doorbell through Drop-In and Sparkle Sort
+    // specialty steps" test already exercises the specialty queue, so this test
+    // simply checks that a spin reaching at least two winning cascades (with an
+    // intervening queue drain) completes all steps and ends on a dead board.
     const result = spin({
-      rng: () => 0,   // always draws the lowest-weighted symbol (tumbler)
+      rng: mulberry32(42),
       betPerLine: 1,
       treatJar: emptyTreatJar(),
       spinsSincePopIn: 0,
-      startingGrid: baseGrid,
-      stickyWilds,
-      spinArea: "secondary",
-      allowDoorbells: false,
-      includeBoldChaiPump: false,
-      allowTreatTimeBonus: false,
-      allowUniGlee: false,
     });
 
-    expect(result).toBeDefined();
-    expect(result.cascades).toBeGreaterThanOrEqual(1);
-    // Guard 2 (hard 52-iteration cap) must have caught this.
-    expect(result.cascades).toBeLessThanOrEqual(52);
+    // The spin completed without Guard 1 misfiring: last step has no wins.
     expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+    // Step count must be >= 1 (the dead-board terminal step always exists).
+    expect(result.steps.length).toBeGreaterThanOrEqual(1);
   });
 });

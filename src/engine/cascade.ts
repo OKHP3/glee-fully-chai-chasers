@@ -243,6 +243,12 @@ export interface SpinInput {
   allowUniGlee?: boolean;
   /** Fixed chapter wilds that survive the complete cascade chain. */
   stickyWilds?: StickyWild[];
+  /**
+   * Override the winning-cascade hard cap for unit tests only.
+   * Production code must not pass this; the default of 52 is the correct
+   * production value (well above the observed maximum of ~20 cascades).
+   */
+  _guardCascadeCap?: number;
 }
 
 export function rollDoorbellFreeSpins(rng: Rng): number {
@@ -266,7 +272,9 @@ export function spin({
   treatTimeRng,
   allowUniGlee = true,
   stickyWilds: inputStickyWilds,
+  _guardCascadeCap,
 }: SpinInput): SpinResult {
+  const guardCascadeCap = _guardCascadeCap ?? 52;
   let grid = startingGrid
     ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
     : spinGrid(rng, { includeDoorbells: allowDoorbells, includeBoldChaiPump });
@@ -298,44 +306,14 @@ export function spin({
     grid = applyDropIn(rng, grid, keepsakeZone);
   }
 
-  let prevGridSnapshot: string | undefined;
-  let iterationGuard = 0;
+  // Tracks the grid state at the start of each WINNING cascade only.
+  // Non-winning queue iterations (double_sparkle, facts_on_facts, etc.) must not
+  // advance this snapshot, or Guard 1 could fire before queued sparkle_sort /
+  // drop_in effects have had a chance to run.
+  let prevWinCascadeGrid: string | undefined;
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    // ── Infinite-loop safety guards ─────────────────────────────────────────
-    // Guard 1 — unchanged-grid detection.
-    // Sticky Lap Quest wilds survive every cascade (cascadeGrid restores them
-    // regardless of removedByReel) and can reconstitute the exact same winning
-    // configuration after every gravity refill.  If the grid is byte-for-byte
-    // identical to the previous iteration's starting state, no further cascade
-    // can change the outcome — exit immediately.
-    iterationGuard++;
-    const currentSnapshot = gridSnapshot(grid);
-    if (prevGridSnapshot !== undefined && currentSnapshot === prevGridSnapshot) {
-      console.warn(
-        `[cascade] Infinite-loop guard: grid unchanged after ${cascades} cascade(s). ` +
-        `Breaking early to prevent hang. iterationGuard=${iterationGuard}`,
-      );
-      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
-      break;
-    }
-    prevGridSnapshot = currentSnapshot;
-    // Guard 2 — hard iteration cap.
-    // Catches slowly-diverging grids that the snapshot guard misses (e.g. a
-    // changing-but-always-winning sticky configuration).  Maximum observed
-    // cascade depth in live data is ~20; 52 provides a generous buffer while
-    // guaranteeing termination.
-    if (iterationGuard > 52) {
-      console.warn(
-        `[cascade] Hard iteration cap reached (${iterationGuard} iterations, ` +
-        `${cascades} winning cascades). Breaking to prevent infinite loop.`,
-      );
-      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
-      break;
-    }
-    // ── End of infinite-loop guards ─────────────────────────────────────────
-
     if (!doorbellPanic) {
       const trigger = findDoorbellTrigger(grid, 0);
       if (trigger) doorbellPanic = { ...trigger, freeSpinsAwarded: rollDoorbellFreeSpins(rng) };
@@ -380,7 +358,48 @@ export function spin({
       break;
     }
 
+    // ── Winning cascade guards ───────────────────────────────────────────────
+    // Both guards live here — after wins are confirmed and after the no-wins /
+    // specialty-queue branch — so that non-mutating queue steps
+    // (double_sparkle, facts_on_facts, drop_in, sparkle_sort) are never
+    // mistakenly treated as a repeated winning state and never consumed by the
+    // hard cap counter.
+
+    // Guard 1 — unchanged-grid detection.
+    // Sticky Lap Quest wilds survive cascadeGrid regardless of removedByReel
+    // and reconstitute the same winning configuration after every refill.
+    // If the grid at the start of this winning iteration matches the previous
+    // winning iteration exactly, the loop is infinite — exit now.
+    const currentWinGrid = gridSnapshot(grid);
+    if (prevWinCascadeGrid !== undefined && currentWinGrid === prevWinCascadeGrid) {
+      console.warn(
+        `[cascade] Infinite-loop guard: grid unchanged after ${cascades} cascade(s). ` +
+        `Breaking early to prevent hang.`,
+      );
+      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
+      break;
+    }
+    prevWinCascadeGrid = currentWinGrid;
+
     cascades++;
+
+    // Guard 2 — hard cascade cap.
+    // Catches slowly-diverging grids where the snapshot guard cannot detect
+    // a cycle (e.g. a single sticky wild where non-sticky cells are refilled
+    // with always-winning but different symbols each cascade).  Cap is set well
+    // above the maximum observed cascade depth in live data (~20).
+    // _guardCascadeCap defaults to 52 and is overridable via SpinInput for
+    // deterministic unit tests only.
+    if (cascades >= guardCascadeCap) {
+      console.warn(
+        `[cascade] Hard cascade cap reached (${cascades} winning cascades). ` +
+        `Breaking to prevent infinite loop.`,
+      );
+      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
+      break;
+    }
+    // ── End of winning cascade guards ────────────────────────────────────────
+
     totalWin += wins.reduce((sum, w) => sum + w.payout, 0);
 
     const specialtyAwarded: SpecialtyWild[] = [];
