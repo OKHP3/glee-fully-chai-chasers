@@ -17,7 +17,7 @@ The game opens on an illustrated splash. One tap unlocks audio and drops you int
 ### The cascade loop
 
 - **Firefly Cascade meter:** reach six cascades in a single spin to open free spins. The ladder pays 6, 9, 15, 25, 40, and 60 spins at six through eleven-plus cascades. Retriggers are blocked engine-wide, so no bonus can extend itself.
-- **Keepsake Constellation:** a giant 2×2 keepsake can hold its place through a free-spin cascade chain while the surrounding board resolves.
+- **Keepsake Constellation:** a giant keepsake spanning 2–3 reels and 2–4 rows (the footprint is chosen by weighted chance each appearance) can hold its place through a free-spin cascade chain while the surrounding board resolves.
 - **Treat Jar and cat pop-ins:** Chicken Comets and Salmon Stars can call in Phoebe. Joey saves his assist for Bougie Bites. Filled treat sets cash out as free spins, one for chicken, two for salmon, three for bougie.
 
 ### The bonuses
