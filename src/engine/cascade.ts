@@ -311,6 +311,10 @@ export function spin({
   // advance this snapshot, or Guard 1 could fire before queued sparkle_sort /
   // drop_in effects have had a chance to run.
   let prevWinCascadeGrid: string | undefined;
+  // Counts WINNING cascades only — sparkle_sort also increments `cascades` (for
+  // the cascade meter / ladder), so Guard 2 must use its own counter to avoid
+  // hitting the cap earlier than the number of player-facing winning cascades warrants.
+  let winningCascades = 0;
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -380,26 +384,13 @@ export function spin({
       break;
     }
     prevWinCascadeGrid = currentWinGrid;
-
-    cascades++;
-
-    // Guard 2 — hard cascade cap.
-    // Catches slowly-diverging grids where the snapshot guard cannot detect
-    // a cycle (e.g. a single sticky wild where non-sticky cells are refilled
-    // with always-winning but different symbols each cascade).  Cap is set well
-    // above the maximum observed cascade depth in live data (~20).
-    // _guardCascadeCap defaults to 52 and is overridable via SpinInput for
-    // deterministic unit tests only.
-    if (cascades >= guardCascadeCap) {
-      console.warn(
-        `[cascade] Hard cascade cap reached (${cascades} winning cascades). ` +
-        `Breaking to prevent infinite loop.`,
-      );
-      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
-      break;
-    }
     // ── End of winning cascade guards ────────────────────────────────────────
 
+    winningCascades++;
+    cascades++;
+
+    // Settle this winning cascade fully before applying any cap so that every
+    // tally cascade is represented in totalWin and steps.
     totalWin += wins.reduce((sum, w) => sum + w.payout, 0);
 
     const specialtyAwarded: SpecialtyWild[] = [];
@@ -427,6 +418,20 @@ export function spin({
       keepsakeZone = { ...keepsakeZone, symbol: rollKeepsakeSymbol(rng, keepsakeZone.symbol) };
     }
     grid = keepsakeZone ? applyKeepsakeZone(nextGrid, keepsakeZone) : nextGrid;
+
+    // Guard 2 — hard winning-cascade cap, applied AFTER full settlement.
+    // Uses winningCascades (not cascades) so sparkle_sort steps — which also
+    // increment `cascades` — do not count against the cap.  Placed after
+    // steps.push and totalWin so that all cascades up to the cap are correctly
+    // settled; the loop then breaks with a synthetic terminal no-win step.
+    if (winningCascades >= guardCascadeCap) {
+      console.warn(
+        `[cascade] Hard cascade cap reached (${winningCascades} winning cascades). ` +
+        `Breaking to prevent infinite loop.`,
+      );
+      steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
+      break;
+    }
   }
 
   const catVisit = rollCatVisit(rng, treatJar, spinsSincePopIn);

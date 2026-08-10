@@ -301,13 +301,23 @@ describe("Lap Quest infinite-loop guard", () => {
         _guardCascadeCap: 2, // low cap to make the test fast and the boundary exact
       });
 
-      // Guard 2 must have fired: exactly 2 winning cascades tallied, then break.
+      // Guard 2 must have fired: exactly 2 winning cascades tallied (cap=2), then break.
+      // `cascades` equals winningCascades here because the mock RNG never triggers
+      // specialty wilds (all specialty checks return 0.9 > 0.05), so no sparkle_sort
+      // step increments `cascades` separately.
       expect(result.cascades).toBe(2);
       // Guard 2 console.warn must have fired (not Guard 1).
       expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Hard cascade cap"));
       expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("grid unchanged"));
-      // Terminal no-win step appended by the guard.
-      expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+      // Settlement: Guard 2 fires AFTER each winning cascade is fully settled,
+      // so both cascades contribute to totalWin and each has a winning step.
+      expect(result.totalWin).toBeGreaterThan(0);
+      // steps = [winning cascade 1, winning cascade 2, terminal no-win] = 3 entries.
+      expect(result.steps).toHaveLength(3);
+      expect(result.steps[0].wins).not.toHaveLength(0); // cascade 1 settled
+      expect(result.steps[1].wins).not.toHaveLength(0); // cascade 2 settled
+      // Terminal no-win step appended by the guard after the last settled cascade.
+      expect(result.steps[2].wins).toHaveLength(0);
     } finally {
       warnSpy.mockRestore();
     }
