@@ -8,6 +8,71 @@
 <style>
 
 html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
+
+/* ── 390 px mobile fixes ── */
+/* The cabinet-frame must clip its overflow so the cat art
+   doesn't bleed above the marquee */
+.cabinet-frame{overflow:hidden}
+
+/* bonus-cabinet-overlay fills the frame as a column */
+.bonus-cabinet-overlay{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  overflow:hidden;
+  padding:8px 10px 12px!important;
+  gap:0!important;
+}
+
+/* Compact the heading so it doesn't eat too much vertical space */
+.wheel-heading{
+  font-size:clamp(13px,4vw,18px)!important;
+  margin:0 0 6px!important;
+  text-align:center;
+}
+
+/* wheel-stage: flex-shrink so it gives space back to the legends */
+.wheel-stage{
+  position:relative;
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  overflow:hidden;
+}
+
+/* The cat-art picture sits on top of the wheel at desktop.
+   At 390 px it overflows the top; tuck it entirely inside the
+   stage and reduce its size so the wheel SVG is fully visible. */
+.wheel-hero-picture{
+  position:absolute!important;
+  top:0!important; left:50%!important;
+  transform:translateX(-50%)!important;
+  width:80%!important;
+  max-width:260px!important;
+  height:auto!important;
+  z-index:1;
+  pointer-events:none;
+}
+.wheel-hero-art{width:100%!important;height:auto!important}
+
+/* The mechanical wheel sits on top of the art */
+.wheel-mechanical-face,.wheel-glow-ring,.wheel-energy-ring,.wheel-pointer{
+  position:relative;
+  z-index:2;
+}
+
+/* Legends row: always show all three, allow wrap */
+.wheel-legends{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  justify-content:center!important;
+  gap:4px 10px!important;
+  font-size:clamp(11px,3vw,13px)!important;
+  flex-shrink:0;
+  padding:6px 4px 0!important;
+  width:100%;
+}
 </style>
 </head>
 <body>

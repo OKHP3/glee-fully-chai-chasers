@@ -9,35 +9,51 @@
 
 html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
 
+/* ── cabinet-frame: needs a floor so the overlay has real height to work with ── */
+.cabinet-frame{min-height:460px;overflow:hidden}
+
 /* ── Summary overlay ── */
 .uniglee-summary-overlay{
   position:absolute;inset:0;z-index:30;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
+  /* flex-start + padding prevents the content overflowing ABOVE the frame
+     when total height exceeds the container (as happens at 390 px) */
+  justify-content:flex-start;
+  padding-top:16px;
   gap:0;
   background:radial-gradient(ellipse at 50% 40%,rgba(120,60,220,.6) 0%,rgba(6,8,26,.88) 75%);
 }
-/* Arch + butterfly unit — fluid width so it fits within any shell width */
+/* Arch + butterfly unit — at 390 px the SVG arc text needs too much
+   vertical space. We hide it and show a plain heading instead, which
+   lets us keep the unit compact (140 px) so the continue button stays
+   on-screen. */
 .uniglee-arch-unit{
   position:relative;
   width:min(880px,100%);
-  /* maintain original 880×340 aspect ratio */
-  aspect-ratio:880/340;
+  height:140px;
   flex-shrink:0;
 }
-.uniglee-arch-svg{
-  position:absolute;top:0;left:0;
-  width:100%;height:100%;
-  overflow:visible;
-  pointer-events:none;
-}
+/* Hide the SVG arch text at mobile — a plain heading is used instead */
+.uniglee-arch-svg{ display:none }
 .uniglee-butterfly{
   position:absolute;
   top:50%;left:50%;
-  transform:translate(-50%,-50%) translateY(13.5%);
-  /* scale butterfly proportionally with the unit */
-  width:min(240px,68%);height:min(240px,68%);
+  transform:translate(-50%,-50%);
+  width:130px;height:130px;
   background-repeat:no-repeat;
   filter:drop-shadow(0 0 32px rgba(180,120,255,.95)) drop-shadow(0 0 12px rgba(255,220,80,.6));
+}
+/* Plain mobile heading that replaces the SVG arch text */
+.uniglee-mobile-title{
+  margin:0 0 2px;
+  font-family:'Baloo 2',sans-serif;
+  font-size:clamp(28px,8vw,36px);
+  font-weight:800;
+  color:#f5d576;
+  letter-spacing:.12em;
+  text-align:center;
+  text-shadow:0 0 20px rgba(180,120,255,.9),0 0 8px rgba(255,220,80,.5);
 }
 .uniglee-subtitle{
   margin:6px 0 0;
@@ -51,8 +67,8 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
 }
 .uniglee-summary-stats{
   display:flex;gap:clamp(16px,8vw,64px);
-  margin-top:12px;
-  padding:14px clamp(16px,8vw,72px);
+  margin-top:8px;
+  padding:10px clamp(16px,8vw,72px);
   border:1px solid rgba(180,120,255,.35);
   border-radius:18px;
   background:rgba(30,15,70,.6);
@@ -62,20 +78,16 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
   font-family:'Baloo 2',sans-serif;
 }
 .uniglee-summary-stats b{
-  font-size:clamp(28px,10vw,52px);font-weight:800;color:#f5d576;line-height:1;
+  font-size:clamp(28px,10vw,44px);font-weight:800;color:#f5d576;line-height:1;
 }
 .uniglee-summary-stats small{
-  font-size:clamp(11px,3vw,16px);color:#9d85c8;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;
+  font-size:clamp(11px,3vw,14px);color:#9d85c8;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;
 }
 .uniglee-summary-note{
-  margin:8px 0 0;
-  font-size:clamp(11px,3.5vw,16px);color:#7a6a9a;
-  font-family:'Baloo 2',sans-serif;
-  text-align:center;
-  padding:0 12px;
+  display:none; /* hidden at 390 px — saves ~34 px so the continue button stays on-screen */
 }
 .uniglee-continue-btn{
-  margin-top:14px;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -102,6 +114,9 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
 
       <!-- UniGlee summary overlay — scoped to cabinet-frame -->
       <div class="uniglee-summary-overlay" role="dialog" aria-modal="true" aria-label="UniGlee Marathon complete">
+
+        <!-- Mobile title: replaces SVG arch text which is hidden at 390 px -->
+        <p class="uniglee-mobile-title" aria-hidden="true">UNI-GLEE</p>
 
         <!-- Arch text + butterfly as a single composed unit -->
         <div class="uniglee-arch-unit">

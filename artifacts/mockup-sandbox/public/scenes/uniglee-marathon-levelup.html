@@ -5,7 +5,27 @@
 <meta name="viewport" content="width=390">
 <title>UniGlee Marathon — Level-Up — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}</style>
+<style>html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
+
+/* ── 390 px mobile fixes ── */
+/* The levelup-overlay is position:absolute;inset:0 with an inline
+   display:flex;align-items:center;justify-content:center that makes
+   the companion-row, status-line, and footer spill horizontally.
+   Override to a column layout that keeps the chrome at the bottom. */
+.levelup-overlay{
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0!important;
+}
+/* Push chrome to the bottom of the overlay */
+.levelup-overlay .companion-row,
+.levelup-overlay .status-line,
+.levelup-overlay .bet-console{
+  width:100%;
+  flex-shrink:0;
+}
+.levelup-overlay .companion-row{margin-top:auto}</style>
 </head>
 <body>
 <div class="cc-root">
