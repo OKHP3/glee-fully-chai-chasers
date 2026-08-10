@@ -164,7 +164,35 @@ for (const filePath of sceneFiles) {
         `       Add an <aside id="ice-notes-card" class="ice-notes-card"> block after the companion-row closing </div>.`,
     );
   } else {
-    iceNotesPassed++;
+    // Content check: ingredient name and description must both be non-empty.
+    const name = filePath.split("/").pop()!;
+    const nameText = src.match(/class="ice-notes-name">([^<]*)</)?.[1]?.trim() ?? "";
+    const descText = src.match(/class="ice-notes-text">([^<]*)</)?.[1]?.trim() ?? "";
+    let contentOk = true;
+    if (!nameText) {
+      contentOk = false;
+      iceNotesFailures.push(name);
+      console.error(
+        `  ✗  ${name}\n` +
+          `     → ice-notes-card has no ingredient name (class="ice-notes-name" is missing or empty)\n` +
+          `       Fill in the ingredient name before pushing.`,
+      );
+    }
+    if (!descText) {
+      contentOk = false;
+      if (nameText) {
+        // Only push once per file (avoid double-counting if name was also blank)
+        iceNotesFailures.push(name);
+      }
+      console.error(
+        `  ✗  ${name}\n` +
+          `     → ice-notes-card has no ingredient description (class="ice-notes-text" is missing or empty)\n` +
+          `       Fill in the ingredient description before pushing.`,
+      );
+    }
+    if (contentOk) {
+      iceNotesPassed++;
+    }
   }
 }
 
