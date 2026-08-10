@@ -3,10 +3,11 @@ import tailwindcss from "@tailwindcss/vite";
 import fs from "node:fs";
 import path from "node:path";
 
-// base: repo name for GitHub Pages project site.
-// If a custom domain (e.g. chai.glee-fully.tools) is added later, change base to "/".
+// base: reads BASE_PATH env var when set (Replit autoscale sets it to "/" via artifact.toml).
+// Falls back to the GitHub Pages project-site path so that channel is preserved unchanged.
+// If a custom domain (e.g. chai.glee-fully.tools) is ever added, set BASE_PATH=/ there too.
 export default defineConfig({
-  base: process.env.NODE_ENV === "production" ? "/glee-fully-chai-chasers/" : "/",
+  base: process.env.BASE_PATH ?? (process.env.NODE_ENV === "production" ? "/glee-fully-chai-chasers/" : "/"),
   plugins: [
     tailwindcss(),
 
