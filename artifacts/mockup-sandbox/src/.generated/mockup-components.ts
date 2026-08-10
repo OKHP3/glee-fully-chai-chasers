@@ -3,10 +3,10 @@ type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/chai-splash/Polished.tsx": () => import("../components/mockups/chai-splash/Polished.tsx"),
   "./components/mockups/cinematic-mobile/Hero.tsx": () => import("../components/mockups/cinematic-mobile/Hero.tsx"),
-  "./components/mockups/gameplay-direction/Desktop.tsx": () => import("../components/mockups/gameplay-direction/Desktop.tsx"),
-  "./components/mockups/gameplay-direction/Mobile.tsx": () => import("../components/mockups/gameplay-direction/Mobile.tsx"),
   "./components/mockups/design-system/SymbolReference.tsx": () => import("../components/mockups/design-system/SymbolReference.tsx"),
   "./components/mockups/design-system/SystemShowcase.tsx": () => import("../components/mockups/design-system/SystemShowcase.tsx"),
+  "./components/mockups/gameplay-direction/Desktop.tsx": () => import("../components/mockups/gameplay-direction/Desktop.tsx"),
+  "./components/mockups/gameplay-direction/Mobile.tsx": () => import("../components/mockups/gameplay-direction/Mobile.tsx"),
   "./components/mockups/progress-feedback/Playful.tsx": () => import("../components/mockups/progress-feedback/Playful.tsx"),
   "./components/mockups/scenes/BoardAskjamieBubble.tsx": () => import("../components/mockups/scenes/BoardAskjamieBubble.tsx"),
   "./components/mockups/scenes/BoldChaiFreeSpins.tsx": () => import("../components/mockups/scenes/BoldChaiFreeSpins.tsx"),
