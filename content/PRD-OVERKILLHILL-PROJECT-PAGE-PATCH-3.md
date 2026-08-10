@@ -9,7 +9,9 @@
 
 ## 0. Mission statement (read twice)
 
-Patch 2 (2026-07-17) corrected this page against decisions **S33 and S34**. Those decisions do not exist in `docs/DECISION-LOG.md`, and the engine change they described never landed. The repository at commit `234ea74` has no "tease" mechanic, no 1-in-4,212 capture rate, and no configuration that produces 103% RTP. Patch 2's edits made three sentences on this page factually wrong.
+Patch 2 (2026-07-17) corrected this page against decisions it called **S33 and S34**, which described a decorative butterfly tease at ~1-in-850 and a rarer real capture at ~1-in-4,212. Those mechanics have not shipped in the engine. The shipped engine rolls a combined ~1-in-1,277 with no non-paying scatter path.
+
+**D6 update (2026-08-10):** The tease and rarer capture were ruled real decisions by Jamie on 2026-08-10, now logged as S34 and S35 in `docs/DECISION-LOG.md`. However, the engine implementation is simulation-gated and not yet built. **This patch still applies in full:** the page must describe the code that actually runs today. Once the S34/S35 engine task lands, the page will become accurate again without further edits.
 
 Your job has two parts:
 
@@ -58,11 +60,11 @@ The oracle asserts the layered model's base leg, not a total. Its base gate is 6
 
 ### Change 4. Decision log artifact, count
 
-`docs/DECISION-LOG.md` holds 33 settled rows spanning S1 through S32. There is no S33 or S34.
+`docs/DECISION-LOG.md` now holds 36 settled rows: S1 through S33 (with the S30 label collision counting as two rows), plus S34 (UniGlee decorative tease, ruled 2026-08-10) and S35 (UniGlee rare capture redesign, ruled 2026-08-10).
 
 - **Section:** "The Orchestration Pattern" → Artifact 2, "The decision log."
 - **FIND (exact):** `Thirty-four settled decisions and counting.`
-- **REPLACE (exact):** `Thirty-three settled decisions and counting.`
+- **REPLACE (exact):** `Thirty-six settled decisions and counting.`
 
 ### Change 5. Project Info, version string
 
@@ -110,8 +112,9 @@ Cycle 1, mechanical:
 3. Confirm the five FIND strings no longer appear anywhere in the file, and
    each REPLACE string appears exactly once.
 4. Confirm "The final build passed 149 tests" is present and UNCHANGED.
-5. Confirm the strings "4,200 spins", "103%", "Thirty-four", and "v1.x" no
-   longer appear anywhere in the file.
+5. Confirm the strings "4,200 spins", "103%", "Thirty-four", "Thirty-three",
+   and "v1.x" no longer appear anywhere in the file. Confirm "Thirty-six"
+   appears exactly once.
 
 Cycle 2, rendered:
 6. Load the page locally at 1440 wide and 390 wide. The two edited cards render

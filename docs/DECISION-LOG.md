@@ -10,7 +10,9 @@ D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table
 
 **Raised:** 2026-08-09, by Claude, during the accuracy audit. **Owner:** Jamie. **Status:** ruled 2026-08-10.
 
-**Ruling: "Ruled."** The decorative tease and the rarer real capture were real decisions that never reached the engine. Logged as settled **S34** (decorative tease sighting) and **S35** (rare capture rate redesign), both carrying the original ruling date of 2026-07-17. A simulation-gated engine task is now open to implement the tease mechanic and re-rate the capture. The public project page (overkillhill.com) describes the intent correctly; it becomes fully accurate once the engine catches up.
+**Ruling: "Ruled."** The decorative tease and the rarer real capture were real decisions that never reached the engine. Logged as settled **S34** (decorative tease sighting) and **S35** (rare capture rate redesign), both carrying the original ruling date of 2026-07-17. A simulation-gated engine task (#184) is open to implement the tease mechanic and re-rate the capture.
+
+**Interim page state:** Until the S34/S35 engine work ships, the overkillhill.com project page must describe the code that actually runs — not the planned mechanic. `content/PRD-OVERKILLHILL-PROJECT-PAGE-PATCH-3.md` (updated 2026-08-10) is the authoritative correction spec; it rolls back the Patch 2 UniGlee claims to the current shipped 1-in-1,277 behavior while the engine catches up. Patch 3 applies regardless of D6's ruling direction and must be executed in the OverKill-Hill repl before the page's own acceptance criterion passes.
 
 **Jamie's exact words (2026-08-10):** "Yes, there should be occasional appearances of the UNI-GLEE Butterfly that don't appear on a paying line, much like there are times where the Chai Pump and the Doorbell icons may appear but not actually payout."
 
