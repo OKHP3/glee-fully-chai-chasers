@@ -107,6 +107,7 @@ COPY = {
     "keepsake-constellation":          ("Moonlit Keepsake · Active",      "✦ Constellation piece collected"),
     "keepsake-memory-failed":          ("Moonlit Keepsake · Active",      "✦ Memory failed — trail resets"),
     "keepsake-memory":                 ("Moonlit Keepsake · Active",      "✦ Memory match in progress"),
+    "keepsake-memory-success":         ("Moonlit Keepsake · Victory",     "✦ All six pairs found — 40 free spins!"),
     "lap-quest-ledge-exit-inactivity": ("Lap Quest · Bonus active",       "✦ Inactivity exit — quest ends"),
     "lap-quest-ledge-exit-joey":       ("Lap Quest · Bonus active",       "✦ Joey retreats — quest complete"),
     "lap-quest-ledge":                 ("Lap Quest · Bonus active",       "✦ Joey on the ledge"),

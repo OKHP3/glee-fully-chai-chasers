@@ -243,6 +243,7 @@ const SCENE_LABELS: Record<string, string> = {
   "keepsake-memory.html":                  "Moonlit Keepsake Trail",
   "keepsake-memory-failed.html":           "Moonlit Keepsake Trail — Trail Over",
   "keepsake-memory-mismatch.html":         "Moonlit Keepsake Trail — Mismatch Mid-Flash",
+  "keepsake-memory-success.html":          "Moonlit Keepsake Trail — All Pairs Found",
   "uniglee-trigger.html":                  "UniGlee Trigger",
   "uniglee-chapter-banner.html":           "UniGlee Chapter Banner",
   "uniglee-act-keepsake-collection.html":  "UniGlee Act — Keepsake Collection",
