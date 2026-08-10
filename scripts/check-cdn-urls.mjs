@@ -264,6 +264,16 @@ function extractHtmlUrls(src) {
     // <a href> and <area href> are user-navigation hyperlinks — not fetched.
     if (tagName === "a" || tagName === "area") continue;
 
+    // ── <base href> ──────────────────────────────────────────────────────
+    // An external <base href> rewrites every relative URL in the document
+    // to the external host — even local-looking paths like src="app.js"
+    // would resolve through the CDN.  Flag any external base href directly.
+    if (tagName === "base") {
+      const hrefVal = attrValue(tag, "href");
+      if (hrefVal && isExternalUrl(hrefVal)) hits.push(hrefVal);
+      continue;
+    }
+
     // ── src attribute ── (script, img, iframe, audio, video, source,
     //                      track, embed, input, …)
     const srcVal = attrValue(tag, "src");
@@ -302,11 +312,13 @@ function extractHtmlUrls(src) {
       if (posterVal && isExternalUrl(posterVal)) hits.push(posterVal);
     }
 
-    // ── SVG resource elements: <image> and <use> ─────────────────────────
-    // SVG <image href> and <use href> cause the browser to fetch the
-    // referenced resource (bitmap or external SVG document respectively).
+    // ── SVG resource elements: <image>, <use>, <feImage> ────────────────
+    // These SVG elements cause the browser to fetch the referenced resource:
+    //   <image>   — embeds an external bitmap or SVG document
+    //   <use>     — references an external SVG fragment
+    //   <feImage> — SVG filter primitive that loads an external image asset
     // Both the modern href and the legacy xlink:href form are checked.
-    if (tagName === "image" || tagName === "use") {
+    if (tagName === "image" || tagName === "use" || tagName === "feimage") {
       const hrefVal = attrValue(tag, "href");
       if (hrefVal && isExternalUrl(hrefVal)) hits.push(hrefVal);
       // xlink:href — namespace-prefixed legacy form still used in inline SVG
@@ -711,6 +723,38 @@ function runSelfTest() {
         `<svg><use href="/assets/sprite.svg#icon"></use></svg>`
       );
       assert(v.length === 0, `same-origin SVG use should not be flagged`);
+    });
+
+    check("SVG <feImage href> fetching an external image is flagged", () => {
+      // feImage is an SVG filter primitive that loads a raster or vector image;
+      // an external href causes a third-party fetch.
+      const v = scan("index.html",
+        `<svg><filter id="f"><feImage href="https://cdn.example.com/texture.png"/></filter></svg>`
+      );
+      assert(v.length === 1, `feImage href must be flagged; got ${v.length}`);
+    });
+
+    // ── <base href> ────────────────────────────────────────────────────────
+    // An external <base href> silently redirects every relative resource URL
+    // (script src, img src, link href, etc.) to a CDN host.
+
+    check("external <base href> is flagged", () => {
+      const v = scan("index.html",
+        `<base href="https://cdn.example.com/assets/">`
+      );
+      assert(v.length === 1, `external base href must be flagged; got ${v.length}`);
+    });
+
+    check("protocol-relative <base href> is flagged", () => {
+      const v = scan("index.html",
+        `<base href="//cdn.example.com/assets/">`
+      );
+      assert(v.length === 1, `protocol-relative base href must be flagged; got ${v.length}`);
+    });
+
+    check("local <base href> is NOT flagged", () => {
+      const v = scan("index.html", `<base href="/assets/">`);
+      assert(v.length === 0, `local base href should not be flagged; got ${v.length}`);
     });
 
     // ── > inside quoted attribute value ────────────────────────────────────
