@@ -51,6 +51,8 @@ jobs:
         run: npm run validate:hand-svg
       - name: Confirm SymbolReference pays match PAYTABLE — catch drift after a rebalance
         run: npm run validate:symbol-pays
+      - name: Confirm SymbolReference reel chips match reels.ts — catch placement drift before it misleads a designer
+        run: npm run validate:symbol-reels
       - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
         run: npm run validate:cabinet-strips
 
