@@ -43,6 +43,24 @@ const { domain, iframes } = await (async function () {
   return { domain, iframes };
 })();
 
+// ── Step 1b: guard — every live canvas iframe must be in the registry ─────────
+// If a frame was added to the canvas without a registry entry, refreshing
+// would silently skip it and it would break on the next domain change.
+{
+  const state = await getCanvasState({ focusArea: { x: -20000, y: -20000, w: 60000, h: 60000 } });
+  const live = [...(state.focusedShapes ?? []), ...(state.blurryShapes ?? [])]
+    .filter((s) => s.shapeType === "iframe")
+    .map((s) => s.shapeId)
+    .filter((id) => !id.startsWith("artifact:"));
+  const registered = new Set(iframes.map((i) => i.shapeId));
+  const unregistered = live.filter((id) => !registered.has(id));
+  if (unregistered.length > 0) {
+    throw new Error(
+      `UNREGISTERED canvas iframes — add to scripts/canvas-iframes.json before refreshing, or they stay broken: ${unregistered.join(", ")}`,
+    );
+  }
+}
+
 // ── Step 2: build one update action per iframe ─────────────────────────────────
 const actions = iframes.map(({ shapeId, path }) => ({
   type: "update",
