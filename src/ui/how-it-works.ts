@@ -7,7 +7,7 @@
  * Art via symbolSvg() and catSprite() — zero emoji on the symbol/cat art.
  */
 import { FREE_SPIN_LADDER } from '../engine/types';
-import { BET_LEVELS, BUST_PROOF_REFILL } from '../engine/economy';
+import { BET_LEVELS, BUST_PROOF_REFILL, LEVEL_6_UNLOCK_PLAYER_LEVEL } from '../engine/economy';
 import { TREAT_JAR_FREE_SPINS } from '../engine/features';
 import { symbolSvg, catSprite } from './symbols';
 
@@ -135,7 +135,11 @@ function buildCats(): string {
 /* ------------------------------------------------------------------ */
 
 function buildFreeForever(): string {
-  const bets = BET_LEVELS.slice(0, 5).join(' · ');
+  // Show the complete bet ladder. The top tier (last entry) has its own unlock
+  // condition; source both the value and the threshold from economy constants
+  // so the guide can never drift from what the engine enforces.
+  const topTier = BET_LEVELS[BET_LEVELS.length - 1];
+  const standardTiers = BET_LEVELS.slice(0, BET_LEVELS.length - 1).join(' · ');
 
   return `
   <section class="hiw-section" aria-labelledby="hiw-econ-title">
@@ -161,8 +165,11 @@ function buildFreeForever(): string {
       <li class="hiw-econ-item">
         <span class="hiw-econ-item__icon" aria-hidden="true">⚙️</span>
         <div>
-          <strong>Bet size.</strong> Tap the coin icon to change your bet:
-          ${bets} coins per spin. All forty paylines are active at every size.
+          <strong>Bet size.</strong> Tap the coin icon to pick your bet:
+          ${standardTiers} coins per spin — available from the start. The
+          ${topTier}-coin level unlocks at player
+          level ${LEVEL_6_UNLOCK_PLAYER_LEVEL}. All forty paylines are active
+          at every size.
         </div>
       </li>
     </ul>
