@@ -108,6 +108,7 @@ COPY = {
     "joey-laundry-sock-drop":          ("Joey's Laundry · Bonus active",  "✦ Sock drop — reel disrupted"),
     "keepsake-constellation":          ("Moonlit Keepsake · Active",      "✦ Constellation piece collected"),
     "keepsake-memory-failed":          ("Moonlit Keepsake · Active",      "✦ Memory failed — trail resets"),
+    "keepsake-memory-mismatch":        ("Moonlit Keepsake · Active",      "✦ Near-match — 1 of 2 mismatches used"),
     "keepsake-memory":                 ("Moonlit Keepsake · Active",      "✦ Memory match in progress"),
     "keepsake-memory-success":         ("Moonlit Keepsake · Victory",     "✦ All six pairs found — 40 free spins!"),
     "lap-quest-ledge-exit-inactivity": ("Lap Quest · Bonus active",       "✦ Inactivity exit — quest ends"),
