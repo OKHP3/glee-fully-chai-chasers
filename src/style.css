@@ -263,6 +263,38 @@ body {
   border-radius: 3px;
 }
 
+/* designathon showcase links — sit between actions and the loop */
+.chai-splash__showcase {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+}
+.chai-splash__showcase-link {
+  font: 600 13px system-ui, sans-serif;
+  color: rgba(94, 212, 196, .7);
+  text-decoration: none;
+  letter-spacing: .01em;
+  transition: color .15s ease;
+}
+.chai-splash__showcase-link:hover,
+.chai-splash__showcase-link:focus-visible {
+  color: var(--cc-mint);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.chai-splash__showcase-link:focus-visible {
+  outline: 2px solid var(--cc-mint);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.chai-splash__showcase-sep {
+  color: rgba(255, 238, 197, .2);
+  font-size: 11px;
+  user-select: none;
+}
+
 /* creator / built-with credit line */
 .chai-splash__credit {
   position: absolute;
@@ -1791,6 +1823,20 @@ body {
   50%       { box-shadow: 0 0 0 5px rgba(245, 213, 118, .28); }
 }
 .about-card { border-color: rgba(159,232,197,.25); background: linear-gradient(145deg, rgba(30,85,89,.52), rgba(26,19,55,.92)); }
+.about-card__links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.about-card__link {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid rgba(94,212,196,.35); background: rgba(94,212,196,.08);
+  color: rgba(94,212,196,.85); font: 600 12px system-ui, sans-serif;
+  text-decoration: none; letter-spacing: .01em;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.about-card__link:hover, .about-card__link:focus-visible {
+  background: rgba(94,212,196,.18); color: var(--cc-mint); border-color: rgba(94,212,196,.65);
+}
+.about-card__link:focus-visible { outline: 2px solid var(--cc-mint); outline-offset: 2px; }
+.cc-root[data-theme="light"] .about-card__link { border-color: rgba(30,130,120,.3); background: rgba(30,130,120,.08); color: rgba(20,110,100,.9); }
 .reset-progress-btn { width: 100%; min-height: 48px; border: 1px solid rgba(232,165,184,.6); border-radius: 13px; color: #ffd6e5; background: rgba(115, 40, 76, .38); font-weight: 800; }
 
 .paytable-intro { display: grid; gap: 4px; border-color: rgba(159,232,197,.36); background: linear-gradient(145deg, rgba(30,85,89,.62), rgba(26,19,55,.9)); }

@@ -114,6 +114,11 @@ export function renderSplash(
               How it works ↗
             </button>
           </div>
+          <div class="chai-splash__showcase" role="navigation" aria-label="Designathon showcase">
+            <a href="/chai-chasers-slides/" target="_blank" rel="noopener noreferrer" class="chai-splash__showcase-link">📊 Pitch deck</a>
+            <span class="chai-splash__showcase-sep" aria-hidden="true">·</span>
+            <a href="/chai-chasers-video/" target="_blank" rel="noopener noreferrer" class="chai-splash__showcase-link">🎬 Build story</a>
+          </div>
           <div class="chai-splash__loop" aria-label="The three-step chai chase loop">
             <div class="chai-splash__step">
               <span class="chai-splash__step-icon">✦</span>
