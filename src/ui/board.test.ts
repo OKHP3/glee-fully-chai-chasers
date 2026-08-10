@@ -172,6 +172,55 @@ describe("volume output label initialization", () => {
     expect(output?.textContent).toBe("50%");
     root.remove();
   });
+
+  it("shows the last-set values on both sliders after close and reopen", () => {
+    // Round-trip: open → move sliders → close → reopen → labels reflect the
+    // values set in the previous session, not '(max)' and not the original defaults.
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.musicVolume = 1;  // initial 100%
+    state.sfxVolume = 1;    // initial 100%
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    // ── First open ──────────────────────────────────────────────────────────
+    root.querySelector<HTMLButtonElement>("#settings-btn")!.click();
+
+    // Move music to 60 and SFX to 40 (values are in percent on the range input)
+    const musicInput = root.querySelector<HTMLInputElement>("#music-volume")!;
+    musicInput.value = "60";
+    musicInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+    const sfxInput = root.querySelector<HTMLInputElement>("#sfx-volume")!;
+    sfxInput.value = "40";
+    sfxInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+    // Close settings — .page-close removes the settings section from the DOM
+    root.querySelector<HTMLButtonElement>(".page-close")!.click();
+
+    // Confirm the settings panel is gone
+    expect(root.querySelector(".settings-page")).toBeNull();
+
+    // ── Second open ─────────────────────────────────────────────────────────
+    root.querySelector<HTMLButtonElement>("#settings-btn")!.click();
+
+    const musicOutput = root.querySelector<HTMLOutputElement>("#music-volume-value");
+    const sfxOutput   = root.querySelector<HTMLOutputElement>("#sfx-volume-value");
+
+    // Both labels must reflect the values set in the first session
+    expect(musicOutput?.textContent).toBe("60%");
+    expect(sfxOutput?.textContent).toBe("40%");
+
+    // Must not fall back to '(max)' (the pre-fix default) or the initial 100%
+    expect(musicOutput?.textContent).not.toBe("(max)");
+    expect(sfxOutput?.textContent).not.toBe("(max)");
+    expect(musicOutput?.textContent).not.toBe("100%");
+    expect(sfxOutput?.textContent).not.toBe("100%");
+
+    root.remove();
+  });
 });
 
 // ── Existing test suites ──────────────────────────────────────────────────────
