@@ -8,17 +8,7 @@ function PawIcon() {
 export function Polished() {
   const [started, setStarted] = useState(false);
 
-  useEffect(() => {
-    const id = "baloo-2-font";
-    if (!document.getElementById(id)) {
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=swap";
-      document.head.appendChild(link);
-    }
-  }, []);
-
+  // Baloo 2 is self-hosted via @font-face in src/index.css (public/fonts/).
   return (
     <main className="chai-splash">
       <div className="chai-splash__orb" aria-hidden="true" />

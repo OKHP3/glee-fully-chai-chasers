@@ -35,7 +35,7 @@ function resolveFromMod(
 }
 
 const KF = `
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Baloo+2:wght@500&display=swap');
+/* Fonts are self-hosted via @font-face in src/index.css (public/fonts/) */
 @keyframes ds-pulse{0%,100%{opacity:.5}50%{opacity:1}}
 @keyframes ds-rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 `;

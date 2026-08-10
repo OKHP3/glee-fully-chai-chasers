@@ -7,7 +7,7 @@
 import { useEffect } from "react";
 
 const KF = `
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap');
+/* Fonts are self-hosted via @font-face in src/index.css (public/fonts/) */
 @keyframes pf-pulse{0%,100%{opacity:.55}50%{opacity:1}}
 @keyframes pf-pop{0%{transform:scale(.72);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
 @keyframes pf-bar{from{width:0}to{width:var(--w)}}

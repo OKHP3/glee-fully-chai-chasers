@@ -35,7 +35,7 @@ const C = {
 };
 
 const KEYFRAMES = `
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap');
+/* Fonts are self-hosted via @font-face in src/index.css (public/fonts/) */
 
 @keyframes gd-pulse    { 0%,100%{opacity:.55}  50%{opacity:1} }
 @keyframes gd-drift    { 0%,100%{transform:translate(0,0) scale(1);opacity:.8} 40%{transform:translate(2px,-4px) scale(1.18);opacity:1} 70%{transform:translate(-2px,2px) scale(.9);opacity:.65} }

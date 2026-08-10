@@ -6,7 +6,7 @@
 import { useEffect } from "react";
 
 const KF = `
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap');
+/* Fonts are self-hosted via @font-face in src/index.css (public/fonts/) */
 @keyframes gm-pulse{0%,100%{opacity:.55}50%{opacity:1}}
 @keyframes gm-shimmer{0%,100%{box-shadow:0 0 0 1.5px rgba(242,200,75,.55),0 0 12px rgba(242,200,75,.22)}50%{box-shadow:0 0 0 1.5px rgba(242,200,75,.95),0 0 26px rgba(242,200,75,.48)}}
 @keyframes gm-pop{0%{transform:scale(.75);opacity:0}65%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
