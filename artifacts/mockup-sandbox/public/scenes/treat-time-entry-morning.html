@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=390">
 <title>Treat Time Entry — Morning — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}</style>
 </head>
 <body>
 <div class="cc-root">
@@ -16,7 +16,7 @@
       <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
       <div id="marquee-status" class="marquee-status"></div>
     </header>
-    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>12</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>6</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>3</span></div></div></div>
+    
     <main class="cabinet-frame treat-time-cabinet">
       <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
       <!-- #50 treat-time-entry-morning: div.treat-time-entry--main.treat-time-entry--morning appended to .cabinet-frame -->
@@ -37,8 +37,19 @@
       <!-- Main reel grid (hidden while entry overlay shows) -->
       <div id="reel-grid" class="reel-grid" role="img" aria-label="Treat Time reel board" style="display:none"></div>
     </main>
-    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:30%"></div></div></div>
-    <div class="hud-row"><span class="level-chip">Level 2</span><div class="status-line">IT'S TREAT TIME! — Morning mode · 6 spins incoming</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+    <div class="companion-row">
+      <div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>12</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>6</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>3</span></div></div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">2 / 6</strong></div>
+      </div>
+    </div>
+    <div id="status-line" class="status-line" aria-live="polite">IT'S TREAT TIME! — Morning mode · 6 spins incoming</div>
+    <footer class="bet-console">
+      <span class="level-chip">Level 2</span>
+      <button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button>
+    </footer>
+
   </div>
 </div>
 </body>

@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=390">
 <title>UniGlee Marathon Summary — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
 <style>
-html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
-.cc-root{width:1280px;height:900px;padding:0!important}
-/* Prevent the min-width:900px grid breakpoint — keep single-column flex */
-.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;display:flex!important;flex-direction:column!important;border-radius:0!important;margin:0!important}
+
+html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
 
 /* ── Summary overlay ── */
 .uniglee-summary-overlay{
@@ -18,10 +16,12 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
   gap:0;
   background:radial-gradient(ellipse at 50% 40%,rgba(120,60,220,.6) 0%,rgba(6,8,26,.88) 75%);
 }
-/* Arch + butterfly unit — scaled so full panel covers ~80% of cabinet */
+/* Arch + butterfly unit — fluid width so it fits within any shell width */
 .uniglee-arch-unit{
   position:relative;
-  width:880px;height:340px;
+  width:min(880px,100%);
+  /* maintain original 880×340 aspect ratio */
+  aspect-ratio:880/340;
   flex-shrink:0;
 }
 .uniglee-arch-svg{
@@ -33,24 +33,26 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
 .uniglee-butterfly{
   position:absolute;
   top:50%;left:50%;
-  transform:translate(-50%,-50%) translateY(46px);
-  width:240px;height:240px;
+  transform:translate(-50%,-50%) translateY(13.5%);
+  /* scale butterfly proportionally with the unit */
+  width:min(240px,68%);height:min(240px,68%);
   background-repeat:no-repeat;
   filter:drop-shadow(0 0 32px rgba(180,120,255,.95)) drop-shadow(0 0 12px rgba(255,220,80,.6));
 }
 .uniglee-subtitle{
   margin:6px 0 0;
   font-family:'Baloo 2',sans-serif;
-  font-size:26px;
+  font-size:clamp(16px,5vw,26px);
   font-weight:600;
   color:#c9aeff;
   letter-spacing:.04em;
   text-align:center;
+  padding:0 12px;
 }
 .uniglee-summary-stats{
-  display:flex;gap:64px;
+  display:flex;gap:clamp(16px,8vw,64px);
   margin-top:12px;
-  padding:18px 72px;
+  padding:14px clamp(16px,8vw,72px);
   border:1px solid rgba(180,120,255,.35);
   border-radius:18px;
   background:rgba(30,15,70,.6);
@@ -60,16 +62,17 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
   font-family:'Baloo 2',sans-serif;
 }
 .uniglee-summary-stats b{
-  font-size:52px;font-weight:800;color:#f5d576;line-height:1;
+  font-size:clamp(28px,10vw,52px);font-weight:800;color:#f5d576;line-height:1;
 }
 .uniglee-summary-stats small{
-  font-size:16px;color:#9d85c8;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;
+  font-size:clamp(11px,3vw,16px);color:#9d85c8;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;
 }
 .uniglee-summary-note{
   margin:8px 0 0;
-  font-size:16px;color:#7a6a9a;
+  font-size:clamp(11px,3.5vw,16px);color:#7a6a9a;
   font-family:'Baloo 2',sans-serif;
   text-align:center;
+  padding:0 12px;
 }
 .uniglee-continue-btn{
   margin-top:14px;
@@ -150,16 +153,13 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
         <div class="jar-meter-body"><strong class="jar-meter-count">6 / 6</strong></div>
       </div>
     </div>
-
-    <div class="hud-row">
+    <div id="status-line" class="status-line" aria-live="polite">UNI-GLEE complete · +24,600 coins · 63 spins played</div>
+    <footer class="bet-console">
       <span class="level-chip">Level 5</span>
-      <div class="status-line">UNI-GLEE complete · +24,600 coins · 63 spins played</div>
-      <div class="bet-console">
-        <button class="bet-adj-btn" disabled>−</button>
+      <button class="bet-adj-btn" disabled>−</button>
         <button class="sparkle-btn">SPARKLE</button>
         <button class="bet-adj-btn" disabled>+</button>
-      </div>
-    </div>
+    </footer>
   </div>
 </div>
 </body>

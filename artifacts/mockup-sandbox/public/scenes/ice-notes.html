@@ -2,18 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=390">
 <title>Ice Notes — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}.ice-notes-focus-frame{display:flex;flex-direction:column;gap:24px;padding:48px 80px;height:100%;box-sizing:border-box;justify-content:center}</style>
+<style>
+html,body{margin:0;padding:0;width:390px;overflow-x:hidden;overflow-y:auto;background:#06081a}
+.ice-notes-review{
+  position:relative;z-index:5;
+  display:flex;flex-direction:column;
+  align-items:stretch;
+  gap:16px;
+  padding:24px 12px 32px;
+  min-height:100%;
+  box-sizing:border-box;
+}
+.ice-notes-review-heading{
+  font-family:sans-serif;color:#f5d576;font-size:11px;
+  letter-spacing:.15em;text-transform:uppercase;margin:0 4px 4px;opacity:0.8;
+}
+</style>
 </head>
 <body>
 <div class="cc-root">
   <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
-  <div style="position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px">
-    <h2 style="font-family:sans-serif;color:#f5d576;font-size:14px;letter-spacing:.15em;text-transform:uppercase;margin:0;opacity:0.8">Ice Notes Design Review — All three note states</h2>
+  <div class="ice-notes-review">
+    <p class="ice-notes-review-heading">Ice Notes Design Review — All three note states</p>
     <!-- Note 1: Cardamom -->
-    <aside class="ice-notes-card" aria-label="Chai ingredient note" style="width:900px;max-width:95vw">
+    <aside class="ice-notes-card" aria-label="Chai ingredient note">
       <p class="ice-notes-eyebrow">ICE NOTES</p>
       <div class="ice-notes-body">
         <div class="ice-notes-header">
@@ -29,7 +44,7 @@
       </div>
     </aside>
     <!-- Note 2: Ginger -->
-    <aside class="ice-notes-card" aria-label="Chai ingredient note" style="width:900px;max-width:95vw">
+    <aside class="ice-notes-card" aria-label="Chai ingredient note">
       <p class="ice-notes-eyebrow">ICE NOTES</p>
       <div class="ice-notes-body">
         <div class="ice-notes-header">
@@ -45,7 +60,7 @@
       </div>
     </aside>
     <!-- Note 3: Black Tea -->
-    <aside class="ice-notes-card" aria-label="Chai ingredient note" style="width:900px;max-width:95vw">
+    <aside class="ice-notes-card" aria-label="Chai ingredient note">
       <p class="ice-notes-eyebrow">ICE NOTES</p>
       <div class="ice-notes-body">
         <div class="ice-notes-header">

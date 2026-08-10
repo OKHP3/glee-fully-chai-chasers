@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=390">
 <title>Lap Quest Ledge — Inactivity Exit — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}</style>
 </head>
 <body>
 <div class="cc-root">
@@ -16,8 +16,14 @@
       <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
       <div id="marquee-status" class="marquee-status">Phoebe&#8217;s Lap Quest · she wandered off</div>
     </header>
-    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span></div></div></div>
-    <main class="cabinet-frame" style="position:relative">
+    
+    <div class="cabinet-shell">
+
+    
+      <div class="cabinet-shell-divider"></div>
+
+    
+      <main class="cabinet-frame" style="position:relative">
       <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
       <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
         <div class="reel-col" data-reel="0"><div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div><div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div></div>
@@ -57,8 +63,22 @@
         <div class="lap-quest-ledge-status" aria-live="polite" aria-atomic="true">Phoebe lost interest and curled away.</div>
       </section>
     </main>
-    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:55%"></div></div></div>
-    <div class="hud-row"><span class="level-chip">Level 5</span><div class="status-line">Phoebe&#8217;s Lap Quest · she wandered off · +1,320 coins</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+
+    
+    </div>
+    <div class="companion-row">
+      <div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span></div></div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">3 / 6</strong></div>
+      </div>
+    </div>
+    <div id="status-line" class="status-line" aria-live="polite">Phoebe&#8217;s Lap Quest · she wandered off · +1,320 coins</div>
+    <footer class="bet-console">
+      <span class="level-chip">Level 5</span>
+      <button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button>
+    </footer>
+
   </div>
 </div>
 </body>
