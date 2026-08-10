@@ -50,11 +50,24 @@ const NAME_DENYLIST = new Set([
 /**
  * Returns true when `v` looks like a placeholder ingredient name.
  * Rejects:
- *   • fewer than 3 characters   ("OK", "Hi", "")
- *   • strings in NAME_DENYLIST  ("TODO", "name", "ingredient name", …)
+ *   • fewer than 3 characters            ("OK", "Hi", "")
+ *   • strings in NAME_DENYLIST           ("TODO", "name", "ingredient name", …)
+ *   • all-same-character strings          ("aaa", "XXX", "zzz")
+ *   • capital + repeated same lowercase   ("Xxx", "Yyy", "Hmm")
+ *   • known filler dictionary words       ("foo", "bar", "baz", "test", …)
+ *
+ * Real short culinary names pass: "Tea", "Ice", "Oil", "Oat", "Gum".
  */
 export function isPlaceholderName(v: string): boolean {
-  return v.length < 3 || NAME_DENYLIST.has(v.toLowerCase());
+  if (v.length < 3) return true;
+  if (NAME_DENYLIST.has(v.toLowerCase())) return true;
+  // All-same-character (any length, any case): aaa, XXX, zzz
+  if (/^(.)\1+$/i.test(v)) return true;
+  // Capital letter followed by one or more of the same lowercase letter: Xxx, Yyy, Hmm
+  if (/^[A-Z]([a-z])\1+$/.test(v)) return true;
+  // Known filler/placeholder dictionary words (case-insensitive)
+  if (/^(foo|bar|baz|qux|lorem|ipsum|abc|xyz|temp|tmp)$/i.test(v)) return true;
+  return false;
 }
 
 /**
@@ -105,7 +118,15 @@ if (process.argv.includes("--self-test")) {
   assert('isPlaceholderName("placeholder") → true',            isPlaceholderName("placeholder"),     true);
   assert('isPlaceholderName("tbd") → true  (denylist)',        isPlaceholderName("tbd"),             true);
   assert('isPlaceholderName("TBD") → true  (denylist, ci)',    isPlaceholderName("TBD"),             true);
-  // Should NOT be flagged:
+  // 3-char pattern-based placeholders — pass length check but are clearly not real names:
+  assert('isPlaceholderName("Xxx") → true  (cap+repeated, 3-char min passer)', isPlaceholderName("Xxx"), true);
+  assert('isPlaceholderName("Yyy") → true  (cap+repeated)',    isPlaceholderName("Yyy"),             true);
+  assert('isPlaceholderName("Hmm") → true  (cap+repeated)',    isPlaceholderName("Hmm"),             true);
+  assert('isPlaceholderName("aaa") → true  (all-same lower)',  isPlaceholderName("aaa"),             true);
+  assert('isPlaceholderName("AAA") → true  (all-same upper)',  isPlaceholderName("AAA"),             true);
+  assert('isPlaceholderName("foo") → true  (filler word)',     isPlaceholderName("foo"),             true);
+  assert('isPlaceholderName("bar") → true  (filler word)',     isPlaceholderName("bar"),             true);
+  // Should NOT be flagged (real short culinary names):
   assert('isPlaceholderName("Tea") → false (real 3-char)',     isPlaceholderName("Tea"),             false);
   assert('isPlaceholderName("Cardamom") → false',              isPlaceholderName("Cardamom"),        false);
   assert('isPlaceholderName("Oat Milk") → false',              isPlaceholderName("Oat Milk"),        false);
