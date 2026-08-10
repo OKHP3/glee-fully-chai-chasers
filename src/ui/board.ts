@@ -551,11 +551,21 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
     const continueBtn = root.querySelector<HTMLButtonElement>(
       "#bonus-continue, #uniglee-summary-continue",
     );
-    if (continueBtn) { continueBtn.click(); return; }
+    if (continueBtn) {
+      // Re-disable so a second click arriving before runSpin unwinds cannot
+      // slip past the `sparkleBtn.disabled` guard below and start a fresh spin.
+      sparkleBtn.disabled = true;
+      continueBtn.click();
+      return;
+    }
     const levelUpOverlay = root.querySelector<HTMLElement>(
       ".levelup-overlay:not(.levelup-overlay--out)",
     );
-    if (levelUpOverlay) { levelUpOverlay.click(); return; }
+    if (levelUpOverlay) {
+      sparkleBtn.disabled = true;
+      levelUpOverlay.click();
+      return;
+    }
 
     if (!isUnlocked()) unlock();
     startBaseMusic();

@@ -527,6 +527,61 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 
+  it("ignores a second sparkle click arriving after the bonus overlay dismiss while runSpin is still unwinding", async () => {
+    // The free-spin summary overlay (showBonusSummary) intentionally re-enables
+    // the sparkle button so it can act as a universal dismiss.  A second click
+    // arriving after the overlay has been dismissed but before renderBoard
+    // replaces the DOM would pass both the overlay guard AND the disabled guard —
+    // unless we re-disable the button as part of the dismiss path.
+    //
+    // This test exercises the fix: sparkleBtn.disabled = true is set before
+    // continueBtn.click() inside the overlay-dismiss guard so any follow-up
+    // click hits a disabled button and is silently dropped.
+    //
+    // Use the treat-jar free-spin path — it calls showBonusSummary without
+    // any additional mock complexity beyond pendingTreatJarSpins = 3.
+
+    const state = makeSpinState();
+    state.pendingTreatJarSpins = 3;
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    // Clear the idle-grid spin() call so only post-click calls are counted.
+    vi.mocked(spin).mockClear();
+
+    const btn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+
+    // Click 1: starts the spin.
+    btn.click();
+    expect(spin).toHaveBeenCalledTimes(1); // runSpin called the engine once
+
+    // Phase 1: drain until showBonusSummary is waiting for the Continue click.
+    // At this point showBonusSummary has re-enabled the sparkle button.
+    await vi.runAllTimersAsync();
+    expect(btn.disabled).toBe(false); // re-enabled by the overlay
+
+    vi.mocked(spin).mockClear(); // reset counter — only subsequent clicks count
+
+    // Click 2 (via sparkle): the overlay-dismiss guard finds #bonus-continue,
+    // re-disables sparkle, proxies the click to #bonus-continue, and returns —
+    // runSpin is NOT called again.
+    btn.click();
+    expect(spin).not.toHaveBeenCalled();
+
+    // Click 3: sparkle is now disabled (re-locked by the dismiss guard) so this
+    // click must also be silently dropped by the `if (sparkleBtn.disabled) return`
+    // guard at the bottom of the handler.
+    btn.click();
+    expect(spin).not.toHaveBeenCalled();
+
+    // Phase 3: drain remaining timers so runSpin fully unwinds.
+    await vi.runAllTimersAsync();
+
+    root.remove();
+  });
+
   it("ignores a second click while the button is disabled mid-spin so spin fires exactly once", async () => {
     // No bonus, no win — the simplest spin path.  The important thing is that
     // the click-handler guard at board.ts (`if (sparkleBtn.disabled) return;`)
