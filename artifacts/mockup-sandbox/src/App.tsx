@@ -159,7 +159,104 @@ const GROUP_PREFIXES: Array<{ label: string; prefixes: string[] }> = [
   { label: "UniGlee",    prefixes: ["uniglee-", "keepsake-"] },
 ];
 
+/**
+ * Human-readable display names for every scene in the gallery.
+ * Keys are filenames (with .html extension). Values are shown in the sidebar.
+ * Derived from the <title> tag of each scene file; strip " — Chai Chasers Design Review".
+ * Unmapped scenes (future additions) fall back to auto-capitalised filename logic below.
+ */
+const SCENE_LABELS: Record<string, string> = {
+  // ── Base Game ──────────────────────────────────────────────────────────────
+  "game-base.html":                        "Base Game",
+  "board-askjamie-bubble.html":            "AskJamie Bubble (Daily Coin Grant)",
+  "ice-notes.html":                        "Ice Notes",
+  "levelup-overlay.html":                  "Level-Up Overlay",
+  "paytable-page.html":                    "Paytable — Symbol Guide",
+  "spin-wheel.html":                       "Joey & Phoebe Sparkle Wheel",
+  "splash-birthday.html":                  "Splash — Birthday Variant",
+  "splash-standard.html":                  "Splash — Standard",
+
+  // ── Settings ───────────────────────────────────────────────────────────────
+  "settings-page.html":                    "Settings Page",
+  "settings-about.html":                   "Settings — About",
+  "settings-look-and-feel.html":           "Settings — Look & Feel",
+  "settings-payline-guide.html":           "Settings — Payline Guide",
+  "settings-reduce-motion.html":           "Settings — Reduce Motion",
+  "settings-sound.html":                   "Settings — Sound",
+  "settings-start-fresh.html":             "Settings — Start Fresh Confirmation",
+
+  // ── Cascade ────────────────────────────────────────────────────────────────
+  "cascade-beam-up.html":                  "Cascade — Beam-Up Removal",
+  "cascade-initial-pop.html":              "Cascade — Initial Pop (Step 0)",
+  "cascade-payline-guide-off.html":        "Cascade — Payline Guide Off (Default)",
+  "cascade-payline-guide-on.html":         "Cascade — Payline Guide On",
+  "cascade-resting-board.html":            "Cascade — Resting Board (No Animation Classes)",
+  "cascade-staggered-drop.html":           "Cascade — Staggered Drop (Step 1+)",
+  "cascade-win-highlight.html":            "Cascade — Win Highlight",
+
+  // ── Cat Visits ─────────────────────────────────────────────────────────────
+  "cat-visit-joey.html":                   "Joey Cat Visit",
+  "cat-visit-phoebe.html":                 "Phoebe Cat Visit",
+  "cat-popin-joey-fed.html":               "Joey Pop-In — Fed (Assist → Eat)",
+  "cat-popin-joey-unfed.html":             "Joey Pop-In — Unfed (Unimpressed)",
+  "cat-popin-phoebe-fed.html":             "Phoebe Pop-In — Fed (Eat Pose)",
+  "cat-popin-phoebe-unfed.html":           "Phoebe Pop-In — Unfed (Unimpressed)",
+
+  // ── Win States ─────────────────────────────────────────────────────────────
+  "win-celebration.html":                  "Win Celebration (Huge Win)",
+  "win-celebration-big.html":              "Win Celebration — BIG WIN!",
+  "win-celebration-nice.html":             "Win Celebration — NICE WIN!",
+  "win-status-only.html":                  "Win — Status Line Only (sub-threshold)",
+
+  // ── Lap Quest ──────────────────────────────────────────────────────────────
+  "lap-quest-ledge.html":                  "Lap Quest Ledge — Grace Phase",
+  "lap-quest-ledge-exit-inactivity.html":  "Lap Quest Ledge — Inactivity Exit",
+  "lap-quest-ledge-exit-joey.html":        "Lap Quest Ledge — Joey Exit",
+  "lap-quest-reveal.html":                 "Lap Quest Reveal",
+  "lap-quest-round-play.html":             "Lap Quest Round Play",
+  "phoebe-lap-quest.html":                 "Phoebe's Lap Quest",
+
+  // ── Bonus ──────────────────────────────────────────────────────────────────
+  "bold-chai-pump.html":                   "Bold Chai Pump",
+  "bold-chai-free-spins.html":             "Bold Chai Free Spins",
+  "bonus-summary.html":                    "Bonus Summary — Free Spins Complete",
+  "chai-storm-splash.html":                "Wild Chai Storm Splash",
+  "doorbell-panic.html":                   "Doorbell Panic",
+  "doorbell-panic-free-spins.html":        "Doorbell Panic Free Spins",
+  "free-spin-board.html":                  "Free Spins Board",
+  "free-spins-session.html":               "Free Spins Session",
+  "iced-chai-wild-rain-board.html":        "Iced Chai Wild Rain Board",
+  "joey-laundry.html":                     "Joey's Laundry Helper",
+  "joey-laundry-combined-strike.html":     "Joey's Laundry — Combined Strike",
+  "joey-laundry-paw-strike.html":          "Joey's Laundry — Paw Strike Effect",
+  "joey-laundry-sock-drop.html":           "Joey's Laundry — Sock Drop Effect",
+  "standard-free-spins.html":              "Standard Chai Chase",
+  "treat-jar-free-spins.html":             "Treat Jar Bonus",
+  "treat-time.html":                       "Treat Time",
+  "treat-time-entry-morning.html":         "Treat Time Entry — Morning",
+  "treat-time-entry-nighttime.html":       "Treat Time Entry — Nighttime",
+  "treat-time-main-board.html":            "Treat Time Main Board",
+  "were-multiplying.html":                 "We're Multiplying — Free Spins Board",
+
+  // ── UniGlee ────────────────────────────────────────────────────────────────
+  "keepsake-constellation.html":           "Keepsake Constellation",
+  "keepsake-memory.html":                  "Moonlit Keepsake Trail",
+  "keepsake-memory-failed.html":           "Moonlit Keepsake Trail — Trail Over",
+  "keepsake-memory-mismatch.html":         "Moonlit Keepsake Trail — Mismatch Mid-Flash",
+  "uniglee-trigger.html":                  "UniGlee Trigger",
+  "uniglee-chapter-banner.html":           "UniGlee Chapter Banner",
+  "uniglee-act-keepsake-collection.html":  "UniGlee Act — Keepsake Collection",
+  "uniglee-act-nighttime-treat-time.html": "UniGlee Act — Nighttime Treat Time",
+  "uniglee-act-were-multiplying.html":     "UniGlee Act — We're Multiplying",
+  "uniglee-marathon-levelup.html":         "UniGlee Marathon — Level-Up",
+  "uniglee-summary.html":                  "UniGlee Marathon Summary",
+};
+
 function toDisplayName(filename: string): string {
+  if (Object.prototype.hasOwnProperty.call(SCENE_LABELS, filename)) {
+    return SCENE_LABELS[filename];
+  }
+  // Fallback for any future scenes not yet in the map
   return filename
     .replace(/\.html$/, "")
     .replace(/-/g, " ")
