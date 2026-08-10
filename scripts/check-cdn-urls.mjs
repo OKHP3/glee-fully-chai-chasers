@@ -321,8 +321,24 @@ function extractHtmlUrls(src) {
       if (hrefVal && isExternalUrl(hrefVal) && linkIsFetchable(tag)) {
         hits.push(hrefVal);
       }
-      continue; // href on <link> handled; skip remaining checks
+      // imagesrcset on <link rel=preload as=image> — the browser selects the
+      // best-matching candidate from this srcset and fetches it, bypassing
+      // href entirely when viewport conditions match a descriptor.
+      const imagesrcset = attrValue(tag, "imagesrcset");
+      if (imagesrcset) {
+        for (const u of srcsetUrls(imagesrcset)) {
+          if (isExternalUrl(u)) hits.push(u);
+        }
+      }
+      continue; // link attributes fully handled; skip remaining checks
     }
+
+    // ── background attribute ── (body, table, tr, td, th — legacy) ───────
+    // Still parsed and fetched by all modern browsers despite being
+    // deprecated; an external background attribute bypasses the guard
+    // completely unless caught here.
+    const bgVal = attrValue(tag, "background");
+    if (bgVal && isExternalUrl(bgVal)) hits.push(bgVal);
 
     // ── data attribute on <object> ───────────────────────────────────────
     if (tagName === "object") {
@@ -833,6 +849,46 @@ function runSelfTest() {
         `<div style="background-image: url('/images/hero.png')">content</div>`
       );
       assert(v.length === 0, `local url() in inline style must not be flagged; got ${v.length}`);
+    });
+
+    // ── imagesrcset on <link> ──────────────────────────────────────────────
+    // <link rel=preload as=image imagesrcset="url 1x, url 2x"> causes the
+    // browser to fetch the best candidate from imagesrcset, bypassing href.
+
+    check("<link imagesrcset> with external URLs is flagged", () => {
+      const v = scan("index.html",
+        `<link rel="preload" as="image" imagesrcset="https://cdn.example.com/img@1x.png 1x, https://cdn.example.com/img@2x.png 2x">`
+      );
+      assert(v.length === 2, `both imagesrcset candidates must be flagged; got ${v.length}`);
+    });
+
+    check("<link imagesrcset> with only local URLs is NOT flagged", () => {
+      const v = scan("index.html",
+        `<link rel="preload" as="image" href="/img/local.png" imagesrcset="/img/local@1x.png 1x, /img/local@2x.png 2x">`
+      );
+      assert(v.length === 0, `local imagesrcset should not be flagged; got ${v.length}`);
+    });
+
+    // ── Legacy background= attribute ───────────────────────────────────────
+    // Deprecated but still fetched by all modern browsers.
+
+    check("legacy <body background> with external URL is flagged", () => {
+      const v = scan("index.html",
+        `<body background="https://cdn.example.com/bg.png">`
+      );
+      assert(v.length === 1, `body background must be flagged; got ${v.length}`);
+    });
+
+    check("legacy <td background> with external URL is flagged", () => {
+      const v = scan("index.html",
+        `<table><tr><td background="https://cdn.example.com/cell-bg.png">cell</td></tr></table>`
+      );
+      assert(v.length === 1, `td background must be flagged; got ${v.length}`);
+    });
+
+    check("legacy background= with local URL is NOT flagged", () => {
+      const v = scan("index.html", `<body background="/images/bg.png">`);
+      assert(v.length === 0, `local background attr should not be flagged; got ${v.length}`);
     });
 
     // ── > inside quoted attribute value ────────────────────────────────────
