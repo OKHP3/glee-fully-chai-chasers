@@ -62,14 +62,18 @@ jobs:
           # undo the self-hosted @font-face work in each artifact's public/fonts/.
           # Fonts must be self-hosted woff2 files loaded via @font-face.
           #
-          # The mockup sandbox (artifacts/mockup-sandbox) is deliberately excluded:
-          # it is a dev-only canvas preview tool that never deploys, and its design
-          # explorations legitimately pull from Google Fonts.
+          # Scope: every deployable input — root game (index.html, src/, public/),
+          # every artifact's index.html, src/, and public/. The mockup sandbox's
+          # public/ IS included because its scene HTML is copied into the game's
+          # shipped dist/scenes/ at build time. Only the sandbox's own index.html
+          # and src/ are excluded: they are dev-only design explorations that never
+          # feed a production build and legitimately pull from Google Fonts.
           matches=$(grep -rn "fonts\.googleapis\.com\|fonts\.gstatic\.com" \
-            index.html src/ \
-            artifacts/*/index.html artifacts/*/src/ \
+            index.html src/ public/ \
+            artifacts/*/index.html artifacts/*/src/ artifacts/*/public/ \
             --include='*' 2>/dev/null \
-            | grep -v '^artifacts/mockup-sandbox/' || true)
+            | grep -v '^artifacts/mockup-sandbox/index.html' \
+            | grep -v '^artifacts/mockup-sandbox/src/' || true)
           if [ -n "$matches" ]; then
             echo "::error::Google Fonts CDN reference found in shipped code. Self-host the font in public/fonts/ with @font-face instead:"
             echo "$matches"
