@@ -28,3 +28,31 @@ jobs:
       - run: npm test
       - run: npm run validate:assets
       - run: npm run build
+
+      - name: Verify How It Works scene files are present in dist
+        run: |
+          missing=()
+          for scene in \
+            bold-chai-pump.html \
+            cat-visit-joey.html \
+            cat-visit-phoebe.html \
+            doorbell-panic.html \
+            free-spins-session.html \
+            game-base.html \
+            joey-laundry.html \
+            keepsake-memory.html \
+            phoebe-lap-quest.html \
+            spin-wheel.html \
+            treat-time.html \
+            uniglee-trigger.html \
+            win-celebration.html; do
+            if [ ! -f "dist/scenes/${scene}" ]; then
+              missing+=("${scene}")
+            fi
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::copy-scenes plugin did not produce the following scene files in dist/scenes/:"
+            printf '  %s\n' "${missing[@]}"
+            exit 1
+          fi
+          echo "All How It Works scene files verified in dist/scenes/ ($(ls dist/scenes/*.html | wc -l) total)"

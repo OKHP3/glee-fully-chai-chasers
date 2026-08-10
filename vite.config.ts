@@ -22,7 +22,10 @@ export default defineConfig({
         const src = path.resolve(__dirname, "artifacts/mockup-sandbox/public/scenes");
         const dest = path.resolve(__dirname, "public/scenes");
         if (!fs.existsSync(src)) {
-          this.warn(`copy-scenes: source directory not found: ${src}`);
+          // Hard-fail the build so missing scenes are never silently absent
+          // on GitHub Pages. If this fires in CI, check that the
+          // artifacts/mockup-sandbox/public/scenes/ directory is committed.
+          this.error(`copy-scenes: source directory not found: ${src}`);
           return;
         }
         fs.mkdirSync(dest, { recursive: true });
