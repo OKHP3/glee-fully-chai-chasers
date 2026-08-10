@@ -338,4 +338,53 @@ describe("sparkle button disabled lifecycle during a spin", () => {
 
     root.remove();
   });
+
+  it("removes is-spinning from the original button reference after a plain spin resolves", async () => {
+    // No bonus, no win — the simplest possible spin path.
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    // Hold the PRE-SPIN button reference.  runSpin re-queries the same node at
+    // board.ts:924 (before renderBoard replaces innerHTML), so this is the
+    // exact element that classList.remove("is-spinning") targets.
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    originalBtn.click();
+    expect(originalBtn.classList.contains("is-spinning")).toBe(true); // class was added
+
+    // Drain all timers: animateSteps (480 ms) + status/ice-note timeouts.
+    await vi.runAllTimersAsync();
+
+    // The cleanup at board.ts:924-925 must have removed is-spinning from the
+    // original node before renderBoard detached it.  The detached reference
+    // still reflects the correct classList state.
+    expect(originalBtn.classList.contains("is-spinning")).toBe(false);
+
+    root.remove();
+  });
+
+  it("removes is-spinning from the original button reference after a win-celebration path resolves", async () => {
+    // totalWin = 125, bet = 25 → 5× ratio → showWinCelebration fires a 1400 ms
+    // overlay before the cleanup at board.ts:924-925 and before renderBoard.
+    vi.mocked(spin).mockReturnValue(noBonusResult({ totalWin: 125 }));
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    originalBtn.click();
+    expect(originalBtn.classList.contains("is-spinning")).toBe(true);
+
+    // Drain all timers: animateSteps (480 ms) + celebration (1400 ms) + misc.
+    await vi.runAllTimersAsync();
+
+    // Even via the longer win-celebration path, the cleanup must have run on
+    // the original node before renderBoard swapped the DOM.
+    expect(originalBtn.classList.contains("is-spinning")).toBe(false);
+
+    root.remove();
+  });
 });
