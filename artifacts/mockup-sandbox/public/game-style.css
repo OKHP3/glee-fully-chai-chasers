@@ -47,3 +47,29 @@
 .w-full{width:100%}
 .h-5{height:1.25rem}
 .w-5{width:1.25rem}
+
+/* ── Cat pop-in variant modifiers (Task #83) ──────────────────────────────────
+   Joey  — warm amber/gold identity (his Wild doubles all wins)
+   Phoebe — cool violet/lavender identity (her Wild expands to fill a reel)
+   Compound selectors carry the colour signature through every pose state
+   (.cat-pop-asset--unimpressed / --eat / --assist) without losing base fx. */
+
+/* ·· Joey sprite — warm amber glow ·· */
+.cat-pop-asset--joey{filter:drop-shadow(0 0 14px rgba(245,185,80,.5))drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+.cat-pop-asset--joey.cat-pop-asset--unimpressed{filter:saturate(.76)drop-shadow(0 0 12px rgba(245,185,80,.4))drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+.cat-pop-asset--joey.cat-pop-asset--assist{filter:drop-shadow(0 0 22px rgba(245,185,80,.72))drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+
+/* ·· Phoebe sprite — cool violet/lavender glow ·· */
+.cat-pop-asset--phoebe{filter:drop-shadow(0 0 14px rgba(180,130,255,.55))drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+.cat-pop-asset--phoebe.cat-pop-asset--unimpressed{filter:saturate(.76)drop-shadow(0 0 12px rgba(180,130,255,.45))drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+.cat-pop-asset--phoebe.cat-pop-asset--assist{filter:drop-shadow(0 0 22px rgba(180,130,255,.76))drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+
+/* ·· Quip bubble accent — left border echoes each cat's colour ·· */
+.cat-sprite:has(.cat-pop-asset--joey)~.cat-quip{border-left:2px solid rgba(245,185,80,.55);padding-left:10px}
+.cat-sprite:has(.cat-pop-asset--phoebe)~.cat-quip{border-left:2px solid rgba(180,130,255,.55);padding-left:10px;color:rgba(220,200,255,.95)}
+
+/* ·· Light-theme overrides (amber/violet shift darker for legibility) ·· */
+.cc-root[data-theme=light] .cat-pop-asset--joey{filter:drop-shadow(0 0 12px rgba(180,100,0,.4))drop-shadow(0 14px 18px rgba(0,0,0,.3))}
+.cc-root[data-theme=light] .cat-pop-asset--joey.cat-pop-asset--unimpressed{filter:saturate(.8)drop-shadow(0 0 10px rgba(180,100,0,.35))drop-shadow(0 14px 18px rgba(0,0,0,.3))}
+.cc-root[data-theme=light] .cat-pop-asset--phoebe{filter:drop-shadow(0 0 12px rgba(110,70,200,.45))drop-shadow(0 14px 18px rgba(0,0,0,.3))}
+.cc-root[data-theme=light] .cat-pop-asset--phoebe.cat-pop-asset--unimpressed{filter:saturate(.8)drop-shadow(0 0 10px rgba(110,70,200,.4))drop-shadow(0 14px 18px rgba(0,0,0,.3))}
