@@ -114,14 +114,16 @@ function buildCats(): string {
       <div class="hiw-cat hiw-cat--phoebe">
         <div class="hiw-cat__portrait">${catSprite('phoebe', 'strut')}</div>
         <strong class="hiw-cat__name">Phoebe</strong>
-        <p class="hiw-cat__bio">Pops in when any treat is stocked. Her visit
-          uses one treat and brings her own brand of sparkle to the board.</p>
+        <p class="hiw-cat__bio">Drops by unexpectedly after a spin. When she
+          visits and the jar has any treat stocked, she eats one and gets
+          cozy. No treat? She's unimpressed but still shows up.</p>
       </div>
       <div class="hiw-cat hiw-cat--joey">
         <div class="hiw-cat__portrait">${catSprite('joey', 'strut')}</div>
         <strong class="hiw-cat__name">Joey</strong>
-        <p class="hiw-cat__bio">Shows up when Bougie Bites are in the jar.
-          His visit uses a Bougie Bite and makes a very professional entrance.</p>
+        <p class="hiw-cat__bio">Also drops by unexpectedly. When he visits and
+          Bougie Bites are stocked, he eats one and delivers his signature
+          assist. No Bougie Bites? He has standards, but he still shows up.</p>
       </div>
     </div>
   </section>`;
