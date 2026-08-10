@@ -729,6 +729,69 @@ describe("sparkle button disabled lifecycle during a spin", () => {
 
     root.remove();
   });
+
+  it("keeps bet-up and bet-down locked when showBonusSummary re-enables the sparkle button mid-bonus", async () => {
+    // showBonusSummary (board.ts ~line 2599) intentionally sets
+    // sparkleBtn.disabled = false so the wireControls click handler can detect
+    // the overlay and use sparkle as an alternative dismiss path.  The bet
+    // buttons must NOT be re-enabled at that same moment — if they were, a
+    // player could change their wager while the free-spin session is still
+    // running and the final balance has not yet been settled.
+    //
+    // The treat-jar path (pendingTreatJarSpins > 0) reaches showBonusSummary
+    // without any extra mock complexity: the beforeEach default (noBonusResult)
+    // covers both the idle-grid render and the runSpin spin call; the queued
+    // treat-jar spins activate the bonus branch on their own.
+    const state = makeSpinState();
+    state.pendingTreatJarSpins = 3; // pre-queued treat-jar spins from a prior spin
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    // Capture the original bet-button references before the spin so we can
+    // assert their state while they are still the live DOM nodes.
+    const betUp = root.querySelector<HTMLButtonElement>("#bet-up")!;
+    const betDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
+    expect(betUp.disabled).toBe(false);  // initially enabled
+    expect(betDown.disabled).toBe(false);
+
+    root.querySelector<HTMLButtonElement>("#sparkle-btn")!.click();
+
+    // runSpin locks both bet buttons synchronously before its first await —
+    // same path as the bet-lock test above.
+    expect(betUp.disabled).toBe(true);
+    expect(betDown.disabled).toBe(true);
+
+    // Phase 1: drain until showBonusSummary is blocking on the Continue button.
+    // At this exact moment showBonusSummary has set sparkleBtn.disabled = false,
+    // but must NOT have touched the bet buttons.
+    await vi.runAllTimersAsync();
+
+    // The sparkle button is now re-enabled (used as overlay dismiss).
+    const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    expect(sparkleBtn.disabled).toBe(false); // confirms we reached showBonusSummary
+
+    // Bet buttons must remain locked throughout the free-spin session.
+    expect(betUp.disabled).toBe(true);
+    expect(betDown.disabled).toBe(true);
+
+    // Phase 2: click Continue so showBonusSummary resolves its Promise.
+    root.querySelector<HTMLButtonElement>("#bonus-continue")?.click();
+
+    // Phase 3: drain remaining timers — runTreatJarFreeSpins calls renderBoard
+    // (replacing root.innerHTML) and the finally block in runSpin re-enables
+    // both the captured references and the fresh nodes in the new DOM.
+    await vi.runAllTimersAsync();
+
+    // After the session fully resolves, the new DOM's bet buttons must be enabled.
+    const newBetUp = root.querySelector<HTMLButtonElement>("#bet-up")!;
+    const newBetDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
+    expect(newBetUp.disabled).toBe(false);
+    expect(newBetDown.disabled).toBe(false);
+
+    root.remove();
+  });
 });
 
 // ── Coin balance protection on engine crash ───────────────────────────────────
