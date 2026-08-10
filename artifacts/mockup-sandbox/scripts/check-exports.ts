@@ -154,39 +154,40 @@ for (const filePath of sceneFiles) {
     iceNotesSkipped++;
     continue;
   }
+  const fileName = filePath.split("/").pop()!;
   const hasIceNotesCard = src.includes('id="ice-notes-card"');
   if (!hasIceNotesCard) {
-    const name = filePath.split("/").pop()!;
-    iceNotesFailures.push(name);
+    iceNotesFailures.push(fileName);
     console.error(
-      `  ✗  ${name}\n` +
+      `  ✗  ${fileName}\n` +
         `     → has companion-row but is missing id="ice-notes-card"\n` +
         `       Add an <aside id="ice-notes-card" class="ice-notes-card"> block after the companion-row closing </div>.`,
     );
   } else {
-    // Content check: ingredient name and description must both be non-empty.
-    const name = filePath.split("/").pop()!;
-    const nameText = src.match(/class="ice-notes-name">([^<]*)</)?.[1]?.trim() ?? "";
-    const descText = src.match(/class="ice-notes-text">([^<]*)</)?.[1]?.trim() ?? "";
+    // Extract only the card element so content checks are scoped to the card,
+    // not the full document (avoids false passes from same-class elements elsewhere).
+    const cardBlock = src.match(/id="ice-notes-card"[\s\S]*?<\/aside>/)?.[0] ?? "";
+    const nameText = cardBlock.match(/class="ice-notes-name">([^<]*)</)?.[1]?.trim() ?? "";
+    const descText = cardBlock.match(/class="ice-notes-text">([^<]*)</)?.[1]?.trim() ?? "";
     let contentOk = true;
     if (!nameText) {
       contentOk = false;
-      iceNotesFailures.push(name);
+      iceNotesFailures.push(fileName);
       console.error(
-        `  ✗  ${name}\n` +
-          `     → ice-notes-card has no ingredient name (class="ice-notes-name" is missing or empty)\n` +
+        `  ✗  ${fileName}\n` +
+          `     → ice-notes-card content: ingredient name is missing or blank (class="ice-notes-name")\n` +
           `       Fill in the ingredient name before pushing.`,
       );
     }
     if (!descText) {
       contentOk = false;
       if (nameText) {
-        // Only push once per file (avoid double-counting if name was also blank)
-        iceNotesFailures.push(name);
+        // Only push once per file (avoid double-counting when both fields are blank)
+        iceNotesFailures.push(fileName);
       }
       console.error(
-        `  ✗  ${name}\n` +
-          `     → ice-notes-card has no ingredient description (class="ice-notes-text" is missing or empty)\n` +
+        `  ✗  ${fileName}\n` +
+          `     → ice-notes-card content: ingredient description is missing or blank (class="ice-notes-text")\n` +
           `       Fill in the ingredient description before pushing.`,
       );
     }
@@ -200,14 +201,15 @@ console.log(); // blank line before summary
 
 if (iceNotesFailures.length > 0) {
   console.error(
-    `❌  Ice-notes-card check FAILED — ${iceNotesFailures.length} scene(s) have companion-row but no ice-notes-card:\n`,
+    `❌  Ice-notes-card check FAILED — ${iceNotesFailures.length} scene(s) have a missing or incomplete ice-notes-card:\n`,
   );
   for (const f of iceNotesFailures) {
     console.error(`     ${f}`);
   }
   console.error(
-    `\nEvery scene with a companion-row must include an ice-notes-card so the\n` +
-    `ingredient context strip is never blank. Add the card before pushing.`,
+    `\nEvery scene with a companion-row must include an ice-notes-card with a\n` +
+    `non-empty ingredient name (class="ice-notes-name") and description\n` +
+    `(class="ice-notes-text"). Fix the scenes above before pushing.`,
   );
 } else {
   console.log(
