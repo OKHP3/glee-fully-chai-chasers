@@ -73,3 +73,185 @@
 .cc-root[data-theme=light] .cat-pop-asset--joey.cat-pop-asset--unimpressed{filter:saturate(.8)drop-shadow(0 0 10px rgba(180,100,0,.35))drop-shadow(0 14px 18px rgba(0,0,0,.3))}
 .cc-root[data-theme=light] .cat-pop-asset--phoebe{filter:drop-shadow(0 0 12px rgba(110,70,200,.45))drop-shadow(0 14px 18px rgba(0,0,0,.3))}
 .cc-root[data-theme=light] .cat-pop-asset--phoebe.cat-pop-asset--unimpressed{filter:saturate(.8)drop-shadow(0 0 10px rgba(110,70,200,.4))drop-shadow(0 14px 18px rgba(0,0,0,.3))}
+
+/* ── Task #119: missing-class coverage pass (2026-08-10) ────────────────────
+   Every class below was referenced in at least one scene HTML file but had no
+   rule in game-style.css. Adding minimal rules prevents a future restyling
+   pass from silently exposing broken layouts across multiple scenes.
+   Source: full scene-vs-CSS audit. ────────────────────────────────────────── */
+
+/* ── Tailwind-compatible layout utilities ────────────────────────────────── */
+/* Used across cat-visit, joey-laundry, uniglee-trigger, phoebe-lap-quest via
+   class="relative z-10 h-full w-full flex flex-col cc-shell …".              */
+.flex{display:flex}
+.flex-col{flex-direction:column}
+.relative{position:relative}
+.overflow-hidden{overflow:hidden}
+.z-10{z-index:10}
+
+/* ── Tailwind-compatible typography utilities ────────────────────────────── */
+/* text-amber-100 used on treat-time-free-spins section in UniGlee ch.4.      */
+.text-amber-100{color:#fef3c7}
+.text-2xl{font-size:1.5rem;line-height:2rem}
+.text-lg{font-size:1.125rem;line-height:1.75rem}
+.text-center{text-align:center}
+.font-bold{font-weight:700}
+.font-semibold{font-weight:600}
+.mt-4{margin-top:1rem}
+
+/* ── Bet-console controls ────────────────────────────────────────────────── */
+/* coin-balance: balance readout between bet-adj buttons in .bet-console.     */
+.coin-balance{
+  font-family:'Baloo 2',sans-serif;
+  font-size:13px;font-weight:700;
+  color:var(--cc-butter,#f5d576);
+  min-width:56px;text-align:center;letter-spacing:.02em;
+}
+/* bet-adj-btn: +/− wager controls flanking the SPARKLE button.              */
+.bet-adj-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(245,213,118,.3);
+  color:var(--cc-butter,#f5d576);
+  font-size:18px;font-weight:700;line-height:1;
+  cursor:pointer;touch-action:manipulation;
+  transition:background .15s;
+}
+.bet-adj-btn:hover{background:rgba(255,255,255,.15)}
+.bet-adj-btn:disabled{opacity:.4;cursor:default}
+
+/* ── Marquee decorative bulbs ────────────────────────────────────────────── */
+/* Individual light in the marquee header strip; --blink-delay is set inline. */
+.marquee-bulb{
+  display:inline-block;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--cc-butter,#f5d576);
+  box-shadow:0 0 4px var(--cc-butter,#f5d576);
+  animation:cc-bulb-blink 1.4s ease-in-out infinite;
+  animation-delay:var(--blink-delay,0s);
+}
+@keyframes cc-bulb-blink{
+  0%,100%{opacity:1}
+  50%{opacity:.2}
+}
+
+/* ── Free-spins and lap-quest shell variants ─────────────────────────────── */
+/* Root layout shell for free-spin / lap-quest scenes; compounds with
+   .cc-shell (flex+column already set). isolation: isolate creates a new
+   stacking context so bonus overlays clip correctly.                          */
+.free-spins-shell{isolation:isolate}
+.lap-quest-mode{isolation:isolate}
+
+/* ── Lap Quest — Phoebe illustration container ───────────────────────────── */
+.lap-quest-phoebe{
+  position:relative;
+  display:flex;align-items:flex-end;justify-content:center;
+  width:100%;overflow:hidden;
+}
+
+/* ── Jar-meter laundry caption ───────────────────────────────────────────── */
+/* "Laundry spin N of M · Round win: 0" text in joey-laundry companion row.  */
+.jar-meter-text{
+  font-family:'Baloo 2',sans-serif;
+  font-size:11px;color:rgba(200,185,230,.75);
+  letter-spacing:.04em;text-align:center;padding:2px 0;
+}
+
+/* ── Symbol sprite — chai-wild modifier ──────────────────────────────────── */
+/* Mermaid-cup wild_chai from special-symbol-atlas (atlas position set inline).
+   Glow distinguishes it from ordinary symbol sprites at a glance.            */
+.symbol-sprite--chai-wild{
+  filter:drop-shadow(0 0 6px rgba(100,220,255,.6));
+}
+
+/* ── Spin wheel — pin group ──────────────────────────────────────────────── */
+/* SVG <g> holding the roulette-style pins around the wheel rim.              */
+.wheel-pins{fill:var(--cc-butter,#f5d576)}
+
+/* ── Bold-Chai pump overlay ──────────────────────────────────────────────── */
+/* bold-chai-pump-btn: PUMP! CTA — font/padding bake the inline overrides in. */
+.bold-chai-pump-btn{font-size:20px;padding:12px 40px}
+/* bold-chai-pump-count: "7 / 12" display above the dot-progress row.        */
+.bold-chai-pump-count{
+  font-family:'Baloo 2',sans-serif;
+  font-size:18px;font-weight:700;
+  text-align:center;margin-top:8px;
+  color:rgba(255,255,255,.9);
+}
+.bold-chai-pump-done{color:#f47b3f}            /* completed pumps — warm orange */
+.bold-chai-pump-sep{color:rgba(255,255,255,.4);margin:0 2px}
+.bold-chai-pump-total{color:rgba(255,255,255,.6)}
+/* bold-chai-spin-award: "Completion awards N free spins" caption.            */
+.bold-chai-spin-award{
+  font-size:13px;color:rgba(255,255,255,.6);
+  text-align:center;letter-spacing:.04em;
+}
+
+/* ── Cat pop-in — strut pose ─────────────────────────────────────────────── */
+/* Phoebe's confident strut in Phoebe Lap Quest — brightened violet glow.    */
+.cat-pop-asset--strut{
+  filter:drop-shadow(0 0 18px rgba(180,130,255,.68))
+         drop-shadow(0 14px 18px rgba(0,0,0,.45));
+}
+.cc-root[data-theme=light] .cat-pop-asset--strut{
+  filter:drop-shadow(0 0 14px rgba(110,70,200,.5))
+         drop-shadow(0 14px 18px rgba(0,0,0,.3));
+}
+
+/* ── Ice Notes review wrapper (gallery scene) ────────────────────────────── */
+/* Full-page wrapper used in the ice-notes.html gallery scene.                */
+.ice-notes-review{
+  position:relative;z-index:5;
+  display:flex;flex-direction:column;align-items:stretch;
+  gap:16px;padding:24px 12px 32px;
+  min-height:100%;box-sizing:border-box;
+}
+.ice-notes-review-heading{
+  font-family:sans-serif;font-size:11px;
+  color:var(--cc-butter,#f5d576);
+  letter-spacing:.15em;text-transform:uppercase;
+  margin:0 4px 4px;opacity:.8;
+}
+
+/* ── Treat-time entry — morning variant ──────────────────────────────────── */
+/* Structural rules are on .treat-time-entry; this modifier sets the warm
+   morning colour token for any future morning-specific rule additions.        */
+.treat-time-entry--morning{
+  --treat-entry-accent:#fde68a; /* sunrise gold */
+}
+
+/* ── Treat-time free-spins panel (UniGlee chapter 4) ────────────────────── */
+/* Compounds with .free-spins-panel; carries the warm amber text theme from
+   the text-amber-100 class stacked alongside it.                              */
+.treat-time-free-spins{color:#fef3c7}
+
+/* ── UniGlee summary overlay — arch unit + mobile title ─────────────────── */
+/* uniglee-arch-unit: positions the SVG arch + butterfly as a composed unit.  */
+.uniglee-arch-unit{
+  position:relative;
+  width:min(880px,100%);height:140px;
+  flex-shrink:0;
+}
+/* SVG arch text is hidden at 390 px mobile; a plain text heading replaces it.*/
+.uniglee-arch-svg{display:none}
+/* Plain heading visible at 390 px in place of the SVG arc text.             */
+.uniglee-mobile-title{
+  margin:0 0 2px;
+  font-family:'Baloo 2',sans-serif;
+  font-size:clamp(28px,8vw,36px);font-weight:800;
+  color:var(--cc-butter,#f5d576);
+  letter-spacing:.12em;text-align:center;
+  text-shadow:0 0 20px rgba(180,120,255,.9),0 0 8px rgba(255,220,80,.5);
+}
+/* Subtitle line below the mobile title in UniGlee summary.                   */
+.uniglee-subtitle{
+  margin:6px 0 0;
+  font-family:'Baloo 2',sans-serif;
+  font-size:clamp(16px,5vw,26px);font-weight:600;
+  color:#c9aeff;
+  letter-spacing:.04em;text-align:center;
+  padding:0 12px;
+}
+/* Continue button — inherits .sparkle-btn styles; this adds top margin only. */
+.uniglee-continue-btn{margin-top:10px}
