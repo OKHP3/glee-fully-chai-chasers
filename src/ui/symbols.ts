@@ -115,38 +115,6 @@ export function catSprite(cat: "joey" | "phoebe", pose: CatPose = "strut"): stri
 
 }
 
-/** The AskJamie Wheel face — three wedges, hand-drawn dimensional prize wheel (docs §7). */
-export function wheelSvg(): string {
-  return `<svg viewBox="0 0 200 200" class="h-full w-full" style="filter:drop-shadow(0 0 14px rgba(107,214,201,0.5)) drop-shadow(0 6px 10px rgba(0,0,0,0.5))">
-    <defs>
-      <radialGradient id="wheelRim" cx="50%" cy="35%" r="70%">
-        <stop offset="0%" stop-color="#4a3d70"/><stop offset="100%" stop-color="#1a1230"/>
-      </radialGradient>
-      <linearGradient id="wedgeTeal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a8f0e5"/><stop offset="100%" stop-color="#3ba296"/></linearGradient>
-      <linearGradient id="wedgePink" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9ecb"/><stop offset="100%" stop-color="#c73e6c"/></linearGradient>
-      <linearGradient id="wedgeGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff0b0"/><stop offset="100%" stop-color="#dba32c"/></linearGradient>
-      <radialGradient id="hubGrad" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="#fffdf5"/><stop offset="100%" stop-color="#f5d576"/></radialGradient>
-    </defs>
-    <circle cx="100" cy="100" r="98" fill="url(#wheelRim)"/>
-    <circle cx="100" cy="100" r="96" fill="#241a42" stroke="#fff4e0" stroke-width="3"/>
-    <g stroke="#1a1230" stroke-width="2">
-      <path d="M100 100 L100 4 A96 96 0 0 1 183 148 Z" fill="url(#wedgeTeal)"/>
-      <path d="M100 100 L183 148 A96 96 0 0 1 17 148 Z" fill="url(#wedgePink)"/>
-      <path d="M100 100 L17 148 A96 96 0 0 1 100 4 Z" fill="url(#wedgeGold)"/>
-    </g>
-    <circle cx="100" cy="100" r="96" fill="none" stroke="#fff4e0" stroke-width="1" opacity="0.25"/>
-    ${Array.from({ length: 12 }, (_, i) => {
-      const a = (i / 12) * Math.PI * 2;
-      const x = 100 + Math.cos(a) * 90;
-      const y = 100 + Math.sin(a) * 90;
-      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="#fff4e0" opacity="0.85"/>`;
-    }).join("")}
-    <circle cx="100" cy="100" r="24" fill="url(#hubGrad)" stroke="${INK}" stroke-width="3"/>
-    <circle cx="92" cy="90" r="7" fill="#ffffff" opacity="0.5"/>
-    <text x="100" y="106" font-size="13" text-anchor="middle" fill="${INK}" font-family="Verdana, sans-serif" font-weight="700">GO</text>
-  </svg>`;
-}
-
 /** One of the five-saucer fleet — dimensional cockpit dome + running lights + beam cone. */
 export function saucerSvg(variant: 1 | 2 | 3 | 4 | 5 = 1): string {
   const domes: Record<number, [string, string]> = {
@@ -270,21 +238,3 @@ export function gleeAvatarSvg(): string {
   </svg>`;
 }
 
-/** AskJamie perch avatar — friendly round robot-adjacent cartoon, consistent vibe with his existing site avatar. */
-export function askJamieSvg(): string {
-  return `<svg viewBox="0 0 64 64" class="h-full w-full" aria-hidden="true" style="filter:drop-shadow(0 0 6px rgba(107,214,201,0.5))">
-    <defs>
-      <radialGradient id="ajBody" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#d6f5ef"/><stop offset="100%" stop-color="#3ba296"/></radialGradient>
-    </defs>
-    <ellipse cx="32" cy="58" rx="16" ry="4" fill="#0c0620" opacity="0.3"/>
-    <rect x="28" y="8" width="8" height="10" rx="2" fill="#8f86b8" stroke="${INK}" stroke-width="1.2"/>
-    <circle cx="32" cy="6" r="3" fill="#ffe27a"/>
-    <rect x="12" y="18" width="40" height="32" rx="14" fill="url(#ajBody)" stroke="${INK}" stroke-width="1.6"/>
-    <rect x="18" y="26" width="28" height="14" rx="7" fill="#0f2f3a"/>
-    <circle cx="26" cy="33" r="3.6" fill="#8ec9ff"/><circle cx="38" cy="33" r="3.6" fill="#8ec9ff"/>
-    <circle cx="25" cy="31.6" r="1" fill="#ffffff"/><circle cx="37" cy="31.6" r="1" fill="#ffffff"/>
-    <path d="M22 44c4 3 16 3 20 0" stroke="${INK}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-    <rect x="4" y="30" width="8" height="4" rx="2" fill="#8f86b8" stroke="${INK}" stroke-width="1"/>
-    <rect x="52" y="30" width="8" height="4" rx="2" fill="#8f86b8" stroke="${INK}" stroke-width="1"/>
-  </svg>`;
-}

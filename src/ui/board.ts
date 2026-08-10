@@ -1389,7 +1389,7 @@ async function runBoldChaiFreeSpins(root: HTMLElement, state: GameState, spinsAw
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
-  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
+  await showBonusSummary(root, session.totalWin, session.totalSpins);
   await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
@@ -1940,7 +1940,7 @@ async function runTreatTimeBonus(
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
   renderBoard(root, state, lastStep?.grid);
-  setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins · ${session.totalSpins} spins${session.retriggers > 0 ? ` · ${session.retriggers} retrigger${session.retriggers > 1 ? "s" : ""}` : ""}`);
+  setStatus(root, `IT'S TREAT TIME! Complete — +${session.totalWin.toLocaleString()} coins · ${session.totalSpins} spins`);
   await maybeLevelUpAfterBonus(root, state, session.totalSpins);
 }
 
@@ -2038,7 +2038,7 @@ async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAw
     state.balance += standardSession.totalWin;
     state.bestCascade = Math.max(state.bestCascade, standardSession.bestCascade);
     saveGameState(state);
-    await showBonusSummary(root, standardSession.totalWin, standardSession.retriggers, standardSession.totalSpins);
+    await showBonusSummary(root, standardSession.totalWin, standardSession.totalSpins);
     await maybeLevelUpAfterBonus(root, state, standardSession.totalSpins);
     const lastRound = standardSession.rounds[standardSession.rounds.length - 1];
     renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
@@ -2053,7 +2053,7 @@ async function runWheelAndFreeSpins(root: HTMLElement, state: GameState, spinsAw
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
 
-  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
+  await showBonusSummary(root, session.totalWin, session.totalSpins);
   await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
@@ -2070,7 +2070,7 @@ async function runDoorbellPanic(root: HTMLElement, state: GameState, spinsAwarde
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
 
-  await showBonusSummary(root, session.totalWin, session.retriggers, session.totalSpins);
+  await showBonusSummary(root, session.totalWin, session.totalSpins);
   await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   const lastStep = lastRound?.steps[lastRound.steps.length - 1];
@@ -2322,11 +2322,7 @@ export async function playJoeyLaundryChapter(
       await sleep(reduced ? 28 : 170);
     }
 
-    if (round.freeSpinsAwarded > 0) {
-      statusEl.textContent = `Joey caught a bonus sock — +${round.freeSpinsAwarded} Laundry spin${round.freeSpinsAwarded === 1 ? "" : "s"}.`;
-      playBonusFanfare();
-      await sleep(reduced ? 40 : 360);
-    } else if (round.totalWin > 0) {
+    if (round.totalWin > 0) {
       statusEl.textContent = `Joey’s Laundry Helper · +${round.totalWin.toLocaleString()} coins`;
       await sleep(reduced ? 30 : 120);
     }
@@ -2336,20 +2332,6 @@ export async function playJoeyLaundryChapter(
   playBonusFanfare();
   await sleep(reduced ? 80 : 560);
   overlay.remove();
-}
-
-/** Resolves the chapter UI and persists its already-accounted session total. */
-export async function runJoeyLaundryChapter(
-  root: HTMLElement,
-  state: GameState,
-  session: JoeyLaundrySessionResult,
-): Promise<void> {
-  await playJoeyLaundryChapter(root, session);
-  state.balance += session.totalWin;
-  state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
-  saveGameState(state);
-  const lastRound = session.rounds[session.rounds.length - 1];
-  renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
 }
 
 function animateLaundryEffects(
@@ -2599,13 +2581,13 @@ function treatTimeHandSvg(): string {
   </svg>`;
 }
 
-function showBonusSummary(root: HTMLElement, totalWin: number, retriggers: number, totalSpins: number): Promise<void> {
+function showBonusSummary(root: HTMLElement, totalWin: number, totalSpins: number): Promise<void> {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="text-2xl font-bold">Free Spins Complete!</h2>
-      <p class="text-lg">You won ${totalWin.toLocaleString()} coins across ${totalSpins} free spins${retriggers > 0 ? ` (with ${retriggers} retrigger${retriggers > 1 ? "s" : ""}!)` : ""}</p>
+      <p class="text-lg">You won ${totalWin.toLocaleString()} coins across ${totalSpins} free spins</p>
       <button id="bonus-continue" class="sparkle-btn mt-4">Continue</button>
     `;
     const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;
