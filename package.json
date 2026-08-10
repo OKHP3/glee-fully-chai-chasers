@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "assets:generate": "node scripts/generate-assets.mjs",
     "validate:assets": "node scripts/validate-assets.mjs",
+    "validate:hand-svg": "node scripts/check-treat-time-hand-svg.mjs",
     "test:watch": "vitest"
   },
   "private": true,

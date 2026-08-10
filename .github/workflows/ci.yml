@@ -27,6 +27,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm test
       - run: npm run validate:assets
+      - run: npm run validate:hand-svg
       - run: npm run build
 
       - name: Verify How It Works scene files are present in dist
