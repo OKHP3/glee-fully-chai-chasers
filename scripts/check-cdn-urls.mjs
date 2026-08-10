@@ -123,26 +123,65 @@ const CSS_EXT  = new Set([".css"]);
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
+ * URL-structural HTML named character references.
+ *
+ * Covers every named entity whose decoded form is a character that appears
+ * in an absolute or protocol-relative URL (scheme, host, path, query,
+ * fragment, credentials).  Unknown named refs are left unchanged so we do
+ * not silently mangle non-URL content.
+ *
+ * The five HTML-mandatory named entities (amp, lt, gt, quot, apos) are
+ * included here; the explicit `.replace(/&amp;/gi, …)` calls that preceded
+ * this table have been removed to avoid double-processing.
+ */
+const HTML_URL_NAMED_ENTITIES = {
+  // HTML-mandatory set
+  amp: "&", AMP: "&",
+  lt: "<",  LT: "<",
+  gt: ">",  GT: ">",
+  quot: '"', QUOT: '"',
+  apos: "'",
+  // URL scheme / authority separators
+  colon: ":", Colon: ":", COLON: ":",
+  sol: "/",  solidus: "/",
+  period: ".", dot: ".",
+  commat: "@",
+  // Query / fragment
+  quest: "?",
+  num: "#",
+  percnt: "%",
+  // Common URL chars
+  hyphen: "-", dash: "-",
+  lowbar: "_", lowline: "_",
+  plus: "+",
+  equals: "=",
+  tilde: "~",  Tilde: "~",
+  lpar: "(",   rpar: ")",
+  lsqb: "[",   rsqb: "]",
+};
+
+/**
  * Decodes HTML character references in an attribute value so that encoded
- * URLs such as `https&#58;//cdn.example.com/lib.js` are normalised to their
+ * URLs such as `https&#58;//cdn.example.com/lib.js` or
+ * `https&colon;&sol;&sol;cdn.example.com/lib.js` are normalised to their
  * browser-equivalent form before external-URL detection.
  *
  * Covers:
- *   Named entities:   &amp; &lt; &gt; &quot; &apos;
- *   Decimal refs:     &#NNN;   (e.g. &#58; → ':')
- *   Hex refs:         &#xHH;   (e.g. &#x3A; → ':', case-insensitive)
+ *   Named refs from HTML_URL_NAMED_ENTITIES (URL-structural characters)
+ *   Decimal refs:  &#NNN;   (e.g. &#58; → ':')
+ *   Hex refs:      &#xHH;   (e.g. &#x3A; → ':', case-insensitive)
  *
  * CSS does not use HTML entity encoding, so this function is applied only
  * to HTML attribute values extracted by attrValue() and srcsetUrls().
  */
 function decodeHtmlEntities(str) {
   return str
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&quot;/gi, '"')
-    .replace(/&apos;/gi, "'")
+    // Named character references — URL-structural subset
+    .replace(/&([a-zA-Z][a-zA-Z0-9]*);/g,
+      (match, name) => HTML_URL_NAMED_ENTITIES[name] ?? match)
+    // Decimal numeric references: &#NNN;
     .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(parseInt(code, 10)))
+    // Hexadecimal numeric references: &#xHH;
     .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)));
 }
 
@@ -380,14 +419,34 @@ function extractHtmlUrls(src) {
 const IMPORT_RE = /@import\s+(?:url\(["']?|["'])(\s*(?:https?:\/\/|\/\/[^/\s])[^"')\s]+)/gi;
 const URL_RE    = /url\(\s*["']?((?:https?:\/\/|\/\/[^/\s])[^"')\s]+)["']?\s*\)/gi;
 
+/**
+ * Decodes CSS escape sequences so that a URL like
+ *   url(https\3a//cdn.example.com/x.css)
+ * is normalised to https://cdn.example.com/x.css before pattern matching.
+ *
+ * CSS escape spec (§4.3.8):
+ *   \HHHHHH [optional single whitespace] — hex code point, 1–6 digits
+ *   \X                                   — literal character X (non-hex form)
+ */
+function decodeCssEscapes(str) {
+  return str
+    .replace(/\\([0-9a-fA-F]{1,6})[ \t\r\n\f]?/g,
+      (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/\\(.)/gs, "$1");
+}
+
 function extractCssUrls(src) {
+  // Strip CSS block comments so URLs inside comments are not flagged.
   const stripped = src.replace(/\/\*[\s\S]*?\*\//g, "");
+  // Decode CSS escape sequences so encoded characters (e.g. \3a → ':')
+  // do not bypass the https?:// pattern match.
+  const decoded = decodeCssEscapes(stripped);
   const hits = [];
   let m;
   IMPORT_RE.lastIndex = 0;
-  while ((m = IMPORT_RE.exec(stripped)) !== null) hits.push(m[1].trim());
+  while ((m = IMPORT_RE.exec(decoded)) !== null) hits.push(m[1].trim());
   URL_RE.lastIndex = 0;
-  while ((m = URL_RE.exec(stripped)) !== null) hits.push(m[1].trim());
+  while ((m = URL_RE.exec(decoded)) !== null) hits.push(m[1].trim());
   return [...new Set(hits)];
 }
 
@@ -942,13 +1001,64 @@ function runSelfTest() {
     });
 
     check("named entity &amp; in URL is decoded before checking", () => {
-      // Encode the colon in the GTM URL with &amp; (#58 = ':') to confirm the
-      // decoded URL matches the ALLOW_LIST entry and is not flagged.
+      // Encode the colon in the GTM URL with &#58; to confirm the decoded URL
+      // matches the ALLOW_LIST entry and is not flagged.
       // Decoded value: https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB
       const v = scan("index.html",
         `<script src="https&#58;//www.googletagmanager.com/gtag/js?id=G-89W66VMGPB"></script>`
       );
       assert(v.length === 0, `entity-encoded GTM URL must decode to the allow-listed value; got ${v.length}`);
+    });
+
+    check("&colon; named entity in <script src> is decoded and flagged", () => {
+      // &colon; is a valid HTML5 named character reference for ':'.
+      // Without named-entity decoding beyond the 5-basic set, this bypasses
+      // the https?:// pattern check.
+      const v = scan("index.html",
+        `<script src="https&colon;&sol;&sol;cdn.example.com/lib.js"></script>`
+      );
+      assert(v.length === 1, `&colon;&sol;&sol; must decode to https:// and be flagged; got ${v.length}`);
+    });
+
+    check("&colon; named entity in <img src> is decoded and flagged", () => {
+      const v = scan("index.html",
+        `<img src="https&colon;&sol;&sol;cdn.example.com/photo.jpg" alt="">`
+      );
+      assert(v.length === 1, `named entity bypass in img src must be caught; got ${v.length}`);
+    });
+
+    // ── CSS escape sequences ───────────────────────────────────────────────
+    // CSS \HHHHHH escape sequences are decoded by the CSS parser before
+    // fetching resources; without decoding, \3a (→ ':') bypasses https?://.
+
+    check("CSS hex escape \\3a in url() in standalone CSS is decoded and flagged", () => {
+      const v = scan("style.css",
+        `body { background-image: url(https\\3a//cdn.example.com/bg.png); }`
+      );
+      assert(v.length === 1, `CSS \\3a escape must decode to ':' and be flagged; got ${v.length}`);
+    });
+
+    check("CSS hex escapes \\3a and \\2F in url() decode to ':' and '/' and are flagged", () => {
+      // \\3a → ':', \\2F → '/' when the next character is non-hex.
+      // Domain starts with 'w' (non-hex), so \\2F is unambiguously 2 hex chars.
+      const v = scan("style.css",
+        `body { background: url(https\\3a\\2F\\2Fwww.example.com/bg.png); }`
+      );
+      assert(v.length === 1, `CSS \\3a and \\2F escapes must decode to ':' and '/' and be flagged; got ${v.length}`);
+    });
+
+    check("CSS hex escape \\3a in url() inside <style> block is decoded and flagged", () => {
+      const v = scan("index.html",
+        `<style>body { background-image: url(https\\3a//cdn.example.com/bg.png); }</style>`
+      );
+      assert(v.length === 1, `CSS escape in <style> block must be decoded; got ${v.length}`);
+    });
+
+    check("CSS hex escape \\3a in url() inside inline style= is decoded and flagged", () => {
+      const v = scan("index.html",
+        `<div style="background:url(https\\3a//cdn.example.com/x.png)">x</div>`
+      );
+      assert(v.length === 1, `CSS escape in style attr must be decoded; got ${v.length}`);
     });
 
     // ── CSS ───────────────────────────────────────────────────────────────
