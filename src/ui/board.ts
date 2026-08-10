@@ -578,6 +578,11 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
       // swallowed) and the sparkle button is always re-enabled so the player
       // can spin again even if an unexpected error escapes the finally block.
       console.error("[runSpin] Unhandled error during spin sequence:", err);
+      // Refund the bet deducted before the try block (runSpin line ~855).
+      // If the spin engine or a bonus handler throws before any win is credited,
+      // state.balance has been decremented but nothing was awarded. Adding the
+      // bet back keeps the player whole so a crash can never drain their coins.
+      state.balance += state.bet;
       sparkleBtn.disabled = false;
     });
   });

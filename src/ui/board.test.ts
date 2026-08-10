@@ -653,3 +653,50 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 });
+
+// ── Coin balance protection on engine crash ───────────────────────────────────
+
+describe("coin balance protection on engine crash", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.clearAllMocks();
+  });
+
+  it("restores state.balance to its pre-spin value when the spin engine throws", async () => {
+    // runSpin deducts state.balance -= state.bet at board.ts ~line 855, BEFORE
+    // the try block that guards spin() and all bonus execution.  If an error
+    // escapes, the catch block in wireControls (board.ts ~line 575) must refund
+    // the bet so the player never loses coins through a crash.
+    //
+    // renderBoard() calls spin() once for the idle grid (call 1); the second
+    // call (from runSpin) is what crashes — simulating a mid-flight bonus error.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())             // call 1: renderBoard idle grid
+      .mockImplementationOnce(() => { throw new Error("bonus crash"); }); // call 2: runSpin
+
+    const state = makeSpinState(); // balance: 10_000, bet: 25
+    const balanceBeforeSpin = state.balance;
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    const btn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+
+    // Click triggers runSpin, which deducts 25 then immediately crashes.
+    // The .catch() handler in wireControls must add 25 back.
+    btn.click();
+    await vi.runAllTimersAsync();
+
+    // No renderBoard is called on the crash path — state is the same object
+    // that runSpin mutated, so we can assert directly on it.
+    expect(state.balance).toBe(balanceBeforeSpin);
+
+    root.remove();
+  });
+});
