@@ -25,6 +25,11 @@ jobs:
           cache: npm
 
       - run: npm ci --no-audit --no-fund
+
+      - name: Check mockup component exports — catch missing scene files before merge
+        working-directory: artifacts/mockup-sandbox
+        run: npm install --no-audit --no-fund && npm run check-exports
+
       - run: npm test
       - run: npm run validate:assets
       - run: npm run validate:hand-svg
