@@ -33,6 +33,10 @@ jobs:
           pnpm --filter @workspace/mockup-sandbox run check-exports
 
       - run: npm test
+
+      - name: Run slot engine unit tests — catch regressions before merge
+        run: npx vitest run src/engine
+
       - run: npm run validate:assets
       - run: npm run validate:hand-svg
       - run: npm run build
