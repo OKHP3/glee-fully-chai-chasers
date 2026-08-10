@@ -13,9 +13,9 @@ import type { Rng } from "./rng";
 
 export const KEEPSAKE_MEMORY_CARD_COUNT = 12;
 export const KEEPSAKE_MEMORY_PAIR_COUNT = 6;
-export const KEEPSAKE_MEMORY_MAX_FAILS = 2;
+export const KEEPSAKE_MEMORY_MAX_FAILS = 3;
 export const KEEPSAKE_MEMORY_FREE_SPINS = 40;
-export const KEEPSAKE_MEMORY_PREVIEW_MS = 2_500;
+export const KEEPSAKE_MEMORY_PREVIEW_MS = 20_000;
 export const KEEPSAKE_MEMORY_MISMATCH_REVEAL_MS = 900;
 
 /** Exactly the regular paying symbols; no wilds, blockers, treats, or legends. */
@@ -84,7 +84,7 @@ export function createKeepsakeMemory(rng: Rng): KeepsakeMemoryState {
   };
 }
 
-/** Ends the fixed preview; the UI owns the 2,500ms wait. */
+/** Ends the fixed preview; the UI owns the 20,000ms wait. */
 export function beginKeepsakeMemory(state: KeepsakeMemoryState): KeepsakeMemoryState {
   if (state.phase !== "preview") return state;
   return {
@@ -150,7 +150,7 @@ export function pickKeepsakeMemoryCard(state: KeepsakeMemoryState, index: number
 
   next.fails = (state.fails + 1) as KeepsakeMemoryState["fails"];
   next.phase = "resolving_mismatch";
-  return result(next, true, { kind: "mismatch", indices, fails: next.fails as 1 | 2 });
+  return result(next, true, { kind: "mismatch", indices, fails: next.fails as 1 | 2 | 3 });
 }
 
 /** Ends the UI-owned mismatch reveal, turning down cards unless the bonus failed. */

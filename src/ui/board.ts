@@ -59,7 +59,7 @@ import {
 import { mountLapQuestLedge } from "./lap-quest-ledge";
 import { renderHowItWorks } from "./how-it-works";
 import { trapFocus } from "./focus-trap";
-import { beginKeepsakeMemory, createKeepsakeMemory, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
+import { beginKeepsakeMemory, createKeepsakeMemory, KEEPSAKE_MEMORY_PREVIEW_MS, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
 import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState, load, save } from "../state";
 import {
@@ -1192,11 +1192,12 @@ export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMe
       <div class="keepsake-memory-grid" id="keepsake-memory-grid" role="group" aria-label="Twelve keepsake memory cards"></div>
       <div class="keepsake-memory-footer">
         <span id="keepsake-memory-pairs">Pairs 0 / 6</span>
-        <span class="keepsake-mismatch-track" id="keepsake-memory-fails" aria-label="Mismatches 0 of 2">
+        <span class="keepsake-mismatch-track" id="keepsake-memory-fails" aria-label="Mismatches 0 of 3">
           <b>Mismatches</b>
           <i data-strike="0" aria-label="First mismatch unused"></i>
           <i data-strike="1" aria-label="Second mismatch unused"></i>
-          <em>0 / 2</em>
+          <i data-strike="2" aria-label="Third mismatch unused"></i>
+          <em>0 / 3</em>
         </span>
       </div>
       <div class="keepsake-memory-result" id="keepsake-memory-result" hidden role="status" aria-live="assertive"></div>`;
@@ -1238,7 +1239,7 @@ export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMe
       fails.querySelector("em")!.textContent = `${usedFails} / ${next.maxFails}`;
       fails.querySelectorAll<HTMLElement>("[data-strike]").forEach((marker, index) => {
         marker.classList.toggle("is-filled", index < usedFails);
-        marker.setAttribute("aria-label", `${index < usedFails ? "Used" : "Unused"} ${index === 0 ? "first" : "second"} mismatch`);
+        marker.setAttribute("aria-label", `${index < usedFails ? "Used" : "Unused"} ${["first", "second", "third"][index] ?? `${index + 1}th`} mismatch`);
       });
     };
 
@@ -1289,7 +1290,7 @@ export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMe
       if (event.kind === "mismatch" || event.kind === "failed") {
         playKeepsakeCardFlip();
         playKeepsakeMismatch();
-        status.textContent = event.kind === "failed" || ("fails" in event && event.fails === 2)
+        status.textContent = event.kind === "failed" || ("fails" in event && event.fails === 3)
           ? "The keepsakes are taking a little night walk."
           : "A near-match. The trail is still glowing.";
         mismatchTimer = window.setTimeout(() => {
@@ -1315,7 +1316,7 @@ export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMe
       status.textContent = "The trail is ready. Choose a keepsake.";
       activeCompare = [];
       updateCardButtons(next, true);
-    }, 2500);
+    }, KEEPSAKE_MEMORY_PREVIEW_MS);
   });
 }
 

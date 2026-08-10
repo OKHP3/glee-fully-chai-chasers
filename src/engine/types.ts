@@ -46,8 +46,8 @@ export interface KeepsakeMemoryState {
   cards: KeepsakeMemoryCard[];
   firstPick?: number;
   pairsFound: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  fails: 0 | 1 | 2;
-  maxFails: 2;
+  fails: 0 | 1 | 2 | 3;
+  maxFails: 3;
   freeSpinsAwarded: 0 | 40;
 }
 
@@ -55,7 +55,7 @@ export type KeepsakeMemoryEvent =
   | { kind: "preview_complete" }
   | { kind: "card_revealed"; index: number }
   | { kind: "match"; indices: [number, number]; pairsFound: number }
-  | { kind: "mismatch"; indices: [number, number]; fails: 1 | 2 }
+  | { kind: "mismatch"; indices: [number, number]; fails: 1 | 2 | 3 }
   | { kind: "completed"; freeSpinsAwarded: 40 }
   | { kind: "failed"; freeSpinsAwarded: 0 };
 

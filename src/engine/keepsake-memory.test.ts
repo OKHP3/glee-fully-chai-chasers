@@ -91,27 +91,39 @@ describe("Moonlit Keepsake Trail state machine", () => {
     expect(pickKeepsakeMemoryCard(result.state, pair[0])).toMatchObject({ accepted: false, reason: "matched_card" });
   });
 
-  it("turns down the first mismatch after resolution and ends on the second", () => {
+  it("turns down mismatches after resolution and ends only on the third", () => {
     const state = readyState(4);
     const pairs = pairIndices(state);
-    const firstPair = pairs[0];
+    const firstPair  = pairs[0];
     const secondPair = pairs[1];
+    const thirdPair  = pairs[2];
 
-    const firstPick = pickKeepsakeMemoryCard(state, firstPair[0]);
-    const mismatch = pickKeepsakeMemoryCard(firstPick.state, secondPair[0]);
-    expect(mismatch.event).toMatchObject({ kind: "mismatch", indices: [firstPair[0], secondPair[0]], fails: 1 });
-    expect(mismatch.state.fails).toBe(1);
-    const afterFirst = { state: resolveKeepsakeMemoryMismatch(mismatch.state) };
-    expect(afterFirst.state.phase).toBe("choosing_first");
-    expect(afterFirst.state.cards[firstPair[0]].revealed).toBe(false);
-    expect(afterFirst.state.cards[secondPair[0]].revealed).toBe(false);
+    // ── Mismatch 1 ─────────────────────────────────────────────────────────
+    const pick1a = pickKeepsakeMemoryCard(state, firstPair[0]);
+    const mismatch1 = pickKeepsakeMemoryCard(pick1a.state, secondPair[0]);
+    expect(mismatch1.event).toMatchObject({ kind: "mismatch", indices: [firstPair[0], secondPair[0]], fails: 1 });
+    expect(mismatch1.state.fails).toBe(1);
+    const after1 = { state: resolveKeepsakeMemoryMismatch(mismatch1.state) };
+    expect(after1.state.phase).toBe("choosing_first");
+    expect(after1.state.cards[firstPair[0]].revealed).toBe(false);
+    expect(after1.state.cards[secondPair[0]].revealed).toBe(false);
 
-    const secondPick = pickKeepsakeMemoryCard(afterFirst.state, firstPair[1]);
-    const finalMismatch = pickKeepsakeMemoryCard(secondPick.state, secondPair[1]);
-    expect(finalMismatch.event).toMatchObject({ kind: "mismatch", fails: 2 });
-    const failed = resolveKeepsakeMemoryMismatchResult(finalMismatch.state);
+    // ── Mismatch 2 — bonus should NOT end yet ───────────────────────────────
+    const pick2a = pickKeepsakeMemoryCard(after1.state, firstPair[1]);
+    const mismatch2 = pickKeepsakeMemoryCard(pick2a.state, secondPair[1]);
+    expect(mismatch2.event).toMatchObject({ kind: "mismatch", fails: 2 });
+    const after2 = { state: resolveKeepsakeMemoryMismatch(mismatch2.state) };
+    expect(after2.state.phase).toBe("choosing_first");
+    expect(after2.state.cards[firstPair[1]].revealed).toBe(false);
+    expect(after2.state.cards[secondPair[1]].revealed).toBe(false);
+
+    // ── Mismatch 3 — now the bonus ends ────────────────────────────────────
+    const pick3a = pickKeepsakeMemoryCard(after2.state, firstPair[0]);
+    const mismatch3 = pickKeepsakeMemoryCard(pick3a.state, thirdPair[0]);
+    expect(mismatch3.event).toMatchObject({ kind: "mismatch", fails: 3 });
+    const failed = resolveKeepsakeMemoryMismatchResult(mismatch3.state);
     expect(failed).toMatchObject({ accepted: true, event: { kind: "failed", freeSpinsAwarded: 0 } });
-    expect(failed.state).toMatchObject({ phase: "failed", fails: 2, pairsFound: 0, freeSpinsAwarded: 0 });
+    expect(failed.state).toMatchObject({ phase: "failed", fails: 3, pairsFound: 0, freeSpinsAwarded: 0 });
     expect(pickKeepsakeMemoryCard(failed.state, firstPair[0])).toMatchObject({ accepted: false, reason: "ended" });
   });
 
