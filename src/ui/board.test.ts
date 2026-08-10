@@ -7,6 +7,7 @@ import { mulberry32 } from "../engine/rng";
 import { sparksForSpin } from "../engine/economy";
 import { spin } from "../engine/cascade";
 import { createKeepsakeMemoryController, maybeLevelUpAfterBonus, renderBoard, renderGridHtml } from "./board";
+import * as stateModule from "../state";
 
 // ── Module-level mocks ────────────────────────────────────────────────────────
 // Audio modules require Web Audio API unavailable in jsdom.  Replace every
@@ -657,45 +658,91 @@ describe("sparkle button disabled lifecycle during a spin", () => {
 // ── Coin balance protection on engine crash ───────────────────────────────────
 
 describe("coin balance protection on engine crash", () => {
+  let saveGameStateSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.useFakeTimers();
     vi.mocked(spin).mockReturnValue(noBonusResult());
+    // Spy on saveGameState so tests can verify balance is persisted correctly
+    // after a crash. The spy calls through by default; override per-test as needed.
+    saveGameStateSpy = vi.spyOn(stateModule, "saveGameState").mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.useRealTimers();
     vi.clearAllMocks();
+    saveGameStateSpy.mockRestore();
   });
 
-  it("restores state.balance to its pre-spin value when the spin engine throws", async () => {
-    // runSpin deducts state.balance -= state.bet at board.ts ~line 855, BEFORE
-    // the try block that guards spin() and all bonus execution.  If an error
-    // escapes, the catch block in wireControls (board.ts ~line 575) must refund
-    // the bet so the player never loses coins through a crash.
+  it("restores state.balance to its pre-deduction value and persists when the engine crashes before any win is credited", async () => {
+    // runSpin deducts state.balance -= state.bet BEFORE the try block that
+    // guards spin() and all bonus execution. If spin() throws immediately,
+    // no win is ever credited (pre-settlement crash). The .catch() handler
+    // in wireControls must restore the pre-deduction balance AND persist it
+    // (saveGameState) so a reload sees the correct balance.
     //
-    // renderBoard() calls spin() once for the idle grid (call 1); the second
-    // call (from runSpin) is what crashes — simulating a mid-flight bonus error.
+    // renderBoard() calls spin() once for the idle grid (call 1).  The second
+    // call — inside runSpin — crashes before result.totalWin is credited.
     vi.mocked(spin)
-      .mockReturnValueOnce(noBonusResult())             // call 1: renderBoard idle grid
-      .mockImplementationOnce(() => { throw new Error("bonus crash"); }); // call 2: runSpin
+      .mockReturnValueOnce(noBonusResult())              // call 1: renderBoard idle grid
+      .mockImplementationOnce(() => { throw new Error("engine crash"); }); // call 2: runSpin
 
     const state = makeSpinState(); // balance: 10_000, bet: 25
-    const balanceBeforeSpin = state.balance;
+    // preDeductionBalance = state.balance (10_000); no bust-proof refill fires
+    // because 10_000 >> 25.
+    const balanceBeforeDeduction = state.balance;
 
     const root = document.createElement("div");
     document.body.appendChild(root);
     renderBoard(root, state);
 
-    const btn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
-
-    // Click triggers runSpin, which deducts 25 then immediately crashes.
-    // The .catch() handler in wireControls must add 25 back.
-    btn.click();
+    root.querySelector<HTMLButtonElement>("#sparkle-btn")!.click();
     await vi.runAllTimersAsync();
 
-    // No renderBoard is called on the crash path — state is the same object
-    // that runSpin mutated, so we can assert directly on it.
-    expect(state.balance).toBe(balanceBeforeSpin);
+    // The settlement guard detects !settled → restores balance and persists.
+    expect(state.balance).toBe(balanceBeforeDeduction);
+
+    // saveGameState must be called in the catch to persist the restored balance.
+    // Without persistence the player would see the correct in-memory balance but
+    // a reload would show the post-deduction value from a prior save.
+    const catchSaveCalls = saveGameStateSpy.mock.calls;
+    expect(catchSaveCalls.length).toBeGreaterThanOrEqual(1);
+    // The last call to saveGameState must carry the restored balance.
+    const lastSavedState = catchSaveCalls[catchSaveCalls.length - 1][0] as GameState;
+    expect(lastSavedState.balance).toBe(balanceBeforeDeduction);
+
+    root.remove();
+  });
+
+  it("does not refund the bet when the crash happens after totalWin is credited (post-settlement)", async () => {
+    // If the engine returns a result and result.totalWin is applied to
+    // state.balance, the settlement guard marks the round settled=true.
+    // A crash that occurs after that point (e.g. saveGameState throws) must
+    // NOT trigger a refund — the player has already won their coins.
+    //
+    // totalWin = 0 keeps arithmetic simple: balance after a normal spin would
+    // be 10_000 - 25 + 0 = 9_975. After settlement, a crash must leave it at
+    // 9_975 (not 10_000).
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())             // call 1: renderBoard idle grid
+      .mockReturnValueOnce(noBonusResult({ totalWin: 0 })); // call 2: runSpin succeeds
+
+    // Make saveGameState throw on its first call (inside runSpin after settlement).
+    saveGameStateSpy.mockImplementationOnce(() => { throw new Error("save failed"); });
+
+    const state = makeSpinState(); // balance: 10_000, bet: 25
+    const expectedBalance = state.balance - state.bet; // 9_975
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    root.querySelector<HTMLButtonElement>("#sparkle-btn")!.click();
+    await vi.runAllTimersAsync();
+
+    // Post-settlement crash: wins (0) credited, bet paid → net 9_975.
+    // The catch must NOT add the bet back because settled=true.
+    expect(state.balance).toBe(expectedBalance);
 
     root.remove();
   });

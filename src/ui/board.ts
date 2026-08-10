@@ -572,17 +572,23 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
     // is mid-spin or locked. Do not move this call above the guard.
     if (sparkleBtn.disabled) return;
     playSpinStart();
-    runSpin(root, state, sparkleBtn).catch((err: unknown) => {
+    // Per-spin settlement guard — shared between the click-handler catch and
+    // runSpin itself.  runSpin sets preDeductionBalance before deducting and
+    // sets settled=true the moment result.totalWin is credited to state.balance.
+    const settlementGuard: SpinSettlementGuard = { settled: false, preDeductionBalance: 0 };
+    runSpin(root, state, sparkleBtn, settlementGuard).catch((err: unknown) => {
       // runSpin's finally block already removes is-spinning and re-enables HIW.
       // This catch ensures the unhandled-rejection path is logged (not silently
       // swallowed) and the sparkle button is always re-enabled so the player
       // can spin again even if an unexpected error escapes the finally block.
       console.error("[runSpin] Unhandled error during spin sequence:", err);
-      // Refund the bet deducted before the try block (runSpin line ~855).
-      // If the spin engine or a bonus handler throws before any win is credited,
-      // state.balance has been decremented but nothing was awarded. Adding the
-      // bet back keeps the player whole so a crash can never drain their coins.
-      state.balance += state.bet;
+      // Transactional balance recovery: only restore if the crash happened
+      // before the spin result win was credited (pre-settlement).  After
+      // settlement the player has earned their win; do not claw it back.
+      if (!settlementGuard.settled) {
+        state.balance = settlementGuard.preDeductionBalance;
+        saveGameState(state);
+      }
       sparkleBtn.disabled = false;
     });
   });
@@ -848,15 +854,35 @@ function formatMultiplier(value: number): string {
   return `${Number.isInteger(tuned) ? tuned : tuned.toFixed(1)}×`;
 }
 
+/**
+ * Settlement guard for crash recovery.
+ * Created per-spin in the click handler; passed into runSpin so both sides
+ * share a reference without module-level state.
+ */
+interface SpinSettlementGuard {
+  /** Balance captured after bust-proof refill but before the bet deduction. */
+  preDeductionBalance: number;
+  /**
+   * Set to true the moment `result.totalWin` is credited to state.balance.
+   * Any crash BEFORE this point means no win was applied — safe to restore.
+   * Any crash AFTER means wins are in state.balance — do not refund.
+   */
+  settled: boolean;
+}
+
 async function runSpin(
   root: HTMLElement,
   state: GameState,
   sparkleBtn: HTMLButtonElement,
+  settlementGuard: SpinSettlementGuard,
 ): Promise<void> {
   const { balance: refilled, refilled: didRefill } = applyBustProofRefill(state.balance, state.bet);
   state.balance = refilled;
   if (didRefill) setStatus(root, "AskJamie found coins under the couch! +500 coins");
 
+  // Snapshot balance AFTER refill but BEFORE deduction.  Used by the outer
+  // .catch() to restore a clean state if the spin crashes pre-settlement.
+  settlementGuard.preDeductionBalance = state.balance;
   state.balance -= state.bet;
   sparkleBtn.disabled = true;
   sparkleBtn.classList.add("is-spinning");
@@ -894,6 +920,10 @@ async function runSpin(
   let boldChaiSpinsAwarded = 0;
 
   state.balance += result.totalWin;
+  // The bet has been deducted and the spin result win has been applied.
+  // Any crash from this point onward leaves balance in a known-good state
+  // (bet paid, win credited).  Signal the outer catch to NOT refund.
+  settlementGuard.settled = true;
   const levelBefore = levelForXp(state.xp);
   state.xp += sparksForSpin(state.bet);
   const levelAfter = levelForXp(state.xp);
