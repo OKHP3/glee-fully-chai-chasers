@@ -55,6 +55,8 @@ jobs:
         run: npm run validate:symbol-reels
       - name: Confirm every canvas iframe is in the refresh registry — a missing entry breaks on the next domain change
         run: npm run validate:canvas-iframes && node scripts/check-canvas-iframe-registry.mjs --self-test
+      - name: Confirm every sandbox scene file has a canvas gallery frame
+        run: npm run validate:scene-coverage
       - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
         run: npm run validate:cabinet-strips
 
