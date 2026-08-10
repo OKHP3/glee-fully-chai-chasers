@@ -1213,6 +1213,7 @@ export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMe
     let settled = false;
     let previewTimer: number | undefined;
     let mismatchTimer: number | undefined;
+    let countdownInterval: number | undefined;
 
     grid.innerHTML = view.cards.map(renderKeepsakeMemoryCard).join("");
 
@@ -1256,6 +1257,7 @@ export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMe
       window.setTimeout(() => {
         window.clearTimeout(previewTimer);
         window.clearTimeout(mismatchTimer);
+        window.clearInterval(countdownInterval);
         scene.remove();
         reelGrid.hidden = false;
         resolve(view.freeSpinsAwarded);
@@ -1311,7 +1313,21 @@ export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMe
     });
 
     updateCardButtons(view, false);
+
+    // Countdown: tick from KEEPSAKE_MEMORY_PREVIEW_MS/1000 down to 1, then the
+    // previewTimer fires and clears it.
+    const previewSeconds = Math.round(KEEPSAKE_MEMORY_PREVIEW_MS / 1000);
+    let secondsLeft = previewSeconds;
+    status.textContent = `The trail is laid out. Memorize the keepsakes… ${secondsLeft}s`;
+    countdownInterval = window.setInterval(() => {
+      secondsLeft -= 1;
+      if (secondsLeft > 0) {
+        status.textContent = `The trail is laid out. Memorize the keepsakes… ${secondsLeft}s`;
+      }
+    }, 1000);
+
     previewTimer = window.setTimeout(() => {
+      window.clearInterval(countdownInterval);
       const next = controller.begin();
       status.textContent = "The trail is ready. Choose a keepsake.";
       activeCompare = [];
