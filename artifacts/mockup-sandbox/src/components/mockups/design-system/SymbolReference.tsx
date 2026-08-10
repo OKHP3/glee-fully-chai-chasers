@@ -61,41 +61,46 @@ interface SymbolDef {
   col:        number | null;  // null for SVG
   row:        number | null;
   svgSrc?:    string;
+  /** Line-bet multipliers from engine PAYTABLE (pre-PAYOUT_SCALE). Paying symbols only. */
+  pays?:      { 3: number; 4: number; 5: number };
+  /** Short role note shown instead of pays for non-paying symbols. */
+  note?:      string;
 }
 
 // ── Symbol table ──────────────────────────────────────────────────────────────
 // Atlas positions sourced from src/ui/asset-manifest.ts.
 // Category tiers sourced from src/engine/types.ts comments.
+// Pays values sourced verbatim from src/engine/paylines.ts PAYTABLE (pre-PAYOUT_SCALE=0.775).
 const SYMBOLS: SymbolDef[] = [
   // ── Standard atlas ────────────────────────────────────────────────────────
   // High-pay row 0
-  { id: "tumbler",       name: "Tumbler",       category: "High",    group: "standard", col: 0, row: 0 },
-  { id: "butterfly",     name: "Butterfly",     category: "High",    group: "standard", col: 1, row: 0 },
-  { id: "mixtape",       name: "Mixtape",       category: "High",    group: "standard", col: 2, row: 0 },
-  { id: "crystal",       name: "Crystal",       category: "High",    group: "standard", col: 3, row: 0 },
+  { id: "tumbler",       name: "Tumbler",       category: "High",    group: "standard", col: 0, row: 0, pays: { 3: 56,  4: 167, 5: 1112 } },
+  { id: "butterfly",     name: "Butterfly",     category: "High",    group: "standard", col: 1, row: 0, pays: { 3: 42,  4: 125, 5: 694  } },
+  { id: "mixtape",       name: "Mixtape",       category: "High",    group: "standard", col: 2, row: 0, pays: { 3: 33,  4: 96,  5: 417  } },
+  { id: "crystal",       name: "Crystal",       category: "High",    group: "standard", col: 3, row: 0, pays: { 3: 27,  4: 82,  5: 334  } },
   // Mid-pay row 1
-  { id: "chai",          name: "Chai",          category: "Mid",     group: "standard", col: 0, row: 1 },
-  { id: "candle",        name: "Candle",        category: "Mid",     group: "standard", col: 1, row: 1 },
-  { id: "cassette",      name: "Cassette",      category: "Mid",     group: "standard", col: 2, row: 1 },
-  { id: "gnome",         name: "Gnome",         category: "Mid",     group: "standard", col: 3, row: 1 },
+  { id: "chai",          name: "Chai",          category: "Mid",     group: "standard", col: 0, row: 1, pays: { 3: 21,  4: 56,  5: 222  } },
+  { id: "candle",        name: "Candle",        category: "Mid",     group: "standard", col: 1, row: 1, pays: { 3: 21,  4: 56,  5: 222  } },
+  { id: "cassette",      name: "Cassette",      category: "Mid",     group: "standard", col: 2, row: 1, pays: { 3: 13,  4: 33,  5: 139  } },
+  { id: "gnome",         name: "Gnome",         category: "Mid",     group: "standard", col: 3, row: 1, pays: { 3: 13,  4: 33,  5: 139  } },
   // Low-pay row 2
-  { id: "mailbox",       name: "Mailbox",       category: "Low",     group: "standard", col: 0, row: 2 },
-  { id: "vhs",           name: "VHS",           category: "Low",     group: "standard", col: 1, row: 2 },
-  { id: "teapot",        name: "Teapot",        category: "Low",     group: "standard", col: 2, row: 2 },
-  { id: "yarn",          name: "Yarn",          category: "Low",     group: "standard", col: 3, row: 2 },
+  { id: "mailbox",       name: "Mailbox",       category: "Low",     group: "standard", col: 0, row: 2, pays: { 3: 8,   4: 21,  5: 69   } },
+  { id: "vhs",           name: "VHS",           category: "Low",     group: "standard", col: 1, row: 2, pays: { 3: 8,   4: 21,  5: 69   } },
+  { id: "teapot",        name: "Teapot",        category: "Low",     group: "standard", col: 2, row: 2, pays: { 3: 8,   4: 21,  5: 69   } },
+  { id: "yarn",          name: "Yarn",          category: "Low",     group: "standard", col: 3, row: 2, pays: { 3: 8,   4: 21,  5: 69   } },
   // Treat row 3 (feature symbols — reels 1/3/5 only)
-  { id: "treat_chicken", name: "Chicken Comet", category: "Treat",   group: "standard", col: 0, row: 3 },
-  { id: "treat_salmon",  name: "Salmon Star",   category: "Treat",   group: "standard", col: 1, row: 3 },
-  { id: "treat_bougie",  name: "Bougie Bite",   category: "Treat",   group: "standard", col: 2, row: 3 },
+  { id: "treat_chicken", name: "Chicken Comet", category: "Treat",   group: "standard", col: 0, row: 3, note: "Collected in Treat Jar → free spins" },
+  { id: "treat_salmon",  name: "Salmon Star",   category: "Treat",   group: "standard", col: 1, row: 3, note: "Collected in Treat Jar → free spins" },
+  { id: "treat_bougie",  name: "Bougie Bite",   category: "Treat",   group: "standard", col: 2, row: 3, note: "Collected in Treat Jar → free spins" },
   // ── Special atlas ─────────────────────────────────────────────────────────
-  { id: "uniglee",       name: "UniGlee",       category: "Scatter", group: "special",  col: 0, row: 0 },
-  { id: "wild_joey",     name: "Wild Joey",     category: "Wild",    group: "special",  col: 1, row: 0 },
-  { id: "wild_phoebe",   name: "Wild Phoebe",   category: "Wild",    group: "special",  col: 2, row: 0 },
-  { id: "wild_handbag",  name: "Wild Handbag",  category: "Wild",    group: "special",  col: 3, row: 0 },
-  { id: "wild_chai",     name: "Wild Chai",     category: "Wild",    group: "special",  col: 0, row: 1 },
+  { id: "uniglee",       name: "UniGlee",       category: "Scatter", group: "special",  col: 0, row: 0, note: "Triggers UniGlee marathon free spins" },
+  { id: "wild_joey",     name: "Wild Joey",     category: "Wild",    group: "special",  col: 1, row: 0, note: "Substitutes for all paying symbols" },
+  { id: "wild_phoebe",   name: "Wild Phoebe",   category: "Wild",    group: "special",  col: 2, row: 0, note: "Substitutes · sticky during Lap Quest" },
+  { id: "wild_handbag",  name: "Wild Handbag",  category: "Wild",    group: "special",  col: 3, row: 0, note: "Substitutes · carries ×3, ×5, or ×10" },
+  { id: "wild_chai",     name: "Wild Chai",     category: "Wild",    group: "special",  col: 0, row: 1, note: "Substitutes · placed by Iced Chai Rain" },
   // ── SVG-only ──────────────────────────────────────────────────────────────
-  { id: "doorbell",      name: "Doorbell",      category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/doorbell.svg`  },
-  { id: "chai_pump",     name: "Chai Pump",     category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/chai-pump.svg` },
+  { id: "doorbell",      name: "Doorbell",      category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/doorbell.svg`,  note: "Pair on reels 1–2 triggers Doorbell Panic" },
+  { id: "chai_pump",     name: "Chai Pump",     category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/chai-pump.svg`, note: "Pair on reels 1–2 triggers Bold Chai Pump" },
 ];
 
 // ── Sprite rendering ──────────────────────────────────────────────────────────
@@ -152,6 +157,55 @@ function Badge({ category }: { category: Category }) {
   );
 }
 
+/**
+ * Shows 3-of-a-kind / 4-of-a-kind / 5-of-a-kind multipliers for paying symbols,
+ * or a brief role note for non-paying symbols (wilds, scatter, treats, blockers).
+ * Multipliers are pre-PAYOUT_SCALE (raw PAYTABLE values from src/engine/paylines.ts).
+ */
+function PayoutRow({ sym }: { sym: SymbolDef }) {
+  if (sym.note) {
+    return (
+      <div style={{
+        width:         "100%",
+        textAlign:     "center",
+        fontSize:      7.5,
+        color:         C.muted,
+        lineHeight:    1.35,
+        fontStyle:     "italic",
+        padding:       "0 2px",
+      }}>
+        {sym.note}
+      </div>
+    );
+  }
+  if (!sym.pays) return null;
+
+  const { pays } = sym;
+  const col = (label: string, val: number) => (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+      <div style={{ fontSize: 7, color: C.muted, letterSpacing: "0.04em" }}>{label}</div>
+      <div style={{ fontSize: 9, fontWeight: 800, color: C.cream, fontFamily: "'Fira Code', monospace" }}>
+        {val}×
+      </div>
+    </div>
+  );
+  return (
+    <div style={{
+      width:          "100%",
+      display:        "flex",
+      justifyContent: "space-around",
+      alignItems:     "flex-start",
+      padding:        "3px 2px 0",
+      borderTop:      `1px solid rgba(255,255,255,.07)`,
+      marginTop:      2,
+    }}>
+      {col("3✦", pays[3])}
+      {col("4✦", pays[4])}
+      {col("5✦", pays[5])}
+    </div>
+  );
+}
+
 function CoordTag({ sym }: { sym: SymbolDef }) {
   const label =
     sym.group === "svg"
@@ -172,7 +226,7 @@ function CoordTag({ sym }: { sym: SymbolDef }) {
 
 const SPRITE_SIZE = 72;
 const CELL_W      = 112;
-const CELL_H      = 148;
+const CELL_H      = 178;
 
 function SymbolCell({ sym }: { sym: SymbolDef }) {
   const isWin = sym.category === "High";
@@ -232,6 +286,9 @@ function SymbolCell({ sym }: { sym: SymbolDef }) {
 
       {/* Category badge */}
       <Badge category={sym.category} />
+
+      {/* Payout multipliers (paying symbols) or role note (wilds / specials) */}
+      <PayoutRow sym={sym} />
 
       {/* Atlas coordinate */}
       <CoordTag sym={sym} />
@@ -367,7 +424,7 @@ export function SymbolReference() {
           <SectionHeading
             label="Standard Symbols"
             accent={C.gold}
-            note="16 cells · 4×4 atlas · rows: High / Mid / Low / Treat"
+            note="16 cells · 4×4 atlas · rows: High / Mid / Low / Treat · multipliers are pre-PAYOUT_SCALE (×0.775) line-bet multipliers"
           />
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {[0, 1, 2, 3].map((rowIdx) => {
