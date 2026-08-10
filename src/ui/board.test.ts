@@ -515,6 +515,48 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 
+  it("re-enables bet-up and bet-down after an engine crash so the player is never bet-locked", async () => {
+    // runSpin disables #bet-up and #bet-down at the top of its try block.
+    // If runSpin throws before its finally block completes (or the outer .catch()
+    // does not include bet-button re-enable), the player is left unable to change
+    // their bet even though they can click SPARKLE again.
+    //
+    // renderBoard calls spin() once for the idle grid (call 1); the second call
+    // inside runSpin is what crashes — simulating a mid-flight engine error.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())                                    // call 1: renderBoard idle grid
+      .mockImplementationOnce(() => { throw new Error("engine crash"); });    // call 2: runSpin
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    const betUp   = root.querySelector<HTMLButtonElement>("#bet-up")!;
+    const betDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
+    expect(betUp).not.toBeNull();
+    expect(betDown).not.toBeNull();
+    expect(betUp.disabled).toBe(false);   // enabled before the spin
+    expect(betDown.disabled).toBe(false);
+
+    const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    // click() fires the handler which calls runSpin().  spin() throws
+    // synchronously inside runSpin's try block, so the finally block executes
+    // (and re-enables bet buttons) before click() even returns.  The outer
+    // .catch() then settles on the microtask queue.
+    sparkleBtn.click();
+
+    // Drain all timers so the async rejection and its .catch() fully settle.
+    await vi.runAllTimersAsync();
+
+    // Both bet buttons must be re-enabled — either by runSpin's finally block
+    // or by the .catch() handler in wireControls.  A locked bet after a crash
+    // is a silent player-facing defect.
+    expect(betUp.disabled).toBe(false);
+    expect(betDown.disabled).toBe(false);
+
+    root.remove();
+  });
+
   it("removes is-spinning after a doorbell-panic free-spin path resolves", async () => {
     // doorbellPanic truthy + freeSpinsAwarded > 0 → hits the runDoorbellPanic branch
     // at board.ts line ~936, then returns without calling the final renderBoard, so
