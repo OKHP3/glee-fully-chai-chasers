@@ -958,6 +958,43 @@ describe("coin balance protection on engine crash", () => {
     root.remove();
   });
 
+  it("preserves the bust-proof refill when the engine crashes before settlement", async () => {
+    // applyBustProofRefill fires when balance < bet, adding 500 coins BEFORE
+    // the bet is deducted.  settlementGuard.preDeductionBalance is snapshotted
+    // AFTER the refill, so a pre-settlement crash must restore the refilled
+    // balance (510), not the original low balance (10) or the post-deduction
+    // value (510 - 25 = 485).
+    //
+    // If the snapshot were ever moved above the refill call, the player would
+    // silently lose the 500-coin refill every time they crashed at low balance.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())                                    // call 1: renderBoard idle grid
+      .mockImplementationOnce(() => { throw new Error("engine crash"); });    // call 2: runSpin
+
+    const state = makeSpinState();
+    state.balance = 10;  // below bet=25 → bust-proof refill fires (+500 → 510)
+    state.bet = 25;
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    root.querySelector<HTMLButtonElement>("#sparkle-btn")!.click();
+    await vi.runAllTimersAsync();
+
+    // The refill fired: snapshot = 510.  Crash before settlement → restore 510.
+    // Must NOT be 10 (pre-refill) or 485 (post-deduction).
+    expect(state.balance).toBe(510);
+
+    // saveGameState must persist the refilled balance so a reload agrees.
+    const calls = saveGameStateSpy.mock.calls;
+    expect(calls.length).toBeGreaterThanOrEqual(1);
+    const lastSaved = calls[calls.length - 1][0] as GameState;
+    expect(lastSaved.balance).toBe(510);
+
+    root.remove();
+  });
+
   it("does not refund the bet when the crash happens after totalWin is credited (post-settlement)", async () => {
     // If the engine returns a result and result.totalWin is applied to
     // state.balance, the settlement guard marks the round settled=true.
