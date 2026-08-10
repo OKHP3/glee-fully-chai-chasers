@@ -88,10 +88,10 @@ COPY = {
     "cascade-resting-board":           ("Base game · Lvl 4",              "✦ Ready to chase · Balance: 12,480 coins"),
     "cascade-staggered-drop":          ("Base game · Lvl 4",              "✦ Symbols dropping in"),
     "cascade-win-highlight":           ("Base game · Lvl 4",              "✦ +640 coins · 3-symbol match"),
-    "cat-popin-joey-fed":              ("Base game · Lvl 4",              "✦ Joey has arrived! · Fed today ✓"),
-    "cat-popin-joey-unfed":            ("Base game · Lvl 4",              "✦ Joey has arrived! · Treat him?"),
-    "cat-popin-phoebe-fed":            ("Base game · Lvl 4",              "✦ Phoebe has arrived! · Fed today ✓"),
-    "cat-popin-phoebe-unfed":          ("Base game · Lvl 4",              "✦ Phoebe has arrived! · Treat her?"),
+    "cat-popin-joey-fed":              ("Base game · Lvl 3",              "✦ Joey has arrived! · Fed today ✓"),
+    "cat-popin-joey-unfed":            ("Base game · Lvl 3",              "✦ Joey has arrived! · Treat him?"),
+    "cat-popin-phoebe-fed":            ("Base game · Lvl 5",              "✦ Phoebe has arrived! · Fed today ✓"),
+    "cat-popin-phoebe-unfed":          ("Base game · Lvl 3",              "✦ Phoebe has arrived! · Treat her?"),
     "cat-visit-joey":                  ("Base game · Lvl 4",              "✦ Joey is visiting!"),
     "cat-visit-phoebe":                ("Base game · Lvl 4",              "✦ Phoebe is visiting!"),
     "chai-storm-splash":               ("Chai Storm · Wild Rain",         "✦ 3× wilds incoming!"),
@@ -214,8 +214,9 @@ def process(html, mode, copy_text, sparks_override=None):
 # ── Validation (--validate mode) ───────────────────────────────────────────────
 def validate():
     """Read each scene's existing cabinet-msg--top strip and assert the
-    level/Sparks values match the SPARKS table, or the default values for
-    scenes not listed in SPARKS.  Exits non-zero on any mismatch."""
+    level/Sparks values and mode label match the SPARKS/COPY tables, or the
+    default values for scenes not listed in SPARKS.  Exits non-zero on any
+    mismatch."""
 
     DEFAULT = ("Lvl 4", "347", "/ 500 Sparks", "69.4%")
 
@@ -245,9 +246,18 @@ def validate():
         r'cabinet-msg__sparks-fill" style="width:([^"]+)"',
         re.DOTALL,
     )
+    # Mode-label span is uniquely identified by the full set of inline style
+    # properties (font-size + letter-spacing + text-transform) that the
+    # sparks-max span does not carry.
+    MODE_RE = re.compile(
+        r'cabinet-msg--top[^>]*>.*?'
+        r'<span style="color:#7a6a9a;font-weight:400;font-size:11px;[^"]*">([^<]+)</span>',
+        re.DOTALL,
+    )
 
     failures      = []   # wrong values, or missing strip for a COPY-known scene
     no_strip_warn = []   # missing strip for a scene not in COPY (hand-stamped origin)
+    mode_warn     = []   # strip present but scene not in COPY — mode unchecked
     checked       = 0
 
     for fname in sorted(os.listdir(SCENES_DIR)):
@@ -273,15 +283,17 @@ def validate():
 
         exp_lvl, exp_cur, exp_max, exp_pct = SPARKS.get(name, DEFAULT)
 
-        m_lvl = LVL_RE.search(html)
-        m_cur = CUR_RE.search(html)
-        m_max = MAX_RE.search(html)
-        m_pct = PCT_RE.search(html)
+        m_lvl  = LVL_RE.search(html)
+        m_cur  = CUR_RE.search(html)
+        m_max  = MAX_RE.search(html)
+        m_pct  = PCT_RE.search(html)
+        m_mode = MODE_RE.search(html)
 
-        got_lvl = m_lvl.group(1) if m_lvl else "<NOT FOUND>"
-        got_cur = m_cur.group(1) if m_cur else "<NOT FOUND>"
-        got_max = m_max.group(1) if m_max else "<NOT FOUND>"
-        got_pct = m_pct.group(1) if m_pct else "<NOT FOUND>"
+        got_lvl  = m_lvl.group(1)  if m_lvl  else "<NOT FOUND>"
+        got_cur  = m_cur.group(1)  if m_cur  else "<NOT FOUND>"
+        got_max  = m_max.group(1)  if m_max  else "<NOT FOUND>"
+        got_pct  = m_pct.group(1)  if m_pct  else "<NOT FOUND>"
+        got_mode = m_mode.group(1) if m_mode else "<NOT FOUND>"
 
         errors = []
         if got_lvl != exp_lvl:
@@ -293,26 +305,39 @@ def validate():
         if got_pct != exp_pct:
             errors.append(f"  bar_pct:    got {got_pct!r}  expected {exp_pct!r}")
 
+        # Mode-label check: only for scenes in COPY (hand-stamped scenes are warned).
+        if name in COPY:
+            exp_mode = COPY[name][0]
+            if got_mode != exp_mode:
+                errors.append(f"  mode_label: got {got_mode!r}  expected {exp_mode!r}")
+        else:
+            # Strip present but not in COPY — mode label was set by hand and
+            # cannot be compared; emit a warning so it stays on the radar.
+            mode_warn.append(fname)
+
         if errors:
             failures.append((fname, errors))
         checked += 1
 
     print(
         f"validate-cabinet-strips: checked={checked}"
-        f"  no-strip-warn={len(no_strip_warn)}  failures={len(failures)}"
+        f"  no-strip-warn={len(no_strip_warn)}  mode-warn={len(mode_warn)}"
+        f"  failures={len(failures)}"
     )
     for fname in no_strip_warn:
         print(f"  ?  {fname}  (no cabinet-msg--top — not in COPY table, skipping)")
+    for fname in mode_warn:
+        print(f"  ?  {fname}  (cabinet-msg--top present but not in COPY — mode label unchecked)")
 
     if failures:
         for fname, errs in failures:
             print(f"\n  ✗  {fname}")
             for e in errs:
                 print(e)
-        print(f"\nFAIL: {len(failures)} scene(s) have drifted from the SPARKS table.")
+        print(f"\nFAIL: {len(failures)} scene(s) have drifted from the SPARKS/COPY tables.")
         sys.exit(1)
     else:
-        print("PASS: all cabinet-msg--top strips match the SPARKS table.")
+        print("PASS: all cabinet-msg--top strips match the SPARKS/COPY tables.")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
