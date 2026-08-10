@@ -11,6 +11,7 @@
     "assets:generate": "node scripts/generate-assets.mjs",
     "validate:assets": "node scripts/validate-assets.mjs",
     "validate:hand-svg": "node scripts/check-treat-time-hand-svg.mjs",
+    "validate:symbol-pays": "node scripts/check-symbol-reference-pays.mjs",
     "validate:cabinet-strips": "python3 scripts/add-cabinet-strips.py --validate",
     "test:watch": "vitest"
   },

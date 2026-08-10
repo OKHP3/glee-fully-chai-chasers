@@ -39,6 +39,8 @@ jobs:
 
       - run: npm run validate:assets
       - run: npm run validate:hand-svg
+      - name: Confirm SymbolReference pays match PAYTABLE — catch drift after a rebalance
+        run: npm run validate:symbol-pays
       - run: npm run build
 
       - name: Verify How It Works scene files are present in dist
