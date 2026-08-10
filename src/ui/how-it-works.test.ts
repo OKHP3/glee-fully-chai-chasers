@@ -37,12 +37,21 @@ describe("How It Works guide — content accuracy", () => {
     "Yarn",
     "RTP",
     "1 in ",          // "1 in X" probability claims
-    "per spin",       // standalone rate claims, e.g. "1 in 850 per spin", "hit rate per spin"
     "highest value",
     "2× / 3×",        // wrong Handbag Wild multipliers from old guide
     "1,000",          // old wrong bust-proof refill threshold (refill is BUST_PROOF_REFILL=500)
   ])("does not contain forbidden string: %s", (pattern) => {
     expect(html).not.toContain(pattern);
+  });
+
+  it("only uses 'per spin' as bet-cost copy, never as a standalone rate claim", () => {
+    // "X coins per spin" (bet cost) is legitimate. Anything else — "odds per
+    // spin", "hit rate per spin", "1 in 850 per spin", "0.1% per spin" — is a
+    // forbidden probability/rate claim pasted from a GDD.
+    const occurrences = html.match(/[^>]{0,20}per spin/gi) ?? [];
+    for (const occurrence of occurrences) {
+      expect(occurrence).toMatch(/coins per spin$/i);
+    }
   });
 
   // ── Engine constant values ───────────────────────────────────────────────
