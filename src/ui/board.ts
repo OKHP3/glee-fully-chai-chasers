@@ -302,8 +302,6 @@ export function renderBoard(
           </button>
         </div>
 
-        <div id="status-line" class="status-line" aria-live="polite"></div>
-
         <footer class="bet-console">
           <div class="coin-chip" aria-label="Glee-coin balance">${state.balance.toLocaleString()}<em>coins</em></div>
           <div class="flex-1"></div>
