@@ -448,12 +448,6 @@ function updateJar(root: HTMLElement, count: number): void {
   if (label) label.textContent = `${Math.min(count, 6)} / 6`;
 }
 
-const ASKJAMIE_URLS: readonly string[] = [
-  "https://glee-fully.tools/arcade/",
-  "https://glee-fully.tools/about/",
-  "https://overkillhill.com/projects/glee-fully-chai-chasers/",
-  "https://overkillhill.com/manifesto/",
-];
 
 function todayDateKey(): string {
   const d = new Date();
@@ -490,11 +484,9 @@ function wireAskJamie(root: HTMLElement, state: GameState): void {
     const chip = root.querySelector<HTMLElement>(".coin-chip");
     if (chip) chip.innerHTML = `${state.balance.toLocaleString()}<em>coins</em>`;
 
-    const url = ASKJAMIE_URLS[Math.floor(Math.random() * ASKJAMIE_URLS.length)];
     showBubble(
-      `<span class="aj-msg">+500 coins! 🎉 Want to learn more about us?</span>` +
-      `<a class="aj-link" href="${url}" target="_blank" rel="noopener noreferrer">Visit us →</a>`,
-      8000,
+      `<span class="aj-msg">Jamie left you 500 coins ✨ Come back tomorrow for more!</span>`,
+      6000,
     );
     setStatus(root, "AskJamie slipped you +500 coins!");
   });
