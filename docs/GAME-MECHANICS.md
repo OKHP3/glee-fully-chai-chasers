@@ -1605,7 +1605,7 @@ The two rulings on offer are (i) "Ruled", meaning log it as S33 and S34 and open
 | Source | Award | Per act 1 to 4 |
 |---|---:|---:|
 | Settled decision S30, 2026-07-15 | 300 / 400 / 500 | 75 / 100 / 125 |
-| `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` lines 9 to 15 and 27 to 31 | 300 / 400 / 500 | 75 / 100 / 125 |
+| S30 contract, 2026-07-15 (absorbed into this document §9) | 300 / 400 / 500 | 75 / 100 / 125 |
 | **Shipped engine** (`uniglee.ts:94`, `reel * 20`) | **40 / 60 / 80** | **10 / 15 / 20** |
 | Shipped type (`laundry.ts:21`, union of 40, 60, 80) | 40 / 60 / 80 | 10 / 15 / 20 |
 | `laundry.ts:20` comment: "2026-07 RTP retune: marathon award reduced from 300/400/500 to 40/60/80" | 40 / 60 / 80 | 10 / 15 / 20 |
@@ -1637,7 +1637,7 @@ The rulings on offer are (i) "Restate", (ii) "Model" (add a realistic-play harne
 | 1 | `docs/DESIGN-SPEC.md` §4: bonus layer ~35% | 37.65% measured | 40-seed fleet |
 | 2 | `docs/DESIGN-SPEC.md` §4 event table: "Chai Tea Bonus (3+ scatters) ~1 in 110 spins" | **No scatter mechanic exists.** There is no scatter symbol, no 3-plus-scatter count, and no bonus of that name. The two chai bonuses are Bold Chai Pump (a blocker pair) and Iced Chai Wild Rain (a wheel wedge) | `grep -rn "scatter" src/engine/` returns only a comment in `cascade.ts:71` |
 | 3 | `docs/DESIGN-SPEC.md` §5: saucer-cat wilds "arrive in stacks up to 6-7 high" | Runs are 5 and 6 on reels 2 to 4, and 6 and 6 on reel 5. Never 7 | `reels.ts:86-92` |
-| 4 | `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` per-act table: 75 / 100 / 125 | 10 / 15 / 20 | `laundry.ts:23-25` |
+| 4 | S30 contract (2026-07-15) per-act table: 75 / 100 / 125 | 10 / 15 / 20 | `laundry.ts:23-25` |
 | 5 | `docs/HANDBAG-WILD-2026-07-14.md`: oracle moved to 95.91% RTP, approved band 95.5% to 96.5% | The oracle reads 61.08% and measures the base game only. The doc's own 2026-08-09 delta already records this, and the mechanic itself still matches its contract exactly | `simulation.test.ts:71-74`; the doc's delta section |
 | 6 | `src/engine/README.md` module table: `reels.ts`, `paylines.ts`, `cascade.ts`, `features.ts`, `economy.ts` marked "☐ TODO", `types.ts` marked "☑ stub" | All six are shipped, complete, and covered by 170 passing tests | `npx vitest run src` |
 | 7 | `src/engine/README.md`: required test is a "1M-spin RTP simulation within ±0.5% of targetRtp" | The oracle runs 200,000 spins and gates base RTP in a 2-point band. There is no `targetRtp` anywhere in executable code | `simulation.test.ts:15, 71-74` |

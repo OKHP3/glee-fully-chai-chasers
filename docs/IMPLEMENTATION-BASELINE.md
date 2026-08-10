@@ -209,7 +209,7 @@ Earlier readings of 95.66% and 97.56%, both over seven seeds, were small-sample 
 
 These are recorded so no tool treats them as settled. None of them is a code defect and none was "fixed" by editing a ruling.
 
-- **UniGlee award size.** S30 and `docs/UNIGLEE-MARATHON-AMENDMENT-2026-07-15.md` say 300/400/500 initial free spins. The engine awards 40/60/80 (`src/engine/uniglee.ts` line 94, typed in `src/engine/laundry.ts` line 21). Open as **D7** in `docs/DECISION-LOG.md`. Do not change either side until Jamie rules.
+- **UniGlee award size.** S30 (2026-07-15) says 300/400/500 initial free spins; full marathon structure is in GAME-MECHANICS.md §9. The engine awards 40/60/80 (`src/engine/uniglee.ts` line 94, typed in `src/engine/laundry.ts` line 21). Open as **D7** in `docs/DECISION-LOG.md`. Do not change either side until Jamie rules.
 - **Full-game RTP is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%; the converged fleet measures 98.70% with a 95% CI of 97.93% to 99.47%, and only 10 of 40 seeds land in band. The figure also assumes a perfect player on the two interactive bonuses. Open as **D8** in `docs/DECISION-LOG.md`. Documentation-accuracy question, not a player-facing defect. Do not retune to chase the band without a ruling.
 - **Decision numbering.** Two settled rows both carry the label S30. Recorded as a numbering errata note in `docs/DECISION-LOG.md`; both rulings stand and nothing was renumbered.
 - **UniGlee tease mechanic.** The live public page describes a decorative sighting at ~1/850 and a real capture at ~1/4,212, citing decisions S33 and S34 that do not exist. The engine implements neither. Open as **D6**.
