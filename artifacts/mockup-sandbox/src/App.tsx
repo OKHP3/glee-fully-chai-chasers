@@ -238,6 +238,32 @@ const S = {
     whiteSpace: "nowrap" as const,
   } satisfies React.CSSProperties,
 
+  navCounter: {
+    fontSize: 11,
+    color: "#475569",
+    flexShrink: 0,
+    minWidth: 48,
+    textAlign: "center" as const,
+  } satisfies React.CSSProperties,
+
+  navBtn: {
+    fontSize: 14,
+    lineHeight: 1,
+    padding: "3px 8px",
+    background: "#0f2744",
+    color: "#93c5fd",
+    border: "1px solid #1e3a5f",
+    borderRadius: 4,
+    cursor: "pointer",
+    flexShrink: 0,
+    userSelect: "none" as const,
+  } satisfies React.CSSProperties,
+
+  navBtnDisabled: {
+    opacity: 0.3,
+    cursor: "default",
+  } satisfies React.CSSProperties,
+
   openLink: {
     fontSize: 11,
     color: "#3b82f6",
@@ -331,6 +357,32 @@ function SceneGallery() {
   }, [basePath]);
 
   const groups = groupScenes(scenes);
+
+  // Flat ordered list matching sidebar display order
+  const flatScenes = groups.flatMap((g) => g.scenes);
+  const selectedIdx = selected ? flatScenes.indexOf(selected) : -1;
+  const hasPrev = selectedIdx > 0;
+  const hasNext = selectedIdx >= 0 && selectedIdx < flatScenes.length - 1;
+
+  const navigate = (delta: -1 | 1) => {
+    const nextIdx = selectedIdx + delta;
+    if (nextIdx >= 0 && nextIdx < flatScenes.length) {
+      setSelected(flatScenes[nextIdx]);
+    }
+  };
+
+  // Keyboard arrow navigation
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); navigate(-1); }
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); navigate(1); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIdx, flatScenes.length]);
+
   const iframeSrc = selected ? `${basePath}/scenes/${selected}` : null;
 
   return (
@@ -380,9 +432,43 @@ function SceneGallery() {
       {/* ── Preview pane ── */}
       <main style={S.main}>
         <div style={S.toolbar}>
+          {/* Prev button */}
+          <button
+            onClick={() => navigate(-1)}
+            disabled={!hasPrev}
+            title="Previous scene (← ↑)"
+            style={{
+              ...S.navBtn,
+              ...(!hasPrev ? S.navBtnDisabled : {}),
+            }}
+          >
+            ‹
+          </button>
+
           <span style={S.toolbarLabel}>
             {selected ? toDisplayName(selected) : "Select a scene to preview"}
           </span>
+
+          {/* Scene counter */}
+          {selectedIdx >= 0 && (
+            <span style={S.navCounter}>
+              {selectedIdx + 1} / {flatScenes.length}
+            </span>
+          )}
+
+          {/* Next button */}
+          <button
+            onClick={() => navigate(1)}
+            disabled={!hasNext}
+            title="Next scene (→ ↓)"
+            style={{
+              ...S.navBtn,
+              ...(!hasNext ? S.navBtnDisabled : {}),
+            }}
+          >
+            ›
+          </button>
+
           {iframeSrc && (
             <a
               href={iframeSrc}
