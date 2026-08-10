@@ -1,7 +1,9 @@
-# Phoebe’s Lap Quest — Chapter Contract
+# Phoebe's Lap Quest — Chapter Contract
+
+> **Archival notice (2026-08-10):** The `LapQuestSessionConfig / LapQuestSessionState` engine API described in this document was removed in the dead-code cleanup (task #152). The live implementation is `src/engine/lap-quest.ts` (round runner and sticky-wild placement) + `src/ui/lap-quest-ledge.ts` (DOM timer, ledge UI, Joey interrupt). This document is preserved for design history only; do not treat its API listings as current.
 
 **Date:** 2026-07-15
-**Status:** bounded UniGlee chapter proposal and implementation contract
+**Status:** bounded UniGlee chapter proposal and implementation contract — **ARCHIVAL**
 **Scope:** pure engine chapter result plus a reusable mobile presentation hook
 
 This amendment extends the existing one-round vertical slice into an implementation-ready, timed Lap Stay overlay contract. The current reusable hook still demonstrates one round; the parent UniGlee session must supply the live timer/input loop after the open math decisions below are approved.

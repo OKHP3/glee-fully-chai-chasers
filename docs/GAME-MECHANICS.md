@@ -41,11 +41,11 @@ The contract is one-directional and strict.
 | The engine imports nothing from the UI | 21 files under `src/engine/`, zero DOM references. Verified: `grep -rn "document\.\|window\.\|Math.random\|Date.now" src/engine/*.ts` returns only comment text |
 | The UI imports the engine as a library | `src/ui/board.ts:25-60` |
 | No RNG is created inside the engine | Every entry point takes `rng: Rng` as a parameter. There is no module-level RNG state anywhere |
-| No clock is read inside the engine | The two timed bonuses take `nowMs` from the caller (`pumpBoldChai(state, nowMs)`, `advanceLapQuestSession(state, atMs, config)`) |
+| No clock is read inside the engine | Bold Chai takes `nowMs` from the caller (`pumpBoldChai(state, nowMs)`); Lap Quest's ledge timer lives entirely in `src/ui/lap-quest-ledge.ts`, not in the engine |
 | A spin is fully resolved before any pixel moves | `spin()` returns `SpinResult.steps`, the complete cascade history. The UI replays it with `animateSteps()`. It cannot change the outcome |
 | Money settles once | `totalWin: Math.round(totalWin)` at `src/engine/cascade.ts:381`. Internal payouts are fractional; the player-facing award is a whole Glee-coin integer |
 
-Interactive bonuses are split rather than compromised. The decision logic lives in the engine as a pure state machine (`keepsake-memory.ts`, `bold-chai-pump.ts`, `lap-quest-session.ts`), and the UI owns the wall clock, the animation, and the input events. Each state machine accepts an action plus a timestamp and returns `{ state, accepted, event?, reason? }`. Rejections are typed, not thrown.
+Interactive bonuses are split rather than compromised. The decision logic lives in the engine as a pure state machine (`keepsake-memory.ts`, `bold-chai-pump.ts`), and the UI owns the wall clock, the animation, and the input events. Each state machine accepts an action plus a timestamp and returns `{ state, accepted, event?, reason? }`. Rejections are typed, not thrown. Phoebe's Lap Quest is the exception: its timing loop lives in `src/ui/lap-quest-ledge.ts` (a DOM interval), not in the engine.
 
 If you rebuild this, keep that boundary. It is the reason the whole game is testable without a browser and the reason the simulation harness in `scripts/sim-agent.ts` can play every bonus through the exact same entry points the UI uses.
 
@@ -102,7 +102,6 @@ Copy that discipline. When you add a feature, either put its rolls on a separate
 | `uniglee-marathon.ts` | acts 1 to 4 runner | 82 |
 | `laundry.ts` | Joey's Laundry Helper effects, quarter allocation | 120 |
 | `lap-quest.ts` | Phoebe's Lap Quest choice and sticky-wild round | 139 |
-| `lap-quest-session.ts` | pure timed-session state machine (built, tested, **not wired**) | 283 |
 | `treattime.ts` | Treat Time trigger rates and wild casting | 98 |
 | `keepsake-constellation.ts` | giant-symbol zone roll and painting | 102 |
 | `keepsake-memory.ts` | memory-match state machine | 180 |
@@ -1003,7 +1002,7 @@ Positions are chosen uniformly without replacement from all 20 cells (`chooseCom
 
 In production the chapter is an **open-ended loop**, not a fixed spin count (`board.ts:1679-1684`): it plays one round, then keeps playing another round roughly every 900ms until the ledge timer ends the chapter. The ledge (`lap-quest-ledge.ts:43-57`) runs a 15-second grace, then a 5-second inactivity watchdog that resets on every pet, with Joey arriving at a uniform time between 15 and 90 seconds (`board.ts:1656`). **Each round re-rolls the choice and the wilds.**
 
-`src/engine/lap-quest-session.ts` is a complete, tested, pure implementation of that timing model with typed end reasons (`joey_interrupt`, `unpetted`, `cap_reached`, `marathon_ended`) and a caller-supplied `lapCoinsByTick` award ladder. **It has no production caller.** The UI uses its own DOM timer instead, and no coin ladder is supplied, so Lap Quest pays only whatever its cascade rounds pay.
+The timing model (`src/ui/lap-quest-ledge.ts`) owns a DOM interval that runs the grace period, the 5-second inactivity watchdog, and the Joey arrival clock. The engine owns only the round engine (`lap-quest.ts`): it rolls the choice, places sticky wilds, and runs the cascade. No coin-ladder is supplied; Lap Quest pays only what its cascade rounds pay.
 
 **Player agency.** The choice is presented as a decision and is not one: the perfect spot is drawn uniformly and no information is exposed before the pick, so all three options are identical at 1/3. The genuine agency is petting: it resets the 5-second inactivity watchdog and therefore keeps the chapter running, which is worth real money because every extra second is another round. **Optimal strategy: pet continuously, every 4 seconds or faster, from the moment grace ends.** Doing nothing ends the chapter at 20 seconds; petting keeps it alive until Joey arrives, which averages 52.5 seconds.
 
@@ -1579,8 +1578,7 @@ Specific things that will bite you, in rough order of how much time they will co
 11. **The harness plays a perfect player.** Perfect memory on the Keepsake Trail, 6 taps per second on Bold Chai. Both numbers are ceilings.
 12. **Phoebe's Lap Quest is outside every measurement.** The marathon runner excludes act 5 by design, and the harness only sums the runner's chapters.
 13. **`applyBonusSpinXp` mutates its argument.** The one impure function in the engine. It is documented, but it will surprise you.
-14. **`lap-quest-session.ts` is a complete, tested module with no production caller.** Do not assume that engine coverage means a mechanic is live.
-15. **RNG stream position is content-dependent.** `cellFrom` consumes extra draws when it hits a handbag candidate, so two boards with the same stop indices can leave the stream in different places. Any test that assumes a fixed number of draws per spin is wrong.
+14. **RNG stream position is content-dependent.** `cellFrom` consumes extra draws when it hits a handbag candidate, so two boards with the same stop indices can leave the stream in different places. Any test that assumes a fixed number of draws per spin is wrong.
 
 ---
 
@@ -1709,11 +1707,10 @@ This should be opened as a decision or a bug in `docs/DECISION-LOG.md`. It is de
 
 ### 12.5 Built but not wired
 
-Three things exist in the engine with full test coverage and no production caller. None is a defect; all three are traps for a reader who assumes coverage means live.
+Two things exist in the engine with full test coverage and no production caller. Neither is a defect; both are traps for a reader who assumes coverage means live.
 
 | Module or export | Status | Note |
 |---|---|---|
-| `src/engine/lap-quest-session.ts`, all 283 lines | Complete, 8 passing tests, **no caller** | The UI uses its own DOM timer in `lap-quest-ledge.ts` instead. Its `lapCoinsByTick` award ladder is therefore never supplied, so Lap Quest currently pays nothing but its cascade wins |
 | `EngineConfig` (`types.ts:248-255`) | Declared, never imported | Its comments are stale (12.3 row 5) |
 | `pickWeighted` (`rng.ts:23-30`) | Exported and tested, no production caller | Every weighted pick in the engine is hand-rolled locally instead |
 
