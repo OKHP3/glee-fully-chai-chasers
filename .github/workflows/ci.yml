@@ -53,6 +53,29 @@ jobs:
         run: npm run validate:symbol-pays
       - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
         run: npm run validate:cabinet-strips
+
+      - name: Confirm no Google Fonts CDN links in shipped artifacts — keep offline-demo resilience
+        run: |
+          # CDN font links (fonts.googleapis.com / fonts.gstatic.com) are forbidden in
+          # anything that ships: they silently break the offline demo, add a
+          # third-party request the analytics/privacy policy does not allow, and
+          # undo the self-hosted @font-face work in each artifact's public/fonts/.
+          # Fonts must be self-hosted woff2 files loaded via @font-face.
+          #
+          # The mockup sandbox (artifacts/mockup-sandbox) is deliberately excluded:
+          # it is a dev-only canvas preview tool that never deploys, and its design
+          # explorations legitimately pull from Google Fonts.
+          matches=$(grep -rn "fonts\.googleapis\.com\|fonts\.gstatic\.com" \
+            index.html src/ \
+            artifacts/*/index.html artifacts/*/src/ \
+            --include='*' 2>/dev/null \
+            | grep -v '^artifacts/mockup-sandbox/' || true)
+          if [ -n "$matches" ]; then
+            echo "::error::Google Fonts CDN reference found in shipped code. Self-host the font in public/fonts/ with @font-face instead:"
+            echo "$matches"
+            exit 1
+          fi
+          echo "No Google Fonts CDN references in shipped artifacts."
       - name: Build — catch TypeScript and bundler errors before merge
         run: npm run build
 
