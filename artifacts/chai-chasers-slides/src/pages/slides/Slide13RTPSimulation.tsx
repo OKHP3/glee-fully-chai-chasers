@@ -50,7 +50,7 @@ export default function Slide13RTPSimulation() {
               textTransform: 'uppercase',
             }}
           >
-            Full-game RTP
+            Full-game RTP (perfect-play ceiling)
           </div>
         </div>
 
@@ -192,7 +192,7 @@ export default function Slide13RTPSimulation() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '2vw', lineHeight: 1.55 }}>
-            2,000,000 paid spins — 40 seeds × 50,000 each — converged to a full-game RTP of <span style={{ color: '#F2C84B', fontWeight: 700 }}>98.70%</span>
+            2,000,000 paid spins — 40 seeds × 50,000 each — measured <span style={{ color: '#F2C84B', fontWeight: 700 }}>98.70%</span> under a perfect-play model: Bold Chai maxed for the full 30 s, Keepsake Trail always completed
           </div>
         </div>
 
