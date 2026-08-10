@@ -9,6 +9,27 @@
 html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
 /* Let the 900px+ CSS grid apply naturally — centre the 868px shell in the 1280px scene */
 .cc-root{width:1280px;height:900px;display:flex;justify-content:center;align-items:flex-start}
+/* Cabinet-frame: flex column so message strips sit above/below the reel grid */
+.cabinet-frame{display:flex!important;flex-direction:column!important}
+.reel-grid{flex:1!important;min-height:0!important}
+/* Top / bottom message zones */
+.cabinet-msg{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 14px;
+  font-family:'Baloo 2',sans-serif;font-size:12px;font-weight:600;
+  color:#c9aeff;letter-spacing:.03em;
+  position:relative;z-index:2;
+}
+.cabinet-msg--top{border-bottom:1px solid rgba(180,120,255,.15)}
+.cabinet-msg--bottom{border-top:1px solid rgba(180,120,255,.15);justify-content:center;font-size:13px}
+.cabinet-msg__sparks{display:flex;align-items:center;gap:6px}
+.cabinet-msg__sparks-bar{
+  width:80px;height:6px;border-radius:3px;
+  background:rgba(255,255,255,.12);
+  overflow:hidden;
+}
+.cabinet-msg__sparks-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#f5d576,#f2a03c)}
 </style>
 </head>
 <body>
@@ -22,6 +43,7 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
       <div class="marquee-row">
         <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
         <button class="chrome-btn" aria-label="Open symbol guide and game rules" title="Symbol guide"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/><path d="M5 4.5v15M9 8h6M9 12h6"/></svg></button>
+        <button class="chrome-btn" aria-label="More information"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="8.5" stroke-linecap="round" stroke-width="2.2"/><line x1="12" y1="11.5" x2="12" y2="17" stroke-linecap="round"/></svg></button>
         <button class="chrome-btn" aria-label="Settings"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/></svg></button>
       </div>
       <div class="marquee-status" aria-live="polite">Press SPARKLE to chase</div>
@@ -30,6 +52,16 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
       <div class="cabinet-shell-divider"></div>
       <main class="cabinet-frame">
         <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+        <!-- Top message zone: level progress + game mode -->
+        <div class="cabinet-msg cabinet-msg--top" aria-label="Player progress">
+          <span class="cabinet-msg__sparks">
+            <span style="color:#f5d576;font-weight:700">Lvl 4</span>
+            <span style="color:#7a6a9a">·</span>
+            <span style="color:#c9aeff">347 <span style="color:#7a6a9a;font-weight:400">/ 500 Sparks</span></span>
+            <span class="cabinet-msg__sparks-bar"><span class="cabinet-msg__sparks-fill" style="width:69.4%"></span></span>
+          </span>
+          <span style="color:#7a6a9a;font-weight:400;font-size:11px;letter-spacing:.06em;text-transform:uppercase">Base game</span>
+        </div>
         <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
           <div class="reel-col" data-reel="0">
             <div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%" aria-hidden="true"></span></div>
@@ -61,6 +93,10 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
             <div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%" aria-hidden="true"></span></div>
             <div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%" aria-hidden="true"></span></div>
           </div>
+        </div>
+        <!-- Bottom message zone: win feedback / game state -->
+        <div class="cabinet-msg cabinet-msg--bottom" aria-live="polite">
+          <span style="color:#8b7eb8">✦ Ready to chase &nbsp;·&nbsp; Balance: <span style="color:#f5d576;font-weight:700">12,480</span> coins</span>
         </div>
       </main>
     </div>
