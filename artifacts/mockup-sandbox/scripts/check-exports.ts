@@ -127,9 +127,70 @@ if (coverageFailures.length > 0) {
   );
 }
 
+// ── CHECK 3: Ice-notes-card completeness ────────────────────────────────────
+
+console.log("\n── Check 3: Ice-notes-card completeness ───────────────────────");
+
+// Every scene HTML that carries the companion-row UI bar must also declare an
+// ice-notes-card.  A companion-row without a card means the ingredient context
+// strip is missing — this check prevents the omission from shipping silently.
+
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
+const scenesDir = join(process.cwd(), "public", "scenes");
+const sceneFiles = readdirSync(scenesDir)
+  .filter((f) => f.endsWith(".html"))
+  .map((f) => join(scenesDir, f));
+
+const iceNotesFailures: string[] = [];
+let iceNotesPassed = 0;
+let iceNotesSkipped = 0;
+
+for (const filePath of sceneFiles) {
+  const src = readFileSync(filePath, "utf8");
+  const hasCompanionRow = src.includes('class="companion-row"') || src.includes("companion-row");
+  if (!hasCompanionRow) {
+    iceNotesSkipped++;
+    continue;
+  }
+  const hasIceNotesCard = src.includes('id="ice-notes-card"');
+  if (!hasIceNotesCard) {
+    const name = filePath.split("/").pop()!;
+    iceNotesFailures.push(name);
+    console.error(
+      `  ✗  ${name}\n` +
+        `     → has companion-row but is missing id="ice-notes-card"\n` +
+        `       Add an <aside id="ice-notes-card" class="ice-notes-card"> block after the companion-row closing </div>.`,
+    );
+  } else {
+    iceNotesPassed++;
+  }
+}
+
+console.log(); // blank line before summary
+
+if (iceNotesFailures.length > 0) {
+  console.error(
+    `❌  Ice-notes-card check FAILED — ${iceNotesFailures.length} scene(s) have companion-row but no ice-notes-card:\n`,
+  );
+  for (const f of iceNotesFailures) {
+    console.error(`     ${f}`);
+  }
+  console.error(
+    `\nEvery scene with a companion-row must include an ice-notes-card so the\n` +
+    `ingredient context strip is never blank. Add the card before pushing.`,
+  );
+} else {
+  console.log(
+    `✅  Ice-notes-card check passed — all ${iceNotesPassed} companion-row scene(s) have an ice-notes-card` +
+      (iceNotesSkipped > 0 ? ` (${iceNotesSkipped} scene(s) without companion-row skipped).` : "."),
+  );
+}
+
 // ── Final exit ──────────────────────────────────────────────────────────────
 
-const totalFailures = exportFailures.length + coverageFailures.length;
+const totalFailures = exportFailures.length + coverageFailures.length + iceNotesFailures.length;
 if (totalFailures > 0) {
   process.exit(1);
 }
