@@ -15,6 +15,14 @@
  *   it means the file was added in the wrong place or the Vite plugin
  *   didn't pick it up.
  *
+ * CHECK 3 — Ice-notes-card completeness
+ *   Every scene HTML with a companion-row must include an ice-notes-card
+ *   with a non-placeholder ingredient name and description.
+ *
+ * Self-test:  tsx scripts/check-exports.ts --self-test
+ *   Runs fixture assertions for the placeholder-detection predicates used in
+ *   CHECK 3 and exits.  The check-exports npm script always runs this first.
+ *
  * Run from the mockup-sandbox package root:
  *   pnpm run check-exports
  *   # or directly:
@@ -25,6 +33,113 @@
 // import.meta.env usage inside component bodies is fine; we never render.
 import { modules } from "../src/.generated/mockup-components.ts";
 import glob from "fast-glob";
+
+// ── Placeholder-detection predicates (module scope) ─────────────────────────
+//
+// Used by CHECK 3 to reject ice-notes-card content that looks like a
+// fill-in placeholder rather than a real chai ingredient.  Hoisted here so
+// the --self-test flag can exercise them with fixtures before the checks run.
+
+/** Words that are never real chai ingredient names, checked case-insensitively. */
+const NAME_DENYLIST = new Set([
+  "todo", "ingredient name", "name", "placeholder", "example", "tbd",
+  "ingredient", "description", "description here", "text here",
+  "enter name", "enter ingredient",
+]);
+
+/**
+ * Returns true when `v` looks like a placeholder ingredient name.
+ * Rejects:
+ *   • fewer than 3 characters   ("OK", "Hi", "")
+ *   • strings in NAME_DENYLIST  ("TODO", "name", "ingredient name", …)
+ */
+export function isPlaceholderName(v: string): boolean {
+  return v.length < 3 || NAME_DENYLIST.has(v.toLowerCase());
+}
+
+/**
+ * Returns true when `v` looks like a placeholder ingredient description.
+ * Rejects:
+ *   • fewer than 5 characters
+ *   • strings in NAME_DENYLIST
+ *   • strings that start with a known placeholder prefix (case-insensitive)
+ */
+export function isPlaceholderDesc(v: string): boolean {
+  return (
+    v.length < 5 ||
+    NAME_DENYLIST.has(v.toLowerCase()) ||
+    /^(todo|tbd|placeholder|description here|text here|example description)/i.test(v)
+  );
+}
+
+// ── Self-test mode ──────────────────────────────────────────────────────────
+//
+// Run with:  tsx scripts/check-exports.ts --self-test
+// The check-exports npm script always passes --self-test as the first phase.
+
+if (process.argv.includes("--self-test")) {
+  console.log("── Self-test: placeholder-detection predicates ─────────────────");
+
+  let selfTestPassed = 0;
+  let selfTestFailed = 0;
+
+  function assert(label: string, actual: boolean, expected: boolean): void {
+    if (actual === expected) {
+      console.log(`  ✓  ${label}`);
+      selfTestPassed++;
+    } else {
+      console.error(`  ✗  ${label}\n     expected ${expected}, got ${actual}`);
+      selfTestFailed++;
+    }
+  }
+
+  // ── isPlaceholderName fixtures ───────────────────────────────────────────
+  // Should be flagged as placeholder:
+  assert('isPlaceholderName("") → true  (empty)',              isPlaceholderName(""),               true);
+  assert('isPlaceholderName("OK") → true  (< 3 chars)',        isPlaceholderName("OK"),              true);
+  assert('isPlaceholderName("Hi") → true  (< 3 chars)',        isPlaceholderName("Hi"),              true);
+  assert('isPlaceholderName("TODO") → true  (denylist)',       isPlaceholderName("TODO"),            true);
+  assert('isPlaceholderName("name") → true  (denylist)',       isPlaceholderName("name"),            true);
+  assert('isPlaceholderName("Name") → true  (denylist, ci)',   isPlaceholderName("Name"),            true);
+  assert('isPlaceholderName("ingredient name") → true',        isPlaceholderName("ingredient name"), true);
+  assert('isPlaceholderName("placeholder") → true',            isPlaceholderName("placeholder"),     true);
+  assert('isPlaceholderName("tbd") → true  (denylist)',        isPlaceholderName("tbd"),             true);
+  assert('isPlaceholderName("TBD") → true  (denylist, ci)',    isPlaceholderName("TBD"),             true);
+  // Should NOT be flagged:
+  assert('isPlaceholderName("Tea") → false (real 3-char)',     isPlaceholderName("Tea"),             false);
+  assert('isPlaceholderName("Cardamom") → false',              isPlaceholderName("Cardamom"),        false);
+  assert('isPlaceholderName("Oat Milk") → false',              isPlaceholderName("Oat Milk"),        false);
+  assert('isPlaceholderName("Natural Flavors") → false',       isPlaceholderName("Natural Flavors"), false);
+  assert('isPlaceholderName("Vitamin D3") → false',            isPlaceholderName("Vitamin D3"),      false);
+
+  // ── isPlaceholderDesc fixtures ───────────────────────────────────────────
+  // Should be flagged as placeholder:
+  assert('isPlaceholderDesc("") → true  (empty)',                      isPlaceholderDesc(""),                     true);
+  assert('isPlaceholderDesc("desc") → true  (< 5 chars)',              isPlaceholderDesc("desc"),                 true);
+  assert('isPlaceholderDesc("TODO") → true  (denylist)',               isPlaceholderDesc("TODO"),                 true);
+  assert('isPlaceholderDesc("description here") → true  (denylist)',   isPlaceholderDesc("description here"),     true);
+  assert('isPlaceholderDesc("Description Here") → true  (denylist ci)',isPlaceholderDesc("Description Here"),     true);
+  assert('isPlaceholderDesc("TODO fill in later") → true  (prefix)',   isPlaceholderDesc("TODO fill in later"),   true);
+  assert('isPlaceholderDesc("tbd") → true  (denylist)',                isPlaceholderDesc("tbd"),                  true);
+  assert('isPlaceholderDesc("placeholder text") → true  (denylist)',   isPlaceholderDesc("placeholder text"),     true);
+  assert('isPlaceholderDesc("example description of chai") → true',    isPlaceholderDesc("example description of chai"), true);
+  assert('isPlaceholderDesc("text here and more") → true  (denylist)', isPlaceholderDesc("text here and more"),   true);
+  // Should NOT be flagged:
+  assert('isPlaceholderDesc("A warm spice with a sweet aroma.") → false',
+    isPlaceholderDesc("A warm spice with a sweet aroma."), false);
+  assert('isPlaceholderDesc("Adds depth and warmth to the blend.") → false',
+    isPlaceholderDesc("Adds depth and warmth to the blend."), false);
+  assert('isPlaceholderDesc("Sourced from the Pacific Northwest.") → false',
+    isPlaceholderDesc("Sourced from the Pacific Northwest."), false);
+
+  console.log();
+  if (selfTestFailed > 0) {
+    console.error(`❌  Self-test FAILED — ${selfTestFailed} fixture(s) did not match expected output.`);
+    process.exit(1);
+  }
+  console.log(`✅  Self-test passed — ${selfTestPassed} fixture(s) all correct.`);
+  process.exit(0);
+}
 
 // ── CHECK 1: Export-format ──────────────────────────────────────────────────
 
@@ -169,20 +284,6 @@ for (const filePath of sceneFiles) {
     const cardBlock = src.match(/id="ice-notes-card"[\s\S]*?<\/aside>/)?.[0] ?? "";
     const nameText = cardBlock.match(/class="ice-notes-name">([^<]*)</)?.[1]?.trim() ?? "";
     const descText = cardBlock.match(/class="ice-notes-text">([^<]*)</)?.[1]?.trim() ?? "";
-
-    // Denylist: placeholder strings that satisfy the non-empty check but are
-    // clearly not real chai ingredients. Comparison is case-insensitive.
-    const NAME_DENYLIST = new Set([
-      "todo", "ingredient name", "name", "placeholder", "example", "tbd",
-      "ingredient", "description", "description here", "text here",
-      "enter name", "enter ingredient",
-    ]);
-    const isPlaceholderName = (v: string): boolean =>
-      v.length < 3 || NAME_DENYLIST.has(v.toLowerCase());
-    const isPlaceholderDesc = (v: string): boolean =>
-      v.length < 5 ||
-      NAME_DENYLIST.has(v.toLowerCase()) ||
-      /^(todo|tbd|placeholder|description here|text here|example description)/i.test(v);
 
     let contentOk = true;
     if (!nameText) {

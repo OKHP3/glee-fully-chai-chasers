@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check-exports": "tsx --import ./scripts/css-stub-loader.mjs scripts/check-exports.ts"
+    "check-exports": "tsx scripts/check-exports.ts --self-test && tsx --import ./scripts/css-stub-loader.mjs scripts/check-exports.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",
