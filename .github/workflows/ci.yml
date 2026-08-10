@@ -20,51 +20,55 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Set up Node 24 with npm cache
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.26.1
+
+      - name: Set up Node 24 with pnpm cache
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies — a failure here means the lockfile and package.json disagree
-        run: npm ci --no-audit --no-fund
+        run: pnpm install --frozen-lockfile
 
       - name: Check mockup component exports — catch missing scene files before merge
         run: |
-          npm install -g pnpm@10.26.1
           pnpm install --filter @workspace/mockup-sandbox --frozen-lockfile
           pnpm --filter @workspace/mockup-sandbox run check-exports
 
       - name: Typecheck mockup canvas components — catch TS errors before merge
         working-directory: artifacts/mockup-sandbox
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Run full test suite — catch game logic and UI regressions before merge
-        run: npm test
+        run: pnpm test
 
       - name: Run slot engine unit tests — catch regressions before merge
-        run: npx vitest run src/engine
+        run: pnpm exec vitest run src/engine
 
       - name: Validate symbol atlas assets — catch a missing or stale generated asset before it ships
-        run: npm run validate:assets
+        run: pnpm run validate:assets
       - name: Confirm treat-time hand SVG matches board.ts — catch scene/source drift before merge
-        run: npm run validate:hand-svg
+        run: pnpm run validate:hand-svg
       - name: Confirm SymbolReference pays match PAYTABLE — catch drift after a rebalance
-        run: npm run validate:symbol-pays
+        run: pnpm run validate:symbol-pays
       - name: Confirm SymbolReference reel chips match reels.ts — catch placement drift before it misleads a designer
-        run: npm run validate:symbol-reels
+        run: pnpm run validate:symbol-reels
       - name: Confirm every canvas iframe is in the refresh registry — a missing entry breaks on the next domain change
-        run: npm run validate:canvas-iframes && node scripts/check-canvas-iframe-registry.mjs --self-test
+        run: pnpm run validate:canvas-iframes && node scripts/check-canvas-iframe-registry.mjs --self-test
       - name: Confirm every sandbox scene file has a canvas gallery frame
-        run: npm run validate:scene-coverage
+        run: pnpm run validate:scene-coverage
       - name: Catch a dead export slipping back into symbols.ts or board.ts
-        run: npm run validate:dead-exports && node scripts/check-dead-exports.mjs --self-test
+        run: pnpm run validate:dead-exports && node scripts/check-dead-exports.mjs --self-test
       - name: Catch a dead CSS selector slipping back into src/style.css
-        run: npm run validate:dead-css && node scripts/check-dead-css.mjs --self-test
+        run: pnpm run validate:dead-css && node scripts/check-dead-css.mjs --self-test
       - name: Catch a stale Keepsake Constellation 2×2 size claim in docs or scenes
-        run: npm run validate:keepsake-size && node scripts/check-keepsake-constellation-size.mjs --self-test
+        run: pnpm run validate:keepsake-size && node scripts/check-keepsake-constellation-size.mjs --self-test
       - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
-        run: npm run validate:cabinet-strips
+        run: pnpm run validate:cabinet-strips
 
       - name: Catch any third-party CDN URL in shipped code — keep offline-demo resilience and privacy boundary
         run: |
@@ -90,7 +94,7 @@ jobs:
           node scripts/check-cdn-urls.mjs --self-test
           node scripts/check-cdn-urls.mjs
       - name: Build — catch TypeScript and bundler errors before merge
-        run: npm run build
+        run: pnpm run build
 
       - name: Verify How It Works scene files are present in dist
         run: |
