@@ -45,7 +45,7 @@ const CATEGORY_STYLE: Record<Category, { bg: string; color: string; border: stri
 // ── Atlas geometry ────────────────────────────────────────────────────────────
 // Assets are served from the sandbox's own public/assets/ directory.
 // import.meta.env.BASE_URL resolves to "/__mockup/" in dev and build.
-const BASE = import.meta.env.BASE_URL;
+const BASE = import.meta.env?.BASE_URL ?? '/';
 const STANDARD_WEBP = `${BASE}assets/atlases/standard-symbol-atlas.webp`;
 const STANDARD_PNG  = `${BASE}assets/atlases/standard-symbol-atlas.png`;
 const SPECIAL_WEBP  = `${BASE}assets/atlases/special-symbol-atlas.webp`;
