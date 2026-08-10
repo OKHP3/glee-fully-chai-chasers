@@ -12,3 +12,38 @@
 .cabinet-msg__sparks{display:flex;align-items:center;gap:6px}
 .cabinet-msg__sparks-bar{width:80px;height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
 .cabinet-msg__sparks-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#f5d576,#f2a03c)}
+
+/* ── Missing classes from CSS mismatch audit (Task #82) ───────────────────────
+   These class names are referenced in scene HTML files but had no rules in
+   game-style.css. Scenes rendered by graceful degradation; these rules make
+   the intended layout explicit and resilient to future restyling. */
+
+/* Page modifier semantics — .game-page is the full-overlay base; these
+   variants carry no additional overrides for now but are present so any
+   future per-page tweaks have a clear home. */
+.settings-page{}
+.paytable-page{}
+
+/* ── Paytable: pay-symbol-card BEM children ───────────────────────────────── */
+/* The new card layout places a sprite icon beside info text (flex row).
+   Use :has() so the flex only activates for cards that carry __icon children,
+   leaving any legacy dl/dt/dd cards untouched. */
+.pay-symbol-card:has(.pay-symbol-card__icon){display:flex;align-items:center;gap:8px}
+.pay-symbol-card__icon{flex-shrink:0;width:50px;height:50px;border-radius:8px;display:block}
+.pay-symbol-card__info{flex:1;min-width:0}
+
+/* Multiplier list inside .pay-symbol-card__info */
+.pay-mult-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:2px 6px}
+.pay-mult-list li{color:var(--cc-butter);font-size:10px;font-weight:700}
+
+/* ── Paytable: feature-symbol-card icon ───────────────────────────────────── */
+/* .feature-symbol-card is already a 50px-1fr grid; this class sizes the
+   sprite that sits in column 1. */
+.feature-symbol-card__icon{width:50px;height:50px;border-radius:8px;display:block;flex-shrink:0}
+
+/* ── SVG / icon utility classes ───────────────────────────────────────────── */
+/* Tailwind-style helpers used on inline SVGs across 14 scenes. */
+.h-full{height:100%}
+.w-full{width:100%}
+.h-5{height:1.25rem}
+.w-5{width:1.25rem}
