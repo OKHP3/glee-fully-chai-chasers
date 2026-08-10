@@ -62,7 +62,7 @@ jobs:
       - name: Catch a dead CSS selector slipping back into src/style.css
         run: npm run validate:dead-css && node scripts/check-dead-css.mjs --self-test
       - name: Catch a stale Keepsake Constellation 2×2 size claim in docs or scenes
-        run: npm run validate:keepsake-size
+        run: npm run validate:keepsake-size && node scripts/check-keepsake-constellation-size.mjs --self-test
       - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
         run: npm run validate:cabinet-strips
 
