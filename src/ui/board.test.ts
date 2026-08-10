@@ -606,6 +606,58 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 
+  it("re-enables bet-up and bet-down even when the post-settlement cleanup render crashes", async () => {
+    // This test covers a subtler failure mode than the engine-crash tests above:
+    // the spin engine resolves successfully (settlement applied, balance updated,
+    // settlementGuard.settled = true), but the cleanup renderBoard call that
+    // follows immediately after settlement throws.  The finally block must
+    // still re-enable bet controls so the player is never bet-locked.
+    //
+    // spin() call sequence:
+    //   call 1 — renderBoard() idle grid (succeeds; sets up the initial board)
+    //   call 2 — runSpin actual spin (succeeds; settlement applied)
+    //   call 3 — cleanup renderBoard() idle grid (throws)
+    //
+    // Providing steps:[] for call 2 forces the cleanup renderBoard at board.ts
+    // line ~1012 to receive undefined as its visibleGrid argument (because
+    // result.steps[-1]?.grid evaluates to undefined), causing it to fall
+    // through to the internal spin() call — which is where call 3 is injected.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())               // call 1: renderBoard idle grid
+      .mockReturnValueOnce(noBonusResult({ steps: [] }))  // call 2: runSpin — settlement succeeds
+      .mockImplementationOnce(() => { throw new Error("cleanup render crash"); }); // call 3
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    // Capture the bet-button references before the spin starts.  The cleanup
+    // renderBoard (call 3) throws before it can replace root.innerHTML, so
+    // these original nodes remain in the DOM throughout the finally block.
+    const betUp   = root.querySelector<HTMLButtonElement>("#bet-up")!;
+    const betDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
+    expect(betUp).not.toBeNull();
+    expect(betDown).not.toBeNull();
+    expect(betUp.disabled).toBe(false);
+    expect(betDown.disabled).toBe(false);
+
+    const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    sparkleBtn.click();
+
+    // Drain animateSteps timers (480 ms per step) and all microtasks so the
+    // full async rejection settles, including the outer .catch() in wireControls.
+    await vi.runAllTimersAsync();
+
+    // Even though the post-settlement renderBoard threw, the finally block in
+    // runSpin must re-enable the bet controls it locked at spin-start.  The
+    // closure-captured betUpAtStart / betDownAtStart references guarantee
+    // re-enable regardless of DOM mutations.
+    expect(betUp.disabled).toBe(false);
+    expect(betDown.disabled).toBe(false);
+
+    root.remove();
+  });
+
   it("removes is-spinning after a doorbell-panic free-spin path resolves", async () => {
     // doorbellPanic truthy + freeSpinsAwarded > 0 → hits the runDoorbellPanic branch
     // at board.ts line ~936, then returns without calling the final renderBoard, so
