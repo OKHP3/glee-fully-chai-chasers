@@ -32,6 +32,37 @@ GEAR_BTN = (
     '</svg></button>'
 )
 
+# ── Per-scene sparks overrides ────────────────────────────────────────────────
+# Scenes whose level/Sparks data differs from the default (Lvl 4 · 347/500 · 69.4%).
+# Format: scene_name → (level_label, sparks_cur, sparks_max, bar_pct_str)
+# Update this table whenever a scene depicts a different level than 4, or uses
+# a different Sparks milestone track (e.g. UniGlee 120/200 vs standard 347/500).
+#
+# Scene                     Level  Cur   Max    Bar%    Source/reason
+# ─────────────────────────────────────────────────────────────────────────────
+# cat-popin-joey-fed        Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
+# cat-popin-joey-unfed      Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
+# cat-popin-phoebe-fed      Lvl 5  320   800    40%     bonus-banner: Lvl 5 · 320/800
+# cat-popin-phoebe-unfed    Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
+# cat-visit-joey            Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
+# cat-visit-phoebe          Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
+# levelup-overlay           Lvl 5  0     800    0%      overlay reads LEVEL 5! → strip shows new lvl
+# bonus-summary             Lvl 4  340   600    56.7%   bonus-banner: Lvl 4 · 340/600
+# uniglee-trigger           Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
+# uniglee-marathon-levelup  Lvl 6  0     1000   0%      overlay reads LEVEL 6! → strip shows new lvl
+SPARKS = {
+    "cat-popin-joey-fed":        ("Lvl 3", "180", "/ 500 Sparks", "36%"),
+    "cat-popin-joey-unfed":      ("Lvl 3", "180", "/ 500 Sparks", "36%"),
+    "cat-popin-phoebe-fed":      ("Lvl 5", "320", "/ 800 Sparks", "40%"),
+    "cat-popin-phoebe-unfed":    ("Lvl 3", "180", "/ 500 Sparks", "36%"),
+    "cat-visit-joey":            ("Lvl 4", "120", "/ 200 Sparks", "60%"),
+    "cat-visit-phoebe":          ("Lvl 4", "120", "/ 200 Sparks", "60%"),
+    "levelup-overlay":           ("Lvl 5", "0",   "/ 800 Sparks", "0%"),
+    "bonus-summary":             ("Lvl 4", "340", "/ 600 Sparks", "56.7%"),
+    "uniglee-trigger":           ("Lvl 4", "120", "/ 200 Sparks", "60%"),
+    "uniglee-marathon-levelup":  ("Lvl 6", "0",   "/ 1,000 Sparks", "0%"),
+}
+
 # ── Per-scene copy (top_mode_label, bottom_state_copy) ────────────────────────
 COPY = {
     "board-askjamie-bubble":           ("Base game",                      "✦ AskJamie daily bonus ready"),
@@ -101,14 +132,14 @@ COPY = {
 }
 
 # ── HTML strip builders ────────────────────────────────────────────────────────
-def top_strip(mode):
+def top_strip(mode, lvl="Lvl 4", sparks_cur="347", sparks_max="/ 500 Sparks", bar_pct="69.4%"):
     return (
         '\n        <div class="cabinet-msg cabinet-msg--top" aria-label="Player progress">'
         '<span class="cabinet-msg__sparks">'
-        '<span style="color:#f5d576;font-weight:700">Lvl 4</span>'
+        f'<span style="color:#f5d576;font-weight:700">{lvl}</span>'
         '<span style="color:#7a6a9a">\u00b7</span>'
-        '<span style="color:#c9aeff">347\u00a0<span style="color:#7a6a9a;font-weight:400">/ 500 Sparks</span></span>'
-        '<span class="cabinet-msg__sparks-bar"><span class="cabinet-msg__sparks-fill" style="width:69.4%"></span></span>'
+        f'<span style="color:#c9aeff">{sparks_cur}\u00a0<span style="color:#7a6a9a;font-weight:400">{sparks_max}</span></span>'
+        f'<span class="cabinet-msg__sparks-bar"><span class="cabinet-msg__sparks-fill" style="width:{bar_pct}"></span></span>'
         '</span>'
         f'<span style="color:#7a6a9a;font-weight:400;font-size:11px;letter-spacing:.06em;text-transform:uppercase">{mode}</span>'
         '</div>'
@@ -135,7 +166,7 @@ MAIN_END   = re.compile(r'</main>')
 H1_END     = re.compile(r'(</h1>)')
 
 # ── Per-file processing ────────────────────────────────────────────────────────
-def process(html, mode, copy_text):
+def process(html, mode, copy_text, sparks_override=None):
     changed = False
 
     # 1. ⓘ button
@@ -152,7 +183,13 @@ def process(html, mode, copy_text):
         m = CABINET_RE.search(html)
         if m:
             ins = m.end()
-            html = html[:ins] + top_strip(mode) + html[ins:]
+            # Use per-scene sparks data if available, else default Lvl 4 · 347/500 · 69.4%
+            if sparks_override:
+                lvl, cur, mx, pct = sparks_override
+                strip = top_strip(mode, lvl=lvl, sparks_cur=cur, sparks_max=mx, bar_pct=pct)
+            else:
+                strip = top_strip(mode)
+            html = html[:ins] + strip + html[ins:]
             # Bottom strip: before first </main>
             html = MAIN_END.sub(bottom_strip(copy_text) + '\n      </main>', html, count=1)
             changed = True
@@ -187,7 +224,8 @@ for fname in sorted(os.listdir(SCENES_DIR)):
         continue
 
     mode, copy_text = COPY[name]
-    new_html, changed, status = process(original, mode, copy_text)
+    sparks_override = SPARKS.get(name)  # None for default Lvl 4 · 347/500 values
+    new_html, changed, status = process(original, mode, copy_text, sparks_override=sparks_override)
 
     if status == "no-cabinet":
         counts["no-cabinet"] += 1
