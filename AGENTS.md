@@ -18,10 +18,9 @@ Read these in order when the task touches product behavior, UI, content, or arch
 4. `docs/DECISION-LOG.md` — settled decisions, ownership, and open decisions.
 5. `docs/COLLABORATIVE-VISION.md` — honored pre-alpha foundation, superseded where the spec says so.
 6. `docs/CANON.md` — Glee, Joey, Phoebe, iced-chai, treat, and narrative canon.
-7. `docs/IP-GUARDRAILS.md` — non-negotiable public-repo safety rules.
-8. `docs/RESEARCH-BRIEF.md` — mechanics research only; do not copy its named products into game-facing work.
-9. `docs/ASSET-CHECKLIST.md` — provenance and release inventory.
-10. `docs/ANALYTICS-PRIVACY.md` — the only permitted measurement policy.
+7. `docs/IP-GUARDRAILS.md` — non-negotiable public-repo safety rules (includes explicit WMS / SciPlay / Moolah brand prohibitions).
+8. `docs/ASSET-CHECKLIST.md` — provenance and release inventory.
+9. `docs/ANALYTICS-PRIVACY.md` — the only permitted measurement policy.
 
 Historical handoffs, assessments, pasted prompts, and `attached_assets/` are context only. In particular, do not build from `docs/DESIGN-HANDOFF.md`, `docs/REPLIT-HANDOFF.md`, or `docs/REPLIT-IMPLEMENTATION-BRIEF.md` when they conflict with the canonical documents above.
 
