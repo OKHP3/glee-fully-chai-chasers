@@ -20,15 +20,15 @@
   "devDependencies": {
     "@emnapi/core": "^1.11.2",
     "@emnapi/runtime": "^1.11.2",
-    "@tailwindcss/vite": "^4.3.2",
+    "@tailwindcss/vite": "catalog:",
     "@types/jsdom": "^28.0.3",
-    "@types/node": "^26.1.1",
+    "@types/node": "catalog:",
     "jsdom": "^29.1.1",
     "prettier": "^3.9.6",
     "sharp": "^0.35.3",
-    "tailwindcss": "^4.3.2",
+    "tailwindcss": "catalog:",
     "typescript": "^7.0.2",
-    "vite": "^8.1.4",
+    "vite": "catalog:",
     "vitest": "^4.1.10"
   }
 }
