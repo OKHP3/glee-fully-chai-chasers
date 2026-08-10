@@ -84,6 +84,31 @@ The entire confidence interval sits above 98%. This is not sampling noise: earli
 
 **This is a documentation-accuracy question, not a player-facing defect.** The game uses fictional Glee-coins only, with no purchase, wager, cash-out, or odds claim, so a player is not harmed by the game paying better than a document predicted. Nothing needs to ship urgently. What is not acceptable is continuing to publish 95% to 98% as a verified figure while the measured value sits outside it.
 
+### D9. Firefly cascade meter cap: 6 or 8?
+
+**Raised:** 2026-08-10, surfaced by scene-catalog audit. **Owner:** Jamie. **Status:** open.
+
+`fireflyJarSvg()` (`src/ui/symbols.ts`) clamps the fill ratio to the range 0–8, meaning it visually represents up to 8 fireflies. Every instance of the label in the UI hardcodes `{n} / 6`, implying the cap is 6. Scene catalog reference: README §8, PART-A Appendix F.
+
+**Ruling needed — one word is enough:**
+
+- **(i) "Six."** The label is authoritative; the SVG clamp is a defensive guard. Update `fireflyJarSvg` to clamp 0–6 and remove any code path that can place a 7th or 8th firefly.
+- **(ii) "Eight."** The SVG function is authoritative; every `/ 6` label is a stale holdover. Update all label strings to `/ 8` and confirm the free-spin trigger condition matches.
+
+### D10. UniGlee free-spin allocation: comment says 75/100/125, code yields 10/15/20
+
+**Raised:** 2026-08-10, surfaced by scene-catalog audit. **Owner:** Jamie. **Status:** open. **Resolve alongside D7.**
+
+`src/engine/uniglee-marathon.ts:18` carries a comment stating per-act free-spin allocations of 75 / 100 / 125. The actual runtime calculation divides the takeover award (40 / 60 / 80 spins from D7's current engine) by 4 (quarter-per-act), yielding 10 / 15 / 20.
+
+The comment likely reflects an earlier design target that predates the award-size conflict recorded in D7. It is consistent with S30's 300/400/500 ruling (25% each = 75/100/125), while the engine currently runs on 40/60/80 (25% = 10/15/20).
+
+**Ruling needed — in practice this resolves when D7 resolves:**
+
+- If D7 rules "300/400/500": the code needs updating; the comment is the design intent.
+- If D7 rules "40/60/80": the comment is wrong; delete or correct it so it matches the code.
+- If D7 is withdrawn: rule this independently by stating which number is the design intent.
+
 ## Settled decisions
 
 > ### Numbering errata (recorded 2026-08-09, nothing renumbered)
