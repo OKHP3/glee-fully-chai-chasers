@@ -2742,4 +2742,3 @@ function showLevelUpCelebration(
   });
 }
 
-export { BET_LEVELS, LINES };

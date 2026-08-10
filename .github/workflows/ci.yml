@@ -58,7 +58,7 @@ jobs:
       - name: Confirm every sandbox scene file has a canvas gallery frame
         run: npm run validate:scene-coverage
       - name: Catch a dead export slipping back into symbols.ts or board.ts
-        run: npm run validate:dead-exports
+        run: npm run validate:dead-exports && node scripts/check-dead-exports.mjs --self-test
       - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
         run: npm run validate:cabinet-strips
 
