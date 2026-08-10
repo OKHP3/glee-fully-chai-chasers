@@ -1396,21 +1396,6 @@ body {
   line-height: 1.4;
   color: rgba(255, 238, 195, .95);
 }
-.aj-link {
-  display: inline-block;
-  padding: 5px 11px 6px;
-  border-radius: 8px;
-  border: 1px solid rgba(159, 232, 197, .5);
-  background: rgba(159, 232, 197, .12);
-  font-size: 12px;
-  font-weight: 700;
-  color: #9fe8c5;
-  text-decoration: none;
-  transition: background 120ms ease, color 120ms ease;
-}
-.aj-link:hover { background: rgba(159, 232, 197, .22); color: #c8f5e0; }
-.aj-link:focus-visible { outline: 2px solid var(--cc-mint); outline-offset: 3px; }
-
 /* Messages now appear in the marquee header; the old status row is kept in
    the DOM for aria-live but occupies no space. */
 #status-line {
