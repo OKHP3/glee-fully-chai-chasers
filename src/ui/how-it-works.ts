@@ -10,6 +10,7 @@ import { FREE_SPIN_LADDER } from '../engine/types';
 import { BET_LEVELS, BUST_PROOF_REFILL, LEVEL_6_UNLOCK_PLAYER_LEVEL } from '../engine/economy';
 import { TREAT_JAR_FREE_SPINS } from '../engine/features';
 import { symbolSvg, catSprite } from './symbols';
+import { trapFocus } from './focus-trap';
 
 /* ------------------------------------------------------------------ */
 /*  Section 1 — Sparkle                                                */
@@ -584,6 +585,10 @@ export function renderHowItWorks(container: HTMLElement): void {
 
   container.appendChild(overlay);
 
+  // Trap focus inside the overlay and move focus to the Close button.
+  // releaseFocus() restores focus to whichever control opened the guide.
+  const releaseFocus = trapFocus(overlay);
+
   // Animate in
   requestAnimationFrame(() => {
     requestAnimationFrame(() => overlay.classList.add('hiw-overlay--visible'));
@@ -593,7 +598,9 @@ export function renderHowItWorks(container: HTMLElement): void {
   const closeBtn = overlay.querySelector<HTMLButtonElement>('#hiw-close-btn');
   closeBtn?.addEventListener('click', close);
 
-  // Close on Escape
+  // Close on Escape — the keydown listener on the overlay itself handles
+  // Tab-trapping; Escape is caught at document level so it fires even if
+  // focus somehow escapes (defensive).
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Escape') close();
   };
@@ -602,6 +609,7 @@ export function renderHowItWorks(container: HTMLElement): void {
   function close() {
     overlay.classList.remove('hiw-overlay--visible');
     document.removeEventListener('keydown', onKeyDown);
+    releaseFocus(); // restore focus to the invoking control immediately
     setTimeout(() => overlay.remove(), 300);
   }
 }

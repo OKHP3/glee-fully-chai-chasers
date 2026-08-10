@@ -58,6 +58,7 @@ import {
 } from "../engine/lap-quest";
 import { mountLapQuestLedge } from "./lap-quest-ledge";
 import { renderHowItWorks } from "./how-it-works";
+import { trapFocus } from "./focus-trap";
 import { beginKeepsakeMemory, createKeepsakeMemory, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
 import type { GameState, ThemeMode } from "../state";
 import { resetAll, saveGameState, load, save } from "../state";
@@ -674,7 +675,8 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
     resetMusicPreviewBtn();
   };
 
-  const close = () => { stopMusicPreviewIfOwned(); page.remove(); };
+  const releaseFocusSettings = trapFocus(page);
+  const close = () => { stopMusicPreviewIfOwned(); releaseFocusSettings(); page.remove(); };
   page.querySelector<HTMLButtonElement>(".page-close")?.addEventListener("click", close);
   page.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
   page.querySelectorAll<HTMLButtonElement>("[data-theme-option]").forEach((button) => {
@@ -776,7 +778,6 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
       location.reload();
     }
   });
-  page.querySelector<HTMLButtonElement>(".page-close")?.focus();
 }
 
 function volumeControl(id: "music" | "sfx", label: string, value: number, help: string): string {
@@ -836,10 +837,10 @@ function openPaytablePage(root: HTMLElement): void {
       <p class="paytable-footnote">Line values are shown with the game’s live tuning applied, so this guide always matches what the board awards.</p>
     </div>`;
   root.querySelector(".cc-root")?.appendChild(page);
-  const close = () => page.remove();
+  const releaseFocusPaytable = trapFocus(page);
+  const close = () => { releaseFocusPaytable(); page.remove(); };
   page.querySelector<HTMLButtonElement>(".page-close")?.addEventListener("click", close);
   page.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
-  page.querySelector<HTMLButtonElement>(".page-close")?.focus();
 }
 
 function paytableCard({ id, name }: { id: SymbolId; name: string }): string {
