@@ -122,6 +122,30 @@ const CSS_EXT  = new Set([".css"]);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+/**
+ * Decodes HTML character references in an attribute value so that encoded
+ * URLs such as `https&#58;//cdn.example.com/lib.js` are normalised to their
+ * browser-equivalent form before external-URL detection.
+ *
+ * Covers:
+ *   Named entities:   &amp; &lt; &gt; &quot; &apos;
+ *   Decimal refs:     &#NNN;   (e.g. &#58; → ':')
+ *   Hex refs:         &#xHH;   (e.g. &#x3A; → ':', case-insensitive)
+ *
+ * CSS does not use HTML entity encoding, so this function is applied only
+ * to HTML attribute values extracted by attrValue() and srcsetUrls().
+ */
+function decodeHtmlEntities(str) {
+  return str
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&apos;/gi, "'")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(parseInt(code, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)));
+}
+
 function isAllowed(url) {
   if (ALLOW_LIST.has(url)) return true;
   for (const [k] of ALLOW_LIST) {
@@ -178,7 +202,7 @@ function attrValue(tag, attrName) {
     "i",
   );
   const mq = quoted.exec(tag);
-  if (mq) return (mq[1] ?? mq[2]).trim();
+  if (mq) return decodeHtmlEntities((mq[1] ?? mq[2]).trim());
 
   // Unquoted: attr=value (stops at whitespace, >, or />)
   const unquoted = new RegExp(
@@ -186,16 +210,17 @@ function attrValue(tag, attrName) {
     "i",
   );
   const mu = unquoted.exec(tag);
-  return mu ? mu[1].trim() : null;
+  return mu ? decodeHtmlEntities(mu[1].trim()) : null;
 }
 
 // Parses a srcset attribute value and returns all candidate URLs.
 // srcset is a comma-separated list; each entry is "url [descriptor]".
+// Entity-decodes each candidate so encoded URLs are normalised before checking.
 function srcsetUrls(srcset) {
   if (!srcset) return [];
   return srcset
     .split(",")
-    .map((entry) => entry.trim().split(/\s+/)[0])
+    .map((entry) => decodeHtmlEntities(entry.trim().split(/\s+/)[0]))
     .filter(Boolean);
 }
 
@@ -702,6 +727,50 @@ function runSelfTest() {
         `<img alt='score > 0' src="https://cdn.example.com/photo.jpg">`
       );
       assert(v.length === 1, `> inside single-quoted attr must not break src parsing; got ${v.length}`);
+    });
+
+    // ── HTML entity decoding ───────────────────────────────────────────────
+    // Browsers decode character references before fetching URLs, so the guard
+    // must do the same.  Without decoding, `&#58;` (the colon in https:)
+    // would bypass the https?:// check and allow a CDN URL to ship silently.
+
+    check("decimal entity in <script src> is decoded and flagged (&#58; → ':')", () => {
+      const v = scan("index.html",
+        `<script src="https&#58;//cdn.example.com/lib.js"></script>`
+      );
+      assert(v.length === 1, `decimal entity must be decoded; got ${v.length}`);
+      assert(v[0].url === "https://cdn.example.com/lib.js", `decoded URL mismatch: ${v[0]?.url}`);
+    });
+
+    check("hex entity in <script src> is decoded and flagged (&#x3A; → ':')", () => {
+      const v = scan("index.html",
+        `<script src="https&#x3A;//cdn.example.com/lib.js"></script>`
+      );
+      assert(v.length === 1, `hex entity must be decoded; got ${v.length}`);
+    });
+
+    check("decimal entity in <img src> is decoded and flagged", () => {
+      const v = scan("index.html",
+        `<img src="https&#58;//cdn.example.com/photo.jpg" alt="">`
+      );
+      assert(v.length === 1, `decimal entity in img src must be decoded; got ${v.length}`);
+    });
+
+    check("hex entity in <link href> is decoded and flagged", () => {
+      const v = scan("index.html",
+        `<link rel="stylesheet" href="https&#x3A;//fonts.googleapis.com/css2?family=Inter">`
+      );
+      assert(v.length === 1, `hex entity in link href must be decoded; got ${v.length}`);
+    });
+
+    check("named entity &amp; in URL is decoded before checking", () => {
+      // Encode the colon in the GTM URL with &amp; (#58 = ':') to confirm the
+      // decoded URL matches the ALLOW_LIST entry and is not flagged.
+      // Decoded value: https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB
+      const v = scan("index.html",
+        `<script src="https&#58;//www.googletagmanager.com/gtag/js?id=G-89W66VMGPB"></script>`
+      );
+      assert(v.length === 0, `entity-encoded GTM URL must decode to the allow-listed value; got ${v.length}`);
     });
 
     // ── CSS ───────────────────────────────────────────────────────────────
