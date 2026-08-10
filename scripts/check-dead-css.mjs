@@ -95,9 +95,10 @@ function cssClassNames(css) {
     if (sel.trim().startsWith("@")) continue; // at-rule preludes
     // Remove attribute selectors and pseudo(-element/class) segments, then
     // pull class tokens.
-    const cleaned = sel.replace(/\[[^\]]*\]/g, "").replace(/::?[\w-]+(\([^)]*\))?/g, (m) =>
-      m.startsWith(".") ? m : "",
-    );
+    // Strip attribute selectors, then pseudo-class/element NAMES only —
+    // keeping the arguments of functional pseudos (:not, :is, :where, :has)
+    // so classes nested inside them are still extracted and checked.
+    const cleaned = sel.replace(/\[[^\]]*\]/g, "").replace(/::?[\w-]+/g, "");
     for (const m of cleaned.matchAll(/\.([A-Za-z_][\w-]*)/g)) names.add(m[1]);
   }
   return names;
@@ -126,11 +127,17 @@ function runCheck(root, allowlist) {
     }
   }
   const corpus = sources.map((f) => readFileSync(f, "utf8")).join("\n");
+  // Exact token matching: a class counts as used only when it appears as a
+  // whole token — not as a substring of a longer class-like word (cc-ghost
+  // must not be satisfied by cc-ghostly). CSS class characters are
+  // [A-Za-z0-9_-], so boundaries exclude exactly those.
+  const escapeRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const usedAsToken = (cls) => new RegExp(`(?<![\\w-])${escapeRe(cls)}(?![\\w-])`).test(corpus);
 
   let failed = false;
   const dead = [];
   for (const cls of [...classes].sort()) {
-    if (corpus.includes(cls)) continue;
+    if (usedAsToken(cls)) continue;
     if (allowlist.has(cls)) {
       console.log(`ALLOWED: .${cls} (${allowlist.get(cls)})`);
       continue;
@@ -145,7 +152,7 @@ function runCheck(root, allowlist) {
     if (!classes.has(cls)) {
       console.error(`STALE ALLOWLIST: .${cls} is allowlisted (${reason}) but no longer in style.css — remove the entry.`);
       failed = true;
-    } else if (corpus.includes(cls)) {
+    } else if (usedAsToken(cls)) {
       console.error(`STALE ALLOWLIST: .${cls} is allowlisted (${reason}) but now statically referenced — remove the entry.`);
       failed = true;
     }
@@ -199,6 +206,32 @@ function selfTest() {
       files: {
         "src/style.css": `.cc-btn:focus-visible { outline: none; }\n.cc-btn[data-state="on"]::after { content: ""; }\n`,
         "src/main.ts": 'const c = "cc-btn";\nconsole.log(c);\n',
+      },
+    },
+    {
+      name: "substring of a longer class name does not count as usage",
+      expectFail: true,
+      expectText: "DEAD SELECTOR: .cc-ghost",
+      files: {
+        "src/style.css": `.cc-ghost { color: gray; }\n.cc-ghostly { color: white; }\n`,
+        "src/main.ts": 'const html = `<div class="cc-ghostly"></div>`;\nconsole.log(html);\n',
+      },
+    },
+    {
+      name: "class nested in :not()/:is() is extracted and flagged when dead",
+      expectFail: true,
+      expectText: "DEAD SELECTOR: .cc-ghost",
+      files: {
+        "src/style.css": `.cc-live:not(.cc-ghost) { color: red; }\n.cc-extra:is(.cc-live) { color: blue; }\n`,
+        "src/main.ts": 'const html = `<div class="cc-live cc-extra"></div>`;\nconsole.log(html);\n',
+      },
+    },
+    {
+      name: "class nested in :not() passes when emitted",
+      expectFail: false,
+      files: {
+        "src/style.css": `.cc-live:not(.cc-ghost) { color: red; }\n`,
+        "src/main.ts": 'const html = `<div class="cc-live"></div><div class="cc-ghost"></div>`;\nconsole.log(html);\n',
       },
     },
     {
