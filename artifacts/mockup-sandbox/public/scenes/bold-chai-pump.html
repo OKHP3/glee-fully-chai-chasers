@@ -17,7 +17,7 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
     <header class="marquee">
       <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span><span class="marquee-bulb" style="--blink-delay:.35s"></span><span class="marquee-bulb" style="--blink-delay:.42s"></span><span class="marquee-bulb" style="--blink-delay:.49s"></span><span class="marquee-bulb" style="--blink-delay:.56s"></span><span class="marquee-bulb" style="--blink-delay:.63s"></span></div>
       <div class="marquee-row">
-        <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+        <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1><button class="chrome-btn" aria-label="Open symbol guide and game rules" title="Symbol guide"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/><path d="M5 4.5v15M9 8h6M9 12h6"/></svg></button><button class="chrome-btn" aria-label="More information"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="8.5" stroke-linecap="round" stroke-width="2.2"/><line x1="12" y1="11.5" x2="12" y2="17" stroke-linecap="round"/></svg></button><button class="chrome-btn" aria-label="Settings"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/></svg></button>
         <button class="chrome-btn" aria-label="Symbol guide"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/><path d="M5 4.5v15M9 8h6M9 12h6"/></svg></button>
       </div>
       <div class="marquee-status">BOLD CHAI! — Barista mode</div>
@@ -26,6 +26,7 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
       <div class="cabinet-shell-divider"></div>
       <main class="cabinet-frame">
         <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+        <div class="cabinet-msg cabinet-msg--top" aria-label="Player progress"><span class="cabinet-msg__sparks"><span style="color:#f5d576;font-weight:700">Lvl 4</span><span style="color:#7a6a9a">·</span><span style="color:#c9aeff">347 <span style="color:#7a6a9a;font-weight:400">/ 500 Sparks</span></span><span class="cabinet-msg__sparks-bar"><span class="cabinet-msg__sparks-fill" style="width:69.4%"></span></span></span><span style="color:#7a6a9a;font-weight:400;font-size:11px;letter-spacing:.06em;text-transform:uppercase">Free Spins · Bold Chai</span></div>
         <!-- Bold Chai Pump overlay — scoped inside cabinet-frame -->
         <div class="bonus-cabinet-overlay" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
           <div class="bold-chai-headline"><strong>BOLD CHAI!</strong><span>Barista mode · 12 pumps per strong chai</span></div>
@@ -60,6 +61,8 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
           <button class="bold-chai-pump-btn sparkle-btn" aria-label="Pump the chai press" style="font-size:20px;padding:12px 40px">PUMP!</button>
           <div class="bold-chai-spin-award">Completion awards <strong>8 free spins</strong></div>
         </div>
+      
+        <div class="cabinet-msg cabinet-msg--bottom" aria-live="polite"><span style="color:#8b7eb8">✦ Chai Pump wild — reel 3 charged</span></div>
       </main>
     </div>
     <div class="companion-row">
