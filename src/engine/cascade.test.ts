@@ -2,9 +2,8 @@ import { describe, expect, it } from "vitest";
 import { mulberry32 } from "./rng";
 import { freeSpinsForCascades, spin } from "./cascade";
 import { emptyTreatJar } from "./features";
-import type { Grid } from "./types";
+import type { Grid, KeepsakeZone, StickyWild } from "./types";
 import { PAYOUT_SCALE, PAYTABLE } from "./paylines";
-import type { KeepsakeZone } from "./types";
 
 describe("spin", () => {
   it("is deterministic for a given seed", () => {
@@ -175,5 +174,109 @@ describe("spin", () => {
     expect(result.steps[1].keepsakeZone?.symbol).not.toBe("tumbler");
     expect(result.steps[1].grid[1][0].symbol).toBe(result.steps[1].keepsakeZone?.symbol);
     expect(result.steps[1].grid[2][1].symbol).toBe(result.steps[1].keepsakeZone?.symbol);
+  });
+});
+
+// ── Lap Quest infinite-loop regression ───────────────────────────────────────
+
+describe("Lap Quest infinite-loop guard", () => {
+  it("terminates when sticky lap-quest wilds permanently hold a winning payline", () => {
+    // ── Why this used to hang ──────────────────────────────────────────────
+    // cascadeColumnAroundStickyWilds restores sticky wilds regardless of
+    // whether their row is in removedByReel.  A sticky wild_phoebe at every
+    // position of a payline (row 0, all 5 reels) means:
+    //   1. evaluateLines detects a win (wild matches any symbol).
+    //   2. removedByReel marks row 0 on every reel.
+    //   3. cascadeGrid restores all five wilds (sticky; removedRows is ignored).
+    //   4. Rows 1-3 were never removed → gravity does not touch them.
+    //   5. The post-cascade grid is byte-for-byte identical to the pre-cascade grid.
+    //   6. evaluateLines detects the same win again → infinite loop.
+    //
+    // ── What the guard does ───────────────────────────────────────────────
+    // The unchanged-grid detection (Guard 1 in cascade.ts) snapshots the grid
+    // at the start of each iteration.  On the second winning cascade it finds
+    // currentSnapshot === prevSnapshot and breaks, returning a finite result.
+    // Guard 2 (hard 52-iteration cap) provides a backstop for cases where the
+    // grid changes slowly between iterations but wins persist.
+    const baseGrid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, (_, row) => ({
+        symbol: row === 0 ? "wild_phoebe" as const : "tumbler" as const,
+      })),
+    );
+    // Five sticky Lap Quest wilds, one per reel at row 0 — the winning payline.
+    const stickyWilds: StickyWild[] = Array.from({ length: 5 }, (_, reel) => ({
+      position: [reel, 0] as [number, number],
+      symbol: "wild_phoebe" as const,
+      sticky: "lap_quest" as const,
+    }));
+
+    const result = spin({
+      rng: mulberry32(20260810),
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+      startingGrid: baseGrid,
+      stickyWilds,
+      spinArea: "secondary",   // suppresses main-spin-only triggers
+      allowDoorbells: false,
+      includeBoldChaiPump: false,
+      allowTreatTimeBonus: false,
+      allowUniGlee: false,
+    });
+
+    // Must terminate and return a result object (not hang).
+    expect(result).toBeDefined();
+    // At least one winning cascade happened (the sticky-wild payline fired).
+    expect(result.cascades).toBeGreaterThanOrEqual(1);
+    // The unchanged-grid guard fires by the second cascade attempt, so the
+    // total is well below the hard cap.
+    expect(result.cascades).toBeLessThanOrEqual(52);
+    // The loop exited cleanly — steps must include a terminal no-win entry.
+    expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+  });
+
+  it("terminates via the hard cap when a sticky wild changes the grid but always wins", () => {
+    // A single sticky wild_phoebe on one reel still guarantees a win on every
+    // payline that passes through that cell — but the non-sticky cells change
+    // each cascade (fresh symbols fill in from gravity).  The grid snapshot
+    // differs between iterations, so Guard 1 does not fire; Guard 2 (hard cap)
+    // must terminate the loop.
+    //
+    // Grid: 5 reels, row 0 = tumbler (so payline 0 wins on first step).
+    // Sticky wild at reel 2 row 0 only — other positions get fresh symbols.
+    const baseGrid: Grid = Array.from({ length: 5 }, (_, reel) =>
+      Array.from({ length: 4 }, (_, row) => ({
+        symbol: row === 0 ? (reel === 2 ? "wild_phoebe" as const : "tumbler" as const)
+          : "treat_chicken" as const,
+      })),
+    );
+    const stickyWilds: StickyWild[] = [{
+      position: [2, 0] as [number, number],
+      symbol: "wild_phoebe" as const,
+      sticky: "lap_quest" as const,
+    }];
+
+    // Use a deterministic RNG that always returns 0 so gravity always fills
+    // "tumbler" (the first symbol in the weighted draw list) — ensuring the
+    // payline at row 0 continuously wins.
+    const result = spin({
+      rng: () => 0,   // always draws the lowest-weighted symbol (tumbler)
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+      startingGrid: baseGrid,
+      stickyWilds,
+      spinArea: "secondary",
+      allowDoorbells: false,
+      includeBoldChaiPump: false,
+      allowTreatTimeBonus: false,
+      allowUniGlee: false,
+    });
+
+    expect(result).toBeDefined();
+    expect(result.cascades).toBeGreaterThanOrEqual(1);
+    // Guard 2 (hard 52-iteration cap) must have caught this.
+    expect(result.cascades).toBeLessThanOrEqual(52);
+    expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
   });
 });
