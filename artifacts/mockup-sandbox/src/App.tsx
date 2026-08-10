@@ -8,19 +8,33 @@ type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 
 // ── React component preview (existing /preview/... path) ──────────────────────
 
+/** Returns v if it is a function, otherwise undefined. */
+function _isFn(v: unknown): v is ComponentType {
+  return typeof v === "function";
+}
+
 function _resolveComponent(
   mod: Record<string, unknown>,
   name: string,
 ): ComponentType | undefined {
-  const fns = Object.values(mod).filter(
-    (v) => typeof v === "function",
-  ) as ComponentType[];
-  return (
-    (mod.default as ComponentType) ||
-    (mod.Preview as ComponentType) ||
-    (mod[name] as ComponentType) ||
-    fns[fns.length - 1]
-  );
+  const fns = Object.values(mod).filter(_isFn);
+  // Each prioritised candidate is checked with typeof before being accepted.
+  // A truthy default export that is a plain object, string, or number is NOT a
+  // component and must not be returned — doing so causes a silent blank/crash.
+  const resolved =
+    (_isFn(mod.default)  ? mod.default  : undefined) ||
+    (_isFn(mod.Preview)  ? mod.Preview  : undefined) ||
+    (_isFn(mod[name])    ? mod[name]    : undefined) ||
+    fns[fns.length - 1];
+  if (!resolved) {
+    console.warn(
+      `[mockup-sandbox] _resolveComponent: no React component found for "${name}". ` +
+      `The file must export at least one function component (named export "${name}", ` +
+      `"default", or "Preview"). Check that the file does not use a default-export ` +
+      `non-component (e.g. a plain object or string).`,
+    );
+  }
+  return resolved;
 }
 
 function PreviewRenderer({

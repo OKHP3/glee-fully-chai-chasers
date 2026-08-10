@@ -1991,7 +1991,7 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
     // Rotate the selected sub-zone's center beneath the fixed pointer.
     const parentCenter = ({ multiplying: 60, keepsake_memory: 180, chai_back: 300 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 60;
     const subzoneCenter = parentCenter + (landing.subzone - 1) * 40;
-    const finalDeg = 1080 + ((360 - subzoneCentre) % 360);
+    const finalDeg = 1080 + ((360 - subzoneCenter) % 360);
 
     const overlay = document.createElement("div");
     overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";

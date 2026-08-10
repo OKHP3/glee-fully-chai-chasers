@@ -3,7 +3,36 @@
  * Compact visual spec: color tokens, typography, components, character guide.
  * Canvas design artifact — do not apply to any codebase.
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { modules as discoveredModules } from "../../../.generated/mockup-components";
+
+/**
+ * The design-system folder prefix used to filter the auto-generated module map.
+ * Any .tsx file placed under components/mockups/design-system/ is automatically
+ * included in the mount-time self-check — no manual list maintenance required.
+ */
+const DS_PATH_PREFIX = "./components/mockups/design-system/";
+
+/**
+ * Mirror of the resolver used by PreviewRenderer / _resolveComponent in App.tsx.
+ * Returns the resolved component or undefined when none can be found.
+ */
+function resolveFromMod(
+  mod: Record<string, unknown>,
+  name: string,
+): ((...args: unknown[]) => unknown) | undefined {
+  const isFn = (v: unknown): v is (...args: unknown[]) => unknown =>
+    typeof v === "function";
+  const fns = Object.values(mod).filter(isFn);
+  // Check each candidate explicitly for function-ness before accepting it —
+  // a truthy default export that is a plain object or string is NOT a component.
+  return (
+    (isFn(mod.default)   ? mod.default   : undefined) ||
+    (isFn(mod.Preview)   ? mod.Preview   : undefined) ||
+    (isFn(mod[name])     ? mod[name]     : undefined) ||
+    fns[fns.length - 1]
+  );
+}
 
 const KF = `
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Baloo+2:wght@500&display=swap');
@@ -87,9 +116,76 @@ function TypeRow({name,family,weight,size,use}:{name:string;family:string;weight
 export function SystemShowcase(){
   useEffect(()=>{document.body.style.cssText="margin:0;padding:0;overflow:hidden;background:#06081a";},[]);
 
+  // ── Self-check: verify all expected design-system paths are discoverable ──
+  const [dsWarnings, setDsWarnings] = useState<string[]>([]);
+
+  useEffect(()=>{
+    async function checkComponents(){
+      const issues: string[] = [];
+
+      // Dynamically collect every design-system path from the generated module map.
+      // No manual list — any file added to components/mockups/design-system/ is
+      // automatically validated here without requiring a code change in this file.
+      const dsPaths = Object.keys(discoveredModules).filter(
+        (k) => k.startsWith(DS_PATH_PREFIX),
+      );
+
+      for (const path of dsPaths) {
+        const loader = discoveredModules[path];
+        // Shouldn't happen (we just got the key from the map), but guard anyway.
+        if (!loader) {
+          const msg = `Missing loader for "${path}" — regenerate mockup-components.ts`;
+          console.warn(`[SystemShowcase] ${msg}`);
+          issues.push(msg);
+          continue;
+        }
+        try {
+          const mod = await loader();
+          const name = path.split("/").pop()!.replace(/\.tsx$/, "");
+          const resolved = resolveFromMod(mod, name);
+          if (!resolved) {
+            const msg = `No exported component found in "${path}" — the file must export a named component matching the filename, "default", or "Preview"`;
+            console.warn(`[SystemShowcase] ${msg}`);
+            issues.push(msg);
+          }
+        } catch(e) {
+          const msg = `Failed to load "${path}": ${e instanceof Error ? e.message : String(e)}`;
+          console.warn(`[SystemShowcase] ${msg}`);
+          issues.push(msg);
+        }
+      }
+
+      setDsWarnings(issues);
+    }
+
+    void checkComponents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return(
     <div style={{width:1440,height:900,overflow:"hidden",fontFamily:"system-ui,sans-serif",background:C.void,color:C.cream,display:"flex",flexDirection:"column"}}>
       <style>{KF}</style>
+
+      {/* ── DEV-TIME WARNINGS: missing / unresolvable design-system components ── */}
+      {dsWarnings.length > 0 && (
+        <div role="alert" style={{
+          background:"rgba(244,63,94,.15)",
+          border:"1px solid rgba(244,63,94,.5)",
+          borderRadius:0,
+          padding:"8px 20px",
+          flexShrink:0,
+          display:"flex",
+          flexDirection:"column",
+          gap:4,
+        }}>
+          <div style={{fontSize:11,fontWeight:700,color:"#fb7185",letterSpacing:"0.08em",textTransform:"uppercase"}}>
+            ⚠ Design-system component check failed ({dsWarnings.length} issue{dsWarnings.length!==1?"s":""})
+          </div>
+          {dsWarnings.map((w,i)=>(
+            <div key={i} style={{fontSize:10,color:"#fda4af",fontFamily:"'Fira Code',monospace,system-ui"}}>{w}</div>
+          ))}
+        </div>
+      )}
 
       {/* ── BRAND HEADER ── */}
       <header style={{height:64,display:"flex",alignItems:"center",padding:"0 32px",background:`linear-gradient(180deg,${C.night} 0%,rgba(7,13,32,.92) 100%)`,borderBottom:`1px solid ${C.border}`,gap:16,flexShrink:0}}>
