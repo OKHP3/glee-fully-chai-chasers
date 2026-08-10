@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=1280">
 <title>Level-Up Overlay — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>
+html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
+.cc-root{width:1280px;height:900px;padding:0!important}
+/* Prevent the min-width:900px grid breakpoint from firing — keep single-column flex */
+.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;display:flex!important;flex-direction:column!important;border-radius:0!important;margin:0!important}
+</style>
 </head>
 <body>
 <div class="cc-root">
@@ -16,7 +21,6 @@
       <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
       <div class="marquee-status">LEVEL 5!</div>
     </header>
-    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span></div></div></div>
     <main class="cabinet-frame">
       <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
       <div id="reel-grid" class="reel-grid" style="opacity:0.3">
@@ -59,7 +63,18 @@
         </div>
       </div>
     </main>
-    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:80%"></div></div></div>
+    <div class="companion-row">
+      <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
+        <span class="treat-jar-title">Treat Jar</span>
+        <div class="treat-chips-row">
+          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span>
+        </div>
+      </div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">5 / 6</strong></div>
+      </div>
+    </div>
     <div class="hud-row"><span class="level-chip">Level 5</span><div class="status-line">LEVEL 5! · +500 coins · Tap to continue</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
   </div>
 </div>
