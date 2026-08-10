@@ -18,6 +18,26 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
+args = "artifacts/chai-chasers: web"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/chai-chasers-video: web"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/chai-chasers-slides: web"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/api-server: API Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/mockup-sandbox: Component Preview Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
 args = "video-typecheck"
 
 [[workflows.workflow]]
