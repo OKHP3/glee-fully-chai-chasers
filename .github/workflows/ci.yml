@@ -27,8 +27,10 @@ jobs:
       - run: npm ci --no-audit --no-fund
 
       - name: Check mockup component exports — catch missing scene files before merge
-        working-directory: artifacts/mockup-sandbox
-        run: npm install --no-audit --no-fund && npm run check-exports
+        run: |
+          npm install -g pnpm@10.26.1
+          pnpm install --filter @workspace/mockup-sandbox --frozen-lockfile
+          pnpm --filter @workspace/mockup-sandbox run check-exports
 
       - run: npm test
       - run: npm run validate:assets
