@@ -66,30 +66,29 @@ jobs:
       - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
         run: npm run validate:cabinet-strips
 
-      - name: Confirm no Google Fonts CDN links in shipped artifacts — keep offline-demo resilience
+      - name: Catch any third-party CDN URL in shipped code — keep offline-demo resilience and privacy boundary
         run: |
-          # CDN font links (fonts.googleapis.com / fonts.gstatic.com) are forbidden in
-          # anything that ships: they silently break the offline demo, add a
-          # third-party request the analytics/privacy policy does not allow, and
-          # undo the self-hosted @font-face work in each artifact's public/fonts/.
-          # Fonts must be self-hosted woff2 files loaded via @font-face.
+          # scripts/check-cdn-urls.mjs scans every shipped HTML file and stylesheet
+          # for URLs that the browser would fetch at runtime:
+          #   HTML: <script src="…"> / <link rel="stylesheet|preconnect|preload|…" href="…">
+          #   CSS:  @import "…" / url("…") in any property (fonts, backgrounds, …)
           #
-          # Scope: every deployable input — root game (index.html, src/, public/)
-          # and every artifact's index.html, src/, and public/, with no exclusions.
-          # The mockup sandbox is covered too: its public/scenes/ HTML is copied
-          # into the game's shipped dist/scenes/ at build time, and the sandbox
-          # itself is a registered artifact. Case-insensitive so an odd-cased
-          # host cannot slip through.
-          matches=$(grep -rniE "fonts\.googleapis\.com|fonts\.gstatic\.com" \
-            index.html src/ public/ \
-            artifacts/*/index.html artifacts/*/src/ artifacts/*/public/ \
-            --include='*' 2>/dev/null || true)
-          if [ -n "$matches" ]; then
-            echo "::error::Google Fonts CDN reference found in shipped code. Self-host the font in public/fonts/ with @font-face instead:"
-            echo "$matches"
-            exit 1
-          fi
-          echo "No Google Fonts CDN references in shipped artifacts."
+          # Meta/OG/Twitter content="…" attributes and JSON-LD are intentionally
+          # excluded — they are document metadata, not runtime fetches.
+          #
+          # Any external URL not in the script's ALLOW_LIST fails CI.  The only
+          # permitted entry is the single Google Analytics tag (measurement ID
+          # G-89W66VMGPB) approved under Decision S25 in docs/ANALYTICS-PRIVACY.md.
+          # No additional tag, CDN library, icon set, or font host may be added
+          # without (1) a docs/ANALYTICS-PRIVACY.md update and (2) an ALLOW_LIST entry
+          # with a justification comment in scripts/check-cdn-urls.mjs.
+          #
+          # Google Fonts CDN links (fonts.googleapis.com / fonts.gstatic.com) are
+          # caught here along with every other external host — fonts must be
+          # self-hosted woff2 files loaded via @font-face in each artifact's
+          # public/fonts/.
+          node scripts/check-cdn-urls.mjs --self-test
+          node scripts/check-cdn-urls.mjs
       - name: Build — catch TypeScript and bundler errors before merge
         run: npm run build
 
