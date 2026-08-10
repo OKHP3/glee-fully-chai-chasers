@@ -91,7 +91,7 @@ export function Desktop(){
         <div style={{position:"absolute",top:28,left:28,zIndex:5}}>
           <div style={{fontSize:9.5,fontWeight:700,letterSpacing:"0.22em",color:"rgba(94,212,196,.65)",textTransform:"uppercase",marginBottom:6}}>Glee-fully Presents</div>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div style={{width:28,height:28,borderRadius:7,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>☕</div>
+            <div style={{width:28,height:28,borderRadius:7,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>🥤</div>
             <span style={{fontFamily:"'Baloo 2',system-ui,sans-serif",fontSize:15,fontWeight:800,color:C.cream,letterSpacing:"-.02em"}}>Chai Chasers</span>
           </div>
         </div>
