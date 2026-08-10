@@ -189,11 +189,11 @@ const PAYTABLE_SYMBOLS: ReadonlyArray<{ id: SymbolId; name: string }> = [
  * file renders typed state and forwards card indexes, but never compares
  * symbols, counts strikes, or awards spins.
  */
-export type KeepsakeMemoryViewCard = KeepsakeMemoryCard;
-export type KeepsakeMemoryViewState = KeepsakeMemoryState;
-export type KeepsakeMemoryViewActionResult = KeepsakeMemoryActionResult;
+type KeepsakeMemoryViewCard = KeepsakeMemoryCard;
+type KeepsakeMemoryViewState = KeepsakeMemoryState;
+type KeepsakeMemoryViewActionResult = KeepsakeMemoryActionResult;
 
-export interface KeepsakeMemoryController {
+interface KeepsakeMemoryController {
   state: KeepsakeMemoryViewState;
   begin(): KeepsakeMemoryViewState;
   pick(index: number): KeepsakeMemoryViewActionResult;
@@ -1194,7 +1194,7 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
  * Engine ownership stays explicit: this adapter forwards indexes and renders
  * only the returned state/event payloads.
  */
-export function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMemoryController): Promise<number> {
+function runKeepsakeMemoryBonus(root: HTMLElement, controller: KeepsakeMemoryController): Promise<number> {
   return new Promise((resolve) => {
     const cabinet = root.querySelector<HTMLElement>(".cabinet-frame");
     const reelGrid = root.querySelector<HTMLElement>("#reel-grid");
@@ -1767,7 +1767,7 @@ function showUniGleeSummary(
 }
 
 /** Reusable UniGlee chapter hook; the marathon session owns when to call it. */
-export interface LapQuestChapterSummary {
+interface LapQuestChapterSummary {
   lastRound: LapQuestRoundResult;
   totalWin: number;
   totalSpins: number;
@@ -2264,7 +2264,7 @@ async function playFreeSpinSession(
  * controller supplies the typed session; this layer only owns timing, art,
  * audio, and accessibility announcements.
  */
-export async function playJoeyLaundryChapter(
+async function playJoeyLaundryChapter(
   root: HTMLElement,
   session: JoeyLaundrySessionResult,
 ): Promise<void> {
