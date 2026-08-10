@@ -283,7 +283,16 @@ function decodeHtmlEntities(s: string): string {
     .replace(/&#39;/g, "'");
 }
 
+// Allow-list for SCENE_LABELS entries whose HTML file is intentionally
+// absent (planned scenes not yet authored). Add the filename and a brief
+// reason; remove the entry once the file is created.
+// Example:  "planned-scene.html": "Planned for Q3 — file not yet authored",
+const MISSING_FILE_ALLOWLIST: Record<string, string> = {
+  // (currently empty — all mapped scenes exist on disk)
+};
+
 const labelDriftFailures: string[] = [];
+const labelDriftMissingFile: string[] = [];
 let labelDriftPassed = 0;
 let labelDriftSkipped = 0;
 
@@ -293,8 +302,20 @@ for (const [filename, mapLabel] of Object.entries(parsedLabels)) {
   try {
     html = readFileSync(htmlPath, "utf8");
   } catch {
-    // Scene file doesn't exist yet — skip rather than fail.
-    labelDriftSkipped++;
+    if (MISSING_FILE_ALLOWLIST[filename]) {
+      // Explicitly planned stub — skip without penalising.
+      labelDriftSkipped++;
+      continue;
+    }
+    // HTML file is absent but not allowlisted — this is a mapping error.
+    labelDriftMissingFile.push(filename);
+    console.error(
+      `  ✗  ${filename}\n` +
+        `     → SCENE_LABELS maps "${mapLabel}" but ${filename} does not exist in public/scenes/.\n` +
+        `       Either create the scene file or remove this entry from SCENE_LABELS in src/App.tsx.\n` +
+        `       If the scene is planned but not yet authored, add it to MISSING_FILE_ALLOWLIST in\n` +
+        `       artifacts/mockup-sandbox/scripts/check-exports.ts with a brief reason.`,
+    );
     continue;
   }
   const titleMatch = html.match(/<title>([^<]+)<\/title>/);
@@ -324,22 +345,32 @@ for (const [filename, mapLabel] of Object.entries(parsedLabels)) {
 
 console.log(); // blank line before summary
 
-if (labelDriftFailures.length > 0) {
+const labelDriftTotalFailures = labelDriftFailures.length + labelDriftMissingFile.length;
+if (labelDriftTotalFailures > 0) {
   console.error(
-    `❌  Scene-label drift check FAILED — ${labelDriftFailures.length} scene(s) have a stale SCENE_LABELS entry:\n`,
+    `❌  Scene-label drift check FAILED — ${labelDriftTotalFailures} problem(s) found:\n`,
   );
-  for (const f of labelDriftFailures) {
-    console.error(`     ${f}`);
+  if (labelDriftMissingFile.length > 0) {
+    console.error(`  Missing HTML files (${labelDriftMissingFile.length}):`);
+    for (const f of labelDriftMissingFile) {
+      console.error(`     ${f}`);
+    }
   }
-  console.error(
-    `\nUpdate SCENE_LABELS in src/App.tsx to match each scene's <title> tag\n` +
-    `(strip " — Chai Chasers Design Review"). Fix before pushing.`,
-  );
+  if (labelDriftFailures.length > 0) {
+    console.error(`  Stale labels (${labelDriftFailures.length}):`);
+    for (const f of labelDriftFailures) {
+      console.error(`     ${f}`);
+    }
+    console.error(
+      `\nUpdate SCENE_LABELS in src/App.tsx to match each scene's <title> tag\n` +
+      `(strip " — Chai Chasers Design Review"). Fix before pushing.`,
+    );
+  }
 } else {
   console.log(
     `✅  Scene-label drift check passed — all ${labelDriftPassed} mapped scene(s) have a matching title` +
       (labelDriftSkipped > 0
-        ? ` (${labelDriftSkipped} scene(s) skipped — missing file or no <title>).`
+        ? ` (${labelDriftSkipped} scene(s) skipped — allowlisted stub or no <title>).`
         : "."),
   );
 }
@@ -350,7 +381,8 @@ const totalFailures =
   exportFailures.length +
   coverageFailures.length +
   iceNotesFailures.length +
-  labelDriftFailures.length;
+  labelDriftFailures.length +
+  labelDriftMissingFile.length;
 if (totalFailures > 0) {
   process.exit(1);
 }
