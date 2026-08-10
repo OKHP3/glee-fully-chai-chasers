@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=1280">
 <title>Base Game — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>
+html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
+/* Let the 900px+ CSS grid apply naturally — centre the 868px shell in the 1280px scene */
+.cc-root{width:1280px;height:900px;display:flex;justify-content:center;align-items:flex-start}
+</style>
 </head>
 <body>
 <div class="cc-root">
@@ -22,7 +26,45 @@
       </div>
       <div class="marquee-status" aria-live="polite">Press SPARKLE to chase</div>
     </header>
-    <div class="sidebar-left">
+    <div class="cabinet-shell">
+      <div class="cabinet-shell-divider"></div>
+      <main class="cabinet-frame">
+        <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+        <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
+          <div class="reel-col" data-reel="0">
+            <div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%" aria-hidden="true"></span></div>
+          </div>
+          <div class="reel-col" data-reel="1">
+            <div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%" aria-hidden="true"></span></div>
+          </div>
+          <div class="reel-col" data-reel="2">
+            <div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%" aria-hidden="true"></span></div>
+          </div>
+          <div class="reel-col" data-reel="3">
+            <div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%" aria-hidden="true"></span></div>
+          </div>
+          <div class="reel-col" data-reel="4">
+            <div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%" aria-hidden="true"></span></div>
+            <div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%" aria-hidden="true"></span></div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div class="companion-row">
       <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
         <span class="treat-jar-title">Treat Jar</span>
         <div class="treat-chips-row">
@@ -31,71 +73,35 @@
           <span title="Bougie Bites" class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%" aria-hidden="true"></span></span>1</span>
         </div>
       </div>
-    </div>
-    <main class="cabinet-frame">
-      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
-      <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board">
-        <div class="reel-col" data-reel="0">
-          <div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%" aria-hidden="true"></span></div>
-        </div>
-        <div class="reel-col" data-reel="1">
-          <div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%" aria-hidden="true"></span></div>
-        </div>
-        <div class="reel-col" data-reel="2">
-          <div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%" aria-hidden="true"></span></div>
-        </div>
-        <div class="reel-col" data-reel="3">
-          <div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%" aria-hidden="true"></span></div>
-        </div>
-        <div class="reel-col" data-reel="4">
-          <div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%" aria-hidden="true"></span></div>
-          <div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%" aria-hidden="true"></span></div>
-        </div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">2 / 6</strong></div>
       </div>
-    </main>
-    <div class="sidebar-right">
-      <div class="firefly-cascade-meter" aria-label="Firefly Cascade meter"><div class="cascade-meter-fill" style="height:35%"></div></div>
     </div>
-    <div class="hud-row">
+    <div id="status-line" class="status-line" aria-live="polite">Ready to chase · Balance: 12,480</div>
+    <footer class="bet-console">
       <span class="level-chip">Level 4</span>
-      <div class="status-line" aria-live="polite">Ready to chase · Balance: 12,480</div>
       <div class="coin-balance">12,480</div>
-      <div class="bet-console">
-        <button class="bet-adj-btn" aria-label="Decrease bet">−</button>
-        <button id="sparkle-btn" class="sparkle-btn">SPARKLE</button>
-        <button class="bet-adj-btn" aria-label="Increase bet">+</button>
+      <button class="bet-adj-btn" aria-label="Decrease bet">−</button>
+      <button id="sparkle-btn" class="sparkle-btn">SPARKLE</button>
+      <button class="bet-adj-btn" aria-label="Increase bet">+</button>
+    </footer>
+    <aside id="ice-notes-card" class="ice-notes-card" aria-label="Chai ingredient note">
+      <p class="ice-notes-eyebrow">ICE NOTES</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cardamom</span> <span class="ice-notes-text">Chai's signature warming spice — opens the nose, lingers on the finish.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Floral, citrusy, warmly spiced</dd></div>
+          <div><dt>Chai role</dt><dd>Cornerstone spice</dd></div>
+          <div><dt>Source</dt><dd>Guatemala &amp; India</dd></div>
+          <div><dt>Gathering</dt><dd>Hand-picked, twice a year</dd></div>
+        </dl>
       </div>
-    </div>
+    </aside>
   </div>
-  <aside id="ice-notes-card" class="ice-notes-card" aria-label="Chai ingredient note">
-    <p class="ice-notes-eyebrow">ICE NOTES</p>
-    <div class="ice-notes-body">
-      <div class="ice-notes-header">
-        <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
-        <span class="ice-notes-name-group"><span class="ice-notes-name">Cardamom</span> <span class="ice-notes-text">Chai's signature warming spice — opens the nose, lingers on the finish.</span></span>
-      </div>
-      <dl class="ice-notes-profile">
-        <div><dt>Flavor</dt><dd>Floral, citrusy, warmly spiced</dd></div>
-        <div><dt>Chai role</dt><dd>Cornerstone spice</dd></div>
-        <div><dt>Source</dt><dd>Guatemala &amp; India</dd></div>
-        <div><dt>Gathering</dt><dd>Hand-picked, twice a year</dd></div>
-      </dl>
-    </div>
-  </aside>
 </div>
 </body>
 </html>
