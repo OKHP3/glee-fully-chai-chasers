@@ -166,21 +166,37 @@ function walk(dir, exts, out = []) {
 // Handles double-quoted, single-quoted, and unquoted attribute values.
 
 function attrValue(tag, attrName) {
+  // Use (?<![:\w]) instead of \b so that a namespace-prefixed attribute like
+  // xlink:href is NOT matched when looking for plain href.  The character
+  // before a plain attribute name is always whitespace or the opening <,
+  // neither of which is in [:\w].  A colon IS in [:\w], so xlink:href is
+  // excluded when attrName === "href" — preventing double-counting when
+  // both href and xlink:href are checked on the same element.
   // Quoted: attr="value" or attr='value'
   const quoted = new RegExp(
-    `\\b${attrName}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`,
+    `(?<![:\\w])${attrName}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`,
     "i",
   );
   const mq = quoted.exec(tag);
   if (mq) return (mq[1] ?? mq[2]).trim();
 
-  // Unquoted: attr=value (stops at whitespace, >, or />) 
+  // Unquoted: attr=value (stops at whitespace, >, or />)
   const unquoted = new RegExp(
-    `\\b${attrName}\\s*=\\s*([^"'\\s>]+)`,
+    `(?<![:\\w])${attrName}\\s*=\\s*([^"'\\s>]+)`,
     "i",
   );
   const mu = unquoted.exec(tag);
   return mu ? mu[1].trim() : null;
+}
+
+// Parses a srcset attribute value and returns all candidate URLs.
+// srcset is a comma-separated list; each entry is "url [descriptor]".
+function srcsetUrls(srcset) {
+  if (!srcset) return [];
+  return srcset
+    .split(",")
+    .map((entry) => entry.trim().split(/\s+/)[0])
+    .filter(Boolean);
 }
 
 // Returns the space-separated rel token set for a <link> tag (lower-cased).
@@ -203,8 +219,11 @@ function linkIsFetchable(tag) {
 // ── Tag-level scanner ────────────────────────────────────────────────────────
 //
 // Matches any opening or void HTML tag; strips comments first.
+// The attribute section uses (?:[^>"']|"[^"]*"|'[^']*')* so that a literal
+// > inside a quoted attribute value (e.g. alt="a > b") does not prematurely
+// end the tag match and cause subsequent attributes to be missed.
 const COMMENT_RE = /<!--[\s\S]*?-->/g;
-const TAG_RE     = /<([a-z][a-z0-9-]*)(\s[^>]*)?\s*\/?>/gi;
+const TAG_RE     = /<([a-z][a-z0-9-]*)(\s(?:[^>"']|"[^"]*"|'[^']*')*)?\s*\/?>/gi;
 
 function extractHtmlUrls(src) {
   // Strip HTML comments — a URL inside <!-- … --> is not fetched.
@@ -225,13 +244,25 @@ function extractHtmlUrls(src) {
     const srcVal = attrValue(tag, "src");
     if (srcVal && isExternalUrl(srcVal)) hits.push(srcVal);
 
+    // ── srcset attribute on <img> and <source> ───────────────────────────
+    // srcset is a comma-separated list of "url [descriptor]" entries;
+    // any external URL in the list triggers a browser fetch.
+    if (tagName === "img" || tagName === "source") {
+      const srcset = attrValue(tag, "srcset");
+      if (srcset) {
+        for (const u of srcsetUrls(srcset)) {
+          if (isExternalUrl(u)) hits.push(u);
+        }
+      }
+    }
+
     // ── href attribute on <link> ─────────────────────────────────────────
     if (tagName === "link") {
       const hrefVal = attrValue(tag, "href");
       if (hrefVal && isExternalUrl(hrefVal) && linkIsFetchable(tag)) {
         hits.push(hrefVal);
       }
-      continue; // href on <link> handled; skip generic href check below
+      continue; // href on <link> handled; skip remaining checks
     }
 
     // ── data attribute on <object> ───────────────────────────────────────
@@ -244,6 +275,18 @@ function extractHtmlUrls(src) {
     if (tagName === "video") {
       const posterVal = attrValue(tag, "poster");
       if (posterVal && isExternalUrl(posterVal)) hits.push(posterVal);
+    }
+
+    // ── SVG resource elements: <image> and <use> ─────────────────────────
+    // SVG <image href> and <use href> cause the browser to fetch the
+    // referenced resource (bitmap or external SVG document respectively).
+    // Both the modern href and the legacy xlink:href form are checked.
+    if (tagName === "image" || tagName === "use") {
+      const hrefVal = attrValue(tag, "href");
+      if (hrefVal && isExternalUrl(hrefVal)) hits.push(hrefVal);
+      // xlink:href — namespace-prefixed legacy form still used in inline SVG
+      const xlinkHref = attrValue(tag, "xlink:href");
+      if (xlinkHref && isExternalUrl(xlinkHref)) hits.push(xlinkHref);
     }
   }
 
@@ -588,6 +631,77 @@ function runSelfTest() {
         `<!-- See https://fonts.googleapis.com/css2?family=Inter for reference -->`
       );
       assert(v.length === 0, `HTML comments should not be flagged`);
+    });
+
+    // ── srcset ─────────────────────────────────────────────────────────────
+
+    check("external <img srcset> URLs are flagged (both descriptors)", () => {
+      const v = scan("index.html",
+        `<img src="/local.jpg" srcset="https://cdn.example.com/img@1x.png 1x, https://cdn.example.com/img@2x.png 2x" alt="">`
+      );
+      assert(v.length === 2, `expected 2 violations (both srcset URLs), got ${v.length}`);
+    });
+
+    check("external <source srcset> inside <picture> is flagged", () => {
+      const v = scan("index.html", `
+        <picture>
+          <source srcset="https://cdn.example.com/img.webp" type="image/webp">
+        </picture>
+      `);
+      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+    });
+
+    check("local-only <img srcset> is NOT flagged", () => {
+      const v = scan("index.html",
+        `<img srcset="/img/photo@1x.png 1x, /img/photo@2x.png 2x" alt="">`
+      );
+      assert(v.length === 0, `local srcset should not be flagged`);
+    });
+
+    // ── SVG resource references ────────────────────────────────────────────
+
+    check("SVG <image href> pointing to external bitmap is flagged", () => {
+      const v = scan("index.html",
+        `<svg><image href="https://cdn.example.com/photo.jpg" width="100" height="100"></image></svg>`
+      );
+      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+    });
+
+    check("SVG <image xlink:href> (legacy) pointing to external bitmap is flagged", () => {
+      const v = scan("index.html",
+        `<svg xmlns:xlink="http://www.w3.org/1999/xlink"><image xlink:href="https://cdn.example.com/photo.jpg"></image></svg>`
+      );
+      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+    });
+
+    check("SVG <use href> referencing an external SVG document is flagged", () => {
+      const v = scan("index.html",
+        `<svg><use href="https://cdn.example.com/sprite.svg#icon"></use></svg>`
+      );
+      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+    });
+
+    check("SVG <use href> with a same-origin fragment reference is NOT flagged", () => {
+      const v = scan("index.html",
+        `<svg><use href="/assets/sprite.svg#icon"></use></svg>`
+      );
+      assert(v.length === 0, `same-origin SVG use should not be flagged`);
+    });
+
+    // ── > inside quoted attribute value ────────────────────────────────────
+
+    check("'>' inside a quoted alt attribute does not break src extraction", () => {
+      const v = scan("index.html",
+        `<img alt="score > 0" src="https://cdn.example.com/photo.jpg">`
+      );
+      assert(v.length === 1, `> inside double-quoted attr must not break src parsing; got ${v.length}`);
+    });
+
+    check("'>' inside a single-quoted attribute does not break src extraction", () => {
+      const v = scan("index.html",
+        `<img alt='score > 0' src="https://cdn.example.com/photo.jpg">`
+      );
+      assert(v.length === 1, `> inside single-quoted attr must not break src parsing; got ${v.length}`);
     });
 
     // ── CSS ───────────────────────────────────────────────────────────────
