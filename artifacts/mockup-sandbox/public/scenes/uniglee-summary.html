@@ -5,7 +5,76 @@
 <meta name="viewport" content="width=1280">
 <title>UniGlee Marathon Summary — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>
+html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
+.cc-root{width:1280px;height:900px;padding:0!important}
+/* Prevent the min-width:900px grid breakpoint — keep single-column flex */
+.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;display:flex!important;flex-direction:column!important;border-radius:0!important;margin:0!important}
+
+/* ── Summary overlay ── */
+.uniglee-summary-overlay{
+  position:absolute;inset:0;z-index:30;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+  background:radial-gradient(ellipse at 50% 40%,rgba(120,60,220,.55) 0%,rgba(6,8,26,.82) 80%);
+}
+.uniglee-arch-unit{
+  position:relative;
+  width:320px;height:260px;
+  flex-shrink:0;
+}
+.uniglee-arch-svg{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  overflow:visible;
+  pointer-events:none;
+}
+.uniglee-butterfly{
+  position:absolute;
+  /* center in the arch-unit and push slightly below mid so text arches over it */
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) translateY(24px);
+  width:136px;height:136px;
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 0 18px rgba(180,120,255,.8));
+}
+.uniglee-subtitle{
+  margin:4px 0 0;
+  font-family:'Baloo 2',sans-serif;
+  font-size:16px;
+  font-weight:600;
+  color:#c9aeff;
+  letter-spacing:.04em;
+  text-align:center;
+}
+.uniglee-summary-stats{
+  display:flex;gap:32px;
+  margin-top:18px;
+  padding:14px 32px;
+  border:1px solid rgba(180,120,255,.3);
+  border-radius:12px;
+  background:rgba(30,15,70,.55);
+}
+.uniglee-summary-stats span{
+  display:flex;flex-direction:column;align-items:center;
+  font-family:'Baloo 2',sans-serif;
+}
+.uniglee-summary-stats b{
+  font-size:26px;font-weight:800;color:#f5d576;line-height:1;
+}
+.uniglee-summary-stats small{
+  font-size:11px;color:#9d85c8;letter-spacing:.05em;text-transform:uppercase;margin-top:2px;
+}
+.uniglee-summary-note{
+  margin:10px 0 0;
+  font-size:12px;color:#7a6a9a;
+  font-family:'Baloo 2',sans-serif;
+  text-align:center;
+}
+.uniglee-continue-btn{
+  margin-top:20px;
+}
+</style>
 </head>
 <body>
 <div class="cc-root">
@@ -16,33 +85,81 @@
       <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
       <div class="marquee-status">UNI-GLEE complete · +24,600 coins · 63 spins played</div>
     </header>
-    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span></div></div></div>
     <main class="cabinet-frame">
-      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
-      <div id="reel-grid" class="reel-grid" style="opacity:0.2">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span>
+      <span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+      <!-- Ghost reel grid at low opacity -->
+      <div id="reel-grid" class="reel-grid" style="opacity:0.15">
         <div class="reel-col" data-reel="0"><div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div><div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div><div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%"></span></div></div>
         <div class="reel-col" data-reel="1"><div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div><div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div><div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div></div>
         <div class="reel-col" data-reel="2"><div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div><div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div><div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div><div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div></div>
         <div class="reel-col" data-reel="3"><div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div><div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div><div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div></div>
         <div class="reel-col" data-reel="4"><div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div><div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div><div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div></div>
       </div>
+
+      <!-- UniGlee summary overlay — scoped to cabinet-frame -->
+      <div class="uniglee-summary-overlay" role="dialog" aria-modal="true" aria-label="UniGlee Marathon complete">
+
+        <!-- Arch text + butterfly as a single composed unit -->
+        <div class="uniglee-arch-unit">
+          <!-- SVG: "UNI-GLEE" following a semicircular arc over the butterfly -->
+          <svg class="uniglee-arch-svg" viewBox="0 0 320 260" aria-hidden="true">
+            <defs>
+              <!-- Arc from (20,230) up through (160,30) and back to (300,230) -->
+              <path id="uni-arch" d="M 20,230 A 148,148 0 0,1 300,230"/>
+            </defs>
+            <!-- Outer glow pass -->
+            <text font-family="'Baloo 2',sans-serif" font-size="46" font-weight="800"
+                  fill="none" stroke="rgba(120,60,200,.6)" stroke-width="8"
+                  text-anchor="middle" letter-spacing="8">
+              <textPath href="#uni-arch" startOffset="50%">UNI-GLEE</textPath>
+            </text>
+            <!-- Main gold text -->
+            <text font-family="'Baloo 2',sans-serif" font-size="46" font-weight="800"
+                  fill="#f5d576" text-anchor="middle" letter-spacing="8">
+              <textPath href="#uni-arch" startOffset="50%">UNI-GLEE</textPath>
+            </text>
+          </svg>
+          <!-- Butterfly — plain div avoids symbol-sprite position:absolute conflicts -->
+          <div class="uniglee-butterfly"
+               style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%;background-repeat:no-repeat"></div>
+        </div>
+
+        <!-- Subtitle below the butterfly -->
+        <p class="uniglee-subtitle">You have completed the mythical marathon</p>
+
+        <!-- Stats panel -->
+        <div class="uniglee-summary-stats">
+          <span><b>63</b><small>spins played</small></span>
+          <span><b>24,600</b><small>Glee-coins won</small></span>
+        </div>
+        <p class="uniglee-summary-note">60 initial spins · 3 local retriggers · Phoebe's sweetener included</p>
+        <button id="uniglee-summary-continue" class="sparkle-btn uniglee-continue-btn">Return to the chase</button>
+      </div>
     </main>
-    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:100%"></div></div></div>
-    <div class="hud-row"><span class="level-chip">Level 5</span><div class="status-line">UNI-GLEE complete · +24,600 coins · 63 spins played</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn">SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
-  </div>
-  <!-- UniGlee summary overlay — class="uniglee-summary-overlay" appended to .cc-root -->
-  <div class="uniglee-summary-overlay" role="dialog" aria-modal="true" style="position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center">
-    <div class="uniglee-summary-butterfly">
-      <span class="symbol-sprite symbol-sprite--atlas" style="width:64px;height:64px;display:block;background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span>
+
+    <div class="companion-row">
+      <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
+        <span class="treat-jar-title">Treat Jar</span>
+        <div class="treat-chips-row">
+          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span>
+        </div>
+      </div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">6 / 6</strong></div>
+      </div>
     </div>
-    <div class="uniglee-summary-title">UNI-GLEE COMPLETE!</div>
-    <p class="uniglee-summary-copy">The mythical marathon is captured.</p>
-    <div class="uniglee-summary-stats">
-      <span><b>63</b><small>spins played</small></span>
-      <span><b>24,600</b><small>Glee-coins won</small></span>
+
+    <div class="hud-row">
+      <span class="level-chip">Level 5</span>
+      <div class="status-line">UNI-GLEE complete · +24,600 coins · 63 spins played</div>
+      <div class="bet-console">
+        <button class="bet-adj-btn" disabled>−</button>
+        <button class="sparkle-btn">SPARKLE</button>
+        <button class="bet-adj-btn" disabled>+</button>
+      </div>
     </div>
-    <p class="uniglee-summary-note">60 initial spins · 3 local retriggers · Phoebe's sweetener included</p>
-    <button id="uniglee-summary-continue" class="sparkle-btn">Return to the chase</button>
   </div>
 </div>
 </body>
