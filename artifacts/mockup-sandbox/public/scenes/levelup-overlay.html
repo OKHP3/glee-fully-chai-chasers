@@ -26,41 +26,41 @@
         <div class="reel-col" data-reel="3"><div class="cell" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div><div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div><div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div></div>
         <div class="reel-col" data-reel="4"><div class="cell" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div><div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div><div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div></div>
       </div>
+      <!-- Level-up overlay — scoped to cabinet-frame so it only covers the 20-cell reel area -->
+      <div class="levelup-overlay" aria-live="assertive" aria-label="Level 5 reached!" style="position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center">
+        <div class="levelup-saucer levelup-saucer--from-left" aria-hidden="true">
+          <svg viewBox="0 0 64 40" style="height:100%;width:100%;filter:drop-shadow(0 0 6px rgba(201,155,255,0.55)) drop-shadow(0 3px 3px rgba(0,0,0,0.4))">
+            <defs><radialGradient id="sDome1" cx="35%" cy="25%" r="75%"><stop offset="0%" stop-color="#ffffff"/><stop offset="45%" stop-color="#ffe0c2"/><stop offset="100%" stop-color="#c99bff"/></radialGradient><linearGradient id="sHull1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e6def7"/><stop offset="55%" stop-color="#8f86b8"/><stop offset="100%" stop-color="#4a4270"/></linearGradient></defs>
+            <ellipse cx="32" cy="27" rx="30" ry="7" fill="url(#sHull1)" stroke="#20163a" stroke-width="1.3"/>
+            <ellipse cx="32" cy="24" rx="30" ry="6" fill="#ffffff" opacity="0.18"/>
+            <ellipse cx="32" cy="17" rx="15" ry="13" fill="url(#sDome1)" stroke="#20163a" stroke-width="1.3"/>
+            <ellipse cx="27" cy="11" rx="5" ry="3.4" fill="#ffffff" opacity="0.55"/>
+            <circle cx="10" cy="27" r="1.8" class="saucer-light-a" fill="#ffe27a"/>
+            <circle cx="22" cy="29.5" r="1.8" class="saucer-light-b" fill="#ff9ecb"/>
+            <circle cx="42" cy="29.5" r="1.8" class="saucer-light-a" fill="#8ec9ff"/>
+            <circle cx="54" cy="27" r="1.8" class="saucer-light-b" fill="#ffe27a"/>
+          </svg>
+        </div>
+        <div class="levelup-burst" aria-hidden="true">
+          <span class="levelup-spark" style="--angle:0deg;--dist:40px;width:5px;height:5px;background:#f5d576;animation-delay:.45s"></span>
+          <span class="levelup-spark" style="--angle:45deg;--dist:35px;width:4px;height:4px;background:#ff9ecb;animation-delay:.462s"></span>
+          <span class="levelup-spark" style="--angle:90deg;--dist:42px;width:6px;height:6px;background:#a8f0e5;animation-delay:.474s"></span>
+          <span class="levelup-spark" style="--angle:135deg;--dist:38px;width:5px;height:5px;background:#c99bff;animation-delay:.486s"></span>
+          <span class="levelup-spark" style="--angle:180deg;--dist:44px;width:4px;height:4px;background:#f5d576;animation-delay:.498s"></span>
+          <span class="levelup-spark" style="--angle:225deg;--dist:36px;width:6px;height:6px;background:#ff9ecb;animation-delay:.51s"></span>
+          <span class="levelup-spark" style="--angle:270deg;--dist:40px;width:5px;height:5px;background:#a8f0e5;animation-delay:.522s"></span>
+          <span class="levelup-spark" style="--angle:315deg;--dist:34px;width:4px;height:4px;background:#c99bff;animation-delay:.534s"></span>
+        </div>
+        <div class="levelup-msg" role="status">
+          <div class="levelup-msg-level">LEVEL 5!</div>
+          <div class="levelup-msg-quip">Joey is briefly impressed. Briefly.</div>
+          <div class="levelup-msg-coins">+500 coins</div>
+          <div class="levelup-msg-hint">Tap to continue</div>
+        </div>
+      </div>
     </main>
     <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:80%"></div></div></div>
     <div class="hud-row"><span class="level-chip">Level 5</span><div class="status-line">LEVEL 5! · +500 coins · Tap to continue</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
-  </div>
-  <!-- Level-up overlay — class="levelup-overlay" appended to .cc-root -->
-  <div class="levelup-overlay" aria-live="assertive" aria-label="Level 5 reached!" style="position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center">
-    <div class="levelup-saucer levelup-saucer--from-left" aria-hidden="true">
-      <svg viewBox="0 0 64 40" style="height:100%;width:100%;filter:drop-shadow(0 0 6px rgba(201,155,255,0.55)) drop-shadow(0 3px 3px rgba(0,0,0,0.4))">
-        <defs><radialGradient id="sDome1" cx="35%" cy="25%" r="75%"><stop offset="0%" stop-color="#ffffff"/><stop offset="45%" stop-color="#ffe0c2"/><stop offset="100%" stop-color="#c99bff"/></radialGradient><linearGradient id="sHull1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e6def7"/><stop offset="55%" stop-color="#8f86b8"/><stop offset="100%" stop-color="#4a4270"/></linearGradient></defs>
-        <ellipse cx="32" cy="27" rx="30" ry="7" fill="url(#sHull1)" stroke="#20163a" stroke-width="1.3"/>
-        <ellipse cx="32" cy="24" rx="30" ry="6" fill="#ffffff" opacity="0.18"/>
-        <ellipse cx="32" cy="17" rx="15" ry="13" fill="url(#sDome1)" stroke="#20163a" stroke-width="1.3"/>
-        <ellipse cx="27" cy="11" rx="5" ry="3.4" fill="#ffffff" opacity="0.55"/>
-        <circle cx="10" cy="27" r="1.8" class="saucer-light-a" fill="#ffe27a"/>
-        <circle cx="22" cy="29.5" r="1.8" class="saucer-light-b" fill="#ff9ecb"/>
-        <circle cx="42" cy="29.5" r="1.8" class="saucer-light-a" fill="#8ec9ff"/>
-        <circle cx="54" cy="27" r="1.8" class="saucer-light-b" fill="#ffe27a"/>
-      </svg>
-    </div>
-    <div class="levelup-burst" aria-hidden="true">
-      <span class="levelup-spark" style="--angle:0deg;--dist:40px;width:5px;height:5px;background:#f5d576;animation-delay:.45s"></span>
-      <span class="levelup-spark" style="--angle:45deg;--dist:35px;width:4px;height:4px;background:#ff9ecb;animation-delay:.462s"></span>
-      <span class="levelup-spark" style="--angle:90deg;--dist:42px;width:6px;height:6px;background:#a8f0e5;animation-delay:.474s"></span>
-      <span class="levelup-spark" style="--angle:135deg;--dist:38px;width:5px;height:5px;background:#c99bff;animation-delay:.486s"></span>
-      <span class="levelup-spark" style="--angle:180deg;--dist:44px;width:4px;height:4px;background:#f5d576;animation-delay:.498s"></span>
-      <span class="levelup-spark" style="--angle:225deg;--dist:36px;width:6px;height:6px;background:#ff9ecb;animation-delay:.51s"></span>
-      <span class="levelup-spark" style="--angle:270deg;--dist:40px;width:5px;height:5px;background:#a8f0e5;animation-delay:.522s"></span>
-      <span class="levelup-spark" style="--angle:315deg;--dist:34px;width:4px;height:4px;background:#c99bff;animation-delay:.534s"></span>
-    </div>
-    <div class="levelup-msg" role="status">
-      <div class="levelup-msg-level">LEVEL 5!</div>
-      <div class="levelup-msg-quip">Joey is briefly impressed. Briefly.</div>
-      <div class="levelup-msg-coins">+500 coins</div>
-      <div class="levelup-msg-hint">Tap to continue</div>
-    </div>
   </div>
 </div>
 </body>
