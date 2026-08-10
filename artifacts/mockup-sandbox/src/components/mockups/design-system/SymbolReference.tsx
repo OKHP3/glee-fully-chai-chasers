@@ -99,8 +99,10 @@ const SYMBOLS: SymbolDef[] = [
   { id: "treat_salmon",  name: "Salmon Star",   category: "Treat",   group: "standard", col: 1, row: 3, note: "Collected in Treat Jar → free spins", reels: "1 · 3 · 5" },
   { id: "treat_bougie",  name: "Bougie Bite",   category: "Treat",   group: "standard", col: 2, row: 3, note: "Collected in Treat Jar → free spins", reels: "1 · 3 · 5" },
   // ── Special atlas ─────────────────────────────────────────────────────────
-  // UniGlee is NOT on any reel strip — it is event-gated in cascade.ts (~1/400 per spin).
-  { id: "uniglee",       name: "UniGlee",       category: "Scatter", group: "special",  col: 0, row: 0, note: "Triggers UniGlee marathon free spins", reels: "event-gated" },
+  // UniGlee appears on reels 3–5 only (UNIGLEE_ACTIVE_REELS = [2,3,4] in uniglee.ts, zero-based).
+  // It is NOT a strip symbol — placement is event-gated (~1/400 per spin) and then restricted
+  // to those three reels. Both facts matter to designers.
+  { id: "uniglee",       name: "UniGlee",       category: "Scatter", group: "special",  col: 0, row: 0, note: "Triggers UniGlee marathon free spins", reels: "3 · 4 · 5 (event-gated)" },
   // Wild stacks appear on reels 2–5 only (wildStackSegments skips reel 0).
   { id: "wild_joey",     name: "Wild Joey",     category: "Wild",    group: "special",  col: 1, row: 0, note: "Substitutes for all paying symbols",   reels: "2 · 3 · 4 · 5" },
   { id: "wild_phoebe",   name: "Wild Phoebe",   category: "Wild",    group: "special",  col: 2, row: 0, note: "Substitutes · sticky during Lap Quest", reels: "2 · 3 · 4 · 5" },
