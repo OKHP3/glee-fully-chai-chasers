@@ -169,6 +169,21 @@ for (const filePath of sceneFiles) {
     const cardBlock = src.match(/id="ice-notes-card"[\s\S]*?<\/aside>/)?.[0] ?? "";
     const nameText = cardBlock.match(/class="ice-notes-name">([^<]*)</)?.[1]?.trim() ?? "";
     const descText = cardBlock.match(/class="ice-notes-text">([^<]*)</)?.[1]?.trim() ?? "";
+
+    // Denylist: placeholder strings that satisfy the non-empty check but are
+    // clearly not real chai ingredients. Comparison is case-insensitive.
+    const NAME_DENYLIST = new Set([
+      "todo", "ingredient name", "name", "placeholder", "example", "tbd",
+      "ingredient", "description", "description here", "text here",
+      "enter name", "enter ingredient",
+    ]);
+    const isPlaceholderName = (v: string): boolean =>
+      v.length < 3 || NAME_DENYLIST.has(v.toLowerCase());
+    const isPlaceholderDesc = (v: string): boolean =>
+      v.length < 5 ||
+      NAME_DENYLIST.has(v.toLowerCase()) ||
+      /^(todo|tbd|placeholder|description here|text here|example description)/i.test(v);
+
     let contentOk = true;
     if (!nameText) {
       contentOk = false;
@@ -178,17 +193,35 @@ for (const filePath of sceneFiles) {
           `     → ice-notes-card content: ingredient name is missing or blank (class="ice-notes-name")\n` +
           `       Fill in the ingredient name before pushing.`,
       );
+    } else if (isPlaceholderName(nameText)) {
+      contentOk = false;
+      iceNotesFailures.push(fileName);
+      console.error(
+        `  ✗  ${fileName}\n` +
+          `     → ice-notes-card content: ingredient name looks like a placeholder: "${nameText}"\n` +
+          `       Replace it with a real chai ingredient name before pushing.`,
+      );
     }
     if (!descText) {
       contentOk = false;
-      if (nameText) {
-        // Only push once per file (avoid double-counting when both fields are blank)
+      if (nameText && !isPlaceholderName(nameText)) {
+        // Only push once per file (avoid double-counting when both fields are blank/placeholder)
         iceNotesFailures.push(fileName);
       }
       console.error(
         `  ✗  ${fileName}\n` +
           `     → ice-notes-card content: ingredient description is missing or blank (class="ice-notes-text")\n` +
           `       Fill in the ingredient description before pushing.`,
+      );
+    } else if (isPlaceholderDesc(descText)) {
+      contentOk = false;
+      if (nameText && !isPlaceholderName(nameText)) {
+        iceNotesFailures.push(fileName);
+      }
+      console.error(
+        `  ✗  ${fileName}\n` +
+          `     → ice-notes-card content: ingredient description looks like a placeholder: "${descText}"\n` +
+          `       Replace it with a real chai ingredient description before pushing.`,
       );
     }
     if (contentOk) {
