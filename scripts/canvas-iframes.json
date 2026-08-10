@@ -1,0 +1,136 @@
+{
+  "_comment": "Source of truth for every canvas iframe shape that embeds mockup-sandbox content. Used by scripts/refresh-canvas-iframes.mjs to re-pin URLs after a dev-domain change (e.g. project fork/clone → new REPL_ID). Artifact iframes (artifact:v3:*) are managed by Replit and never need re-pinning here.",
+  "_url_pattern": "https://{REPLIT_DEV_DOMAIN}{path}",
+  "iframes": [
+    {
+      "shapeId": "design-system",
+      "name": "Chai Chasers — Retro-Bright Midnight PNW",
+      "path": "/__mockup/preview/design-system/SystemShowcase"
+    },
+    {
+      "shapeId": "progress-feedback",
+      "name": "Progress Feedback — Playful",
+      "path": "/__mockup/preview/progress-feedback/Playful"
+    },
+    {
+      "shapeId": "gameplay-desktop",
+      "name": "Gameplay Direction — Desktop",
+      "path": "/__mockup/preview/gameplay-direction/Desktop"
+    },
+    {
+      "shapeId": "gameplay-mobile",
+      "name": "Gameplay Direction — Mobile",
+      "path": "/__mockup/preview/gameplay-direction/Mobile"
+    },
+    {
+      "shapeId": "chai-splash-mobile",
+      "name": "Chai Chasers Splash — Mobile",
+      "path": "/__mockup/preview/chai-splash/Polished"
+    },
+    {
+      "shapeId": "cinematic-mobile",
+      "name": "Chai Chase Cinematic Mobile Hero",
+      "path": "/__mockup/preview/cinematic-mobile/Hero"
+    },
+    {
+      "shapeId": "storybook-opening",
+      "name": "Chai Chase Storybook Opening",
+      "path": "/__mockup/preview/storybook-opening/Desktop"
+    },
+    {
+      "shapeId": "chai-splash-desktop",
+      "name": "Chai Chasers Splash — Desktop",
+      "path": "/__mockup/preview/chai-splash/Polished"
+    },
+    {
+      "shapeId": "scene-win-celebration-big",
+      "name": "Win Celebration — Big Win",
+      "path": "/__mockup/scenes/win-celebration-big.html"
+    },
+    {
+      "shapeId": "scene-game-base",
+      "name": "Game Scene — Base Idle",
+      "path": "/__mockup/scenes/game-base.html"
+    },
+    {
+      "shapeId": "scene-doorbell-panic",
+      "name": "Game Scene — Doorbell Panic",
+      "path": "/__mockup/scenes/doorbell-panic.html"
+    },
+    {
+      "shapeId": "scene-bold-chai-pump",
+      "name": "Game Scene — Bold Chai Pump",
+      "path": "/__mockup/scenes/bold-chai-pump.html"
+    },
+    {
+      "shapeId": "scene-keepsake-memory",
+      "name": "Game Scene — Moonlit Keepsake Trail",
+      "path": "/__mockup/scenes/keepsake-memory.html"
+    },
+    {
+      "shapeId": "scene-spin-wheel",
+      "name": "Game Scene — Joey & Phoebe Sparkle Wheel",
+      "path": "/__mockup/scenes/spin-wheel.html"
+    },
+    {
+      "shapeId": "scene-free-spins",
+      "name": "Game Scene — We're Multiplying Free Spins",
+      "path": "/__mockup/scenes/free-spins-session.html"
+    },
+    {
+      "shapeId": "scene-joey-laundry",
+      "name": "Game Scene — Joey's Laundry Helper",
+      "path": "/__mockup/scenes/joey-laundry.html"
+    },
+    {
+      "shapeId": "scene-treat-time",
+      "name": "Game Scene — Treat Time Entry",
+      "path": "/__mockup/scenes/treat-time.html"
+    },
+    {
+      "shapeId": "scene-bonus-summary",
+      "name": "Bonus Summary — Free Spins Complete",
+      "path": "/__mockup/scenes/bonus-summary.html"
+    },
+    {
+      "shapeId": "scene-phoebe-lap-quest",
+      "name": "Game Scene — Phoebe Lap Quest",
+      "path": "/__mockup/scenes/phoebe-lap-quest.html"
+    },
+    {
+      "shapeId": "scene-uniglee-trigger",
+      "name": "Game Scene — UniGlee Takeover",
+      "path": "/__mockup/scenes/uniglee-trigger.html"
+    },
+    {
+      "shapeId": "scene-uniglee-summary",
+      "name": "Game Scene — UniGlee Marathon Summary",
+      "path": "/__mockup/scenes/uniglee-summary.html"
+    },
+    {
+      "shapeId": "scene-win-celebration",
+      "name": "Game Scene — HUGE WIN Celebration",
+      "path": "/__mockup/scenes/win-celebration.html"
+    },
+    {
+      "shapeId": "scene-cat-visit-joey",
+      "name": "Game Scene — Joey Cat Pop-In",
+      "path": "/__mockup/scenes/cat-visit-joey.html"
+    },
+    {
+      "shapeId": "scene-cat-visit-phoebe",
+      "name": "Game Scene — Phoebe Cat Pop-In",
+      "path": "/__mockup/scenes/cat-visit-phoebe.html"
+    },
+    {
+      "shapeId": "scene-levelup",
+      "name": "Game Scene — Level 5 Overlay",
+      "path": "/__mockup/scenes/levelup-overlay.html"
+    },
+    {
+      "shapeId": "scene-ice-notes",
+      "name": "Game Scene — Ice Notes (All 3 States)",
+      "path": "/__mockup/scenes/ice-notes.html"
+    }
+  ]
+}
