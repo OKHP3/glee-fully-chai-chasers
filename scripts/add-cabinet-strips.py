@@ -2,8 +2,14 @@
 """
 Task #80: Add cabinet-msg strips and ⓘ button to all design-canvas scene files.
 Run from workspace root: python3 scripts/add-cabinet-strips.py
+
+Validation mode (Task #124):
+  python3 scripts/add-cabinet-strips.py --validate
+  Reads every scene's existing cabinet-msg--top strip and asserts the
+  level/Sparks values match the SPARKS table (or the defaults for unlisted
+  scenes).  Exits non-zero if any scene has drifted.
 """
-import os, re
+import os, re, sys
 
 SCENES_DIR = "artifacts/mockup-sandbox/public/scenes"
 SKIP = {"game-base.html", "ice-notes.html", "splash-birthday.html", "splash-standard.html"}
@@ -198,7 +204,109 @@ def process(html, mode, copy_text, sparks_override=None):
 
     return html, changed, "ok"
 
+# ── Validation (--validate mode) ───────────────────────────────────────────────
+def validate():
+    """Read each scene's existing cabinet-msg--top strip and assert the
+    level/Sparks values match the SPARKS table, or the default values for
+    scenes not listed in SPARKS.  Exits non-zero on any mismatch."""
+
+    DEFAULT = ("Lvl 4", "347", "/ 500 Sparks", "69.4%")
+
+    # Each regex anchors on 'cabinet-msg--top' then matches lazily to the
+    # target token.  DOTALL is needed because the strip is on one long line.
+    LVL_RE = re.compile(
+        r'cabinet-msg--top[^>]*>.*?'
+        r'<span style="color:#f5d576;font-weight:700">([^<]+)</span>',
+        re.DOTALL,
+    )
+    # sparks_cur is followed by a space (non-breaking \u00a0 from the generator,
+    # or a plain space from hand-stamped files) then a child <span
+    CUR_RE = re.compile(
+        r'cabinet-msg--top[^>]*>.*?'
+        r'<span style="color:#c9aeff">([^\u00a0\s<]+)[\u00a0\s]<span',
+        re.DOTALL,
+    )
+    # sparks_max span has EXACTLY these two properties — the mode-label span
+    # appends font-size, letter-spacing, etc., so this won't false-match it
+    MAX_RE = re.compile(
+        r'cabinet-msg--top[^>]*>.*?'
+        r'<span style="color:#7a6a9a;font-weight:400">([^<]+)</span>',
+        re.DOTALL,
+    )
+    PCT_RE = re.compile(
+        r'cabinet-msg--top[^>]*>.*?'
+        r'cabinet-msg__sparks-fill" style="width:([^"]+)"',
+        re.DOTALL,
+    )
+
+    failures = []
+    no_strip = []
+    checked  = 0
+
+    for fname in sorted(os.listdir(SCENES_DIR)):
+        if not fname.endswith(".html"):
+            continue
+        if fname in SKIP:
+            continue
+
+        name  = fname[:-5]
+        fpath = os.path.join(SCENES_DIR, fname)
+        with open(fpath, encoding="utf-8") as fh:
+            html = fh.read()
+
+        if "cabinet-msg--top" not in html:
+            no_strip.append(fname)
+            continue
+
+        exp_lvl, exp_cur, exp_max, exp_pct = SPARKS.get(name, DEFAULT)
+
+        m_lvl = LVL_RE.search(html)
+        m_cur = CUR_RE.search(html)
+        m_max = MAX_RE.search(html)
+        m_pct = PCT_RE.search(html)
+
+        got_lvl = m_lvl.group(1) if m_lvl else "<NOT FOUND>"
+        got_cur = m_cur.group(1) if m_cur else "<NOT FOUND>"
+        got_max = m_max.group(1) if m_max else "<NOT FOUND>"
+        got_pct = m_pct.group(1) if m_pct else "<NOT FOUND>"
+
+        errors = []
+        if got_lvl != exp_lvl:
+            errors.append(f"  level:      got {got_lvl!r}  expected {exp_lvl!r}")
+        if got_cur != exp_cur:
+            errors.append(f"  sparks_cur: got {got_cur!r}  expected {exp_cur!r}")
+        if got_max != exp_max:
+            errors.append(f"  sparks_max: got {got_max!r}  expected {exp_max!r}")
+        if got_pct != exp_pct:
+            errors.append(f"  bar_pct:    got {got_pct!r}  expected {exp_pct!r}")
+
+        if errors:
+            failures.append((fname, errors))
+        checked += 1
+
+    print(
+        f"validate-cabinet-strips: checked={checked}"
+        f"  no-strip={len(no_strip)}  failures={len(failures)}"
+    )
+    for fname in no_strip:
+        print(f"  ?  {fname}  (no cabinet-msg--top — run add-cabinet-strips.py to stamp)")
+
+    if failures:
+        for fname, errs in failures:
+            print(f"\n  ✗  {fname}")
+            for e in errs:
+                print(e)
+        print(f"\nFAIL: {len(failures)} scene(s) have drifted from the SPARKS table.")
+        sys.exit(1)
+    else:
+        print("PASS: all cabinet-msg--top strips match the SPARKS table.")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
+if "--validate" in sys.argv:
+    validate()
+    sys.exit(0)
+
 counts = {"updated": 0, "already": 0, "skip": 0, "no-copy": 0, "no-cabinet": 0}
 issues = []
 
