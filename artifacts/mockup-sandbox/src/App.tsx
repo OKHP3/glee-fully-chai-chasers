@@ -382,6 +382,8 @@ function SceneGallery() {
   const basePath = getBasePath();
   const [scenes, setScenes] = useState<string[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
+  /** True when the Design System showcase is shown instead of a scene. */
+  const [dsView, setDsView] = useState(false);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -428,7 +430,11 @@ function SceneGallery() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIdx, flatScenes.length]);
 
-  const iframeSrc = selected ? `${basePath}/scenes/${selected}` : null;
+  const iframeSrc = dsView
+    ? `${basePath}/preview/design-system/SystemShowcase`
+    : selected
+      ? `${basePath}/scenes/${selected}`
+      : null;
 
   return (
     <div style={S.root}>
@@ -458,6 +464,33 @@ function SceneGallery() {
             </div>
           )}
 
+          {/* ── Pinned: Design System reference ── */}
+          <div>
+            <div style={S.groupLabel}>Reference</div>
+            <button
+              onClick={() => { setDsView(true); setSelected(null); }}
+              title="Design System — System Showcase"
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "left",
+                padding: "5px 12px 5px 16px",
+                fontSize: 11,
+                background: dsView ? "#0f2744" : "transparent",
+                color: dsView ? "#f5d576" : "#9b8ea0",
+                border: "none",
+                borderLeft: dsView ? "2px solid #f5d576" : "2px solid transparent",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                lineHeight: 1.5,
+              }}
+            >
+              ✦ Design System
+            </button>
+          </div>
+
           {groups.map((g) => (
             <div key={g.label}>
               <div style={S.groupLabel}>{g.label}</div>
@@ -466,7 +499,7 @@ function SceneGallery() {
                   key={scene}
                   name={scene}
                   selected={selected === scene}
-                  onClick={() => setSelected(scene)}
+                  onClick={() => { setDsView(false); setSelected(scene); }}
                 />
               ))}
             </div>
@@ -491,11 +524,15 @@ function SceneGallery() {
           </button>
 
           <span style={S.toolbarLabel}>
-            {selected ? toDisplayName(selected) : "Select a scene to preview"}
+            {dsView
+              ? "Design System — System Showcase"
+              : selected
+                ? toDisplayName(selected)
+                : "Select a scene to preview"}
           </span>
 
-          {/* Scene counter */}
-          {selectedIdx >= 0 && (
+          {/* Scene counter — only shown for scene navigation, not design system view */}
+          {!dsView && selectedIdx >= 0 && (
             <span style={S.navCounter}>
               {selectedIdx + 1} / {flatScenes.length}
             </span>
@@ -531,7 +568,7 @@ function SceneGallery() {
             key={iframeSrc}
             src={iframeSrc}
             style={{ flex: 1, border: "none", background: "#090f24" }}
-            title={selected ?? "Scene preview"}
+            title={dsView ? "Design System — System Showcase" : (selected ?? "Scene preview")}
           />
         ) : (
           <div style={S.placeholder}>
