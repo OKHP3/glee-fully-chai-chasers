@@ -37,6 +37,7 @@ describe("How It Works guide — content accuracy", () => {
     "Yarn",
     "RTP",
     "1 in ",          // "1 in X" probability claims
+    "per spin",       // standalone rate claims, e.g. "1 in 850 per spin", "hit rate per spin"
     "highest value",
     "2× / 3×",        // wrong Handbag Wild multipliers from old guide
     "1,000",          // old wrong bust-proof refill threshold (refill is BUST_PROOF_REFILL=500)
