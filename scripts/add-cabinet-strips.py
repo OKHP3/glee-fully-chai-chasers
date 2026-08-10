@@ -46,27 +46,33 @@ GEAR_BTN = (
 #
 # Scene                     Level  Cur   Max    Bar%    Source/reason
 # ─────────────────────────────────────────────────────────────────────────────
-# cat-popin-joey-fed        Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
-# cat-popin-joey-unfed      Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
-# cat-popin-phoebe-fed      Lvl 5  320   800    40%     bonus-banner: Lvl 5 · 320/800
-# cat-popin-phoebe-unfed    Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
-# cat-visit-joey            Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
-# cat-visit-phoebe          Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
-# levelup-overlay           Lvl 5  0     800    0%      overlay reads LEVEL 5! → strip shows new lvl
-# bonus-summary             Lvl 4  340   600    56.7%   bonus-banner: Lvl 4 · 340/600
-# uniglee-trigger           Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
-# uniglee-marathon-levelup  Lvl 6  0     1000   0%      overlay reads LEVEL 6! → strip shows new lvl
+# cat-popin-joey-fed              Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
+# cat-popin-joey-unfed            Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
+# cat-popin-phoebe-fed            Lvl 5  320   800    40%     bonus-banner: Lvl 5 · 320/800
+# cat-popin-phoebe-unfed          Lvl 3  180   500    36%     bonus-banner: Lvl 3 · 180/500
+# cat-visit-joey                  Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
+# cat-visit-phoebe                Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
+# levelup-overlay                 Lvl 5  0     800    0%      overlay reads LEVEL 5! → strip shows new lvl
+# bonus-summary                   Lvl 4  340   600    56.7%   bonus-banner: Lvl 4 · 340/600
+# uniglee-trigger                 Lvl 4  120   200    60%     bonus-banner: Lvl 4 · 120/200 (different track)
+# uniglee-marathon-levelup        Lvl 6  0     1000   0%      overlay reads LEVEL 6! → strip shows new lvl
+# uniglee-act-keepsake-collection Lvl 5  320   800    40%     footer level-chip shows Level 5; no bonus-banner
+# uniglee-act-nighttime-treat-time Lvl 5 320   800    40%     Sparks track; / 800 used per cat-popin-phoebe-fed ref
+# uniglee-act-were-multiplying    Lvl 5  320   800    40%     (same reasoning — all three acts same player state)
 SPARKS = {
-    "cat-popin-joey-fed":        ("Lvl 3", "180", "/ 500 Sparks", "36%"),
-    "cat-popin-joey-unfed":      ("Lvl 3", "180", "/ 500 Sparks", "36%"),
-    "cat-popin-phoebe-fed":      ("Lvl 5", "320", "/ 800 Sparks", "40%"),
-    "cat-popin-phoebe-unfed":    ("Lvl 3", "180", "/ 500 Sparks", "36%"),
-    "cat-visit-joey":            ("Lvl 4", "120", "/ 200 Sparks", "60%"),
-    "cat-visit-phoebe":          ("Lvl 4", "120", "/ 200 Sparks", "60%"),
-    "levelup-overlay":           ("Lvl 5", "0",   "/ 800 Sparks", "0%"),
-    "bonus-summary":             ("Lvl 4", "340", "/ 600 Sparks", "56.7%"),
-    "uniglee-trigger":           ("Lvl 4", "120", "/ 200 Sparks", "60%"),
-    "uniglee-marathon-levelup":  ("Lvl 6", "0",   "/ 1,000 Sparks", "0%"),
+    "cat-popin-joey-fed":                ("Lvl 3", "180", "/ 500 Sparks", "36%"),
+    "cat-popin-joey-unfed":              ("Lvl 3", "180", "/ 500 Sparks", "36%"),
+    "cat-popin-phoebe-fed":              ("Lvl 5", "320", "/ 800 Sparks", "40%"),
+    "cat-popin-phoebe-unfed":            ("Lvl 3", "180", "/ 500 Sparks", "36%"),
+    "cat-visit-joey":                    ("Lvl 4", "120", "/ 200 Sparks", "60%"),
+    "cat-visit-phoebe":                  ("Lvl 4", "120", "/ 200 Sparks", "60%"),
+    "levelup-overlay":                   ("Lvl 5", "0",   "/ 800 Sparks", "0%"),
+    "bonus-summary":                     ("Lvl 4", "340", "/ 600 Sparks", "56.7%"),
+    "uniglee-trigger":                   ("Lvl 4", "120", "/ 200 Sparks", "60%"),
+    "uniglee-marathon-levelup":          ("Lvl 6", "0",   "/ 1,000 Sparks", "0%"),
+    "uniglee-act-keepsake-collection":   ("Lvl 5", "320", "/ 800 Sparks", "40%"),
+    "uniglee-act-nighttime-treat-time":  ("Lvl 5", "320", "/ 800 Sparks", "40%"),
+    "uniglee-act-were-multiplying":      ("Lvl 5", "320", "/ 800 Sparks", "40%"),
 }
 
 # ── Per-scene copy (top_mode_label, bottom_state_copy) ────────────────────────
