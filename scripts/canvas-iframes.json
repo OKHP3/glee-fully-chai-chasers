@@ -131,6 +131,31 @@
       "shapeId": "scene-ice-notes",
       "name": "Game Scene — Ice Notes (All 3 States)",
       "path": "/__mockup/scenes/ice-notes.html"
+    },
+    {
+      "shapeId": "scene-settings-page",
+      "name": "Settings — Main Page",
+      "path": "/__mockup/scenes/settings-page.html"
+    },
+    {
+      "shapeId": "scene-paytable-page",
+      "name": "Game Scene — Paytable",
+      "path": "/__mockup/scenes/paytable-page.html"
+    },
+    {
+      "shapeId": "scene-cascade-resting-board",
+      "name": "Cascade — Resting Board",
+      "path": "/__mockup/scenes/cascade-resting-board.html"
+    },
+    {
+      "shapeId": "scene-cascade-win-highlight",
+      "name": "Cascade — Win Highlight",
+      "path": "/__mockup/scenes/cascade-win-highlight.html"
+    },
+    {
+      "shapeId": "scene-iced-chai-wild-rain",
+      "name": "Iced Chai Wild Rain — Board",
+      "path": "/__mockup/scenes/iced-chai-wild-rain-board.html"
     }
   ]
 }
