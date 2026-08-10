@@ -11,7 +11,9 @@
  *   - Class names are extracted from selectors after stripping comments,
  *     @keyframes bodies, pseudo-classes/elements, and attribute selectors.
  *   - A class counts as used when its full name appears as a substring in
- *     any .ts/.tsx file under src/ or in index.html. This covers template
+ *     any .ts/.tsx file under src/, in index.html, or in the shipped scene
+ *     HTML under artifacts/mockup-sandbox/public/scenes/ (scenes link the
+ *     compiled stylesheet as ../game-style.css). This covers template
  *     literals, class="..." strings in rendered HTML, and classList calls.
  *   - Classes built dynamically at runtime (e.g. `cls--${variant}`) can't be
  *     found by substring search — list them in ALLOWLIST with a reason.
@@ -47,16 +49,10 @@ const DEFAULT_ROOT = resolve(dirname(SELF), "..");
  * Keep this list SHORT — if it grows, prefer emitting full class names in code.
  */
 const ALLOWLIST = new Map([
-  ["cat-pop-asset--eat", "composed as `cat-pop-asset--${pose}` in src/ui/symbols.ts catSprite()"],
-  ["cat-pop-asset--assist", "composed as `cat-pop-asset--${pose}` in src/ui/symbols.ts catSprite()"],
-  ["cat-pop-asset--unimpressed", "composed as `cat-pop-asset--${pose}` in src/ui/symbols.ts catSprite()"],
-  ["theme-swatch--dark", "composed as `theme-swatch--${theme}` in src/ui/board.ts settings panel"],
-  ["theme-swatch--light", "composed as `theme-swatch--${theme}` in src/ui/board.ts settings panel"],
-  ["theme-swatch--system", "composed as `theme-swatch--${theme}` in src/ui/board.ts settings panel"],
-  ["win-tier-nice", "composed as `win-tier-${tier}` in src/ui/board.ts win celebration"],
-  ["win-tier-big", "composed as `win-tier-${tier}` in src/ui/board.ts win celebration"],
-  ["win-tier-huge", "composed as `win-tier-${tier}` in src/ui/board.ts win celebration"],
-  ["is-failure", "composed as `is-${outcome}` in src/ui/board.ts keepsake memory result"],
+  // Currently empty: every dynamically composed class (cat-pop-asset--*,
+  // theme-swatch--*, win-tier-*, is-failure) also appears statically in the
+  // shipped scene HTML, so substring search finds it. Add entries here only
+  // when a class is composed at runtime AND absent from all static markup.
 ]);
 
 function walk(dir, out = []) {
@@ -120,6 +116,15 @@ function runCheck(root, allowlist) {
   const sources = walk(resolve(root, "src")).filter((f) => !f.endsWith(".css"));
   const indexHtml = resolve(root, "index.html");
   if (existsSync(indexHtml)) sources.push(indexHtml);
+  // Shipped scene HTML links the compiled stylesheet (../game-style.css), so
+  // classes used only by scenes are live too. The mockup-sandbox copy is the
+  // source of truth; the root public/scenes copy is build output.
+  const scenesDir = resolve(root, "artifacts/mockup-sandbox/public/scenes");
+  if (existsSync(scenesDir)) {
+    for (const name of readdirSync(scenesDir)) {
+      if (name.endsWith(".html")) sources.push(join(scenesDir, name));
+    }
+  }
   const corpus = sources.map((f) => readFileSync(f, "utf8")).join("\n");
 
   let failed = false;
@@ -148,12 +153,12 @@ function runCheck(root, allowlist) {
 
   for (const cls of dead) {
     console.error(
-      `DEAD SELECTOR: .${cls} appears in src/style.css but nothing under src/ (or index.html) emits it — remove the rule or add the class to the markup (allowlist it only if it is composed dynamically).`,
+      `DEAD SELECTOR: .${cls} appears in src/style.css but nothing under src/ (or index.html / shipped scene HTML) emits it — remove the rule or add the class to the markup (allowlist it only if it is composed dynamically).`,
     );
   }
 
   if (!failed) {
-    console.log(`All ${classes.size} class selectors in src/style.css have an emitter in src/ or index.html.`);
+    console.log(`All ${classes.size} class selectors in src/style.css have an emitter in src/, index.html, or shipped scene HTML.`);
   }
   return !failed;
 }
@@ -194,6 +199,15 @@ function selfTest() {
       files: {
         "src/style.css": `.cc-btn:focus-visible { outline: none; }\n.cc-btn[data-state="on"]::after { content: ""; }\n`,
         "src/main.ts": 'const c = "cc-btn";\nconsole.log(c);\n',
+      },
+    },
+    {
+      name: "class used only by shipped scene HTML counts as live",
+      expectFail: false,
+      files: {
+        "src/style.css": `.aj-link { color: red; }\n`,
+        "src/main.ts": "console.log(1);\n",
+        "artifacts/mockup-sandbox/public/scenes/bubble.html": '<a class="aj-link">Ask Jamie</a>\n',
       },
     },
     {
