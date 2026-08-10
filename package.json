@@ -17,6 +17,7 @@
     "validate:scene-coverage": "node scripts/check-scene-gallery-coverage.mjs",
     "validate:dead-exports": "node scripts/check-dead-exports.mjs",
     "validate:dead-css": "node scripts/check-dead-css.mjs",
+    "validate:keepsake-size": "node scripts/check-keepsake-constellation-size.mjs",
     "validate:cabinet-strips": "python3 scripts/add-cabinet-strips.py --validate",
     "test:watch": "vitest"
   },
