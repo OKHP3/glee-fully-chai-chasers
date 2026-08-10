@@ -387,4 +387,42 @@ describe("sparkle button disabled lifecycle during a spin", () => {
 
     root.remove();
   });
+
+  it("ignores a second click while the button is disabled mid-spin so spin fires exactly once", async () => {
+    // No bonus, no win — the simplest spin path.  The important thing is that
+    // the click-handler guard at board.ts (`if (sparkleBtn.disabled) return;`)
+    // prevents runSpin — and therefore the engine mock — from being invoked a
+    // second time when the player clicks again before the reel sequence ends.
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    // renderBoard calls spin() internally to render the initial idle grid.
+    // Clear that call from the mock history so the assertion below only counts
+    // calls that come from the click handler path.
+    vi.mocked(spin).mockClear();
+
+    const btn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+
+    // First click: starts the spin, disables the button synchronously before
+    // runSpin reaches its first await, so the second click below sees disabled=true.
+    btn.click();
+    expect(btn.disabled).toBe(true);
+
+    // Second click while the button is disabled — must be silently dropped.
+    // The guard `if (sparkleBtn.disabled) return;` in the click handler is the
+    // production defence; this test confirms it holds under programmatic clicks.
+    btn.click();
+
+    // The engine `spin` function must have been called exactly once — the
+    // second click must not have reached runSpin.
+    expect(spin).toHaveBeenCalledTimes(1);
+
+    // Drain remaining timers so the test does not leak into the next one.
+    await vi.runAllTimersAsync();
+
+    root.remove();
+  });
 });
