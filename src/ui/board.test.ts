@@ -5,6 +5,7 @@ import type { GameState } from "../state";
 import { createKeepsakeMemory } from "../engine/keepsake-memory";
 import { mulberry32 } from "../engine/rng";
 import { sparksForSpin } from "../engine/economy";
+import { BOLD_CHAI_DURATION_MS, BOLD_CHAI_PUMPS_PER_CUP } from "../engine/bold-chai-pump";
 import { spin } from "../engine/cascade";
 import { createKeepsakeMemoryController, maybeLevelUpAfterBonus, renderBoard, renderGridHtml } from "./board";
 import * as stateModule from "../state";
@@ -525,6 +526,81 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     await vi.runAllTimersAsync();
 
     // The finally block must have cleared is-spinning from the original node.
+    expect(originalBtn.classList.contains("is-spinning")).toBe(false);
+
+    root.remove();
+  });
+
+  it("removes is-spinning after a bold-chai free-spin path resolves", async () => {
+    // result.boldChaiPump = true → runBoldChaiBonus (interactive 30-second
+    // mini-game) → runBoldChaiFreeSpins → early return without calling the
+    // outermost renderBoard.  The finally block is the only place that removes
+    // is-spinning on this path.
+    //
+    // ── Timer strategy ────────────────────────────────────────────────────────
+    // runBoldChaiBonus drives its countdown via requestAnimationFrame (shimmed
+    // as setTimeout(fn, 16) by fake-timers).  Using vi.runAllTimersAsync() in
+    // that phase would exhaust the 10 000-timer ceiling because rAF re-queues
+    // itself on every frame.  Instead:
+    //   • Phase 2 uses vi.advanceTimersByTimeAsync(BOLD_CHAI_DURATION_MS + 1000)
+    //     to fire exactly ~1 940 rAF frames (30 000 ms / 16 ms) and terminate
+    //     the loop when finish() sets settled = true.
+    //   • Phases 3-4 switch back to vi.runAllTimersAsync(); runBoldChaiFreeSpins
+    //     uses only setTimeout-based sleeps (no rAF), so the ceiling is safe.
+    //
+    // ── Pump registration ─────────────────────────────────────────────────────
+    // The pump button listens for "pointerdown" (not "click"), so we must
+    // dispatch PointerEvent.  All BOLD_CHAI_PUMPS_PER_CUP events are dispatched
+    // at the same faked performance.now() value (~480 ms), which is fine:
+    // pumpBoldChai() has no per-pump cooldown and accepts rapid bursts.
+    // One completed cup awards BOLD_CHAI_FREE_SPINS_PER_CUP (3) free spins,
+    // ensuring boldChaiSpinsAwarded > 0 so the runBoldChaiFreeSpins early-return
+    // branch is exercised rather than falling through to the normal renderBoard.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())                        // call 1: renderBoard idle grid
+      .mockReturnValueOnce(noBonusResult({ boldChaiPump: true })); // call 2: runSpin main spin
+    // Subsequent calls (bold-chai free-spin session) use the beforeEach default.
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    originalBtn.click();
+    expect(originalBtn.classList.contains("is-spinning")).toBe(true);
+
+    // Phase 1: advance past animateSteps (480 ms).  runBoldChaiBonus appends
+    // its scene synchronously inside the Promise executor so the pump button is
+    // live in the DOM immediately after this await resolves.
+    await vi.advanceTimersByTimeAsync(ANIMATE_STEP_MS);
+
+    // Register one completed cup via pointerdown events.
+    const pumpBtn = root.querySelector<HTMLButtonElement>("#bold-chai-pump-button");
+    for (let i = 0; i < BOLD_CHAI_PUMPS_PER_CUP; i++) {
+      pumpBtn?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    }
+
+    // Phase 2: advance time past the 30-second bold-chai duration.  The rAF
+    // loop fires ~1 940 frames (well under the 10 000 ceiling), finish() is
+    // called, settled = true stops the loop, and the 750 ms cleanup timer
+    // resolves the promise with the awarded free spins.
+    await vi.advanceTimersByTimeAsync(BOLD_CHAI_DURATION_MS + 1000);
+
+    // Phase 3: drain the bold-chai free-spin session (setTimeout/sleep only —
+    // no rAF) until showBonusSummary blocks on the Continue button.
+    await vi.runAllTimersAsync();
+
+    // Phase 4: click Continue so showBonusSummary resolves.
+    root.querySelector<HTMLButtonElement>("#bonus-continue")?.click();
+
+    // Phase 5: drain remaining timers (advanceIceNote 200 ms + status clear).
+    // The early return in runSpin fires, then the finally block removes is-spinning.
+    await vi.runAllTimersAsync();
+
+    // The finally block must have cleared is-spinning from the original node.
+    // runBoldChaiFreeSpins calls renderBoard internally, detaching the original
+    // sparkle button, but the captured sparkleBtn parameter reference still
+    // reflects its final classList state.
     expect(originalBtn.classList.contains("is-spinning")).toBe(false);
 
     root.remove();
