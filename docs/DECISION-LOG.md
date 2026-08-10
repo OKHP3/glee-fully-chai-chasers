@@ -4,29 +4,17 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 
 ## Open decisions
 
-D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table as S8 through S12. The two decisions below were raised on 2026-08-09 by the accuracy audit (`content/AUDIT-2026-08-09.md`) and are awaiting Jamie's ruling. Both are written so a one-word answer settles them.
+D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table as S8 through S12. D6 was raised on 2026-08-09 and ruled on 2026-08-10. The decisions below were raised on 2026-08-09 by the accuracy audit (`content/AUDIT-2026-08-09.md`) and are awaiting Jamie's ruling. Each is written so a one-word answer settles it.
 
 ### D6. Was the UniGlee tease and rarity redesign ever ruled?
 
-**Raised:** 2026-08-09, by Claude, during the accuracy audit. **Owner:** Jamie. **Status:** open.
+**Raised:** 2026-08-09, by Claude, during the accuracy audit. **Owner:** Jamie. **Status:** ruled 2026-08-10.
 
-The live overkillhill.com project page was patched on 2026-07-17 describing a UniGlee redesign in two parts: a decorative "sighting" or tease that a player sees often at roughly 1 in 850 spins, and a real capture that is much rarer at roughly 1 in 4,212 spins. `content/PRD-OVERKILLHILL-PROJECT-PAGE-PATCH-2.md` attributes that copy to decisions **S33** and **S34**. Neither S33 nor S34 exists in this log, which ends at S32.
+**Ruling: "Ruled."** The decorative tease and the rarer real capture were real decisions that never reached the engine. Logged as settled **S34** (decorative tease sighting) and **S35** (rare capture rate redesign), both carrying the original ruling date of 2026-07-17. A simulation-gated engine task is now open to implement the tease mechanic and re-rate the capture. The public project page (overkillhill.com) describes the intent correctly; it becomes fully accurate once the engine catches up.
 
-**The code implements neither half of it.**
+**Jamie's exact words (2026-08-10):** "Yes, there should be occasional appearances of the UNI-GLEE Butterfly that don't appear on a paying line, much like there are times where the Chai Pump and the Doorbell icons may appear but not actually payout."
 
-| Page claim | Shipped reality | Evidence |
-|---|---|---|
-| Real capture at ~1 in 4,212 | Three independent per-reel rolls at 1/2,500, 1/4,000 and 1/7,500, combining to ~1 in 1,277 | `src/engine/uniglee.ts` lines 32 to 38, `UNIGLEE_REEL_RATES` and `UNIGLEE_ACTIVE_RATE` |
-| Decorative sighting at ~1 in 850 | No such mechanic exists anywhere. `grep -rn "tease\|sighting" src/` returns zero hits. The only 850 in the engine tree is an oracle upper bound on the real capture rate, not a tease rate | `src/engine/simulation.test.ts` line 95 |
-| The butterfly "shows itself often but is only truly caught" rarely | The engine enforces the opposite. `placeUniGleeTrigger` deliberately makes the trigger land line-valid "so the event cannot be a decorative, non-paying-looking scatter" | `src/engine/uniglee.ts`, `placeUniGleeTrigger` |
-| Measured rate | 1 in 1,370 on the seeded oracle, against a spec target of ~1 in 1,277 | `npx vitest run src/engine/simulation.test.ts --reporter=verbose`; `docs/DESIGN-SPEC.md` line 85 |
-
-**Ruling needed. One word is enough.**
-
-- **(i) "Ruled."** The redesign was a real decision that simply never reached the engine. Log it here as settled S33 and S34 dated 2026-07-17, and open a simulation-gated engine task to build the tease mechanic and re-rate the capture. The public page becomes accurate once the engine catches up.
-- **(ii) "Withdrawn."** It was a proposal that got dropped before it was ruled. Record it here as withdrawn and dated, and correct the public page to the shipped 1-in-1,277 behavior.
-
-**Note for Jamie:** the live page currently asserts option (i) as present-tense fact about the shipped game. Until this is ruled, the page describes a mechanic the game does not have, and the page's own acceptance criterion ("a reader who fact-checks the page against the repo finds zero stale claims") fails.
+*Note on numbering:* D6 as raised anticipated logging as S33 and S34. S33 was already in use for the feature-branch/PR workflow (ADR-0001, 2026-07-12), so the tease decisions land at S34 and S35. The errata note in the settled section is updated accordingly.
 
 ### D7. UniGlee award size: is it 300/400/500 or 40/60/80?
 
@@ -127,7 +115,7 @@ The comment likely reflects an earlier design target that predates the award-siz
 > - The re-labelled row would carry an inline `(was S30, relabelled 2026-08-09)` marker so the retired ID stays searchable, matching the existing `S8 (was D1)` convention already used in this table.
 > - If Jamie prefers the opposite assignment, the same shape applies with the two rows swapped.
 >
-> **Which number to use is blocked on D6.** D6 asks whether S33 and S34 already exist as rulings that were made but never logged. If D6 is ruled "withdrawn", the UniGlee row becomes **S33**. If D6 is ruled "ruled", S33 and S34 are already spoken for and the UniGlee row becomes **S35**. Rule D6 first, then apply this renumbering to whatever number is genuinely free.
+> **D6 settled (ruled 2026-08-10).** S33 was already in use for the feature-branch/PR workflow (ADR-0001, 2026-07-12). S34 and S35 are now spoken for by the UniGlee tease and rare-capture decisions respectively (logged 2026-08-10). When Jamie approves the renumbering, the UniGlee marathon structure row becomes **S36**. The rename itself has not been applied pending that approval.
 
 | # | Date | Decision | Rationale |
 |---|---|---|---|
@@ -165,6 +153,8 @@ The comment likely reflects an earlier design target that predates the award-siz
 | S31 | 2026-07-15 | **Iced Chai Wild Rain is a one-shot Wild Chai Storm.** At the start of the wheel-awarded bonus session, every standard iced-chai symbol on the opening board converts into a mermaid-cup `wild_chai`. The storm does not repeat on cascades or retriggered spins. Presentation uses an orange-gold pumpkin-fall glow, chai-like drops, and glitter sparkles without pumpkins or fall leaves. | Jamie's explicit ruling 2026-07-15; absorbed into DESIGN-SPEC.md §7. |
 | S32 | 2026-07-15 | **Moonlit Keepsake Trail is a dedicated memory bonus in the existing reel staging area.** It deals 12 cards as six randomly arranged pairs from the standard symbol pool, allows two mismatches, and awards exactly 40 standard free spins only after all six pairs are found. Twelve is an explicit exception for this one memory bonus and must not spread to levels, caps, multipliers, charms, or general game copy. | Jamie's revised keepsake-trail ruling; implementation contract: `docs/MOONLIT-KEEPSAKE-TRAIL-2026-07-14.md`. |
 | S33 | 2026-07-12 | **Feature branch + PR is the canonical integration workflow when tool workspaces diverge from `origin/main`.** When approved local work and remote `main` diverge: (1) stash unrelated changes by explicit path, (2) create an `agent/*` branch, (3) commit only the approved deliverable in small conventional commits, (4) rebase onto current `origin/main`, (5) resolve only genuine conflicts, (6) run full tests + build + diff checks, (7) merge via reviewed PR, (8) let GitHub Actions deploy from `main`, (9) restore stashed changes after the PR lands. **Rejected approaches:** pulling into a dirty local `main` (overwrites in-flight approved work), force-pushing (discards remote history and violates GitHub's role as the canonical source), and whole-file copying between tools (hides ancestry, makes conflicts unreviewable, risks restoring superseded content). All tools must pull the resulting `main` descendant before accepting a new bounded assignment. | ADR-0001 (2026-07-12); `docs/adr/` purged after absorption |
+| S34 | 2026-07-17 | **UniGlee decorative tease: the butterfly appears on the board without landing on a paying line, at roughly 1-in-850 spins.** The sighting is non-paying and purely atmospheric — the butterfly is visible to the player but does not trigger the marathon. This mirrors the pattern of the Bold Chai Pump and Doorbell Panic icons, which can appear on the board without paying out. Jamie's ruling (2026-08-10): "there should be occasional appearances of the UNI-GLEE Butterfly that don't appear on a paying line, much like there are times where the Chai Pump and the Doorbell icons may appear but not actually payout." Exact rate and visual treatment are subject to engine implementation and RTP simulation gate. | Ruled 2026-08-10 via D6 |
+| S35 | 2026-07-17 | **UniGlee real capture re-rated to roughly 1-in-4,212 spins.** The three independent per-reel capture rolls (currently 1/2,500, 1/4,000, 1/7,500 combining to ~1-in-1,277) are adjusted so the true marathon capture is rarer than a tease sighting. Award size of 40/60/80 spins (current engine, per D7) or 300/400/500 (per S30, pending D7 ruling) is unchanged by this decision. Exact rates are engine work gated by a full-game RTP simulation sweep; the oracle upper bound in `src/engine/simulation.test.ts` must be updated to match the new target. | Ruled 2026-08-10 via D6; resolve alongside D7 |
 
 ## Workstream owners
 
