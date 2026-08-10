@@ -218,9 +218,106 @@ if (iceNotesFailures.length > 0) {
   );
 }
 
+// ── CHECK 4: SCENE_LABELS vs. HTML <title> drift ────────────────────────────
+
+console.log("\n── Check 4: Scene-label drift (SCENE_LABELS vs. HTML title) ──");
+
+// Scenes in App.tsx's SCENE_LABELS map are labelled from their <title> tag.
+// If a scene's title is updated but the map entry is not (or vice versa) the
+// sidebar shows the wrong name with no visible warning.  This check catches
+// that drift at push time.
+
+const TITLE_SUFFIX = " — Chai Chasers Design Review";
+const appTsxPath = join(process.cwd(), "src", "App.tsx");
+const appSrc = readFileSync(appTsxPath, "utf8");
+
+// Extract every "filename.html": "Label" pair from SCENE_LABELS.  The .html
+// filter is specific enough to avoid matching other string literals in the file.
+const labelPattern = /"([^"]+\.html)"\s*:\s*"([^"]+)"/g;
+const parsedLabels: Record<string, string> = {};
+let lMatch: RegExpExecArray | null;
+while ((lMatch = labelPattern.exec(appSrc)) !== null) {
+  parsedLabels[lMatch[1]] = lMatch[2];
+}
+
+/** Decode the small set of HTML entities that appear in scene <title> tags. */
+function decodeHtmlEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+const labelDriftFailures: string[] = [];
+let labelDriftPassed = 0;
+let labelDriftSkipped = 0;
+
+for (const [filename, mapLabel] of Object.entries(parsedLabels)) {
+  const htmlPath = join(scenesDir, filename);
+  let html: string;
+  try {
+    html = readFileSync(htmlPath, "utf8");
+  } catch {
+    // Scene file doesn't exist yet — skip rather than fail.
+    labelDriftSkipped++;
+    continue;
+  }
+  const titleMatch = html.match(/<title>([^<]+)<\/title>/);
+  if (!titleMatch) {
+    // No <title> tag — skip without penalising.
+    labelDriftSkipped++;
+    continue;
+  }
+  const rawTitle = titleMatch[1].trim();
+  const htmlLabel = decodeHtmlEntities(
+    rawTitle.endsWith(TITLE_SUFFIX)
+      ? rawTitle.slice(0, -TITLE_SUFFIX.length).trim()
+      : rawTitle,
+  );
+  if (htmlLabel !== mapLabel) {
+    labelDriftFailures.push(filename);
+    console.error(
+      `  ✗  ${filename}\n` +
+        `     → SCENE_LABELS says: "${mapLabel}"\n` +
+        `       <title> says:       "${htmlLabel}"\n` +
+        `       Update SCENE_LABELS in src/App.tsx to match the new title, or revert the title change.`,
+    );
+  } else {
+    labelDriftPassed++;
+  }
+}
+
+console.log(); // blank line before summary
+
+if (labelDriftFailures.length > 0) {
+  console.error(
+    `❌  Scene-label drift check FAILED — ${labelDriftFailures.length} scene(s) have a stale SCENE_LABELS entry:\n`,
+  );
+  for (const f of labelDriftFailures) {
+    console.error(`     ${f}`);
+  }
+  console.error(
+    `\nUpdate SCENE_LABELS in src/App.tsx to match each scene's <title> tag\n` +
+    `(strip " — Chai Chasers Design Review"). Fix before pushing.`,
+  );
+} else {
+  console.log(
+    `✅  Scene-label drift check passed — all ${labelDriftPassed} mapped scene(s) have a matching title` +
+      (labelDriftSkipped > 0
+        ? ` (${labelDriftSkipped} scene(s) skipped — missing file or no <title>).`
+        : "."),
+  );
+}
+
 // ── Final exit ──────────────────────────────────────────────────────────────
 
-const totalFailures = exportFailures.length + coverageFailures.length + iceNotesFailures.length;
+const totalFailures =
+  exportFailures.length +
+  coverageFailures.length +
+  iceNotesFailures.length +
+  labelDriftFailures.length;
 if (totalFailures > 0) {
   process.exit(1);
 }
