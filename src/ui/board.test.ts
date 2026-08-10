@@ -388,6 +388,35 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 
+  it("removes is-spinning even when the spin engine throws an unhandled error", async () => {
+    // renderBoard() calls spin() once internally to render the idle grid, so
+    // give it a valid result first, then make the second call (from runSpin)
+    // throw — simulating a mid-flight bonus crash.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())           // renderBoard idle render
+      .mockImplementationOnce(() => { throw new Error("bonus crash"); }); // runSpin
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState()); // uses first mockReturnValueOnce — succeeds
+
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    expect(originalBtn).not.toBeNull();
+
+    // click() starts runSpin (async).  The engine throws synchronously inside
+    // runSpin's try block, which causes the finally block to execute before the
+    // promise settles.  Drain all timers so the async rejection is fully handled.
+    originalBtn.click();
+    await vi.runAllTimersAsync();
+
+    // The finally block in runSpin must have called sparkleBtn.classList.remove
+    // ("is-spinning") on the original reference even though the engine threw.
+    // The button is still in the DOM (no renderBoard call on error paths).
+    expect(originalBtn.classList.contains("is-spinning")).toBe(false);
+
+    root.remove();
+  });
+
   it("ignores a second click while the button is disabled mid-spin so spin fires exactly once", async () => {
     // No bonus, no win — the simplest spin path.  The important thing is that
     // the click-handler guard at board.ts (`if (sparkleBtn.disabled) return;`)

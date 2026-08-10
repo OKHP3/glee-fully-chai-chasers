@@ -564,7 +564,14 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
     // is mid-spin or locked. Do not move this call above the guard.
     if (sparkleBtn.disabled) return;
     playSpinStart();
-    void runSpin(root, state, sparkleBtn);
+    runSpin(root, state, sparkleBtn).catch((err: unknown) => {
+      // runSpin's finally block already removes is-spinning and re-enables HIW.
+      // This catch ensures the unhandled-rejection path is logged (not silently
+      // swallowed) and the sparkle button is always re-enabled so the player
+      // can spin again even if an unexpected error escapes the finally block.
+      console.error("[runSpin] Unhandled error during spin sequence:", err);
+      sparkleBtn.disabled = false;
+    });
   });
 }
 
@@ -921,9 +928,6 @@ async function runSpin(
 
   saveGameState(state);
 
-  const btnAgain = root.querySelector<HTMLButtonElement>("#sparkle-btn");
-  btnAgain?.classList.remove("is-spinning");
-
   if (result.treatTimeBonus) {
     await runTreatTimeBonus(root, state, result.treatTimeBonus.mode, result.treatTimeBonus.freeSpinsAwarded);
   }
@@ -952,11 +956,19 @@ async function runSpin(
   if (!result.treatTimeBonus) renderBoard(root, state, result.steps[result.steps.length - 1]?.grid);
   await advanceIceNote(root);
   } finally {
-    // Re-enable the HIW button on every exit path. Most paths end with
-    // renderBoard() which recreates the DOM, making this a no-op on the now-
-    // detached old element. The finally block guards exception paths and any
-    // future path that skips renderBoard(), so the guide is never stranded
-    // disabled after a spin.
+    // Remove is-spinning on every exit path — including unhandled bonus errors.
+    // We use the `sparkleBtn` parameter (captured before the try block) rather
+    // than a fresh querySelector because most normal paths end with
+    // renderBoard(), which replaces root.innerHTML and detaches the original
+    // node from the DOM; the parameter reference still points to that original
+    // node so the class removal is guaranteed to run on it even after
+    // detachment. On error paths the original button is still live in the DOM,
+    // so this is the only place that stops the animation.
+    sparkleBtn.classList.remove("is-spinning");
+
+    // Re-enable the HIW button on every exit path (same rationale — use the
+    // pre-try reference where available, plus a live querySelector as fallback
+    // for any future path that navigates without calling renderBoard()).
     if (hiwBtnAtStart) hiwBtnAtStart.disabled = false;
     const hiwBtnCurrent = root.querySelector<HTMLButtonElement>("#hiw-btn");
     if (hiwBtnCurrent) hiwBtnCurrent.disabled = false;
