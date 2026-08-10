@@ -1028,3 +1028,51 @@ describe("coin balance protection on engine crash", () => {
     root.remove();
   });
 });
+
+// ── Bold-chai bonus timeout ───────────────────────────────────────────────────
+
+describe("bold-chai bonus — no-pump timeout", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.clearAllMocks();
+  });
+
+  it("resolves and clears is-spinning after the 30-second deadline even when the player never taps the pump", async () => {
+    // Without the fallback setTimeout, startedAtMs stays undefined (the clock
+    // only starts on the first pump), the rAF frame() condition is never true,
+    // and the bonus loop runs forever — permanently trapping the player.
+    //
+    // renderBoard() calls spin() once for the idle grid (call 1).  The second
+    // call — inside runSpin — returns boldChaiPump: true to route into
+    // runBoldChaiBonus.  We dispatch no pointerdown events so startedAtMs
+    // stays undefined throughout.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())                               // call 1: renderBoard idle grid
+      .mockReturnValueOnce(noBonusResult({ boldChaiPump: true }));        // call 2: runSpin
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    originalBtn.click();
+    expect(originalBtn.classList.contains("is-spinning")).toBe(true);
+
+    // Advance past the 30-second deadline + 750 ms dismiss delay + slack.
+    // No pump events are dispatched — the fallback setTimeout must be the sole
+    // mechanism that calls finish() and resolves the Promise.
+    await vi.advanceTimersByTimeAsync(BOLD_CHAI_DURATION_MS + 2_000);
+
+    // The fallback fires finish(), which clears the scene and resolves the
+    // Promise.  runSpin's finally block removes is-spinning from the original
+    // button reference before renderBoard swaps the DOM.
+    expect(originalBtn.classList.contains("is-spinning")).toBe(false);
+
+    root.remove();
+  });
+});

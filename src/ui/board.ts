@@ -1070,6 +1070,10 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
     const status = scene.querySelector<HTMLDivElement>("#bold-chai-status")!;
     let settled = false;
     let plungerTimers: number[] = [];
+    // Absolute fallback: resolve the bonus after BOLD_CHAI_DURATION_MS even if
+    // the player never taps the pump.  Without this, startedAtMs stays undefined
+    // and the frame() condition is never true, trapping the player indefinitely.
+    let mountFallbackTimer: number | undefined;
 
     const setPlungerState = (next: "up" | "mid" | "down") => {
       plunger.src = boldChaiAsset(`plunger-${next}.svg`);
@@ -1111,6 +1115,7 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
     const finish = (now: number) => {
       if (settled) return;
       settled = true;
+      window.clearTimeout(mountFallbackTimer);
       pumpState = settleBoldChaiPump(pumpState, now);
       playBoldChaiTimerBuzzer();
       button.disabled = true;
@@ -1164,6 +1169,10 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
     paint(performance.now());
     setBoldChaiUrgency(true);
     requestAnimationFrame(frame);
+    // Unconditional deadline: fire finish() after the full duration so the bonus
+    // always exits even when the player never taps the pump (startedAtMs stays
+    // undefined and the frame() condition never triggers without this guard).
+    mountFallbackTimer = window.setTimeout(() => finish(performance.now()), BOLD_CHAI_DURATION_MS);
   });
 }
 
