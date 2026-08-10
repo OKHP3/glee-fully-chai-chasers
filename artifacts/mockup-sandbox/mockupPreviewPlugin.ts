@@ -3,7 +3,7 @@ import path from "path";
 import glob from "fast-glob";
 import chokidar from "chokidar";
 import type { FSWatcher } from "chokidar";
-import type { Plugin } from "vite";
+import type { Plugin, ViteDevServer } from "vite";
 
 const MOCKUPS_DIR = "src/components/mockups";
 const GENERATED_MODULE = "src/.generated/mockup-components.ts";
@@ -17,6 +17,8 @@ export function mockupPreviewPlugin(): Plugin {
   let root = "";
   let currentSource = "";
   let watcher: FSWatcher | null = null;
+  /** Set in configureServer; used to trigger HMR after map regeneration. */
+  let devServer: ViteDevServer | null = null;
 
   function getMockupsAbsDir(): string {
     return path.join(root, MOCKUPS_DIR);
@@ -111,7 +113,16 @@ export function mockupPreviewPlugin(): Plugin {
   }
 
   async function onFileAddedOrRemoved(): Promise<void> {
-    await refresh();
+    const changed = await refresh();
+    if (changed && devServer) {
+      // Invalidate the generated module in Vite's module graph so the next
+      // import gets the fresh map, then trigger a full-page reload so the
+      // sidebar reflects the new/removed component without a manual restart.
+      const genAbs = getGeneratedModuleAbsPath();
+      const mod = devServer.moduleGraph.getModuleById(genAbs);
+      if (mod) devServer.moduleGraph.invalidateModule(mod);
+      devServer.ws.send({ type: "full-reload", path: "*" });
+    }
   }
 
   return {
@@ -127,6 +138,7 @@ export function mockupPreviewPlugin(): Plugin {
     },
 
     async configureServer(viteServer) {
+      devServer = viteServer;
       await refresh();
 
       const mockupsAbsDir = getMockupsAbsDir();
@@ -198,6 +210,7 @@ export function mockupPreviewPlugin(): Plugin {
       if (watcher) {
         await watcher.close();
       }
+      devServer = null;
     },
   };
 }
