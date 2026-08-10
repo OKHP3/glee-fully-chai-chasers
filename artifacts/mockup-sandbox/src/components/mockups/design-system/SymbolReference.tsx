@@ -65,6 +65,12 @@ interface SymbolDef {
   pays?:      { 3: number; 4: number; 5: number };
   /** Short role note shown instead of pays for non-paying symbols. */
   note?:      string;
+  /**
+   * Reel placement constraint from src/engine/reels.ts.
+   * Omitted for symbols that appear on all five reels (standard paying symbols).
+   * Format: human-readable, e.g. "1 · 3 · 5" or "1–2 only" or "2–5".
+   */
+  reels?:     string;
 }
 
 // ── Symbol table ──────────────────────────────────────────────────────────────
@@ -88,19 +94,24 @@ const SYMBOLS: SymbolDef[] = [
   { id: "vhs",           name: "VHS",           category: "Low",     group: "standard", col: 1, row: 2, pays: { 3: 8,   4: 21,  5: 69   } },
   { id: "teapot",        name: "Teapot",        category: "Low",     group: "standard", col: 2, row: 2, pays: { 3: 8,   4: 21,  5: 69   } },
   { id: "yarn",          name: "Yarn",          category: "Low",     group: "standard", col: 3, row: 2, pays: { 3: 8,   4: 21,  5: 69   } },
-  // Treat row 3 (feature symbols — reels 1/3/5 only)
-  { id: "treat_chicken", name: "Chicken Comet", category: "Treat",   group: "standard", col: 0, row: 3, note: "Collected in Treat Jar → free spins" },
-  { id: "treat_salmon",  name: "Salmon Star",   category: "Treat",   group: "standard", col: 1, row: 3, note: "Collected in Treat Jar → free spins" },
-  { id: "treat_bougie",  name: "Bougie Bite",   category: "Treat",   group: "standard", col: 2, row: 3, note: "Collected in Treat Jar → free spins" },
+  // Treat row 3 (feature symbols — reels 1/3/5 only, sourced from reels.ts buildStrip)
+  { id: "treat_chicken", name: "Chicken Comet", category: "Treat",   group: "standard", col: 0, row: 3, note: "Collected in Treat Jar → free spins", reels: "1 · 3 · 5" },
+  { id: "treat_salmon",  name: "Salmon Star",   category: "Treat",   group: "standard", col: 1, row: 3, note: "Collected in Treat Jar → free spins", reels: "1 · 3 · 5" },
+  { id: "treat_bougie",  name: "Bougie Bite",   category: "Treat",   group: "standard", col: 2, row: 3, note: "Collected in Treat Jar → free spins", reels: "1 · 3 · 5" },
   // ── Special atlas ─────────────────────────────────────────────────────────
-  { id: "uniglee",       name: "UniGlee",       category: "Scatter", group: "special",  col: 0, row: 0, note: "Triggers UniGlee marathon free spins" },
-  { id: "wild_joey",     name: "Wild Joey",     category: "Wild",    group: "special",  col: 1, row: 0, note: "Substitutes for all paying symbols" },
-  { id: "wild_phoebe",   name: "Wild Phoebe",   category: "Wild",    group: "special",  col: 2, row: 0, note: "Substitutes · sticky during Lap Quest" },
-  { id: "wild_handbag",  name: "Wild Handbag",  category: "Wild",    group: "special",  col: 3, row: 0, note: "Substitutes · carries ×3, ×5, or ×10" },
-  { id: "wild_chai",     name: "Wild Chai",     category: "Wild",    group: "special",  col: 0, row: 1, note: "Substitutes · placed by Iced Chai Rain" },
+  // UniGlee is NOT on any reel strip — it is event-gated in cascade.ts (~1/400 per spin).
+  { id: "uniglee",       name: "UniGlee",       category: "Scatter", group: "special",  col: 0, row: 0, note: "Triggers UniGlee marathon free spins", reels: "event-gated" },
+  // Wild stacks appear on reels 2–5 only (wildStackSegments skips reel 0).
+  { id: "wild_joey",     name: "Wild Joey",     category: "Wild",    group: "special",  col: 1, row: 0, note: "Substitutes for all paying symbols",   reels: "2 · 3 · 4 · 5" },
+  { id: "wild_phoebe",   name: "Wild Phoebe",   category: "Wild",    group: "special",  col: 2, row: 0, note: "Substitutes · sticky during Lap Quest", reels: "2 · 3 · 4 · 5" },
+  // Wild Handbag is added only to reel 5 strip (handbagWildSegments).
+  { id: "wild_handbag",  name: "Wild Handbag",  category: "Wild",    group: "special",  col: 3, row: 0, note: "Substitutes · carries ×3, ×5, or ×10", reels: "5 only" },
+  // Wild Chai is placed by the Iced Chai Rain event, not on any strip.
+  { id: "wild_chai",     name: "Wild Chai",     category: "Wild",    group: "special",  col: 0, row: 1, note: "Substitutes · placed by Iced Chai Rain", reels: "event-placed" },
   // ── SVG-only ──────────────────────────────────────────────────────────────
-  { id: "doorbell",      name: "Doorbell",      category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/doorbell.svg`,  note: "Pair on reels 1–2 triggers Doorbell Panic" },
-  { id: "chai_pump",     name: "Chai Pump",     category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/chai-pump.svg`, note: "Pair on reels 1–2 triggers Bold Chai Pump" },
+  // Blockers are injected by spinGrid() into reels 1–2 only (placeBlocker indices 0 and 1).
+  { id: "doorbell",      name: "Doorbell",      category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/doorbell.svg`,  note: "Pair on reels 1–2 triggers Doorbell Panic", reels: "1–2 only" },
+  { id: "chai_pump",     name: "Chai Pump",     category: "Blocker", group: "svg",      col: null, row: null, svgSrc: `${BASE}assets/symbols/chai-pump.svg`, note: "Pair on reels 1–2 triggers Bold Chai Pump", reels: "1–2 only" },
 ];
 
 // ── Sprite rendering ──────────────────────────────────────────────────────────
@@ -206,6 +217,49 @@ function PayoutRow({ sym }: { sym: SymbolDef }) {
   );
 }
 
+/**
+ * Compact reel-placement chip. Only rendered when `sym.reels` is set.
+ * Omitting it for standard paying symbols keeps the card uncluttered —
+ * "appears on all reels" is the expected default.
+ */
+function ReelTag({ sym }: { sym: SymbolDef }) {
+  if (!sym.reels) return null;
+
+  // Color the chip by constraint type so at a glance the constraint is obvious.
+  const isEvent   = sym.reels === "event-gated" || sym.reels === "event-placed";
+  const isLimited = !isEvent;
+
+  const bg     = isEvent   ? "rgba(124,58,237,.18)"  : "rgba(65,184,183,.13)";
+  const border = isEvent   ? "rgba(124,58,237,.45)"  : "rgba(65,184,183,.38)";
+  const color  = isEvent   ? "#b8a8ff"               : C.teal;
+
+  return (
+    <div style={{
+      display:        "flex",
+      alignItems:     "center",
+      gap:            3,
+      padding:        "2px 5px",
+      borderRadius:   4,
+      background:     bg,
+      border:         `1px solid ${border}`,
+    }}>
+      {isLimited && (
+        <span style={{ fontSize: 7, color, opacity: 0.75, lineHeight: 1 }}>⬡</span>
+      )}
+      <span style={{
+        fontSize:      7.5,
+        fontWeight:    700,
+        color,
+        letterSpacing: "0.04em",
+        fontFamily:    "'Fira Code', 'Courier New', monospace",
+        whiteSpace:    "nowrap",
+      }}>
+        {sym.reels}
+      </span>
+    </div>
+  );
+}
+
 function CoordTag({ sym }: { sym: SymbolDef }) {
   const label =
     sym.group === "svg"
@@ -226,7 +280,7 @@ function CoordTag({ sym }: { sym: SymbolDef }) {
 
 const SPRITE_SIZE = 72;
 const CELL_W      = 112;
-const CELL_H      = 178;
+const CELL_H      = 202; // +24 px to accommodate the ReelTag chip
 
 function SymbolCell({ sym }: { sym: SymbolDef }) {
   const isWin = sym.category === "High";
@@ -289,6 +343,9 @@ function SymbolCell({ sym }: { sym: SymbolDef }) {
 
       {/* Payout multipliers (paying symbols) or role note (wilds / specials) */}
       <PayoutRow sym={sym} />
+
+      {/* Reel placement constraint (omitted for all-reel symbols) */}
+      <ReelTag sym={sym} />
 
       {/* Atlas coordinate */}
       <CoordTag sym={sym} />
