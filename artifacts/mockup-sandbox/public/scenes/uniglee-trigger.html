@@ -8,52 +8,220 @@
 <style>
 html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
 .cc-root{width:1280px;height:900px;padding:0!important}
-/* Prevent the min-width:900px grid breakpoint from firing — keep single-column flex */
-.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;display:flex!important;flex-direction:column!important;border-radius:0!important;margin:0!important}
+.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;
+          display:flex!important;flex-direction:column!important;
+          border-radius:0!important;margin:0!important}
+
+/* ── Trigger overlay — scoped to cabinet-frame ── */
+.uniglee-trigger-overlay{
+  position:absolute;inset:0;z-index:30;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;
+  /* Slightly more electric / intense than the calm summary radial */
+  background:radial-gradient(ellipse at 50% 38%,rgba(80,30,240,.72) 0%,rgba(30,10,80,.6) 40%,rgba(6,8,26,.92) 78%);
+}
+
+/* Arch + butterfly unit — identical sizing to summary (~80% cabinet) */
+.uniglee-arch-unit{
+  position:relative;
+  width:880px;height:340px;
+  flex-shrink:0;
+}
+.uniglee-arch-svg{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  overflow:visible;
+  pointer-events:none;
+}
+/* Central butterfly */
+.uniglee-butterfly{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) translateY(46px);
+  width:240px;height:240px;
+  background-repeat:no-repeat;
+  filter:
+    drop-shadow(0 0 40px rgba(94,184,255,.9))
+    drop-shadow(0 0 16px rgba(120,60,220,.8));
+  animation:ug-pulse 2.8s ease-in-out infinite;
+}
+@keyframes ug-pulse{
+  0%,100%{filter:drop-shadow(0 0 32px rgba(94,184,255,.8)) drop-shadow(0 0 12px rgba(120,60,220,.7));transform:translate(-50%,-50%) translateY(46px) scale(1)}
+  50%{filter:drop-shadow(0 0 56px rgba(94,184,255,1)) drop-shadow(0 0 24px rgba(140,80,255,.9));transform:translate(-50%,-50%) translateY(46px) scale(1.05)}
+}
+
+/* Subtitle */
+.uniglee-subtitle{
+  margin:6px 0 0;
+  font-family:'Baloo 2',sans-serif;
+  font-size:26px;font-weight:600;
+  color:#c9aeff;
+  letter-spacing:.04em;
+  text-align:center;
+}
+
+/* Award panel — what's about to begin */
+.uniglee-award-panel{
+  display:flex;gap:64px;
+  margin-top:12px;
+  padding:18px 72px;
+  border:1px solid rgba(94,184,255,.35);
+  border-radius:18px;
+  background:rgba(10,5,40,.65);
+  box-shadow:0 0 32px rgba(94,184,255,.08);
+}
+.uniglee-award-panel span{
+  display:flex;flex-direction:column;align-items:center;
+  font-family:'Baloo 2',sans-serif;
+}
+.uniglee-award-panel b{
+  font-size:52px;font-weight:800;color:#7eb8ff;line-height:1;
+}
+.uniglee-award-panel small{
+  font-size:16px;color:#9d85c8;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;
+}
+
+.uniglee-trigger-note{
+  margin:8px 0 0;
+  font-size:16px;color:#7a6a9a;
+  font-family:'Baloo 2',sans-serif;
+  text-align:center;
+}
+
+/* Begin button */
+.uniglee-begin-btn{
+  margin-top:16px;
+  padding:0 52px;height:64px;border-radius:18px;
+  background:linear-gradient(160deg,#3a6fdf,#2248b8);
+  box-shadow:0 6px 0 #12297a,0 12px 36px rgba(60,120,240,.38),0 0 0 1.5px rgba(140,180,255,.3);
+  border:none;cursor:pointer;
+  font-family:'Baloo 2',sans-serif;
+  font-size:21px;font-weight:800;
+  color:#e8f0ff;
+  letter-spacing:.01em;
+  display:flex;align-items:center;gap:12px;
+  position:relative;overflow:hidden;
+  transition:transform .12s,box-shadow .12s;
+}
+.uniglee-begin-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%);
+  pointer-events:none;
+}
+.uniglee-begin-btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 #12297a,0 16px 40px rgba(60,120,240,.45),0 0 0 1.5px rgba(140,180,255,.45)}
+.uniglee-begin-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #12297a,0 6px 20px rgba(60,120,240,.3)}
+
+/* Win-flash on triggered cells */
+.win-flash{animation:cell-flash .55s ease-in-out infinite alternate}
+@keyframes cell-flash{from{box-shadow:inset 0 0 0 2px rgba(94,184,255,.9),0 0 18px rgba(94,184,255,.5)}to{box-shadow:inset 0 0 0 3px rgba(180,140,255,1),0 0 32px rgba(140,80,255,.7)}}
 </style>
 </head>
 <body>
 <div class="cc-root">
   <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
   <div class="cc-shell">
+
     <header class="marquee">
-      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
-      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
-      <div class="marquee-status">UNI-GLEE! The mythical capture is yours!</div>
-    </header>
-    <main class="cabinet-frame">
-      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
-      <!-- UniGlee symbols on reels 3,4,5 -->
-      <div id="reel-grid" class="reel-grid" role="img" aria-label="Reel board with UniGlee triggers">
-        <div class="reel-col" data-reel="0"><div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div><div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div><div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%"></span></div></div>
-        <div class="reel-col" data-reel="1"><div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div><div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div><div class="cell" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div></div>
-        <!-- Reels 2,3,4: UniGlee symbol -->
-        <div class="reel-col" data-reel="2"><div class="cell win-flash" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%"></span></div><div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div><div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div><div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div></div>
-        <div class="reel-col" data-reel="3"><div class="cell win-flash" data-reel="3" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%"></span></div><div class="cell" data-reel="3" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div><div class="cell" data-reel="3" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div><div class="cell" data-reel="3" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div></div>
-        <div class="reel-col" data-reel="4"><div class="cell win-flash" data-reel="4" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%"></span></div><div class="cell" data-reel="4" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div><div class="cell" data-reel="4" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div><div class="cell" data-reel="4" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div></div>
+      <div class="marquee-bulbs" aria-hidden="true">
+        <span class="marquee-bulb" style="--blink-delay:0s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.07s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.14s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.21s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.28s"></span>
       </div>
-      <!-- UniGlee takeover overlay — scoped to cabinet-frame so it only covers the 20-cell reel area -->
-      <div class="uniglee-takeover" style="position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center">
-        <div class="uniglee-butterflies" aria-hidden="true">
-          <div class="uniglee-butterfly" style="left:4%;animation-delay:0s;animation-duration:3.2s"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
-          <div class="uniglee-butterfly" style="left:16%;animation-delay:.25s;animation-duration:3.8s"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
-          <div class="uniglee-butterfly" style="left:28%;animation-delay:.5s;animation-duration:3.2s"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
-          <div class="uniglee-butterfly" style="left:40%;animation-delay:.75s;animation-duration:4.4s"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
-          <div class="uniglee-butterfly" style="left:54%;animation-delay:1s;animation-duration:3.6s"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
-          <div class="uniglee-butterfly" style="left:68%;animation-delay:1.25s;animation-duration:3.2s"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
-          <div class="uniglee-butterfly" style="left:80%;animation-delay:1.5s;animation-duration:4.0s"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+      <div class="marquee-row">
+        <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+      </div>
+      <div class="marquee-status">UNI-GLEE! · The mythical capture is yours · 60 spin marathon unlocked</div>
+    </header>
+
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span>
+      <span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+
+      <!-- Ghost reel grid — UniGlee symbols visible on reels 2,3,4 -->
+      <div id="reel-grid" class="reel-grid" style="opacity:0.15" role="img" aria-label="Reel board showing UniGlee trigger on reels 3, 4, 5">
+        <div class="reel-col" data-reel="0">
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%"></span></div>
         </div>
-        <div class="uniglee-content">
-          <div class="uniglee-avatar">
-            <!-- gleeAvatarSvg() — simplified representation -->
-            <span class="symbol-sprite symbol-sprite--atlas" style="width:80px;height:80px;display:block;background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%"></span>
-          </div>
-          <div class="uniglee-title">UNI-GLEE!</div>
-          <div class="uniglee-sub">The mythical capture is yours.</div>
-          <div class="uniglee-award">60 SPIN MARATHON · REEL 3</div>
+        <div class="reel-col" data-reel="1">
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
         </div>
+        <!-- Reels 2, 3, 4: UniGlee trigger symbols — flashing blue -->
+        <div class="reel-col" data-reel="2">
+          <div class="cell win-flash"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+        </div>
+        <div class="reel-col" data-reel="3">
+          <div class="cell win-flash"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+        </div>
+        <div class="reel-col" data-reel="4">
+          <div class="cell win-flash"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+        </div>
+      </div>
+
+      <!-- UniGlee Trigger overlay — scoped to cabinet-frame, matching summary composition -->
+      <div class="uniglee-trigger-overlay" role="dialog" aria-modal="true" aria-label="UniGlee Marathon triggered">
+
+        <!-- Arch text + butterfly unit (identical sizing to summary; text is blue) -->
+        <div class="uniglee-arch-unit">
+          <svg class="uniglee-arch-svg" viewBox="0 0 560 380" aria-hidden="true">
+            <defs>
+              <path id="uni-arch-trigger" d="M 20,360 A 270,270 0 0,1 540,360"/>
+            </defs>
+            <!-- Outer glow pass — electric blue -->
+            <text font-family="'Baloo 2',sans-serif" font-size="62" font-weight="800"
+                  fill="none" stroke="rgba(30,80,200,.7)" stroke-width="10"
+                  text-anchor="middle" letter-spacing="12">
+              <textPath href="#uni-arch-trigger" startOffset="50%">UNI-GLEE</textPath>
+            </text>
+            <!-- Main text — blue instead of gold -->
+            <text font-family="'Baloo 2',sans-serif" font-size="62" font-weight="800"
+                  fill="#7eb8ff" text-anchor="middle" letter-spacing="12">
+              <textPath href="#uni-arch-trigger" startOffset="50%">UNI-GLEE</textPath>
+            </text>
+          </svg>
+          <!-- Mythical UniGlee butterfly -->
+          <div class="uniglee-butterfly"
+               style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:0% 0%;background-repeat:no-repeat"
+               role="img" aria-label="UniGlee butterfly"></div>
+        </div>
+
+        <!-- Subtitle -->
+        <p class="uniglee-subtitle">The mythical marathon is about to begin</p>
+
+        <!-- What's unlocked -->
+        <div class="uniglee-award-panel">
+          <span><b>60</b><small>free spins</small></span>
+          <span><b>3×</b><small>retrigger cap</small></span>
+        </div>
+
+        <p class="uniglee-trigger-note">Reels 3 · 4 · 5 · all three UniGlee symbols aligned · Phoebe's sweetener active</p>
+
+        <!-- Start button — the moment of magic -->
+        <button id="uniglee-begin" class="uniglee-begin-btn" aria-label="Begin the UniGlee Marathon">
+          <svg viewBox="0 0 22 22" style="width:22px;height:22px;flex-shrink:0" fill="none">
+            <polygon points="5,3 19,11 5,19" fill="#e8f0ff" opacity=".9"/>
+          </svg>
+          Begin the Marathon
+        </button>
       </div>
     </main>
+
     <div class="companion-row">
       <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
         <span class="treat-jar-title">Treat Jar</span>
@@ -67,7 +235,17 @@ html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;backgroun
         <div class="jar-meter-body"><strong class="jar-meter-count">6 / 6</strong></div>
       </div>
     </div>
-    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">UNI-GLEE! · 60 SPIN MARATHON · REEL 3</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
+
+    <div id="status-line" class="status-line" aria-live="polite">
+      UNI-GLEE! · 60 spin marathon unlocked · tap to begin
+    </div>
+
+    <footer class="bet-console">
+      <button class="bet-adj-btn" disabled>−</button>
+      <button class="sparkle-btn" disabled>SPARKLE</button>
+      <button class="bet-adj-btn" disabled>+</button>
+    </footer>
+
   </div>
 </div>
 </body>

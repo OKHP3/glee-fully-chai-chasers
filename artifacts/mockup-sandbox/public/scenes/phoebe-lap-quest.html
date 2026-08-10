@@ -5,51 +5,243 @@
 <meta name="viewport" content="width=1280">
 <title>Phoebe's Lap Quest — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>
+html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
+.cc-root{width:1280px;height:900px;padding:0!important}
+.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;
+          display:flex!important;flex-direction:column!important;
+          border-radius:0!important;margin:0!important}
+
+/* ── Lap Quest overlay — scoped to cabinet-frame ── */
+.lq-overlay{
+  position:absolute;inset:0;z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 45% 35%,rgba(244,123,63,.22) 0%,rgba(6,8,26,.82) 70%);
+}
+.lq-panel{
+  position:relative;
+  width:780px;
+  background:linear-gradient(160deg,rgba(24,16,48,.96),rgba(14,10,34,.97));
+  border:1.5px solid rgba(244,123,63,.35);
+  border-radius:24px;
+  box-shadow:0 0 64px rgba(244,123,63,.18),0 24px 80px rgba(0,0,0,.6);
+  padding:36px 48px 40px;
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  overflow:hidden;
+}
+/* Warm glow top edge */
+.lq-panel::before{
+  content:'';position:absolute;top:0;left:10%;right:10%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(244,123,63,.7),rgba(242,200,75,.5),transparent);
+  border-radius:1px;
+}
+/* Phoebe — large frameless sprite, no border, no crop box */
+.lq-cat{
+  width:480px;height:360px;
+  background-image:url('../assets/joey-phoebe-wilds.png');
+  background-image:image-set(
+    url('../assets/optimized/joey-phoebe-wilds.webp') type('image/webp'),
+    url('../assets/joey-phoebe-wilds.png') type('image/png')
+  );
+  background-size:200% auto;
+  background-position:100% 20%;
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 12px 40px rgba(244,123,63,.28)) drop-shadow(0 0 2px rgba(0,0,0,.5));
+  flex-shrink:0;
+  margin-bottom:-12px; /* pull title up slightly under her */
+}
+.lq-title{
+  font-family:'Baloo 2',sans-serif;
+  font-size:38px;font-weight:800;
+  color:#f5d576;
+  letter-spacing:-.02em;
+  text-align:center;
+  margin:0 0 8px;
+  line-height:1.1;
+}
+.lq-copy{
+  font-family:'Baloo 2',sans-serif;
+  font-size:16px;font-weight:500;
+  color:#c9aeff;text-align:center;
+  margin:0 0 28px;
+  max-width:520px;
+  line-height:1.55;
+}
+/* Choice buttons */
+.lq-choices{
+  display:flex;gap:14px;width:100%;
+}
+.lq-choice{
+  flex:1;
+  background:linear-gradient(160deg,rgba(40,24,72,.9),rgba(24,14,52,.9));
+  border:1.5px solid rgba(244,123,63,.3);
+  border-radius:16px;
+  padding:20px 16px;
+  cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:border-color .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.lq-choice::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(244,123,63,.04),transparent 60%);
+  border-radius:14px;pointer-events:none;
+}
+.lq-choice:hover{
+  border-color:rgba(244,123,63,.65);
+  box-shadow:0 0 24px rgba(244,123,63,.18);
+}
+.lq-choice-spark{
+  font-size:20px;color:#f2c84b;
+  text-shadow:0 0 8px rgba(242,200,75,.6);
+}
+.lq-choice strong{
+  font-family:'Baloo 2',sans-serif;
+  font-size:17px;font-weight:800;
+  color:#fff8ee;text-align:center;
+  display:block;
+}
+.lq-choice small{
+  font-family:'Baloo 2',sans-serif;
+  font-size:12px;font-weight:500;
+  color:#8b7eb8;text-align:center;
+  display:block;line-height:1.4;
+}
+/* Choice icons */
+.lq-choice-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  background:rgba(244,123,63,.12);
+  border:1px solid rgba(244,123,63,.2);
+}
+/* Divider */
+.lq-divider{
+  width:100%;display:flex;align-items:center;gap:12px;
+  margin:0 0 20px;
+}
+.lq-divider span{font-size:13px;color:rgba(244,123,63,.5);flex-shrink:0}
+.lq-divider::before,.lq-divider::after{
+  content:'';flex:1;height:1px;
+  background:rgba(244,123,63,.2);
+}
+</style>
 </head>
 <body>
 <div class="cc-root">
   <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
-  <div class="cc-shell lap-quest-mode">
+  <div class="cc-shell">
     <header class="marquee">
-      <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
-      <div class="marquee-row"><h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1></div>
-      <div id="marquee-status" class="marquee-status">Phoebe's Lap Quest</div>
-    </header>
-    <div class="sidebar-left"><div class="treat-jar-housing"><span class="treat-jar-title">Treat Jar</span><div class="treat-chips-row"><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span><span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>7</span></div></div></div>
-    <main class="cabinet-frame">
-      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
-      <!-- Lap Quest choice overlay — class="lap-quest-overlay" appended to .cc-root -->
-    </main>
-    <div class="sidebar-right"><div class="firefly-cascade-meter"><div class="cascade-meter-fill" style="height:55%"></div></div></div>
-    <div class="hud-row"><span class="level-chip">Level 4</span><div class="status-line">Phoebe's Lap Quest · choose her cozy spot</div><div class="bet-console"><button class="bet-adj-btn" disabled>−</button><button class="sparkle-btn" disabled>SPARKLE</button><button class="bet-adj-btn" disabled>+</button></div></div>
-  </div>
-  <!-- Lap Quest choice dialog — appended to .cc-root in game -->
-  <div class="lap-quest-overlay" role="dialog" aria-modal="true" aria-labelledby="lap-quest-title" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:20">
-    <div class="lap-quest-panel">
-      <div class="lap-quest-cat" aria-hidden="true">
-        <span class="cat-pop-asset cat-pop-asset--phoebe cat-pop-asset--strut" style="background-image:url('../assets/joey-phoebe-wilds.png');background-image:image-set(url('../assets/optimized/joey-phoebe-wilds.webp') type('image/webp'),url('../assets/joey-phoebe-wilds.png') type('image/png'));background-position:100% 50%" role="img" aria-label="Phoebe"></span>
+      <div class="marquee-bulbs" aria-hidden="true">
+        <span class="marquee-bulb" style="--blink-delay:0s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.07s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.14s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.21s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.28s"></span>
       </div>
-      <h2 id="lap-quest-title" class="lap-quest-title">Phoebe's Lap Quest</h2>
-      <p class="lap-quest-copy">Phoebe is conducting a comfort survey. Which cozy place should she investigate?</p>
-      <div class="lap-quest-choices" role="group" aria-label="Choose Phoebe's cozy place">
-        <button type="button" class="lap-quest-choice" data-lap-spot="window_perch">
-          <span class="lap-quest-choice-spark" aria-hidden="true">✦</span>
-          <strong>Window Perch</strong>
-          <small> Phoebe-approved comfort</small>
-        </button>
-        <button type="button" class="lap-quest-choice" data-lap-spot="blanket_nest">
-          <span class="lap-quest-choice-spark" aria-hidden="true">✦</span>
-          <strong>Blanket Nest</strong>
-          <small> Phoebe-approved comfort</small>
-        </button>
-        <button type="button" class="lap-quest-choice" data-lap-spot="moonlit_cushion">
-          <span class="lap-quest-choice-spark" aria-hidden="true">✦</span>
-          <strong>Moonlit Cushion</strong>
-          <small> Phoebe-approved comfort</small>
-        </button>
+      <div class="marquee-row">
+        <span class="level-chip">UniGlee · Chapter 1</span>
+        <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+      </div>
+      <div class="marquee-status">Phoebe's Lap Quest · choose her cozy spot</div>
+    </header>
+
+    <main class="cabinet-frame">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span>
+      <span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+
+      <!-- Ghost reel grid at low opacity, same as uniglee-summary -->
+      <div id="reel-grid" class="reel-grid" style="opacity:0.12">
+        <div class="reel-col" data-reel="0">
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%"></span></div>
+        </div>
+        <div class="reel-col" data-reel="1">
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
+        </div>
+        <div class="reel-col" data-reel="2">
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
+        </div>
+        <div class="reel-col" data-reel="3">
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+        </div>
+        <div class="reel-col" data-reel="4">
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
+          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+        </div>
+      </div>
+
+      <!-- Lap Quest choice panel — scoped to cabinet-frame -->
+      <div class="lq-overlay" role="dialog" aria-modal="true" aria-labelledby="lq-title">
+        <div class="lq-panel">
+          <!-- Phoebe sprite -->
+          <div class="lq-cat" role="img" aria-label="Phoebe"></div>
+
+          <h2 id="lq-title" class="lq-title">Phoebe's Lap Quest</h2>
+          <p class="lq-copy">Phoebe is conducting a comfort survey.<br>Which cozy place should she investigate?</p>
+
+          <div class="lq-divider"><span>✦</span></div>
+
+          <div class="lq-choices" role="group" aria-label="Choose Phoebe's cozy place">
+            <button type="button" class="lq-choice" data-lap-spot="window_perch">
+              <div class="lq-choice-icon">🪟</div>
+              <span class="lq-choice-spark">✦</span>
+              <strong>Window Perch</strong>
+              <small>Premium morning sun · bird-watching included</small>
+            </button>
+            <button type="button" class="lq-choice" data-lap-spot="blanket_nest">
+              <div class="lq-choice-icon">🧣</div>
+              <span class="lq-choice-spark">✦</span>
+              <strong>Blanket Nest</strong>
+              <small>Biscuit-making terrain · scientifically optimal</small>
+            </button>
+            <button type="button" class="lq-choice" data-lap-spot="moonlit_cushion">
+              <div class="lq-choice-icon">🌙</div>
+              <span class="lq-choice-spark">✦</span>
+              <strong>Moonlit Cushion</strong>
+              <small>Mysterious night vibes · Phoebe approved</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="companion-row">
+      <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
+        <span class="treat-jar-title">Treat Jar</span>
+        <div class="treat-chips-row">
+          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span>
+          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>7</span>
+        </div>
+      </div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">4 / 6</strong></div>
       </div>
     </div>
+
+    <div id="status-line" class="status-line" aria-live="polite">
+      Phoebe's Lap Quest · UniGlee spin 18 of 60 · choose her cozy spot
+    </div>
+
+    <footer class="bet-console">
+      <button class="bet-adj-btn" disabled>−</button>
+      <button class="sparkle-btn" disabled>SPARKLE</button>
+      <button class="bet-adj-btn" disabled>+</button>
+    </footer>
   </div>
 </div>
 </body>
