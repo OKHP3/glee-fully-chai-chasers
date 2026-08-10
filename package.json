@@ -13,6 +13,7 @@
     "validate:hand-svg": "node scripts/check-treat-time-hand-svg.mjs",
     "validate:symbol-pays": "node scripts/check-symbol-reference-pays.mjs",
     "validate:symbol-reels": "node scripts/check-symbol-reference-reels.mjs",
+    "validate:canvas-iframes": "node scripts/check-canvas-iframe-registry.mjs",
     "validate:cabinet-strips": "python3 scripts/add-cabinet-strips.py --validate",
     "test:watch": "vitest"
   },
