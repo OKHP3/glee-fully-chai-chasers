@@ -1988,9 +1988,9 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
     const landing = spinWheelLanding(rng);
     const wedge = landing.wedge;
     // The visible three wedges each contain three hidden 40° landing zones.
-    // Rotate the selected sub-zone's centre beneath the fixed pointer.
-    const parentCentre = ({ multiplying: 60, keepsake_memory: 180, chai_back: 300 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 60;
-    const subzoneCentre = parentCentre + (landing.subzone - 1) * 40;
+    // Rotate the selected sub-zone's center beneath the fixed pointer.
+    const parentCenter = ({ multiplying: 60, keepsake_memory: 180, chai_back: 300 } as Partial<Record<WheelWedge, number>>)[wedge] ?? 60;
+    const subzoneCenter = parentCenter + (landing.subzone - 1) * 40;
     const finalDeg = 1080 + ((360 - subzoneCentre) % 360);
 
     const overlay = document.createElement("div");

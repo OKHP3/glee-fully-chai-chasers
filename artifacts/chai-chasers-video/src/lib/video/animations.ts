@@ -182,7 +182,7 @@ export const elementAnimations = {
 // Note: `transition` inside a variant object is valid framer-motion API but
 // motion-dom@12.42.2 introduced a type regression where the Variant index
 // signature no longer accepts `transition`. Cast visible states to `any` to
-// work around the upstream type bug while preserving runtime behaviour.
+// work around the upstream type bug while preserving runtime behavior.
 export const charVariants: Variants = {
   hidden: { opacity: 0, y: 40, rotateX: -40, transformPerspective: 800 },
   visible: {

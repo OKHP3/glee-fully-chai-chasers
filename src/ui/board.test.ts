@@ -413,7 +413,7 @@ describe("sparkle button disabled lifecycle during a spin", () => {
 
     // Second click while the button is disabled — must be silently dropped.
     // The guard `if (sparkleBtn.disabled) return;` in the click handler is the
-    // production defence; this test confirms it holds under programmatic clicks.
+    // production defense; this test confirms it holds under programmatic clicks.
     btn.click();
 
     // The engine `spin` function must have been called exactly once — the

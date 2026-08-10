@@ -184,7 +184,7 @@ export default function Slide07IceNotes() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '1.85vw', lineHeight: 1.55 }}>
-            Each entry has: ingredient name, flavour profile, chai role, source region, and gathering method
+            Each entry has: ingredient name, flavor profile, chai role, source region, and gathering method
           </div>
         </div>
         <div className="flex items-start" style={{ gap: '1.2vw', marginBottom: '2.2vh' }}>
