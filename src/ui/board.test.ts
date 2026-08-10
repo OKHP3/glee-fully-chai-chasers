@@ -417,6 +417,39 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 
+  it("re-enables the sparkle button on the original reference after an engine crash", async () => {
+    // The .catch() on runSpin at board.ts line ~575 sets sparkleBtn.disabled = false.
+    // If that assignment targets the wrong node (or is absent), the player is left
+    // with a permanently disabled sparkle button after a rare bonus error.
+    //
+    // renderBoard() calls spin() once for the idle grid (call 1); the second call
+    // inside runSpin is what crashes — simulating a mid-flight bonus error.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())            // call 1: renderBoard idle grid
+      .mockImplementationOnce(() => { throw new Error("bonus crash"); }); // call 2: runSpin
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    expect(originalBtn).not.toBeNull();
+    expect(originalBtn.disabled).toBe(false); // initially enabled
+
+    originalBtn.click();
+    // The engine throws synchronously; runSpin rejects. The .catch() fires
+    // after the microtask queue drains (captured by runAllTimersAsync).
+    await vi.runAllTimersAsync();
+
+    // The .catch() block in wireControls (board.ts line ~581) must set
+    // sparkleBtn.disabled = false on the original closure-captured reference.
+    // No renderBoard is called on the error path, so the original node is
+    // still in the DOM — we can assert directly on it.
+    expect(originalBtn.disabled).toBe(false);
+
+    root.remove();
+  });
+
   it("removes is-spinning after a doorbell-panic free-spin path resolves", async () => {
     // doorbellPanic truthy + freeSpinsAwarded > 0 → hits the runDoorbellPanic branch
     // at board.ts line ~936, then returns without calling the final renderBoard, so
