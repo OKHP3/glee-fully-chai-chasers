@@ -1,71 +1,68 @@
 import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
-import { useEffect, useState } from 'react';
-
-const MOMENTS = [
-  {
-    src: `${import.meta.env.BASE_URL}images/replay-captures/uniglee-capture.png`,
-    eyebrow: 'RARE REPLAY',
-    title: 'UniGlee capture',
-    copy: 'A rainbow butterfly opens an 80-spin marathon.',
-  },
-  {
-    src: `${import.meta.env.BASE_URL}images/replay-captures/treat-time.png`,
-    eyebrow: 'CAT-POWERED MOMENT',
-    title: 'Treat Time',
-    copy: 'Stock the jar, and Joey and Phoebe can make a good run better.',
-  },
-  {
-    src: `${import.meta.env.BASE_URL}images/replay-captures/bold-chai.png`,
-    eyebrow: 'QUICK-FIRE FEATURE',
-    title: 'Bold Chai',
-    copy: 'When the pump appears, the countdown is on.',
-  },
-] as const;
 
 export function Scene7() {
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      window.setTimeout(() => setActive(1), 6000),
-      window.setTimeout(() => setActive(2), 12000),
-    ];
-    return () => timers.forEach(window.clearTimeout);
-  }, []);
-
-  const moment = MOMENTS[active];
   return (
     <motion.div
-      className="absolute inset-0 overflow-hidden z-10"
-      {...sceneTransitions.perspectiveFlip}
+      className="absolute inset-0 flex flex-col items-center justify-center z-10"
+      {...sceneTransitions.fadeBlur}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#120d36] via-[#0b1029] to-[#22102b]" />
-      <div className="absolute top-[10vh] left-[8vw] z-20">
-        <p className="font-mono uppercase tracking-[.25em] text-cyan-200 text-sm">Original details, distinct moments</p>
-        <h2 className="font-display font-bold text-[4.4vw] text-white mt-2 leading-none">The chase keeps<br /><span className="text-gradient-gold">changing shape.</span></h2>
-      </div>
-
+      <div className="absolute inset-0 bg-[#0a0a20]" />
+      
       <motion.div
-        key={moment.title}
-        className="absolute right-[8vw] top-[18vh] z-20 w-[53vw] rounded-[1.8rem] overflow-hidden border border-white/25 shadow-[0_30px_90px_rgba(0,0,0,.55)]"
-        initial={{ opacity: 0, x: 110, rotate: 3 }}
-        animate={{ opacity: 1, x: 0, rotate: 0 }}
-        exit={{ opacity: 0, x: -110, rotate: -3 }}
-        transition={{ duration: .7, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <img src={moment.src} alt={`${moment.title} from a current engine replay`} className="block w-full" />
-        <div className="absolute inset-x-0 bottom-0 p-7 bg-gradient-to-t from-[#080515] via-[#080515]/85 to-transparent">
-          <p className="font-mono text-xs tracking-[.22em] text-cyan-200">{moment.eyebrow}</p>
-          <h3 className="font-display font-bold text-4xl text-white mt-2">{moment.title}</h3>
-          <p className="text-lg text-slate-200 mt-1">{moment.copy}</p>
-        </div>
-      </motion.div>
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] rounded-full blur-[150px] bg-gradient-to-tr from-accent/30 to-pink-600/30"
+        animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+      />
 
-      <div className="absolute left-[8vw] bottom-[14vh] z-20 flex gap-3">
-        {MOMENTS.map((item, index) => (
-          <div key={item.title} className={`h-2 rounded-full transition-all duration-500 ${active === index ? 'w-24 bg-warning' : 'w-8 bg-white/30'}`} />
-        ))}
+      {/* Decorative Assets */}
+      <motion.div
+        className="absolute left-[15vw] top-[30vh] w-48 h-48 bg-contain bg-center bg-no-repeat drop-shadow-[0_0_30px_rgba(251,191,36,0.4)]"
+        style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/chai-cup.png')` }}
+        initial={{ opacity: 0, y: 50, rotate: -20 }}
+        animate={{ opacity: 1, y: 0, rotate: -10 }}
+        transition={{ delay: 0.5, duration: 1, type: 'spring' }}
+      />
+      <motion.div
+        className="absolute right-[15vw] bottom-[30vh] w-48 h-48 bg-contain bg-center bg-no-repeat drop-shadow-[0_0_30px_rgba(16,185,129,0.4)]"
+        style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/generated/firefly-jar.png')` }}
+        initial={{ opacity: 0, y: -50, rotate: 20 }}
+        animate={{ opacity: 1, y: 0, rotate: 10 }}
+        transition={{ delay: 0.7, duration: 1, type: 'spring' }}
+      />
+
+      <div className="relative z-20 text-center flex flex-col items-center">
+        <motion.h2
+          className="font-display font-medium text-3xl text-slate-300 tracking-[0.2em] uppercase mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1 }}
+        >
+          Join the chase
+        </motion.h2>
+
+        <motion.h1
+          className="font-display font-bold text-[7vw] leading-tight text-white mb-12 drop-shadow-xl"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 1.3, type: 'spring' }}
+        >
+          Glee-fully <span className="text-gradient-gold">Chai Chasers</span>
+        </motion.h1>
+
+        {/* Hero SPARKLE Button CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 2 }}
+        >
+          <div className="px-16 py-6 rounded-full bg-gradient-to-r from-accent to-pink-500 shadow-[0_0_60px_rgba(217,70,239,0.6)] border-2 border-white/30 cursor-pointer">
+            <span className="font-display font-bold text-4xl tracking-widest text-white">SPARKLE!</span>
+          </div>
+          <p className="text-slate-400 mt-6 font-mono tracking-widest text-sm">
+            PLAY FREE NOW
+          </p>
+        </motion.div>
       </div>
     </motion.div>
   );

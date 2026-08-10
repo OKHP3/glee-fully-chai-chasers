@@ -78,7 +78,7 @@ export function BackgroundEffects({ currentScene }: BackgroundEffectsProps) {
       <motion.div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-100"
         style={{
-          backgroundImage: `url('${import.meta.env.BASE_URL}images/glee-fully-game.jpg')`,
+          backgroundImage: `url('${import.meta.env.BASE_URL}images/glee-fully-arcade.png')`,
         }}
         animate={{
           scale: currentScene === 0 ? 1 : currentScene === 1 ? 1.2 : 1.3,

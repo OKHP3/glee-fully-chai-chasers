@@ -13,12 +13,12 @@ import { BackgroundEffects } from './video_scenes/BackgroundEffects';
 
 export const SCENE_DURATIONS: Record<string, number> = {
   scene1: 14000,
-  scene2: 20000,
-  scene3: 18000,
-  scene6: 22000,
-  scene7: 18000,
-  scene4: 14000,
-  scene5: 14000,
+  scene2: 18000,
+  scene3: 16000,
+  scene4: 16000,
+  scene5: 16000,
+  scene6: 18000,
+  scene7: 12000,
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
@@ -71,13 +71,15 @@ export default function VideoTemplate({
     const audio = audioRef.current;
     const voice = voiceRef.current;
     const targetTime = SCENE_START_SEC[baseSceneKey] ?? 0;
+    
     if (audio) {
-      audio.volume = 0.22;
+      audio.volume = 0.20; // Changed to 20%
       if (Math.abs(audio.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) audio.currentTime = targetTime;
       audio.play().catch(() => {});
     }
+    
     if (voice) {
-      voice.volume = 0.92;
+      voice.volume = 0.90; // Changed to 90%
       if (Math.abs(voice.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) voice.currentTime = targetTime;
       voice.play().catch(() => {});
     }
@@ -86,7 +88,7 @@ export default function VideoTemplate({
   return (
     <>
       <div
-        className="w-full h-screen overflow-hidden relative"
+        className="w-full h-screen overflow-hidden relative font-sans"
         style={{ backgroundColor: 'var(--color-bg-dark)' }}
       >
         {/* Background elements that persist across scenes for continuous motion */}
@@ -108,7 +110,7 @@ export default function VideoTemplate({
       />
       <audio
         ref={voiceRef}
-        src={`${import.meta.env.BASE_URL}audio/chai-chasers-third-cut-voiceover.mp3`}
+        src={`${import.meta.env.BASE_URL}audio/chai-chasers-v3-voiceover.mp3`}
         preload="auto"
         autoPlay
         muted={muted}

@@ -7,3 +7,10 @@ uri = "file://artifacts/chai-chasers-video/public/audio/bg_music.mp3"
 type = "audio"
 title = "cozy lo-fi folk background music"
 description = "Generated music: Playful lo-fi indie-folk instrumental scoring a warm personal game reveal video. Acoustic guitar, gentle marimba, soft piano, light bells, brushed percussion, 88 BPM. Cozy Pacific-No…"
+
+[[outputs]]
+id = "oZcYoCM4cKFDOBkHP41nt"
+uri = "file://artifacts/chai-chasers-video/public/audio/chai-chasers-v3-voiceover_2.mp3"
+type = "audio"
+title = "chai chasers v3 voiceover"
+description = "Text-to-speech audio: Welcome to Glee-fully Chai Chasers — a cozy slot game with a night-garden aesthetic. The chase is on. Meet Joey and Phoebe. Spin the reels in this moonlit garden, where floating…"
