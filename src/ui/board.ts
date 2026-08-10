@@ -1077,6 +1077,12 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
     const status = scene.querySelector<HTMLDivElement>("#bold-chai-status")!;
     let settled = false;
     let plungerTimers: number[] = [];
+    // The visible countdown and the actual deadline share ONE origin: scene
+    // mount. The fallback setTimeout below resolves the bonus at mount +
+    // BOLD_CHAI_DURATION_MS regardless of pump activity, so the clock must
+    // count from mount too — not from pumpState.startedAtMs (first accepted
+    // pump), or a player who pumps late would see the display jump.
+    const mountedAtMs = performance.now();
     // Absolute fallback: resolve the bonus after BOLD_CHAI_DURATION_MS even if
     // the player never taps the pump.  Without this, startedAtMs stays undefined
     // and the frame() condition is never true, trapping the player indefinitely.
@@ -1097,7 +1103,7 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
 
     const paint = (now: number) => {
       pumpState = settleBoldChaiPump(pumpState, now);
-      const elapsed = pumpState.startedAtMs === undefined ? 0 : Math.max(0, now - pumpState.startedAtMs);
+      const elapsed = Math.max(0, now - mountedAtMs);
       seconds.textContent = (Math.max(0, BOLD_CHAI_DURATION_MS - elapsed) / 1000).toFixed(1);
       count.textContent = `${pumpState.pumpsInCurrentCup} / ${BOLD_CHAI_PUMPS_PER_CUP}`;
       scene.classList.toggle("is-resetting", pumpState.phase === "resetting");
@@ -1142,7 +1148,7 @@ function runBoldChaiBonus(root: HTMLElement): Promise<number> {
     const frame = (now: number) => {
       if (settled) return;
       paint(now);
-      if (pumpState.startedAtMs !== undefined && now - pumpState.startedAtMs >= BOLD_CHAI_DURATION_MS) { finish(now); return; }
+      if (now - mountedAtMs >= BOLD_CHAI_DURATION_MS) { finish(now); return; }
       requestAnimationFrame(frame);
     };
 

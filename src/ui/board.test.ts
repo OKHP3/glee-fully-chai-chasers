@@ -1163,4 +1163,48 @@ describe("bold-chai bonus — no-pump timeout", () => {
 
     root.remove();
   });
+
+  it("counts the timer display down from scene mount even when the player ignores pumping until the last moment", async () => {
+    // The fallback deadline is mount + BOLD_CHAI_DURATION_MS regardless of
+    // pump activity, so the visible clock must count from mount too. Before
+    // the fix it counted from pumpState.startedAtMs (first accepted pump), so
+    // a player pumping at t=25s saw the display jump from "30.0" to "5.0".
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())                        // call 1: renderBoard idle grid
+      .mockReturnValueOnce(noBonusResult({ boldChaiPump: true })); // call 2: runSpin
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    root.querySelector<HTMLButtonElement>("#sparkle-btn")!.click();
+    // Let animateSteps (480 ms) resolve so the bold-chai scene mounts, then
+    // idle for the rest of a 25-second stretch with zero pumps.
+    await vi.advanceTimersByTimeAsync(480);
+    const seconds = root.querySelector<HTMLSpanElement>("#bold-chai-seconds")!;
+    expect(Number(seconds.textContent)).toBeCloseTo(BOLD_CHAI_DURATION_MS / 1000, 0);
+
+    await vi.advanceTimersByTimeAsync(25_000);
+
+    // 25 idle seconds have elapsed since mount → display must read ~5.0,
+    // proving the clock ticked down during the idle period.
+    const idleReading = Number(seconds.textContent);
+    expect(idleReading).toBeGreaterThan(3);
+    expect(idleReading).toBeLessThan(6);
+
+    // The player finally pumps at t≈25s. The display must NOT restart from
+    // 30.0 — it stays anchored to the mount-time deadline.
+    const pump = root.querySelector<HTMLButtonElement>("#bold-chai-pump-button")!;
+    pump.dispatchEvent(new Event("pointerdown", { bubbles: true, cancelable: true }));
+    const afterPumpReading = Number(seconds.textContent);
+    expect(afterPumpReading).toBeLessThanOrEqual(idleReading);
+    expect(afterPumpReading).toBeGreaterThan(3);
+
+    // And the bonus still resolves at the mount-anchored deadline (~5s later,
+    // not 30s after the late pump).
+    await vi.advanceTimersByTimeAsync(6_000 + 2_000);
+    expect(root.querySelector(".bold-chai-scene")).toBeNull();
+
+    root.remove();
+  });
 });
