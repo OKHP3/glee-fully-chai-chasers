@@ -73,9 +73,8 @@ function buildCascade(): string {
       ${ladderRows}
     </div>
     <p class="hiw-section__caption">
-      The Sparkle Wheel has three outcomes. Which one lands is already
-      decided the moment the chain closes — the wheel animation simply
-      reveals the result.
+      The Sparkle Wheel has three outcomes: extra wilds on the opening
+      board, a memory-match round, or an iced-chai storm.
     </p>
   </section>`;
 }
@@ -116,15 +115,13 @@ function buildCats(): string {
         <div class="hiw-cat__portrait">${catSprite('phoebe', 'strut')}</div>
         <strong class="hiw-cat__name">Phoebe</strong>
         <p class="hiw-cat__bio">Pops in when any treat is stocked. Her visit
-          uses one treat and fires a Sparkle Sort — blasting random symbols
-          to keep the chain going.</p>
+          uses one treat and brings her own brand of sparkle to the board.</p>
       </div>
       <div class="hiw-cat hiw-cat--joey">
         <div class="hiw-cat__portrait">${catSprite('joey', 'strut')}</div>
         <strong class="hiw-cat__name">Joey</strong>
         <p class="hiw-cat__bio">Shows up when Bougie Bites are in the jar.
-          His visit uses a Bougie Bite and drops a whole reel of cat wilds —
-          the only way wilds reach the outermost column.</p>
+          His visit uses a Bougie Bite and makes a very professional entrance.</p>
       </div>
     </div>
   </section>`;
