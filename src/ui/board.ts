@@ -583,6 +583,13 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
         saveGameState(state);
       }
       sparkleBtn.disabled = false;
+      // Bet buttons are normally re-enabled by runSpin's finally block; repeat
+      // it here so crash recovery is self-contained even if that block ever
+      // throws partway through or a future async path changes the timing.
+      const betUpCatch = root.querySelector<HTMLButtonElement>("#bet-up");
+      const betDownCatch = root.querySelector<HTMLButtonElement>("#bet-down");
+      if (betUpCatch) betUpCatch.disabled = false;
+      if (betDownCatch) betDownCatch.disabled = false;
     });
   });
 }
