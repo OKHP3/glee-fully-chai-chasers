@@ -8,6 +8,10 @@ reference-photos/
 dist
 tmp
 out-tsc
+
+# Scene HTML files are generated at build time by copying from
+# artifacts/mockup-sandbox/public/scenes/ — never commit these.
+public/scenes/
 *.tsbuildinfo
 .expo
 .expo-shared
