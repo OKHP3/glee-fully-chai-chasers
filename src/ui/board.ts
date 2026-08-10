@@ -843,6 +843,13 @@ async function runSpin(
   state.balance -= state.bet;
   sparkleBtn.disabled = true;
   sparkleBtn.classList.add("is-spinning");
+  // Lock bet controls for the duration of the spin.  The payout was computed
+  // at the current bet; changing it mid-spin would make the displayed bet
+  // inconsistent with what was actually wagered.
+  const betUpAtStart = root.querySelector<HTMLButtonElement>("#bet-up");
+  const betDownAtStart = root.querySelector<HTMLButtonElement>("#bet-down");
+  if (betUpAtStart) betUpAtStart.disabled = true;
+  if (betDownAtStart) betDownAtStart.disabled = true;
   // Prevent the HIW guide from opening mid-spin: an open overlay sits at
   // z-index 9999 and would hide any bonus overlay appended during the spin.
   const hiwBtnAtStart = root.querySelector<HTMLButtonElement>("#hiw-btn");
@@ -966,6 +973,13 @@ async function runSpin(
     // so this is the only place that stops the animation.
     sparkleBtn.classList.remove("is-spinning");
 
+    // Re-enable bet controls on every exit path (same rationale as HIW below).
+    if (betUpAtStart) betUpAtStart.disabled = false;
+    if (betDownAtStart) betDownAtStart.disabled = false;
+    const betUpCurrent = root.querySelector<HTMLButtonElement>("#bet-up");
+    const betDownCurrent = root.querySelector<HTMLButtonElement>("#bet-down");
+    if (betUpCurrent) betUpCurrent.disabled = false;
+    if (betDownCurrent) betDownCurrent.disabled = false;
     // Re-enable the HIW button on every exit path (same rationale — use the
     // pre-try reference where available, plus a live querySelector as fallback
     // for any future path that navigates without calling renderBoard()).

@@ -496,6 +496,37 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 
+  it("disables bet-up and bet-down during a spin and re-enables them after the sequence resolves", async () => {
+    // Bet buttons must be locked for the entire spin so the displayed bet can
+    // never diverge from the wagered amount while cascades are resolving.
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    const betUp = root.querySelector<HTMLButtonElement>("#bet-up")!;
+    const betDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
+    expect(betUp.disabled).toBe(false);   // not locked before the spin
+    expect(betDown.disabled).toBe(false);
+
+    const sparkleBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    sparkleBtn.click();
+
+    // runSpin disables the bet buttons synchronously before its first await.
+    expect(betUp.disabled).toBe(true);
+    expect(betDown.disabled).toBe(true);
+
+    // Drain all timers so renderBoard is called and the sequence completes.
+    await vi.runAllTimersAsync();
+
+    // After renderBoard replaces the DOM the fresh bet buttons must be enabled.
+    const newBetUp = root.querySelector<HTMLButtonElement>("#bet-up")!;
+    const newBetDown = root.querySelector<HTMLButtonElement>("#bet-down")!;
+    expect(newBetUp.disabled).toBe(false);
+    expect(newBetDown.disabled).toBe(false);
+
+    root.remove();
+  });
+
   it("ignores a second click while the button is disabled mid-spin so spin fires exactly once", async () => {
     // No bonus, no win — the simplest spin path.  The important thing is that
     // the click-handler guard at board.ts (`if (sparkleBtn.disabled) return;`)
