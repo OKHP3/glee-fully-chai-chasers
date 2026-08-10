@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=390">
 <title>Treat Time Entry — Nighttime — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}</style>
+<style>html,body{margin:0;padding:0;width:390px;overflow:hidden;background:#06081a}
+/* Scene preview: show the hand graphic — override display:none and all clipping ancestors */
+.treat-time-entry--main .treat-time-entry-hand{display:block!important}
+.treat-time-entry--main{overflow:visible!important}
+.treat-time-cabinet{overflow:visible!important}</style>
 </head>
 <body>
 <div class="cc-root">
@@ -23,11 +27,38 @@
       <!-- treat-time-entry-nighttime: div.treat-time-entry--main.treat-time-entry--night appended to .cabinet-frame -->
       <!-- CSS: radial-gradient(ellipse at 52% 48%, rgba(107,214,201,.34), rgba(21,15,48,.92) 78%) — mint fill; --morning uses gold -->
       <div class="treat-time-entry treat-time-entry--main treat-time-entry--night" style="animation:none;opacity:1">
-        <div class="treat-time-entry-hand" aria-hidden="true">
+        <div class="treat-time-entry-hand" aria-hidden="true" style="display:block!important;position:relative!important;left:auto!important;bottom:auto!important;width:90px;flex-shrink:0;align-self:flex-end">
           <!-- treatTimeHandSvg() inline (hand is hidden on --main variant per CSS) -->
-          <svg viewBox="0 0 88 110" aria-hidden="true">
-            <path d="M28 101c-7-7-9-19-6-31l6-24c1-5 8-5 9 0l1 14 2-34c0-6 8-6 9 0l1 31 2-39c0-6 8-6 9 0l1 38 3-28c1-6 9-5 9 1l-2 38c-1 16-7 26-18 34z" fill="#f5d576" stroke="#2d1f4c" stroke-width="4" stroke-linejoin="round"/>
-            <path d="M24 69c-7-7-13-9-17-4-4 5 1 12 10 17" fill="none" stroke="#2d1f4c" stroke-width="4" stroke-linecap="round"/>
+          <svg viewBox="0 0 88 110" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="tth-fill" x1="0.3" y1="0" x2="0.75" y2="1">
+                <stop offset="0%" stop-color="#fde9a8"/>
+                <stop offset="100%" stop-color="#e8ab36"/>
+              </linearGradient>
+              <linearGradient id="tth-cuff" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#9461f0"/>
+                <stop offset="100%" stop-color="#5b18c4"/>
+              </linearGradient>
+            </defs>
+            <!-- Sleeve / cuff -->
+            <rect x="18" y="93" width="52" height="17" rx="5" fill="url(#tth-cuff)" stroke="#2d1f4c" stroke-width="2.5"/>
+            <rect x="18" y="93" width="52" height="6" rx="3" fill="rgba(255,248,238,.14)"/>
+            <path d="M21 100 Q44 104 67 100" fill="none" stroke="#f2c84b" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+            <!-- Thumb -->
+            <path d="M22 83 C13 80 6 71 8 61 C10 53 18 51 24 57 L24 75 Z" fill="url(#tth-fill)" stroke="#2d1f4c" stroke-width="3" stroke-linejoin="round"/>
+            <!-- 4-finger + palm silhouette -->
+            <path d="M22 90 L22 36 C22 28 33 28 33 36 L33 58 L33 20 C33 12 45 12 45 20 L45 58 L45 26 C45 18 57 18 57 26 L57 60 L57 40 C57 32 67 32 67 40 L67 76 C70 88 70 90 66 90 Z" fill="url(#tth-fill)" stroke="#2d1f4c" stroke-width="3.5" stroke-linejoin="round"/>
+            <!-- Finger valley lines -->
+            <line x1="33" y1="52" x2="33" y2="58" stroke="#2d1f4c" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+            <line x1="45" y1="52" x2="45" y2="58" stroke="#2d1f4c" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+            <line x1="57" y1="54" x2="57" y2="60" stroke="#2d1f4c" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+            <!-- Knuckle highlights -->
+            <ellipse cx="27" cy="59" rx="3" ry="2" fill="rgba(255,248,238,.44)"/>
+            <ellipse cx="39" cy="57" rx="3" ry="2" fill="rgba(255,248,238,.44)"/>
+            <ellipse cx="51" cy="57" rx="3" ry="2" fill="rgba(255,248,238,.44)"/>
+            <ellipse cx="62" cy="61" rx="2.5" ry="2" fill="rgba(255,248,238,.44)"/>
+            <!-- Palm highlight streak -->
+            <path d="M28 78 Q44 74 62 78" fill="none" stroke="rgba(255,248,238,.28)" stroke-width="5" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="treat-time-entry-copy">
