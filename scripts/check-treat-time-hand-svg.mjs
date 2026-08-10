@@ -32,7 +32,7 @@
  * in board.ts is still caught as a divergence.
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
@@ -71,10 +71,20 @@ const canonicalBoard = canonical(fnMatch[1]);
 
 // ── 3. Check each scene file ──────────────────────────────────────────────────
 
-const SCENE_FILES = [
-  "artifacts/mockup-sandbox/public/scenes/treat-time-entry-morning.html",
-  "artifacts/mockup-sandbox/public/scenes/treat-time-entry-nighttime.html",
-];
+// Discover treat-time-entry scene files dynamically so any new variant is
+// automatically included without editing this script.
+const SCENES_DIR = resolve(ROOT, "artifacts/mockup-sandbox/public/scenes");
+const SCENE_FILES = readdirSync(SCENES_DIR)
+  .filter((f) => f.startsWith("treat-time-entry-") && f.endsWith(".html"))
+  .map((f) => `artifacts/mockup-sandbox/public/scenes/${f}`);
+
+if (SCENE_FILES.length === 0) {
+  console.error(
+    "ERROR: No treat-time-entry-*.html scene files found in artifacts/mockup-sandbox/public/scenes/.\n" +
+    "       Expected at least treat-time-entry-morning.html and treat-time-entry-nighttime.html.",
+  );
+  process.exit(1);
+}
 
 // The scene files mark the inline SVG with this comment immediately before
 // the <svg> element so the extractor has a reliable anchor.
