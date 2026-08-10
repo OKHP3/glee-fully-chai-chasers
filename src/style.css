@@ -925,6 +925,7 @@ body {
 }
 .chrome-btn:active { transform: scale(0.94); }
 .chrome-btn:disabled { opacity: 0.38; pointer-events: none; }
+.chrome-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 /* ------------------------------------------------------------------ */
 /* Firefly-jar cascade meter                                           */
