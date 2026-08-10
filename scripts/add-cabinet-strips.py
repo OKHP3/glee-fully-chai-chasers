@@ -239,9 +239,9 @@ def validate():
         re.DOTALL,
     )
 
-    failures = []
-    no_strip = []
-    checked  = 0
+    failures      = []   # wrong values, or missing strip for a COPY-known scene
+    no_strip_warn = []   # missing strip for a scene not in COPY (hand-stamped origin)
+    checked       = 0
 
     for fname in sorted(os.listdir(SCENES_DIR)):
         if not fname.endswith(".html"):
@@ -255,7 +255,13 @@ def validate():
             html = fh.read()
 
         if "cabinet-msg--top" not in html:
-            no_strip.append(fname)
+            if name in COPY:
+                # The script knows how to stamp this scene; a missing strip means
+                # the file was regenerated from scratch and the strip was lost.
+                failures.append((fname, ["  strip missing — scene is in COPY table but has no cabinet-msg--top"]))
+            else:
+                # Hand-stamped or genuinely un-strippable; warn but don't fail.
+                no_strip_warn.append(fname)
             continue
 
         exp_lvl, exp_cur, exp_max, exp_pct = SPARKS.get(name, DEFAULT)
@@ -286,10 +292,10 @@ def validate():
 
     print(
         f"validate-cabinet-strips: checked={checked}"
-        f"  no-strip={len(no_strip)}  failures={len(failures)}"
+        f"  no-strip-warn={len(no_strip_warn)}  failures={len(failures)}"
     )
-    for fname in no_strip:
-        print(f"  ?  {fname}  (no cabinet-msg--top — run add-cabinet-strips.py to stamp)")
+    for fname in no_strip_warn:
+        print(f"  ?  {fname}  (no cabinet-msg--top — not in COPY table, skipping)")
 
     if failures:
         for fname, errs in failures:
