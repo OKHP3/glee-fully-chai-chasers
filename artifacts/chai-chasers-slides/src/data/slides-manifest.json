@@ -88,10 +88,26 @@
     "speakerNotes": ""
   },
   {
-    "id": "8d1e8c4f-6a2b-4d93-b7a5-3c9e74b8d512",
+    "id": "3a6c9e2f-7d4b-4f18-b2a8-1e5d83c7f412",
     "position": 12,
+    "title": "The Probability Engine",
+    "filepath": "src/pages/slides/Slide12MathEngine.tsx",
+    "description": "Engine architecture — 20 pure-function modules, seeded RNG, 40 paylines, 178 tests",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b7d2f5a9-1e3c-4d86-a5b4-9c7e42d8b613",
+    "position": 13,
+    "title": "The RTP Simulation",
+    "filepath": "src/pages/slides/Slide13RTPSimulation.tsx",
+    "description": "Monte Carlo simulation — 2,000,000 spins, 40 seeds, 98.70% full-game RTP, per-feature breakdown",
+    "speakerNotes": ""
+  },
+  {
+    "id": "8d1e8c4f-6a2b-4d93-b7a5-3c9e74b8d512",
+    "position": 14,
     "title": "What I Built",
-    "filepath": "src/pages/slides/Slide12WhatIBuilt.tsx",
+    "filepath": "src/pages/slides/Slide14WhatIBuilt.tsx",
     "description": "Closing slide — summary of the complete project",
     "speakerNotes": ""
   }

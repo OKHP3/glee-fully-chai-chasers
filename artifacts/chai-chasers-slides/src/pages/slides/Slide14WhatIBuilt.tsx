@@ -1,6 +1,6 @@
 const base = import.meta.env.BASE_URL;
 
-export default function Slide12WhatIBuilt() {
+export default function Slide14WhatIBuilt() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden"
