@@ -292,7 +292,7 @@ export function renderBoard(
             <span class="jar-meter-kicker">Firefly Cascade</span>
             <div class="jar-meter-body">
               <div class="jar-meter-icon" id="jar-icon">${fireflyJarSvg(state.fireflyMeter)}</div>
-              <strong id="meter-count" class="jar-meter-count">${state.fireflyMeter} / 6</strong>
+              <strong id="meter-count" class="jar-meter-count">${Math.min(state.fireflyMeter, 6)} / 6</strong>
             </div>
           </div>
           <button id="askjamie-perch" aria-label="AskJamie — tap for daily bonus" class="askjamie-housing">
@@ -444,7 +444,7 @@ function updateJar(root: HTMLElement, count: number): void {
   const icon = root.querySelector<HTMLDivElement>("#jar-icon");
   if (icon) icon.innerHTML = fireflyJarSvg(count);
   const label = root.querySelector<HTMLSpanElement>("#meter-count");
-  if (label) label.textContent = `${count} / 6`;
+  if (label) label.textContent = `${Math.min(count, 6)} / 6`;
 }
 
 const ASKJAMIE_URLS: readonly string[] = [
@@ -784,7 +784,7 @@ function volumeControl(id: "music" | "sfx", label: string, value: number, help: 
   const maxPercent = id === "music" ? MUSIC_VOLUME_MAX * 100 : SFX_VOLUME_MAX * 100;
   const previewLabel = id === "music" ? "Preview music (3 s)" : "Preview sound effects";
   return `<div class="volume-row">` +
-    `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">(max)</output><input id="${id}-volume" type="range" min="0" max="${maxPercent}" value="${percent}" aria-label="${label} volume"/></label>` +
+    `<label class="volume-control" for="${id}-volume"><span><b>${label}</b><small>${help}</small></span><output id="${id}-volume-value" for="${id}-volume">${percent}%</output><input id="${id}-volume" type="range" min="0" max="${maxPercent}" value="${percent}" aria-label="${label} volume"/></label>` +
     `<button type="button" class="volume-preview-btn" id="${id}-preview-btn" aria-label="${previewLabel}" aria-pressed="false">▶</button>` +
     `</div>`;
 }
@@ -796,9 +796,11 @@ function wireVolume(
   persist: () => void,
 ): void {
   const input = page.querySelector<HTMLInputElement>(`#${id}-volume`)!;
+  const output = page.querySelector<HTMLOutputElement>(`#${id}-volume-value`);
   input.addEventListener("input", () => {
     const value = Number(input.value) / 100;
     apply(value);
+    if (output) output.textContent = `${input.value}%`;
   });
   input.addEventListener("change", persist);
 }

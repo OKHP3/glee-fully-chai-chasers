@@ -111,6 +111,69 @@ function makeSpinState(): GameState {
   } as GameState;
 }
 
+// ── Volume display and firefly meter ─────────────────────────────────────────
+
+describe("firefly meter display clamping", () => {
+  it("shows 6 / 6 when fireflyMeter is above the meter max", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.fireflyMeter = 9; // above max of 6
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+    const label = root.querySelector<HTMLElement>("#meter-count");
+    expect(label?.textContent).toBe("6 / 6");
+    root.remove();
+  });
+
+  it("shows the exact count when fireflyMeter is within range", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.fireflyMeter = 4;
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+    const label = root.querySelector<HTMLElement>("#meter-count");
+    expect(label?.textContent).toBe("4 / 6");
+    root.remove();
+  });
+});
+
+describe("volume output label initialization", () => {
+  it("shows the stored percentage rather than '(max)' when settings page opens", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.musicVolume = 0.75;  // 75%
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+    root.querySelector<HTMLButtonElement>("#settings-btn")?.click();
+    const output = root.querySelector<HTMLOutputElement>("#music-volume-value");
+    expect(output?.textContent).toBe("75%");
+    expect(output?.textContent).not.toBe("(max)");
+    root.remove();
+  });
+
+  it("updates the label immediately when a volume slider is moved", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.musicVolume = 1;
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+    root.querySelector<HTMLButtonElement>("#settings-btn")?.click();
+    const input = root.querySelector<HTMLInputElement>("#music-volume");
+    const output = root.querySelector<HTMLOutputElement>("#music-volume-value");
+    // Simulate moving the slider to 50
+    if (input) {
+      input.value = "50";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    expect(output?.textContent).toBe("50%");
+    root.remove();
+  });
+});
+
 // ── Existing test suites ──────────────────────────────────────────────────────
 
 describe("free-spin multiplier overlay", () => {
