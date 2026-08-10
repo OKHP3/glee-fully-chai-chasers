@@ -1007,6 +1007,45 @@ describe("coin balance protection on engine crash", () => {
     root.remove();
   });
 
+  it("fires the bust-proof refill and shows its status message when a low-balance spin leads into a free-spin session", async () => {
+    // The refill entry point (applyBustProofRefill at the top of runSpin) is
+    // shared by base spins AND spins that hand off into a bonus free-spin
+    // session (treat-time here — it runs a full runFreeSpinSession mid-spin
+    // with no user interaction). If that entry point were ever bypassed for
+    // bonus-bound spins, a near-zero-balance player would silently play a
+    // whole free-spin session with no refill and no message.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult()) // call 1: renderBoard idle grid
+      .mockReturnValueOnce(noBonusResult({
+        treatTimeBonus: { mode: "morning", freeSpinsAwarded: 3 },
+      } as Partial<SpinResult>));           // call 2: runSpin → treat-time session
+
+    const state = makeSpinState();
+    state.balance = 10; // below bet=25 → refill fires (+500 → 510)
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    root.querySelector<HTMLButtonElement>("#sparkle-btn")!.click();
+
+    // The refill and its message are applied synchronously at runSpin entry,
+    // before the bet deduction and before the bonus session starts.
+    expect(root.querySelector<HTMLElement>("#marquee-status")?.textContent)
+      .toBe("AskJamie found coins under the couch! +500 coins");
+    // 10 + 500 (refill) − 25 (bet) = 485
+    expect(state.balance).toBe(485);
+
+    // Let the whole treat-time free-spin session play out (entry overlay,
+    // session rounds, celebration, re-render). The session credits wins on
+    // top of the refilled balance — it must never end below the post-refill,
+    // post-deduction floor, proving the refill survived into the session.
+    await vi.runAllTimersAsync();
+    expect(state.balance).toBeGreaterThanOrEqual(485);
+
+    root.remove();
+  });
+
   it("preserves the bust-proof refill when the engine crashes before settlement", async () => {
     // applyBustProofRefill fires when balance < bet, adding 500 coins BEFORE
     // the bet is deducted.  settlementGuard.preDeductionBalance is snapshotted
