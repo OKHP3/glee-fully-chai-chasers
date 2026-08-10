@@ -5,55 +5,183 @@
 <meta name="viewport" content="width=1280">
 <title>Joey's Laundry Helper — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}.cc-root{width:1280px;height:900px}</style>
+<style>
+html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
+.cc-root{width:1280px;height:900px;padding:0!important}
+.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;
+          display:flex!important;flex-direction:column!important;
+          border-radius:0!important;margin:0!important}
+
+/* Cabinet-frame: flex column so Joey zone + reel-grid stack */
+.cabinet-frame{display:flex!important;flex-direction:column!important}
+.reel-grid{flex:1!important;min-height:0!important}
+
+/* ── Joey perch zone: a strip above the reel columns ── */
+.joey-perch-zone{
+  flex-shrink:0;
+  position:relative;
+  height:110px;
+  overflow:visible;
+  border-bottom:1px solid rgba(120,80,240,.2);
+  background:linear-gradient(180deg,rgba(14,8,38,.85),rgba(8,4,24,.6));
+}
+
+/* Joey sprite — slides across the strip above each reel column */
+.joey-perch-cat{
+  position:absolute;
+  bottom:0;
+  width:140px;height:110px;
+  background-image:url('../assets/joey-phoebe-wilds.png');
+  background-image:image-set(
+    url('../assets/optimized/joey-phoebe-wilds.webp') type('image/webp'),
+    url('../assets/joey-phoebe-wilds.png') type('image/png')
+  );
+  background-size:200% auto;
+  background-position:0% 30%;
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 8px 24px rgba(180,140,255,.4)) drop-shadow(0 0 2px rgba(0,0,0,.6));
+  /* Horizontal slide across 3 reel columns, dip-and-lift at each */
+  animation:joey-sweep 5.4s ease-in-out infinite;
+  transform-origin:center bottom;
+}
+
+/* Reel 0 centre = 16.67%, Reel 1 = 50%, Reel 2 = 83.33% */
+/* translateX is relative to the element's own width (140px),    */
+/* so offsets adjust to centre Joey over each column             */
+@keyframes joey-sweep{
+  /* Above reel 0 */
+  0%   { left:calc(16.67% - 70px); transform:translateY(0) scaleX(1); }
+  8%   { left:calc(16.67% - 70px); transform:translateY(14px) scaleX(1); }   /* reach down */
+  16%  { left:calc(16.67% - 70px); transform:translateY(0) scaleX(1); }
+
+  /* Slide to reel 1 */
+  30%  { left:calc(50% - 70px);    transform:translateY(0) scaleX(1); }
+  38%  { left:calc(50% - 70px);    transform:translateY(14px) scaleX(1); }
+  46%  { left:calc(50% - 70px);    transform:translateY(0) scaleX(1); }
+
+  /* Slide to reel 2 */
+  60%  { left:calc(83.33% - 70px); transform:translateY(0) scaleX(-1); }     /* face right on return */
+  68%  { left:calc(83.33% - 70px); transform:translateY(14px) scaleX(-1); }
+  76%  { left:calc(83.33% - 70px); transform:translateY(0) scaleX(-1); }
+
+  /* Return to reel 0 */
+  90%  { left:calc(16.67% - 70px); transform:translateY(0) scaleX(1); }
+  100% { left:calc(16.67% - 70px); transform:translateY(0) scaleX(1); }
+}
+
+/* Animated paw-reach indicator (a small glowing dot that drops at pause moments) */
+.joey-paw-hint{
+  position:absolute;
+  bottom:-8px;
+  left:50%;transform:translateX(-50%);
+  width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,220,80,1),rgba(255,180,40,.6));
+  box-shadow:0 0 10px rgba(255,200,60,.8);
+  animation:paw-drop 5.4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes paw-drop{
+  0%,14%,32%,44%,62%,78%,100%{opacity:0;transform:translateX(-50%) translateY(0)}
+  8%  {opacity:1;transform:translateX(-50%) translateY(6px)}
+  38% {opacity:1;transform:translateX(-50%) translateY(6px)}
+  68% {opacity:1;transform:translateX(-50%) translateY(6px)}
+}
+
+/* Zone label */
+.joey-zone-label{
+  position:absolute;top:8px;right:14px;
+  font-family:'Baloo 2',sans-serif;font-size:10.5px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(180,140,255,.5);
+  pointer-events:none;
+}
+
+/* Reel 0 wild column tint */
+.reel-col[data-reel="0"] .cell{
+  background:rgba(120,60,220,.12);
+  box-shadow:inset 0 0 0 1px rgba(180,120,255,.25);
+}
+</style>
 </head>
 <body>
 <div class="cc-root">
   <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
-  <!-- Joey Laundry Helper overlay — class="joey-laundry-overlay" appended to .cc-root -->
-  <div class="joey-laundry-overlay" role="region" aria-label="Joey's Laundry Helper sub-bonus" style="position:absolute;inset:0;z-index:10">
-    <div class="night-garden aurora" aria-hidden="true" style="position:absolute;inset:0"></div>
-    <div style="position:relative;z-index:10;height:100%;width:100%;display:flex;flex-direction:column" class="cc-shell free-spins-shell joey-laundry-shell">
-      <header class="marquee joey-laundry-header">
-        <div class="marquee-bulbs" aria-hidden="true"><span class="marquee-bulb" style="--blink-delay:0s"></span><span class="marquee-bulb" style="--blink-delay:.07s"></span><span class="marquee-bulb" style="--blink-delay:.14s"></span><span class="marquee-bulb" style="--blink-delay:.21s"></span><span class="marquee-bulb" style="--blink-delay:.28s"></span></div>
-        <div class="marquee-row">
-          <span class="level-chip">UniGlee · Chapter 1</span>
-          <h1 class="marquee-title">Joey's Laundry Helper</h1>
-        </div>
-      </header>
-      <div class="jar-meter joey-laundry-meter">
-        <div class="jar-meter-text">Laundry spin <span id="laundry-index">3</span> of <span id="laundry-total">10</span> · Round win: <span id="laundry-round-win">1,240</span></div>
+  <div class="cc-shell">
+
+    <header class="marquee joey-laundry-header">
+      <div class="marquee-bulbs" aria-hidden="true">
+        <span class="marquee-bulb" style="--blink-delay:0s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.07s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.14s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.21s"></span>
+        <span class="marquee-bulb" style="--blink-delay:.28s"></span>
       </div>
-      <main class="cabinet-frame joey-laundry-cabinet">
-        <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span><span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
-        <!-- Joey perched on top of the active reel -->
-        <div class="joey-laundry-perch" aria-hidden="true">
-          <span class="cat-pop-asset cat-pop-asset--joey cat-pop-asset--assist" style="background-image:url('../assets/joey-phoebe-wilds.png');background-image:image-set(url('../assets/optimized/joey-phoebe-wilds.webp') type('image/webp'),url('../assets/joey-phoebe-wilds.png') type('image/png'));background-position:0% 50%" role="img" aria-label="Joey"></span>
+      <div class="marquee-row">
+        <span class="level-chip">UniGlee · Chapter 1</span>
+        <h1 class="marquee-title">Joey's Laundry Helper</h1>
+      </div>
+      <div class="marquee-status">Laundry spin 3 of 10 · Round win: 1,240</div>
+    </header>
+
+    <main class="cabinet-frame joey-laundry-cabinet">
+      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span>
+      <span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
+
+      <!-- ── Joey animation zone: above the ingredient columns ── -->
+      <div class="joey-perch-zone" aria-label="Joey sweeping above the laundry reels" aria-hidden="true">
+        <span class="joey-zone-label">Joey is collecting…</span>
+        <div class="joey-perch-cat">
+          <div class="joey-paw-hint"></div>
         </div>
-        <!-- 3-reel laundry grid: reel 0 is all Joey wilds (sock drop), reels 1-2 normal -->
-        <div id="laundry-grid" class="reel-grid" role="img" aria-label="Laundry reel board">
-          <div class="reel-col" data-reel="0">
-            <div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
-            <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
-            <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
-            <div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
-          </div>
-          <div class="reel-col" data-reel="1">
-            <div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
-            <div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
-            <div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
-            <div class="cell win-flash" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
-          </div>
-          <div class="reel-col" data-reel="2">
-            <div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
-            <div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
-            <div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
-            <div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
-          </div>
+      </div>
+
+      <!-- 3-reel laundry grid: reel 0 all Joey wilds (sock drop), reels 1–2 normal -->
+      <div id="laundry-grid" class="reel-grid" role="img" aria-label="Laundry reel board">
+        <div class="reel-col" data-reel="0">
+          <div class="cell" data-reel="0" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
+          <div class="cell" data-reel="0" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
+          <div class="cell" data-reel="0" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
+          <div class="cell" data-reel="0" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/special-symbol-atlas.png');background-size:400% 200%;background-position:33.33% 0%"></span></div>
         </div>
-      </main>
-      <div id="laundry-status" class="status-line" aria-live="polite">Joey's Laundry Helper · Sock drop! Reel 1 all Joey wilds · +1,240 coins</div>
+        <div class="reel-col" data-reel="1">
+          <div class="cell" data-reel="1" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
+          <div class="cell" data-reel="1" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
+          <div class="cell" data-reel="1" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
+          <div class="cell win-flash" data-reel="1" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
+        </div>
+        <div class="reel-col" data-reel="2">
+          <div class="cell" data-reel="2" data-row="0"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
+          <div class="cell" data-reel="2" data-row="1"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
+          <div class="cell" data-reel="2" data-row="2"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
+          <div class="cell" data-reel="2" data-row="3"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
+        </div>
+      </div>
+    </main>
+
+    <div class="companion-row">
+      <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
+        <span class="treat-jar-title">Treat Jar</span>
+        <div class="treat-chips-row">
+          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>3</span>
+          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>7</span>
+        </div>
+      </div>
+      <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
+        <span class="jar-meter-kicker">Firefly Cascade</span>
+        <div class="jar-meter-body"><strong class="jar-meter-count">5 / 6</strong></div>
+      </div>
     </div>
+
+    <div id="status-line" class="status-line" aria-live="polite">
+      Joey's Laundry Helper · Sock drop! Reel 1 all Joey wilds · +1,240 coins
+    </div>
+
+    <footer class="bet-console">
+      <button class="bet-adj-btn" disabled>−</button>
+      <button class="sparkle-btn" disabled>SPARKLE</button>
+      <button class="bet-adj-btn" disabled>+</button>
+    </footer>
+
   </div>
 </div>
 </body>
