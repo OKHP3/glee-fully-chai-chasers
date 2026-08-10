@@ -45,6 +45,8 @@ jobs:
       - run: npm run validate:hand-svg
       - name: Confirm SymbolReference pays match PAYTABLE — catch drift after a rebalance
         run: npm run validate:symbol-pays
+      - name: Confirm cabinet-strip Sparks values match SPARKS table — catch a drifted scene before merge
+        run: npm run validate:cabinet-strips
       - run: npm run build
 
       - name: Verify How It Works scene files are present in dist
