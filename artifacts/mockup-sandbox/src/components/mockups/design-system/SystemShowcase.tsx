@@ -57,6 +57,18 @@ function ColSwatch({name,hex,role,text,border}:{name:string;hex:string;role:stri
   );
 }
 
+/** Card header: prominent display name + one-line usage note */
+function SectionLabel({name,note,accent=C.muted}:{name:string;note:string;accent?:string}){
+  return(
+    <div style={{marginBottom:10,paddingBottom:8,borderBottom:`1px solid rgba(255,255,255,.06)`}}>
+      <div style={{fontSize:11,fontWeight:700,color:C.cream,letterSpacing:"0.06em",textTransform:"uppercase",lineHeight:1}}>
+        {name}
+      </div>
+      <div style={{fontSize:9,color:accent,marginTop:3,lineHeight:1.5}}>{note}</div>
+    </div>
+  );
+}
+
 function TypeRow({name,family,weight,size,use}:{name:string;family:string;weight:number;size:number;use:string}){
   return(
     <div style={{display:"flex",alignItems:"baseline",gap:0,padding:"10px 0",borderBottom:`1px solid rgba(255,255,255,.05)`}}>
@@ -157,7 +169,7 @@ export function SystemShowcase(){
 
           {/* Buttons */}
           <div style={{padding:"14px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:12}}>
-            <div style={{fontSize:9,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:10}}>Buttons</div>
+            <SectionLabel name="Buttons" note="Primary (Sparkle), secondary CTA, ghost · Baloo 2 · min 44 px touch target" accent={C.gold}/>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <button style={{padding:"0 20px",height:52,borderRadius:14,background:`linear-gradient(160deg,${C.gold},#e5a800 60%,#c8860a)`,boxShadow:`0 5px 0 #8a5a00,0 8px 20px rgba(242,200,75,.32)`,border:"none",color:C.night,fontFamily:"'Baloo 2',system-ui,sans-serif",fontSize:17,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
                 <span>✦</span> SPARKLE! <span style={{fontSize:9,fontWeight:600,opacity:.7}}>Primary</span>
@@ -173,7 +185,7 @@ export function SystemShowcase(){
 
           {/* Badges */}
           <div style={{padding:"14px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:12}}>
-            <div style={{fontSize:9,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:10}}>Badges &amp; Chips</div>
+            <SectionLabel name="Badges & Chips" note="Game-state labels · outlined pill · 9 px uppercase · color-coded by context" accent={C.mint}/>
             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
               {[
                 {label:"BIG WIN",bg:"rgba(242,200,75,.2)",border:"rgba(242,200,75,.55)",color:C.gold},
@@ -190,7 +202,7 @@ export function SystemShowcase(){
 
           {/* Progress bar */}
           <div style={{padding:"14px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:12}}>
-            <div style={{fontSize:9,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:10}}>Progress Bars</div>
+            <SectionLabel name="Progress Bars" note="Treat Jar fill per symbol · 7 px track · per-symbol accent color" accent={C.teal}/>
             {[{l:"🍗 Chicken Comets",f:.4,a:"#f5c86a"},{l:"🐟 Salmon Stars",f:.8,a:"#82d8ff"},{l:"💎 Bougie Bites",f:.2,a:"#d4a4ff"}].map(b=>(
               <div key={b.l} style={{marginBottom:8}}>
                 <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
@@ -206,7 +218,7 @@ export function SystemShowcase(){
 
           {/* Reel cell */}
           <div style={{padding:"14px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:12}}>
-            <div style={{fontSize:9,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:10}}>Reel Cells</div>
+            <SectionLabel name="Reel Cells" note="5×4 board tiles · 70×82 px · Butter Yellow win highlight + pulse dot · WILD badge" accent={C.gold}/>
             <div style={{display:"flex",gap:6}}>
               {/* Tumbler (top symbol), Butterfly, Cat Wild */}
               {[
@@ -298,7 +310,7 @@ export function SystemShowcase(){
 
           {/* Style rules */}
           <div style={{padding:"12px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:10}}>
-            <div style={{fontSize:9,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>Style Rules</div>
+            <SectionLabel name="Style Rules" note="Guardrails for AI-generated & hand-drawn assets in this design system" accent={C.dustyPink}/>
             {[
               "Rounded, outlined illustration · no photo-realism",
               "Pacific Northwest: aurora, midnight sky, mountain silhouettes",
@@ -315,7 +327,7 @@ export function SystemShowcase(){
 
           {/* Spacing & radius tokens */}
           <div style={{padding:"12px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:10}}>
-            <div style={{fontSize:9,fontWeight:700,color:C.muted,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>Spacing &amp; Radius</div>
+            <SectionLabel name="Spacing & Radius" note="Token values for consistent sizing across all components" accent={C.muted}/>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
               {[{l:"Button radius",v:"14px"},{l:"Card radius",v:"12px"},{l:"Badge radius",v:"8px"},{l:"Progress h",v:"7–8px"},{l:"Border",v:"1–1.5px"},{l:"Touch target",v:"≥44px"}].map(t=>(
                 <div key={t.l} style={{padding:"5px 8px",background:"rgba(255,255,255,.04)",borderRadius:6}}>
