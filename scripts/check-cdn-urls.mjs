@@ -247,13 +247,27 @@ function linkIsFetchable(tag) {
 // The attribute section uses (?:[^>"']|"[^"]*"|'[^']*')* so that a literal
 // > inside a quoted attribute value (e.g. alt="a > b") does not prematurely
 // end the tag match and cause subsequent attributes to be missed.
-const COMMENT_RE = /<!--[\s\S]*?-->/g;
-const TAG_RE     = /<([a-z][a-z0-9-]*)(\s(?:[^>"']|"[^"]*"|'[^']*')*)?\s*\/?>/gi;
+const COMMENT_RE   = /<!--[\s\S]*?-->/g;
+const TAG_RE       = /<([a-z][a-z0-9-]*)(\s(?:[^>"']|"[^"]*"|'[^']*')*)?\s*\/?>/gi;
+// Matches the full <style>…</style> block; opening tag is attribute-aware so
+// a > inside a type="text/css" or similar attribute does not cut it short.
+const STYLE_BLOCK_RE = /<style\b(?:[^>"']|"[^"]*"|'[^']*')*>([\s\S]*?)<\/style>/gi;
 
 function extractHtmlUrls(src) {
   // Strip HTML comments — a URL inside <!-- … --> is not fetched.
   const stripped = src.replace(COMMENT_RE, "");
   const hits = [];
+
+  // ── Inline <style> blocks ─────────────────────────────────────────────────
+  // CSS inside <style>…</style> is parsed by the browser identically to a
+  // linked stylesheet — both @import and url() trigger fetches.
+  STYLE_BLOCK_RE.lastIndex = 0;
+  let sm;
+  while ((sm = STYLE_BLOCK_RE.exec(stripped)) !== null) {
+    for (const url of extractCssUrls(sm[1])) {
+      if (!isAllowed(url)) hits.push(url);
+    }
+  }
 
   let m;
   TAG_RE.lastIndex = 0;
@@ -272,6 +286,16 @@ function extractHtmlUrls(src) {
       const hrefVal = attrValue(tag, "href");
       if (hrefVal && isExternalUrl(hrefVal)) hits.push(hrefVal);
       continue;
+    }
+
+    // ── style attribute ── (any element) ────────────────────────────────
+    // Inline styles are parsed by the browser as CSS — url() values in
+    // background-image, cursor, mask-image, etc. trigger fetches.
+    const styleAttr = attrValue(tag, "style");
+    if (styleAttr) {
+      for (const url of extractCssUrls(styleAttr)) {
+        if (!isAllowed(url)) hits.push(url);
+      }
     }
 
     // ── src attribute ── (script, img, iframe, audio, video, source,
@@ -755,6 +779,60 @@ function runSelfTest() {
     check("local <base href> is NOT flagged", () => {
       const v = scan("index.html", `<base href="/assets/">`);
       assert(v.length === 0, `local base href should not be flagged; got ${v.length}`);
+    });
+
+    // ── Inline <style> blocks ──────────────────────────────────────────────
+
+    check("external @import in <style> block is flagged", () => {
+      const v = scan("index.html",
+        `<style>@import "https://fonts.googleapis.com/css2?family=Inter";</style>`
+      );
+      assert(v.length === 1, `@import in <style> block must be flagged; got ${v.length}`);
+    });
+
+    check("external url() in <style> block is flagged", () => {
+      const v = scan("index.html",
+        `<style>body { background-image: url("https://cdn.example.com/bg.png"); }</style>`
+      );
+      assert(v.length === 1, `url() in <style> block must be flagged; got ${v.length}`);
+    });
+
+    check("<style> block with only local url() is NOT flagged", () => {
+      const v = scan("index.html",
+        `<style>body { background-image: url("/images/bg.png"); }</style>`
+      );
+      assert(v.length === 0, `local url() in <style> should not be flagged; got ${v.length}`);
+    });
+
+    check("CSS comment inside <style> block does not hide external URL", () => {
+      // The URL inside the CSS comment must not be flagged; the URL outside must be.
+      const v = scan("index.html",
+        `<style>/* see https://cdn.example.com/ref */ body { color: red; }</style>`
+      );
+      assert(v.length === 0, `URL inside CSS comment in <style> must not be flagged; got ${v.length}`);
+    });
+
+    // ── Inline style= attributes ───────────────────────────────────────────
+
+    check("external url() in inline style= attribute is flagged", () => {
+      const v = scan("index.html",
+        `<div style="background-image: url('https://cdn.example.com/photo.jpg')">content</div>`
+      );
+      assert(v.length === 1, `url() in inline style attr must be flagged; got ${v.length}`);
+    });
+
+    check("protocol-relative url() in inline style= attribute is flagged", () => {
+      const v = scan("index.html",
+        `<div style="background: url(//cdn.example.com/bg.png) center">content</div>`
+      );
+      assert(v.length === 1, `protocol-relative url() in inline style must be flagged; got ${v.length}`);
+    });
+
+    check("local url() in inline style= attribute is NOT flagged", () => {
+      const v = scan("index.html",
+        `<div style="background-image: url('/images/hero.png')">content</div>`
+      );
+      assert(v.length === 0, `local url() in inline style must not be flagged; got ${v.length}`);
     });
 
     // ── > inside quoted attribute value ────────────────────────────────────
