@@ -1,5 +1,15 @@
 @import 'tailwindcss';
 
+/* Baloo 2 ExtraBold — self-hosted woff2, no CDN dependency at runtime.
+   Font licensed under SIL OFL 1.1. Source: Google Fonts / Ek Type. */
+@font-face {
+  font-family: 'Baloo 2';
+  src: url('/fonts/baloo2-800.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: block;
+}
+
 @theme inline {
   --color-primary: var(--slide-primary);
   --color-accent: var(--slide-accent);
