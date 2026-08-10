@@ -59,6 +59,7 @@ GEAR_BTN = (
 # uniglee-act-keepsake-collection Lvl 5  320   800    40%     footer level-chip shows Level 5; no bonus-banner
 # uniglee-act-nighttime-treat-time Lvl 5 320   800    40%     Sparks track; / 800 used per cat-popin-phoebe-fed ref
 # uniglee-act-were-multiplying    Lvl 5  320   800    40%     (same reasoning — all three acts same player state)
+# uniglee-summary                 Lvl 5  320   800    40%     footer level-chip shows Level 5 (same marathon session)
 SPARKS = {
     "cat-popin-joey-fed":                ("Lvl 3", "180", "/ 500 Sparks", "36%"),
     "cat-popin-joey-unfed":              ("Lvl 3", "180", "/ 500 Sparks", "36%"),
@@ -73,6 +74,7 @@ SPARKS = {
     "uniglee-act-keepsake-collection":   ("Lvl 5", "320", "/ 800 Sparks", "40%"),
     "uniglee-act-nighttime-treat-time":  ("Lvl 5", "320", "/ 800 Sparks", "40%"),
     "uniglee-act-were-multiplying":      ("Lvl 5", "320", "/ 800 Sparks", "40%"),
+    "uniglee-summary":                   ("Lvl 5", "320", "/ 800 Sparks", "40%"),
 }
 
 # ── Per-scene copy (top_mode_label, bottom_state_copy) ────────────────────────
