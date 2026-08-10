@@ -417,6 +417,85 @@ describe("sparkle button disabled lifecycle during a spin", () => {
     root.remove();
   });
 
+  it("removes is-spinning after a doorbell-panic free-spin path resolves", async () => {
+    // doorbellPanic truthy + freeSpinsAwarded > 0 → hits the runDoorbellPanic branch
+    // at board.ts line ~936, then returns without calling the final renderBoard, so
+    // the original sparkle button node stays in the DOM.  The finally block must
+    // remove is-spinning from the captured sparkleBtn parameter.
+    //
+    // renderBoard() calls spin() once to render the idle grid (call 1), then
+    // runSpin calls spin() for the actual spin (call 2).  Any subsequent calls
+    // inside the doorbell-panic free-spin session fall back to the beforeEach
+    // default (noBonusResult) so the bonus path is not re-triggered.
+    vi.mocked(spin)
+      .mockReturnValueOnce(noBonusResult())              // call 1: renderBoard idle grid
+      .mockReturnValueOnce(noBonusResult({               // call 2: runSpin main spin
+        freeSpinsAwarded: 3,
+        doorbellPanic: { lineIndex: 0, positions: [[2, 1]] as Array<[number, number]>, freeSpinsAwarded: 3 },
+      }));
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    originalBtn.click();
+    expect(originalBtn.classList.contains("is-spinning")).toBe(true);
+
+    // Phase 1: drain all timer-based waits — animateSteps (480 ms), doorbell
+    // overlay (1550 ms), free-spin round sleep() calls — until showBonusSummary
+    // appends its click-to-dismiss overlay and blocks on the Continue button.
+    await vi.runAllTimersAsync();
+
+    // Phase 2: click Continue so showBonusSummary resolves its Promise.
+    root.querySelector<HTMLButtonElement>("#bonus-continue")?.click();
+
+    // Phase 3: drain any remaining timers (advanceIceNote 200 ms, status clear).
+    // The finally block runs after advanceIceNote resolves.
+    await vi.runAllTimersAsync();
+
+    // The finally block must have cleared is-spinning from the original node.
+    expect(originalBtn.classList.contains("is-spinning")).toBe(false);
+
+    root.remove();
+  });
+
+  it("removes is-spinning after a treat-jar free-spin path resolves", async () => {
+    // pendingTreatJarSpins > 0 with no other bonus → hits the runTreatJarFreeSpins
+    // branch at board.ts line ~950 then returns without calling the final renderBoard.
+    // The finally block is the only place that removes is-spinning on this path.
+    //
+    // No spin-mock override: the beforeEach default (noBonusResult) covers both the
+    // renderBoard idle-grid call and runSpin's spin call; pendingTreatJarSpins alone
+    // activates the treat-jar branch without any spin result bonus flags.
+    const state = makeSpinState();
+    state.pendingTreatJarSpins = 3; // pre-queued treat-jar spins from a prior spin
+
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    const originalBtn = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    originalBtn.click();
+    expect(originalBtn.classList.contains("is-spinning")).toBe(true);
+
+    // Phase 1: drain all timer-based waits — animateSteps (480 ms), treat-jar
+    // free-spin round sleep() calls — until showBonusSummary appends its
+    // click-to-dismiss overlay and blocks on the Continue button.
+    await vi.runAllTimersAsync();
+
+    // Phase 2: click Continue so showBonusSummary resolves.
+    root.querySelector<HTMLButtonElement>("#bonus-continue")?.click();
+
+    // Phase 3: drain remaining timers (advanceIceNote 200 ms, status clear).
+    await vi.runAllTimersAsync();
+
+    // The finally block must have cleared is-spinning from the original node.
+    expect(originalBtn.classList.contains("is-spinning")).toBe(false);
+
+    root.remove();
+  });
+
   it("ignores a second click while the button is disabled mid-spin so spin fires exactly once", async () => {
     // No bonus, no win — the simplest spin path.  The important thing is that
     // the click-handler guard at board.ts (`if (sparkleBtn.disabled) return;`)
