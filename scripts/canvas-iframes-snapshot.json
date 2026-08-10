@@ -72,6 +72,12 @@
     "scene-splash-standard",
     "scene-were-multiplying",
     "scene-win-celebration-nice",
-    "scene-win-status-only"
+    "scene-win-status-only",
+    "scene-settings-sound",
+    "scene-settings-look-and-feel",
+    "scene-settings-payline-guide",
+    "scene-settings-reduce-motion",
+    "scene-settings-start-fresh",
+    "scene-settings-about"
   ]
 }

@@ -138,6 +138,36 @@
       "path": "/__mockup/scenes/settings-page.html"
     },
     {
+      "shapeId": "scene-settings-sound",
+      "name": "Settings — Sound",
+      "path": "/__mockup/scenes/settings-sound.html"
+    },
+    {
+      "shapeId": "scene-settings-look-and-feel",
+      "name": "Settings — Look & Feel",
+      "path": "/__mockup/scenes/settings-look-and-feel.html"
+    },
+    {
+      "shapeId": "scene-settings-payline-guide",
+      "name": "Settings — Payline Guide",
+      "path": "/__mockup/scenes/settings-payline-guide.html"
+    },
+    {
+      "shapeId": "scene-settings-reduce-motion",
+      "name": "Settings — Reduce Motion",
+      "path": "/__mockup/scenes/settings-reduce-motion.html"
+    },
+    {
+      "shapeId": "scene-settings-start-fresh",
+      "name": "Settings — Start Fresh",
+      "path": "/__mockup/scenes/settings-start-fresh.html"
+    },
+    {
+      "shapeId": "scene-settings-about",
+      "name": "Settings — About",
+      "path": "/__mockup/scenes/settings-about.html"
+    },
+    {
       "shapeId": "scene-paytable-page",
       "name": "Game Scene — Paytable",
       "path": "/__mockup/scenes/paytable-page.html"
