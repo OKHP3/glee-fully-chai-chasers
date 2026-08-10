@@ -40,6 +40,10 @@ args = "artifacts/mockup-sandbox: Component Preview Server"
 task = "workflow.run"
 args = "video-typecheck"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "mockup-export-check"
+
 [[workflows.workflow]]
 name = "video-typecheck"
 author = "agent"
@@ -47,6 +51,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd artifacts/chai-chasers-video && pnpm tsc --noEmit"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "mockup-export-check"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/mockup-sandbox run check-exports"
 
 [workflows.workflow.metadata]
 isValidation = true
