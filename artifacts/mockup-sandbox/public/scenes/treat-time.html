@@ -2,282 +2,101 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1280">
-<title>Treat Time Entry — Chai Chasers Design Review</title>
+<meta name="viewport" content="width=390">
+<title>Treat Time — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
-<style>
-html,body{margin:0;padding:0;width:1280px;height:900px;overflow:hidden;background:#06081a}
-.cc-root{width:1280px;height:900px;padding:0!important}
-.cc-shell{width:100%!important;max-width:100%!important;height:900px!important;
-          display:flex!important;flex-direction:column!important;
-          border-radius:0!important;margin:0!important}
-
-/* ── Treat Time overlay — scoped to cabinet-frame, ~80% coverage ── */
-.tt-overlay{
-  position:absolute;inset:0;z-index:20;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse at 50% 42%,rgba(244,123,63,.55) 0%,rgba(180,60,20,.3) 35%,rgba(6,8,26,.88) 72%);
-}
-
-/* Central panel — matches UniGlee summary proportions (~80% of cabinet) */
-.tt-panel{
-  position:relative;
-  width:840px;
-  padding:40px 56px 44px;
-  background:linear-gradient(160deg,rgba(48,18,6,.94),rgba(28,10,4,.97));
-  border:1.5px solid rgba(244,123,63,.45);
-  border-radius:28px;
-  box-shadow:
-    0 0 80px rgba(244,123,63,.22),
-    0 0 200px rgba(244,100,20,.1),
-    0 32px 80px rgba(0,0,0,.65);
-  display:flex;flex-direction:column;align-items:center;gap:0;
-  overflow:visible;
-}
-/* Gold top-edge accent */
-.tt-panel::before{
-  content:'';position:absolute;top:0;left:12%;right:12%;height:2px;
-  background:linear-gradient(90deg,transparent,rgba(244,123,63,.8),rgba(242,200,75,.7),rgba(244,123,63,.8),transparent);
-  border-radius:1px;
-}
-
-/* ── Main title — oscillating / shimmying ── */
-.tt-title{
-  font-family:'Baloo 2',sans-serif;
-  font-size:68px;font-weight:800;
-  letter-spacing:-.02em;line-height:1;
-  color:#f5d576;
-  text-shadow:0 0 40px rgba(244,123,63,.7),0 0 80px rgba(242,200,75,.3);
-  margin:0 0 10px;
-  animation:tt-shimmy 2.6s ease-in-out infinite;
-  transform-origin:center center;
-  white-space:nowrap;
-}
-@keyframes tt-shimmy{
-  0%   { transform:scale(1)    rotate(0deg); }
-  12%  { transform:scale(1.06) rotate(-1.4deg); }
-  25%  { transform:scale(0.97) rotate(1.1deg); }
-  38%  { transform:scale(1.07) rotate(-0.7deg); }
-  52%  { transform:scale(0.98) rotate(0.6deg); }
-  66%  { transform:scale(1.04) rotate(-0.4deg); }
-  80%  { transform:scale(0.99) rotate(0.2deg); }
-  100% { transform:scale(1)    rotate(0deg); }
-}
-
-.tt-subtitle{
-  font-family:'Baloo 2',sans-serif;
-  font-size:22px;font-weight:600;
-  color:#c9aeff;letter-spacing:.04em;
-  margin:0 0 22px;text-align:center;
-}
-
-/* Divider */
-.tt-divider{
-  width:100%;display:flex;align-items:center;gap:14px;margin-bottom:22px;
-}
-.tt-divider span{font-size:15px;color:rgba(244,123,63,.55);flex-shrink:0}
-.tt-divider::before,.tt-divider::after{
-  content:'';flex:1;height:1px;background:rgba(244,123,63,.25);
-}
-
-/* Spins award row */
-.tt-award{
-  display:flex;gap:64px;
-  padding:18px 64px;
-  border:1px solid rgba(244,123,63,.35);
-  border-radius:18px;
-  background:rgba(30,8,2,.65);
-  margin-bottom:14px;
-}
-.tt-award span{
-  display:flex;flex-direction:column;align-items:center;
-  font-family:'Baloo 2',sans-serif;
-}
-.tt-award b{
-  font-size:52px;font-weight:800;color:#f5d576;line-height:1;
-}
-.tt-award small{
-  font-size:16px;color:#9d85c8;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;
-}
-
-.tt-note{
-  font-family:'Baloo 2',sans-serif;font-size:15px;color:#7a6a9a;
-  text-align:center;margin:0 0 20px;
-}
-
-/* Treat bags row — positioned bottom-left of the panel */
-.tt-treat-bags{
-  position:absolute;
-  bottom:24px;left:32px;
-  display:flex;gap:10px;align-items:flex-end;
-}
-.tt-bag{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-}
-.tt-bag-icon{
-  width:48px;height:48px;
-  border-radius:12px;
-  background:rgba(244,123,63,.12);
-  border:1px solid rgba(244,123,63,.25);
-  display:flex;align-items:center;justify-content:center;
-}
-.tt-bag-label{
-  font-family:'Baloo 2',sans-serif;font-size:10px;font-weight:700;
-  color:rgba(244,123,63,.6);letter-spacing:.04em;text-transform:uppercase;
-}
-
-/* Continue button */
-.tt-btn{
-  padding:0 48px;height:60px;border-radius:16px;
-  background:linear-gradient(160deg,#f47b3f,#c05a25);
-  box-shadow:0 6px 0 #7a3010,0 10px 32px rgba(244,123,63,.32);
-  border:none;cursor:pointer;
-  font-family:'Baloo 2',sans-serif;
-  font-size:20px;font-weight:800;
-  color:#fff8ee;
-  letter-spacing:.01em;
-  display:flex;align-items:center;gap:10px;
-  position:relative;overflow:hidden;
-}
-.tt-btn::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%);
-  pointer-events:none;border-radius:14px;
-}
-</style>
+<style>html,body{margin:0;padding:0;width:390px;overflow:hidden}</style>
 </head>
 <body>
-<div class="cc-root">
-  <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
-  <div class="cc-shell">
-
-    <!-- Full-width marquee; title flows edge-to-edge -->
+<div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden cc-root treat-time-main-mode" data-theme="dark" data-reduced-motion="false">
+  <div class="night-garden" id="bg-layer">
+    <div class="aurora-ribbons"><span></span><span></span><span></span></div>
+    <div class="star star-fast" style="top:4%;left:3%;animation-delay:0s"></div>
+    <div class="star star-slow" style="top:21%;left:44%;animation-delay:0.5s"></div>
+    <div class="star star-slow" style="top:38%;left:85%;animation-delay:1s"></div>
+    <div class="star star-fast" style="top:55%;left:32%;animation-delay:1.5s"></div>
+    <div class="firefly" style="top:45%;left:8%;animation-delay:0s"></div>
+    <div class="firefly" style="top:52%;left:61%;animation-delay:0.7s"></div>
+    <div class="firefly" style="top:73%;left:52%;animation-delay:2.8s"></div>
+  </div>
+  <div class="relative z-10 h-full w-full flex flex-col cc-shell">
     <header class="marquee">
-      <div class="marquee-bulbs" aria-hidden="true">
-        <span class="marquee-bulb" style="--blink-delay:0s"></span>
-        <span class="marquee-bulb" style="--blink-delay:.07s"></span>
-        <span class="marquee-bulb" style="--blink-delay:.14s"></span>
-        <span class="marquee-bulb" style="--blink-delay:.21s"></span>
-        <span class="marquee-bulb" style="--blink-delay:.28s"></span>
-      </div>
+      <div class="marquee-bulbs" aria-hidden="true"><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span><span class="bulb" style="animation-delay:0s"></span><span class="bulb" style="animation-delay:0.18s"></span><span class="bulb" style="animation-delay:0.36s"></span><span class="bulb" style="animation-delay:0.54s"></span></div>
       <div class="marquee-row">
         <h1 class="marquee-title">Glee-fully <span>Chai Chasers</span></h1>
+        <button class="chrome-btn" aria-label="Open symbol guide and game rules" title="Symbol guide"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 0 5 23z"/><path d="M5 4.5v15M9 8h6M9 12h6"/></svg></button>
+        <button class="chrome-btn" aria-label="How it works guide" title="How it works"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.5M12 11.5v5"/></svg></button>
+        <button class="chrome-btn" aria-label="Settings"><svg viewBox="0 0 24 24" style="width:20px;height:20px" fill="none" stroke="#f5d576" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/></svg></button>
       </div>
-      <div class="marquee-status">Nighttime Treat Time · Spin 2 of 8 · every spin gets a treat toss</div>
+      <div id="marquee-status" class="marquee-status" aria-live="polite">Nighttime Treat Time · Spin 2 of 8</div>
     </header>
-
-    <main class="cabinet-frame treat-time-cabinet">
-      <span class="ornament ornament-tl"></span><span class="ornament ornament-tr"></span>
-      <span class="ornament ornament-bl"></span><span class="ornament ornament-br"></span>
-
-      <!-- Ghost reel grid at low opacity (same pattern as uniglee-summary) -->
-      <div id="reel-grid" class="reel-grid" style="opacity:0.12" role="img" aria-label="Reel board (treat time active)">
-        <div class="reel-col" data-reel="0">
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 0%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 33.33%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 33.33%"></span></div>
+    <div class="cabinet-shell">
+      <div id="bonus-banner" class="bonus-banner bonus-banner--active" aria-live="polite">
+        <div class="bonus-banner-heading">
+          <span class="bonus-banner-kicker">Nighttime</span>
+          <strong class="bonus-banner-title">IT'S TREAT TIME!</strong>
         </div>
-        <div class="reel-col" data-reel="1">
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 0%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 66.67%"></span></div>
-        </div>
-        <div class="reel-col" data-reel="2">
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 66.67%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
-        </div>
-        <div class="reel-col" data-reel="3">
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 66.67%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 66.67%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 0%"></span></div>
-        </div>
-        <div class="reel-col" data-reel="4">
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 0%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:100% 33.33%"></span></div>
-          <div class="cell"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 33.33%"></span></div>
-        </div>
+        <div class="bonus-banner-stats">Spin <span id="tt-index">2</span> of <span id="tt-total">8</span> · every spin gets a treat toss</div>
       </div>
-
-      <!-- Treat Time entry panel — overlaying ~80% of the cabinet -->
-      <div class="tt-overlay" role="dialog" aria-modal="true" aria-label="It's Treat Time!">
-        <div class="tt-panel">
-
-          <!-- Title with shimmy animation -->
-          <h2 class="tt-title">IT'S TREAT TIME!</h2>
-          <p class="tt-subtitle">Phoebe found the nighttime spread — Joey is awake too!</p>
-
-          <div class="tt-divider"><span>✦</span></div>
-
-          <!-- Award panel -->
-          <div class="tt-award">
-            <span><b>8</b><small>free spins</small></span>
-            <span><b>1×</b><small>treat toss / spin</small></span>
+      <div class="cabinet-shell-divider"></div>
+      <main class="cabinet-frame treat-time-cabinet">
+        <span class="ornament ornament-tl"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span><span class="ornament ornament-tr"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span><span class="ornament ornament-bl"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span><span class="ornament ornament-br"><svg viewBox="0 0 24 24" class="h-full w-full" aria-hidden="true"><path d="M12 1l3 7 7 1-5.2 5 1.5 7.5L12 18l-6.3 3.5L7.2 14 2 9l7-1z" fill="#f5d576" stroke="#2d1f4c" stroke-width="1"/></svg></span>
+        <!-- Treat Time entry overlay — treat-time-entry--night shown on trigger -->
+        <div class="treat-time-entry treat-time-entry--main treat-time-entry--night" style="animation:none;opacity:1">
+          <div class="treat-time-entry-hand" aria-hidden="true">
+            <svg viewBox="0 0 120 200" style="width:72px;height:128px;fill:#f2c84b;opacity:0.9">
+              <ellipse cx="60" cy="90" rx="35" ry="55" fill="#f5d576"/>
+              <rect x="35" y="140" width="50" height="48" rx="8" fill="#e8b84b"/>
+              <circle cx="60" cy="60" r="16" fill="#fff8ee" opacity="0.35"/>
+              <ellipse cx="60" cy="162" rx="22" ry="10" fill="#d4a030" opacity="0.5"/>
+            </svg>
           </div>
-
-          <p class="tt-note">Every spin during Treat Time guarantees a treat toss into the Treat Jar</p>
-
-          <!-- CTA -->
-          <button class="tt-btn" aria-label="Start Treat Time free spins">
-            <span style="font-size:22px">🫙</span> Let's eat!
-          </button>
-
-          <!-- Three treat bags — bottom-left of panel -->
-          <div class="tt-treat-bags" aria-label="Treat bags unlocked" aria-hidden="true">
-            <div class="tt-bag">
-              <div class="tt-bag-icon">
-                <span class="symbol-sprite symbol-sprite--atlas" style="width:36px;height:36px;display:block;background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span>
-              </div>
-              <span class="tt-bag-label">×8</span>
-            </div>
-            <div class="tt-bag">
-              <div class="tt-bag-icon">
-                <span class="symbol-sprite symbol-sprite--atlas" style="width:36px;height:36px;display:block;background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span>
-              </div>
-              <span class="tt-bag-label">×4</span>
-            </div>
-            <div class="tt-bag">
-              <div class="tt-bag-icon">
-                <span class="symbol-sprite symbol-sprite--atlas" style="width:36px;height:36px;display:block;background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span>
-              </div>
-              <span class="tt-bag-label">×2</span>
-            </div>
+          <div class="treat-time-entry-copy">
+            <div class="treat-time-entry-title">IT'S TREAT TIME!</div>
+            <div class="treat-time-entry-sub">Phoebe found the nighttime spread — Joey is awake too!</div>
+            <div class="treat-time-entry-spins">8 free spins · every spin gets a treat toss</div>
           </div>
-
         </div>
-      </div>
-    </main>
-
+        <!-- Reel grid with Treat Time wilds already placed (hidden behind entry overlay) -->
+        <div id="reel-grid" class="reel-grid" role="img" aria-label="Treat Time reel board" style="display:none"></div>
+      </main>
+    </div>
     <div class="companion-row">
       <div id="treat-jar" aria-label="Treat Jar" class="treat-jar-housing">
         <span class="treat-jar-title">Treat Jar</span>
         <div class="treat-chips-row">
-          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%"></span></span>8</span>
-          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%"></span></span>4</span>
-          <span class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%"></span></span>2</span>
+          <span title="Chicken Comets" class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:0% 100%" aria-hidden="true"></span></span>8</span>
+          <span title="Salmon Stars" class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:33.33% 100%" aria-hidden="true"></span></span>4</span>
+          <span title="Bougie Bites" class="treat-chip"><span class="treat-icon"><span class="symbol-sprite symbol-sprite--atlas" style="background-image:url('../assets/atlases/standard-symbol-atlas.png');background-size:400% 400%;background-position:66.67% 100%" aria-hidden="true"></span></span>2</span>
         </div>
       </div>
       <div class="jar-meter jar-meter--inline" aria-label="Firefly cascade meter">
         <span class="jar-meter-kicker">Firefly Cascade</span>
         <div class="jar-meter-body"><strong class="jar-meter-count">3 / 6</strong></div>
       </div>
+      <button aria-label="AskJamie — tap for daily bonus" class="askjamie-housing">
+        <div class="askjamie-icon"><picture><source srcset="../assets/optimized/askjamie-avatar.webp" type="image/webp"><img src="../assets/askjamie-avatar.jpg" alt="" class="askjamie-picture" aria-hidden="true"></picture></div>
+        <span class="askjamie-label">AskJamie</span>
+      </button>
     </div>
-
-    <div id="status-line" class="status-line" aria-live="polite">
-      IT'S TREAT TIME! — Nighttime mode · 8 free spins · every spin gets a treat toss
-    </div>
-
+    <div id="status-line" class="status-line" aria-live="polite">IT'S TREAT TIME! — Nighttime mode · 8 spins · every spin gets a treat toss</div>
     <footer class="bet-console">
-      <button class="bet-adj-btn" disabled>−</button>
-      <button class="sparkle-btn" disabled>SPARKLE</button>
-      <button class="bet-adj-btn" disabled>+</button>
+      <div class="coin-chip" aria-label="Glee-coin balance">12,480<em>coins</em></div>
+      <div class="flex-1"></div>
+      <button class="chrome-btn" aria-label="Decrease bet" disabled>−</button>
+      <span class="bet-display">50</span>
+      <button class="chrome-btn" aria-label="Increase bet" disabled>+</button>
+      <button id="sparkle-btn" class="sparkle-btn" disabled><span>SPARKLE!</span></button>
     </footer>
-
+    <aside id="ice-notes-card" class="ice-notes-card" aria-label="Chai ingredient note">
+      <p class="ice-notes-eyebrow">ICE NOTES</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Treat Time</span> <span class="ice-notes-text">Nighttime mode fires when both cats are spotted — every spin in the session tosses a treat.</span></span>
+        </div>
+      </div>
+    </aside>
   </div>
 </div>
 </body>
