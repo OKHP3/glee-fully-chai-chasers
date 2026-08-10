@@ -7,14 +7,18 @@ import { Scene2 } from './video_scenes/Scene2';
 import { Scene3 } from './video_scenes/Scene3';
 import { Scene4 } from './video_scenes/Scene4';
 import { Scene5 } from './video_scenes/Scene5';
+import { Scene6 } from './video_scenes/Scene6';
+import { Scene7 } from './video_scenes/Scene7';
 import { BackgroundEffects } from './video_scenes/BackgroundEffects';
 
 export const SCENE_DURATIONS: Record<string, number> = {
-  scene1: 7000,
-  scene2: 10000,
-  scene3: 10000,
-  scene4: 9000,
-  scene5: 9000,
+  scene1: 14000,
+  scene2: 20000,
+  scene3: 18000,
+  scene6: 22000,
+  scene7: 18000,
+  scene4: 14000,
+  scene5: 14000,
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
@@ -23,6 +27,8 @@ const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
   scene3: Scene3,
   scene4: Scene4,
   scene5: Scene5,
+  scene6: Scene6,
+  scene7: Scene7,
 };
 
 const SCENE_START_SEC: Record<string, number> = (() => {
@@ -59,16 +65,22 @@ export default function VideoTemplate({
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
-    audio.volume = 0.45;
+    const voice = voiceRef.current;
     const targetTime = SCENE_START_SEC[baseSceneKey] ?? 0;
-    if (Math.abs(audio.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) {
-      audio.currentTime = targetTime;
+    if (audio) {
+      audio.volume = 0.22;
+      if (Math.abs(audio.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) audio.currentTime = targetTime;
+      audio.play().catch(() => {});
     }
-    audio.play().catch(() => {});
+    if (voice) {
+      voice.volume = 0.92;
+      if (Math.abs(voice.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) voice.currentTime = targetTime;
+      voice.play().catch(() => {});
+    }
   }, [currentSceneKey, baseSceneKey, muted]);
 
   return (
@@ -89,6 +101,14 @@ export default function VideoTemplate({
       <audio
         ref={audioRef}
         src={`${import.meta.env.BASE_URL}audio/bg_music.mp3`}
+        preload="auto"
+        autoPlay
+        loop
+        muted={muted}
+      />
+      <audio
+        ref={voiceRef}
+        src={`${import.meta.env.BASE_URL}audio/chai-chasers-third-cut-voiceover.mp3`}
         preload="auto"
         autoPlay
         muted={muted}
