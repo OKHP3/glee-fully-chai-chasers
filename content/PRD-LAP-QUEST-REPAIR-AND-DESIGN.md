@@ -139,7 +139,7 @@ So the Lap Quest ledge is the only place in the game where Phoebe is drawn by a 
 |---|---|---|
 | `showLapQuestChoice` + `showLapQuestReveal` in `board.ts` | Wired and live | Pick one of three cozy spots, reveal, wilds land |
 | `mountLapQuestLedge` in `lap-quest-ledge.ts` | Built, 90-second petting minigame with grace period and a Joey interrupt | **Unclear whether it is reachable in production** |
-| `lap-quest-session.ts` | 283 lines, 8 passing tests, **no production caller at all** | Dead |
+| `lap-quest-session.ts` | ~~283 lines, 8 passing tests, **no production caller at all**~~ | **Deleted 2026-08-10** (dead-code cleanup task #152) |
 
 Trace the call graph and report what is actually reachable from a real UniGlee capture. Then raise **D9** in `docs/DECISION-LOG.md` asking Jamie which presentation is canon and what happens to the other two. Do not delete anything. Do not wire anything up. Ask.
 

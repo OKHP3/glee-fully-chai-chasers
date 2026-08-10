@@ -237,4 +237,3 @@ export function gleeAvatarSvg(): string {
     </g>
   </svg>`;
 }
-

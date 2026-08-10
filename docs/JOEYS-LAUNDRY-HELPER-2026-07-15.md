@@ -6,7 +6,7 @@
 
 This amendment supersedes the earlier drawer-row proposal. Joey is perched over the upper half of the reel cabinet for the duration of his UniGlee sub-bonus. He chases falling socks across the middle reels and occasionally reaches down with a multiplier paw.
 
-The implementation slice is now present in `src/engine/laundry.ts`, `src/engine/freespins.ts`, and the scoped Laundry presentation/audio additions in `src/ui/board.ts`, `src/style.css`, and `src/audio/synth.ts`. The exported `runJoeyLaundryChapter` UI entry point accepts the typed child session from the parent marathon; it does not invent the parent’s award builder, chapter order, or open Laundry rates.
+The implementation is present in `src/engine/laundry.ts`, `src/engine/freespins.ts`, and the scoped Laundry presentation/audio additions in `src/ui/board.ts`, `src/style.css`, and `src/audio/synth.ts`. The live UI entry point is `playJoeyLaundryChapter` (non-exported, called directly by the UniGlee marathon runner inside `board.ts`); it accepts the typed child session from the parent marathon and does not invent the parent's award builder, chapter order, or open Laundry rates. (Note: `runJoeyLaundryChapter`, a formerly exported wrapper, was removed in the 2026-08-10 dead-code cleanup.)
 
 ## Player loop
 
