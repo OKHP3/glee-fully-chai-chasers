@@ -27,20 +27,25 @@ jobs:
             exit 1
           fi
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.26.1
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile
       # Unit tests must pass to deploy; the spec oracle runs in its own
       # visible-but-non-blocking job below so iterative builds can ship
       # while Round-2 math tuning is in progress.
-      - run: npm test
+      - run: pnpm test
         env:
           SKIP_ORACLE: "1"
-      - run: npm run validate:assets
-      - run: npm run build
+      - run: pnpm run validate:assets
+      - run: pnpm run build
 
       - name: Brand-string gate — shipped bundle must be clean
         run: |
@@ -60,12 +65,17 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.26.1
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - run: npm ci --no-audit --no-fund
-      - run: npx vitest run src/engine/simulation.test.ts
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run src/engine/simulation.test.ts
 
   deploy:
     needs: build
