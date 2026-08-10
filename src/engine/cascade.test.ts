@@ -4,6 +4,7 @@ import { freeSpinsForCascades, spin } from "./cascade";
 import { emptyTreatJar } from "./features";
 import type { Grid, KeepsakeZone, StickyWild } from "./types";
 import { PAYOUT_SCALE, PAYTABLE } from "./paylines";
+import { createLapQuestChallenge, LAP_QUEST_SPOTS, spinLapQuestRound } from "./lap-quest";
 
 describe("spin", () => {
   it("is deterministic for a given seed", () => {
@@ -318,6 +319,43 @@ describe("Lap Quest infinite-loop guard", () => {
       expect(result.steps[1].wins).not.toHaveLength(0); // cascade 2 settled
       // Terminal no-win step appended by the guard after the last settled cascade.
       expect(result.steps[2].wins).toHaveLength(0);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("terminates cleanly for all spot choices and 100 seeds, with guards rescuing any sticky-wild lock-up", () => {
+    // Fuzz: run spinLapQuestRound for every LapQuestSpot × seeds 0–99.
+    // chooseComfortWilds returns 2 (cozy) or 4 (perfect) sticky wilds drawn
+    // randomly from 20 board positions.
+    //
+    // Finding from this test run: both Guard 1 ("grid unchanged") and Guard 2
+    // ("Hard cascade cap") can fire for realistic comfort-wild counts when wilds
+    // land on high-payline rows.  This is EXPECTED and CORRECT — the guards
+    // terminate the cascade cleanly rather than hanging.  The pre-fix code had
+    // no such guards and would loop forever in these cases.
+    //
+    // The critical assertion is: every round always terminates on a dead board,
+    // regardless of which guard (if any) fires.  A hung game would never return
+    // from spinLapQuestRound at all, so a completed assertion confirms safety.
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      for (let seed = 0; seed < 100; seed++) {
+        for (const spot of LAP_QUEST_SPOTS) {
+          // Use one RNG stream: challenge creation draws from it first, then the
+          // round itself draws from the same stream — matching real game usage.
+          const rng = mulberry32(seed);
+          const challenge = createLapQuestChallenge(rng);
+          const result = spinLapQuestRound(rng, challenge, spot, 1);
+
+          // Every round must terminate (have at least one step)
+          expect(result.steps.length).toBeGreaterThanOrEqual(1);
+          // The final step must be a dead board — whether the guards fired or not
+          expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+        }
+      }
+      // If this line is reached, no round hung indefinitely — all 300 calls
+      // (100 seeds × 3 spots) returned a valid terminated result.
     } finally {
       warnSpy.mockRestore();
     }
