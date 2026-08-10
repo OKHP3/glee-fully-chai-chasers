@@ -156,6 +156,211 @@
       "shapeId": "scene-iced-chai-wild-rain",
       "name": "Iced Chai Wild Rain — Board",
       "path": "/__mockup/scenes/iced-chai-wild-rain-board.html"
+    },
+    {
+      "shapeId": "scene-cascade-beam-up",
+      "name": "Cascade — Beam Up",
+      "path": "/__mockup/scenes/cascade-beam-up.html"
+    },
+    {
+      "shapeId": "scene-cascade-initial-pop",
+      "name": "Cascade — Initial Pop",
+      "path": "/__mockup/scenes/cascade-initial-pop.html"
+    },
+    {
+      "shapeId": "scene-cascade-payline-guide-off",
+      "name": "Cascade — Payline Guide Off",
+      "path": "/__mockup/scenes/cascade-payline-guide-off.html"
+    },
+    {
+      "shapeId": "scene-cascade-payline-guide-on",
+      "name": "Cascade — Payline Guide On",
+      "path": "/__mockup/scenes/cascade-payline-guide-on.html"
+    },
+    {
+      "shapeId": "scene-cascade-staggered-drop",
+      "name": "Cascade — Staggered Drop",
+      "path": "/__mockup/scenes/cascade-staggered-drop.html"
+    },
+    {
+      "shapeId": "scene-bold-chai-free-spins",
+      "name": "Bold Chai Free Spins",
+      "path": "/__mockup/scenes/bold-chai-free-spins.html"
+    },
+    {
+      "shapeId": "scene-doorbell-panic-free-spins",
+      "name": "Doorbell Panic Free Spins",
+      "path": "/__mockup/scenes/doorbell-panic-free-spins.html"
+    },
+    {
+      "shapeId": "scene-free-spin-board",
+      "name": "Free Spin Board",
+      "path": "/__mockup/scenes/free-spin-board.html"
+    },
+    {
+      "shapeId": "scene-standard-free-spins",
+      "name": "Standard Free Spins",
+      "path": "/__mockup/scenes/standard-free-spins.html"
+    },
+    {
+      "shapeId": "scene-treat-jar-free-spins",
+      "name": "Treat Jar Free Spins",
+      "path": "/__mockup/scenes/treat-jar-free-spins.html"
+    },
+    {
+      "shapeId": "scene-cat-popin-joey-fed",
+      "name": "Cat Pop-In — Joey Fed",
+      "path": "/__mockup/scenes/cat-popin-joey-fed.html"
+    },
+    {
+      "shapeId": "scene-cat-popin-joey-unfed",
+      "name": "Cat Pop-In — Joey Unfed",
+      "path": "/__mockup/scenes/cat-popin-joey-unfed.html"
+    },
+    {
+      "shapeId": "scene-cat-popin-phoebe-fed",
+      "name": "Cat Pop-In — Phoebe Fed",
+      "path": "/__mockup/scenes/cat-popin-phoebe-fed.html"
+    },
+    {
+      "shapeId": "scene-cat-popin-phoebe-unfed",
+      "name": "Cat Pop-In — Phoebe Unfed",
+      "path": "/__mockup/scenes/cat-popin-phoebe-unfed.html"
+    },
+    {
+      "shapeId": "scene-joey-laundry-paw-strike",
+      "name": "Joey Laundry — Paw Strike",
+      "path": "/__mockup/scenes/joey-laundry-paw-strike.html"
+    },
+    {
+      "shapeId": "scene-joey-laundry-sock-drop",
+      "name": "Joey Laundry — Sock Drop",
+      "path": "/__mockup/scenes/joey-laundry-sock-drop.html"
+    },
+    {
+      "shapeId": "scene-joey-laundry-combined-strike",
+      "name": "Joey Laundry — Combined Strike",
+      "path": "/__mockup/scenes/joey-laundry-combined-strike.html"
+    },
+    {
+      "shapeId": "scene-keepsake-constellation",
+      "name": "Keepsake — Constellation",
+      "path": "/__mockup/scenes/keepsake-constellation.html"
+    },
+    {
+      "shapeId": "scene-keepsake-memory-failed",
+      "name": "Keepsake — Failed",
+      "path": "/__mockup/scenes/keepsake-memory-failed.html"
+    },
+    {
+      "shapeId": "scene-keepsake-memory-mismatch",
+      "name": "Keepsake — Mismatch",
+      "path": "/__mockup/scenes/keepsake-memory-mismatch.html"
+    },
+    {
+      "shapeId": "scene-keepsake-memory-success",
+      "name": "Keepsake — Success",
+      "path": "/__mockup/scenes/keepsake-memory-success.html"
+    },
+    {
+      "shapeId": "scene-lap-quest-reveal",
+      "name": "Lap Quest — Reveal",
+      "path": "/__mockup/scenes/lap-quest-reveal.html"
+    },
+    {
+      "shapeId": "scene-lap-quest-ledge",
+      "name": "Lap Quest — Ledge",
+      "path": "/__mockup/scenes/lap-quest-ledge.html"
+    },
+    {
+      "shapeId": "scene-lap-quest-round-play",
+      "name": "Lap Quest — Round Play",
+      "path": "/__mockup/scenes/lap-quest-round-play.html"
+    },
+    {
+      "shapeId": "scene-lap-quest-ledge-exit-inactivity",
+      "name": "Lap Quest — Ledge Exit (Inactivity)",
+      "path": "/__mockup/scenes/lap-quest-ledge-exit-inactivity.html"
+    },
+    {
+      "shapeId": "scene-lap-quest-ledge-exit-joey",
+      "name": "Lap Quest — Ledge Exit (Joey)",
+      "path": "/__mockup/scenes/lap-quest-ledge-exit-joey.html"
+    },
+    {
+      "shapeId": "scene-treat-time-entry-morning",
+      "name": "Treat Time Entry — Morning",
+      "path": "/__mockup/scenes/treat-time-entry-morning.html"
+    },
+    {
+      "shapeId": "scene-treat-time-entry-nighttime",
+      "name": "Treat Time Entry — Nighttime",
+      "path": "/__mockup/scenes/treat-time-entry-nighttime.html"
+    },
+    {
+      "shapeId": "scene-treat-time-main-board",
+      "name": "Treat Time — Main Board",
+      "path": "/__mockup/scenes/treat-time-main-board.html"
+    },
+    {
+      "shapeId": "scene-uniglee-chapter-banner",
+      "name": "UniGlee — Chapter Banner",
+      "path": "/__mockup/scenes/uniglee-chapter-banner.html"
+    },
+    {
+      "shapeId": "scene-uniglee-marathon-levelup",
+      "name": "UniGlee — Marathon Level Up",
+      "path": "/__mockup/scenes/uniglee-marathon-levelup.html"
+    },
+    {
+      "shapeId": "scene-uniglee-act-keepsake",
+      "name": "UniGlee Act — Keepsake Collection",
+      "path": "/__mockup/scenes/uniglee-act-keepsake-collection.html"
+    },
+    {
+      "shapeId": "scene-uniglee-act-nighttime-treat",
+      "name": "UniGlee Act — Nighttime Treat Time",
+      "path": "/__mockup/scenes/uniglee-act-nighttime-treat-time.html"
+    },
+    {
+      "shapeId": "scene-uniglee-act-were-multiplying",
+      "name": "UniGlee Act — We're Multiplying",
+      "path": "/__mockup/scenes/uniglee-act-were-multiplying.html"
+    },
+    {
+      "shapeId": "scene-board-askjamie-bubble",
+      "name": "Board — AskJamie Bubble",
+      "path": "/__mockup/scenes/board-askjamie-bubble.html"
+    },
+    {
+      "shapeId": "scene-chai-storm-splash",
+      "name": "Chai Storm Splash",
+      "path": "/__mockup/scenes/chai-storm-splash.html"
+    },
+    {
+      "shapeId": "scene-splash-birthday",
+      "name": "Splash — Birthday",
+      "path": "/__mockup/scenes/splash-birthday.html"
+    },
+    {
+      "shapeId": "scene-splash-standard",
+      "name": "Splash — Standard",
+      "path": "/__mockup/scenes/splash-standard.html"
+    },
+    {
+      "shapeId": "scene-were-multiplying",
+      "name": "We're Multiplying",
+      "path": "/__mockup/scenes/were-multiplying.html"
+    },
+    {
+      "shapeId": "scene-win-celebration-nice",
+      "name": "Win Celebration — Nice",
+      "path": "/__mockup/scenes/win-celebration-nice.html"
+    },
+    {
+      "shapeId": "scene-win-status-only",
+      "name": "Win Status Only",
+      "path": "/__mockup/scenes/win-status-only.html"
     }
   ]
 }
