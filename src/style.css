@@ -263,12 +263,12 @@ body {
   border-radius: 3px;
 }
 
-/* designathon showcase links — sit between actions and the loop */
+/* designathon showcase links — stacked column, one per line */
 .chai-splash__showcase {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   margin-top: 14px;
 }
 .chai-splash__showcase-link {
@@ -277,6 +277,13 @@ body {
   text-decoration: none;
   letter-spacing: .01em;
   transition: color .15s ease;
+}
+/* button-reset for the How it works entry */
+.chai-splash__showcase-link--btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 .chai-splash__showcase-link:hover,
 .chai-splash__showcase-link:focus-visible {
@@ -288,11 +295,6 @@ body {
   outline: 2px solid var(--cc-mint);
   outline-offset: 3px;
   border-radius: 3px;
-}
-.chai-splash__showcase-sep {
-  color: rgba(255, 238, 197, .2);
-  font-size: 11px;
-  user-select: none;
 }
 
 /* creator / built-with credit line */

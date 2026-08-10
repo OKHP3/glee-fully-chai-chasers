@@ -110,13 +110,10 @@ export function renderSplash(
               type="button">
               ${showBirthday ? "🎂 Start the Chai Chase" : "Start the Chai Chase"}
             </button>
-            <button class="chai-splash__secondary" type="button" id="chai-how-it-works-btn">
-              How it works ↗
-            </button>
           </div>
           <div class="chai-splash__showcase" role="navigation" aria-label="Designathon showcase">
             <a href="/chai-chasers-slides/" target="_blank" rel="noopener noreferrer" class="chai-splash__showcase-link">📊 Pitch deck</a>
-            <span class="chai-splash__showcase-sep" aria-hidden="true">·</span>
+            <button class="chai-splash__showcase-link chai-splash__showcase-link--btn" type="button" id="chai-how-it-works-btn">⚙️ How it works</button>
             <a href="/chai-chasers-video/" target="_blank" rel="noopener noreferrer" class="chai-splash__showcase-link">🎬 Build story</a>
           </div>
           <div class="chai-splash__loop" aria-label="The three-step chai chase loop">
