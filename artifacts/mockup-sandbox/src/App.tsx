@@ -106,17 +106,24 @@ const GROUP_PREFIXES: Array<{ label: string; prefixes: string[] }> = [
   {
     label: "Base Game",
     prefixes: [
-      "game-", "board-", "bold-", "doorbell-", "ice-",
+      "game-", "board-", "ice-",
       "levelup-", "paytable-", "spin-", "splash-",
     ],
   },
-  { label: "Settings",     prefixes: ["settings-"] },
-  { label: "Cascade",      prefixes: ["cascade-"] },
-  { label: "Cat Visits",   prefixes: ["cat-", "joey-", "phoebe-"] },
-  { label: "Win States",   prefixes: ["win-"] },
-  { label: "Lap Quest",    prefixes: ["lap-quest-"] },
-  { label: "Bonus Rounds", prefixes: ["free-spins-", "treat-"] },
-  { label: "UniGlee",      prefixes: ["uniglee-", "keepsake-"] },
+  { label: "Settings",   prefixes: ["settings-"] },
+  { label: "Cascade",    prefixes: ["cascade-"] },
+  { label: "Cat Visits", prefixes: ["cat-", "joey-", "phoebe-"] },
+  { label: "Win States", prefixes: ["win-"] },
+  { label: "Lap Quest",  prefixes: ["lap-quest-"] },
+  {
+    label: "Bonus",
+    prefixes: [
+      "bold-", "bonus-", "chai-storm-", "doorbell-",
+      "free-spin-", "free-spins-", "iced-chai-",
+      "standard-", "treat-", "were-",
+    ],
+  },
+  { label: "UniGlee",    prefixes: ["uniglee-", "keepsake-"] },
 ];
 
 function toDisplayName(filename: string): string {
