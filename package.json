@@ -19,6 +19,7 @@
     "validate:dead-css": "node scripts/check-dead-css.mjs",
     "validate:keepsake-size": "node scripts/check-keepsake-constellation-size.mjs",
     "validate:cabinet-strips": "python3 scripts/add-cabinet-strips.py --validate",
+    "validate:cdn": "node scripts/check-cdn-urls.mjs",
     "test:watch": "vitest"
   },
   "private": true,
