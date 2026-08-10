@@ -115,7 +115,26 @@ function getPreviewPath(): string | null {
 
 // ── Scene gallery ─────────────────────────────────────────────────────────────
 
-/** Prefix → group label, in display order. */
+/**
+ * Prefix → group label, in display order.
+ *
+ * When you add a new scene whose filename prefix is not listed here it will
+ * silently land in the "Other" bucket and a console warning fires in dev.
+ * Add the prefix to the right group (or create a new group) to keep the
+ * sidebar organised.
+ *
+ * Current prefix → group mapping
+ * ───────────────────────────────
+ * Base Game  : board-, game-, ice-, levelup-, paytable-, spin-, splash-
+ * Settings   : settings-
+ * Cascade    : cascade-
+ * Cat Visits : cat-, joey-, phoebe-
+ * Win States : win-
+ * Lap Quest  : lap-quest-
+ * Bonus      : bold-, bonus-, chai-storm-, doorbell-, free-spin-,
+ *              free-spins-, iced-chai-, standard-, treat-, were-
+ * UniGlee    : keepsake-, uniglee-
+ */
 const GROUP_PREFIXES: Array<{ label: string; prefixes: string[] }> = [
   {
     label: "Base Game",
@@ -164,7 +183,19 @@ function groupScenes(
   }
 
   const rest = scenes.filter((s) => !used.has(s));
-  if (rest.length) groups.push({ label: "Other", scenes: rest });
+  if (rest.length) {
+    groups.push({ label: "Other", scenes: rest });
+    // Dev-only nudge: a scene landed in "Other" because its filename prefix
+    // is not listed in GROUP_PREFIXES. Add it to the right group above.
+    if (import.meta.env.DEV) {
+      console.warn(
+        "[scene-gallery] The following scenes have no matching prefix in " +
+        "GROUP_PREFIXES and fell through to \"Other\". Update the prefix " +
+        "mapping at the top of App.tsx to keep the sidebar organised:\n" +
+        rest.map((s) => `  • ${s}`).join("\n"),
+      );
+    }
+  }
 
   return groups;
 }
