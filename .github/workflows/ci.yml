@@ -32,6 +32,10 @@ jobs:
           pnpm install --filter @workspace/mockup-sandbox --frozen-lockfile
           pnpm --filter @workspace/mockup-sandbox run check-exports
 
+      - name: Typecheck mockup canvas components — catch TS errors before merge
+        working-directory: artifacts/mockup-sandbox
+        run: npm run typecheck
+
       - run: npm test
 
       - name: Run slot engine unit tests — catch regressions before merge
