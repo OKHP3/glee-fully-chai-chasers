@@ -1415,7 +1415,7 @@ async function runTreatJarFreeSpins(
   state.balance += session.totalWin;
   state.bestCascade = Math.max(state.bestCascade, session.bestCascade);
   saveGameState(state);
-  await showBonusSummary(root, session.totalWin, 0, session.totalSpins);
+  await showBonusSummary(root, session.totalWin, session.totalSpins);
   await maybeLevelUpAfterBonus(root, state, session.totalSpins);
   const lastRound = session.rounds[session.rounds.length - 1];
   renderBoard(root, state, lastRound?.steps[lastRound.steps.length - 1]?.grid);
