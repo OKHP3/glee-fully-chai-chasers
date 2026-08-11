@@ -3,15 +3,15 @@ name: okhp3-replit-build-in-public
 description: >
   Full playbook for a Replit Designathon competition submission — canvas
   organisation for judges, artifact selection, dual deployment (Replit Publish
-  + GitHub Pages), session-to-session narrative continuity, and building-in-
-  public commit discipline. Activate for "designathon", "competition",
+  + GitHub Pages), session-to-session narrative continuity, and
+  building-in-public commit discipline. Activate for "designathon", "competition",
   "building in public", "judges", "showcase", "submission", "dual deploy",
   "GitHub Pages + Replit", or any request to prepare a Replit project for
   public or competitive review.
 license: MIT
 metadata:
   author: Jamie Hill (OverKill Hill P³)
-  version: "1.0.0"
+  version: "1.0.1"
   category: developer-tooling
   origin: Glee-fully Chai Chasers Designathon — retrospective skill extraction
   homepage: https://overkillhill.com
