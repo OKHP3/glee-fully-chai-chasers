@@ -245,7 +245,7 @@ export interface SpinInput {
   stickyWilds?: StickyWild[];
   /**
    * Override the winning-cascade hard cap for unit tests only.
-   * Production code must not pass this; the default of 52 is the correct
+   * Production code must not pass this; the default of 500 is the correct
    * production value (well above the observed maximum of ~20 cascades).
    */
   _guardCascadeCap?: number;
@@ -274,7 +274,7 @@ export function spin({
   stickyWilds: inputStickyWilds,
   _guardCascadeCap,
 }: SpinInput): SpinResult {
-  const guardCascadeCap = _guardCascadeCap ?? 52;
+  const guardCascadeCap = _guardCascadeCap ?? 500;
   let grid = startingGrid
     ? startingGrid.map((column) => column.map((cell) => ({ ...cell })))
     : spinGrid(rng, { includeDoorbells: allowDoorbells, includeBoldChaiPump });

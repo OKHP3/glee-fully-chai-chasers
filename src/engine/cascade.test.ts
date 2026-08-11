@@ -251,7 +251,7 @@ describe("Lap Quest infinite-loop guard", () => {
     // changes between iterations — Guard 1 never fires.
     //
     // ── Why a low _guardCascadeCap is used ────────────────────────────────
-    // The production cap of 52 would require 52 winning cascades in CI, making
+    // The production cap of 500 would require 500 winning cascades in CI, making
     // the test slow and the assertion imprecise.  _guardCascadeCap: 2 keeps the
     // test fast while demonstrating the exact Guard 2 boundary: after cascades
     // reaches 2 (the cap) the loop breaks and the result has cascades === 2.
@@ -366,7 +366,7 @@ describe("Lap Quest infinite-loop guard", () => {
     //
     // Guard 1b (src/engine/cascade.ts) fires when the same set of board cells
     // wins on two consecutive winning cascades while sticky wilds are present.
-    // This terminates the cascade loop BEFORE Guard 2 (the hard 52-cascade cap)
+    // This terminates the cascade loop BEFORE Guard 2 (the hard 500-cascade cap)
     // becomes necessary.
     //
     // SpinResult.terminatedByCascadeCap is set to true ONLY when Guard 2 fires.
@@ -408,6 +408,172 @@ describe("Lap Quest infinite-loop guard", () => {
         // stickyWilds: intentionally omitted
       }),
     ).not.toThrow();
+  });
+
+  // ── PRD §2.7 four required regression tests ──────────────────────────────
+  // Each of these four tests must fail on pre-fix code (no guards) and pass
+  // after the grid-identity guard and iteration backstop are applied.
+
+  it("PRD test 1 — exact repro: comfort wilds (0,3)(1,2)(2,2)(3,2) terminate", () => {
+    // PRD §2.3: seed 99, Lap Quest round 28 produced comfort wilds at
+    // (0,3)(1,2)(2,2)(3,2) — covering reels 0–3 of payline 13 ([3,2,2,2,3]).
+    // Those four wilds caused an infinite cascade loop pre-fix.
+    // This test directly constructs that sticky-wild set and asserts termination.
+    const stickyWilds: StickyWild[] = [
+      { position: [0, 3], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [1, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [2, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [3, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+    ];
+    // All-tumbler board: sticky wilds restore after each cascade, and other
+    // paylines may also win, but the guards must break the loop regardless.
+    const startingGrid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "tumbler" as const })),
+    );
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const result = spin({
+        rng: mulberry32(99),
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+        startingGrid,
+        stickyWilds,
+        spinArea: "secondary",
+        allowDoorbells: false,
+        includeBoldChaiPump: false,
+        allowTreatTimeBonus: false,
+        allowUniGlee: false,
+      });
+
+      // Must terminate; if it loops, this assertion is never reached.
+      expect(result.steps.length).toBeGreaterThanOrEqual(1);
+      // Terminal step is a dead board.
+      expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+      // Hard cap (Guard 2) must not fire — Guard 1 or 1b must intercept first.
+      expect(result.terminatedByCascadeCap).toBeUndefined();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("PRD test 2 — constructed worst case: all 5 positions of payline 13 as sticky wilds", () => {
+    // Payline 13 (0-indexed) = [3, 2, 2, 2, 3].
+    // Sticky wilds at all 5 positions guarantee payline 13 wins on every pass.
+    // The non-sticky board uses treat_chicken (NON_PAYING) so no other payline
+    // can start a win — only payline 13 is eligible each iteration.
+    // After the first winning cascade, cascadeColumnAroundStickyWilds restores
+    // all 5 wilds and treat_chicken cells are untouched (never removed), leaving
+    // the grid byte-for-byte identical to the previous iteration.
+    // Guard 1 must fire — the pre-fix code would loop forever.
+    const stickyWilds: StickyWild[] = [
+      { position: [0, 3], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [1, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [2, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [3, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [4, 3], symbol: "wild_phoebe", sticky: "lap_quest" },
+    ];
+    const startingGrid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),
+    );
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const result = spin({
+        rng: mulberry32(7),
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+        startingGrid,
+        stickyWilds,
+        spinArea: "secondary",
+        allowDoorbells: false,
+        includeBoldChaiPump: false,
+        allowTreatTimeBonus: false,
+        allowUniGlee: false,
+      });
+
+      // Guard 1 must fire: the grid is identical after every cascade.
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("grid unchanged"));
+      // Guard 2 (hard cap) must NOT fire — Guard 1 is sufficient.
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("Hard cascade cap"));
+      expect(result.terminatedByCascadeCap).toBeUndefined();
+      // Exactly one winning cascade: Guard 1 fires on the second evaluation.
+      expect(result.cascades).toBe(1);
+      // Terminal step is a dead board.
+      expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("PRD test 3 — pays once, not forever: all-wild payline 13 contributes its payout exactly one time", () => {
+    // Same constructed worst-case setup as PRD test 2.
+    // Only payline 13 (5 sticky wilds, treat_chicken elsewhere) can win.
+    // Guard 1 fires after the first winning cascade, so the line pays exactly
+    // one time.  Pre-fix code would accumulate the same payout forever.
+    const stickyWilds: StickyWild[] = [
+      { position: [0, 3], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [1, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [2, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [3, 2], symbol: "wild_phoebe", sticky: "lap_quest" },
+      { position: [4, 3], symbol: "wild_phoebe", sticky: "lap_quest" },
+    ];
+    const startingGrid: Grid = Array.from({ length: 5 }, () =>
+      Array.from({ length: 4 }, () => ({ symbol: "treat_chicken" as const })),
+    );
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const result = spin({
+        rng: mulberry32(7),
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+        startingGrid,
+        stickyWilds,
+        spinArea: "secondary",
+        allowDoorbells: false,
+        includeBoldChaiPump: false,
+        allowTreatTimeBonus: false,
+        allowUniGlee: false,
+      });
+
+      // 5-of-a-kind wilds pay as tumbler: PAYTABLE.tumbler[5] * betPerLine * PAYOUT_SCALE.
+      // Math.round(1112 * 1 * 0.775) = Math.round(861.8) = 862.
+      const expectedOnce = Math.round(PAYTABLE.tumbler![5] * 1 * PAYOUT_SCALE);
+      expect(result.totalWin).toBe(expectedOnce);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("PRD test 4 — no false positives: guard is inert when sticky wilds do not anchor a repeating win", () => {
+    // A cozy-lap Lap Quest round places 2 sticky wilds at random positions.
+    // When those wilds do not happen to cover a full payline prefix, the cascade
+    // resolves naturally without any guard firing.  This test verifies the guard
+    // is inert on a healthy spin — neither Guard 1 nor Guard 1b should fire.
+    //
+    // Seed 41 produces a well-behaved round (also used in lap-quest.test.ts).
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const rng = mulberry32(41);
+      const challenge = createLapQuestChallenge(rng);
+      const cozySpot = challenge.choices.find((spot) => spot !== challenge.perfectSpot)!;
+      const result = spinLapQuestRound(rng, challenge, cozySpot, 1);
+
+      // Round terminates on a dead board.
+      expect(result.steps.length).toBeGreaterThanOrEqual(1);
+      expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+      // Neither guard should have fired — the board changed normally each cascade.
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("grid unchanged"));
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining("Sticky-wild anchor"));
+      // Hard cap must not fire.
+      expect(result.terminatedByCascadeCap).toBeUndefined();
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   it("does not fire Guard 1 during non-mutating specialty steps between winning cascades", () => {
