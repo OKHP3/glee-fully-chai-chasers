@@ -229,7 +229,8 @@ const STYLES = `
   transform: translateY(0);
 }
 
-/* Header */
+/* Header — absorbs the iOS/PWA safe-area inset so the notch is covered
+   and the close button is always reachable above the status bar. */
 .hiw-header {
   position: sticky;
   top: 0;
@@ -237,9 +238,14 @@ const STYLES = `
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: .75rem 1.25rem;
+  padding:
+    calc(.75rem + env(safe-area-inset-top, 0px))
+    max(1.25rem, env(safe-area-inset-right, 0px))
+    .75rem
+    max(1.25rem, env(safe-area-inset-left, 0px));
   background: rgba(7,12,31,.92);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--hiw-border);
 }
 .hiw-header__wordmark {
@@ -270,11 +276,15 @@ const STYLES = `
   outline: none;
 }
 
-/* Content wrapper */
+/* Content wrapper — extra bottom padding clears the iOS home indicator. */
 .hiw-content {
   max-width: 680px;
   margin: 0 auto;
-  padding: 2rem 1.25rem 5rem;
+  padding:
+    2rem
+    max(1.25rem, env(safe-area-inset-right, 0px))
+    max(5rem, calc(3rem + env(safe-area-inset-bottom, 0px)))
+    max(1.25rem, env(safe-area-inset-left, 0px));
 }
 
 /* Sections */
