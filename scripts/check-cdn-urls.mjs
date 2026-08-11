@@ -45,10 +45,11 @@
  * passes scan.  runCheck() closes the gap by walking .js files and flagging
  * unlisted http:// or https:// URL literals in those specific call contexts.
  *
- * Scanning scope: http:// and https:// literal URL arguments inside
- *   fetch(), import(), and importScripts() calls.  Both schemes are matched,
- *   consistent with isExternalUrl() used by the HTML/CSS scanners.
- *   Block comments are stripped so licence-header URLs are not reported.
+ * Scanning scope: http://, https://, and protocol-relative //host/ URL
+ *   literals inside fetch(), import(), and importScripts() calls.  The
+ *   external-URL definition matches isExternalUrl() used by the HTML/CSS
+ *   scanners.  Block and line comments are stripped before scanning so
+ *   commented-out call syntax (// fetch("...")) is not reported.
  * Out of scope (require full JS AST / data-flow analysis):
  *   - Indirect URLs: const U="https://cdn.example.com"; fetch(U)
  *   - Template expressions: fetch(`https://${host}/path`)
@@ -485,24 +486,68 @@ function extractCssUrls(src) {
 // identifiers, and other non-fetch string contexts are naturally excluded
 // because they never appear as the first argument to fetch()/import()/etc.
 //
-// Both http:// and https:// are matched, consistent with isExternalUrl().
+// Both http://, https://, and protocol-relative //host/ URLs are matched,
+// consistent with isExternalUrl() used by the HTML/CSS scanners.
 //
 // Matches:
 //   fetch("https://cdn.example.com/api")
-//   import("https://cdn.jsdelivr.net/npm/lib@1/lib.js")   ← dynamic import
+//   fetch("//cdn.example.com/api")           ← protocol-relative
+//   import("https://cdn.jsdelivr.net/npm/lib@1/lib.js")
 //   importScripts("https://cdn.example.com/worker.js")
 //
 // Does NOT match (out of scope — require AST/data-flow analysis):
 //   href="https://replit.com/refer/"   (HTML navigation link in template str)
 //   xmlns="http://www.w3.org/2000/svg" (XML namespace identifier)
-//   const U = "https://cdn.example.com"; fetch(U);        (indirect via var)
+//   const U = "https://cdn.example.com"; fetch(U);  (indirect via variable)
+//   // fetch("https://...")                   (line comment — stripped first)
 const JS_FETCH_RE =
-  /\b(?:fetch|import|importScripts)\s*\(\s*["'`](https?:\/\/[^"'`\s\\]{4,})/gi;
+  /\b(?:fetch|import|importScripts)\s*\(\s*["'`]((?:https?:\/\/|\/\/[^/\s"'`\\])[^"'`\s\\]+)/gi;
+
+/**
+ * Strips JavaScript line comments (// to end of line) while preserving string
+ * literals.  Handles ", ', and ` delimiters and `\` escape sequences.
+ * Template expressions (${…}) are treated as opaque — safe for built Vite
+ * output where template expressions have been pre-evaluated.
+ *
+ * Preserves newlines so line positions are not shifted for the caller.
+ */
+function stripJsLineComments(src) {
+  const out = [];
+  let i = 0;
+  while (i < src.length) {
+    const ch = src[i];
+    // Opening string delimiter — copy the entire literal verbatim
+    if (ch === '"' || ch === "'" || ch === '`') {
+      out.push(src[i++]);
+      while (i < src.length) {
+        if (src[i] === '\\') {
+          // Escape sequence — preserve both the backslash and the next char
+          out.push(src[i++]);
+          if (i < src.length) out.push(src[i++]);
+        } else if (src[i] === ch) {
+          out.push(src[i++]);
+          break; // end of string literal
+        } else {
+          out.push(src[i++]);
+        }
+      }
+    } else if (ch === '/' && src[i + 1] === '/') {
+      // Line comment — discard everything up to (but not including) the newline
+      while (i < src.length && src[i] !== '\n') i++;
+      // The newline itself is left for the outer loop to copy, preserving
+      // line numbers for any position-sensitive downstream processing.
+    } else {
+      out.push(src[i++]);
+    }
+  }
+  return out.join('');
+}
 
 function extractJsUrls(src) {
-  // Strip block comments (licence headers, etc.) so URLs inside them are
-  // not reported.
-  const stripped = src.replace(/\/\*[\s\S]*?\*\//g, "");
+  // Strip block comments first (/* … */), then line comments (// … \n).
+  // Order matters: a block comment may span lines that contain //.
+  const noBlock = src.replace(/\/\*[\s\S]*?\*\//g, "");
+  const stripped = stripJsLineComments(noBlock);
   const hits = [];
   let m;
   JS_FETCH_RE.lastIndex = 0;
@@ -1284,6 +1329,55 @@ function runSelfTest() {
       assert(v.length === 0, `SVG xmlns namespace must not be flagged; got ${v.length}`);
     });
 
+    check("protocol-relative CDN URL in fetch() is flagged", () => {
+      // //host/… is an external URL, identical to isExternalUrl() semantics.
+      const v = scan("chunk.js",
+        `fetch("//cdn.example.com/lib.js");`
+      );
+      assert(v.length === 1, `protocol-relative URL in fetch() must be flagged; got ${v.length}`);
+      assert(v[0].url.startsWith("//cdn.example.com"), `URL mismatch: ${v[0]?.url}`);
+    });
+
+    check("protocol-relative CDN URL in import() is flagged", () => {
+      const v = scan("chunk.js",
+        `import("//cdn.jsdelivr.net/npm/lib@1/lib.js");`
+      );
+      assert(v.length === 1, `protocol-relative URL in import() must be flagged; got ${v.length}`);
+    });
+
+    check("protocol-relative root-relative URL (///) is NOT a valid host — not flagged", () => {
+      // isExternalUrl: /^\/\/[^/\s]/ requires a non-slash char after //
+      // so ///path is NOT external (it's root-relative with an empty authority).
+      const v = scan("chunk.js", `fetch("///path/to/resource");`);
+      assert(v.length === 0, `triple-slash path must not be flagged; got ${v.length}`);
+    });
+
+    check("commented-out fetch() call is NOT flagged — line comment stripped first", () => {
+      // Regression: // fetch("https://cdn.example.com/x.js") must not match
+      // after line comments are stripped.
+      const v = scan("chunk.js",
+        `// fetch("https://cdn.example.com/x.js")\nconst x=42;`
+      );
+      assert(v.length === 0, `commented-out fetch must not be flagged; got ${v.length}`);
+    });
+
+    check("commented-out import() call is NOT flagged — line comment stripped first", () => {
+      const v = scan("chunk.js",
+        `// import("https://cdn.jsdelivr.net/npm/lib@1/lib.js")\nconst x=42;`
+      );
+      assert(v.length === 0, `commented-out import must not be flagged; got ${v.length}`);
+    });
+
+    check("real fetch() after a commented-out fetch() is still flagged", () => {
+      // The commented line is stripped; the real call on the next line is caught.
+      const v = scan("chunk.js", [
+        `// fetch("https://cdn.example.com/old.js")`,
+        `fetch("https://unpkg.com/some-lib@1.0/dist/lib.js");`,
+      ].join("\n"));
+      assert(v.length === 1, `real fetch after commented fetch must be flagged; got ${v.length}`);
+      assert(v[0].url.includes("unpkg.com"), `wrong URL: ${v[0]?.url}`);
+    });
+
     check("CDN URL inside a JS block comment is NOT flagged", () => {
       const v = scan("chunk.js",
         `/* Injected from https://unpkg.com/some-lib@1.0 */\nconst x=42;`
@@ -1291,13 +1385,15 @@ function runSelfTest() {
       assert(v.length === 0, `URL inside JS block comment must not be flagged; got ${v.length}`);
     });
 
-    check("CDN URL in a JS line comment is NOT flagged", () => {
-      // Line comments never appear as arguments to fetch()/import(), so
-      // JS_FETCH_RE does not match them.
+    check("URL in line comment after a string containing // is handled correctly", () => {
+      // The string "http://local" must not be treated as a line-comment start.
+      // The genuine line comment after it should be stripped.
       const v = scan("chunk.js",
-        `// See https://cdn.jsdelivr.net/npm/some-lib for reference\nconst x=42;`
+        `const base="http://localhost:3000"; // fetch("https://cdn.example.com/x.js")\n`
       );
-      assert(v.length === 0, `URL in JS line comment must not be flagged; got ${v.length}`);
+      // The string literal "http://localhost:3000" is not inside a fetch/import
+      // call, so it is not flagged.  The commented-out fetch is stripped.
+      assert(v.length === 0, `localhost bare string and commented fetch must not be flagged; got ${v.length}`);
     });
 
     check("local relative path in a JS string is NOT flagged", () => {
