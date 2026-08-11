@@ -1,6 +1,7 @@
 {
   "name": "glee-fully-chai-chasers",
   "version": "0.1.0",
+  "packageManager": "pnpm@10.26.1",
   "type": "module",
   "description": "A free, fan-made cascading-reels game starring Joey & Phoebe. Original art, fictional currency, real love.",
   "scripts": {
