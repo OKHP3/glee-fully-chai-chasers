@@ -1,11 +1,12 @@
-import { motion } from 'framer-motion';
-import { sceneTransitions } from '@/lib/video/animations';
+import { motion, useReducedMotion } from 'framer-motion';
+import { getSceneTransition } from '@/lib/video/animations';
 
 export function Scene1() {
+  const prefersReduced = useReducedMotion();
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center z-10"
-      {...sceneTransitions.fadeBlur}
+      {...getSceneTransition('fadeBlur', prefersReduced ?? false)}
     >
       <div className="absolute bottom-0 left-0 right-0 h-[80vh] bg-gradient-to-t from-[#0a0a20] via-[#0a0a20]/90 to-transparent z-10 pointer-events-none" />
 

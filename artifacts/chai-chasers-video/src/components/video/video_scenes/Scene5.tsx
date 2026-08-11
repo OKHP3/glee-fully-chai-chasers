@@ -1,11 +1,12 @@
-import { motion } from 'framer-motion';
-import { sceneTransitions } from '@/lib/video/animations';
+import { motion, useReducedMotion } from 'framer-motion';
+import { getSceneTransition } from '@/lib/video/animations';
 
 export function Scene5() {
+  const prefersReduced = useReducedMotion();
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center z-10"
-      {...sceneTransitions.slideUp}
+      {...getSceneTransition('slideUp', prefersReduced ?? false)}
     >
       <div className="absolute inset-0 bg-gradient-to-tr from-[#1a0b12] to-[#2d1b1e]/90" />
 

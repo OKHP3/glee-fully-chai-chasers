@@ -250,19 +250,9 @@ export const REDUCED_MOTION_TRANSITION = {
 export function getSceneTransition(
   name: keyof typeof sceneTransitions,
   prefersReducedMotion: boolean,
-): {
-  initial: Record<string, unknown>;
-  animate: Record<string, unknown>;
-  exit: Record<string, unknown>;
-  transition: Record<string, unknown>;
-} {
+): typeof REDUCED_MOTION_TRANSITION | (typeof sceneTransitions)[keyof typeof sceneTransitions] {
   if (prefersReducedMotion) return REDUCED_MOTION_TRANSITION;
-  return sceneTransitions[name] as {
-    initial: Record<string, unknown>;
-    animate: Record<string, unknown>;
-    exit: Record<string, unknown>;
-    transition: Record<string, unknown>;
-  };
+  return sceneTransitions[name];
 }
 
 // Utilities

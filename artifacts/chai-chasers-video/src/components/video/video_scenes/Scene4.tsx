@@ -1,12 +1,13 @@
-import { motion } from 'framer-motion';
-import { sceneTransitions } from '@/lib/video/animations';
+import { motion, useReducedMotion } from 'framer-motion';
+import { getSceneTransition } from '@/lib/video/animations';
 import wheelHeroArt from '@game-assets/optimized/joey-phoebe-wheel.webp';
 
 export function Scene4() {
+  const prefersReduced = useReducedMotion();
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center z-10"
-      {...sceneTransitions.perspectiveFlip}
+      {...getSceneTransition('perspectiveFlip', prefersReduced ?? false)}
     >
       <div className="absolute inset-0 bg-[#22102b]/80" />
 

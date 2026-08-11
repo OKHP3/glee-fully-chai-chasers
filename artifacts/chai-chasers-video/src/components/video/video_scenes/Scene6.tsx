@@ -1,11 +1,12 @@
-import { motion } from 'framer-motion';
-import { sceneTransitions } from '@/lib/video/animations';
+import { motion, useReducedMotion } from 'framer-motion';
+import { getSceneTransition } from '@/lib/video/animations';
 
 export function Scene6() {
+  const prefersReduced = useReducedMotion();
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center overflow-hidden z-10"
-      {...sceneTransitions.zoomThrough}
+      {...getSceneTransition('zoomThrough', prefersReduced ?? false)}
     >
       <div className="absolute inset-0 bg-[#080515]" />
       
