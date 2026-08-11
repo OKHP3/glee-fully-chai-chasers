@@ -59,7 +59,7 @@ Style anchor for ALL raster art: "retro-bright mid-century cartoon, flat colors 
 
 | Asset | Spec | Owner | Provenance | Status |
 |---|---|---|---|---|
-| Chai Chasers showcase video | 45-second 16:9 animated build-in-public promo; 5 scenes; React + Framer Motion export from Replit Design (Chai-Chasers-Showcase project) | Replit Agent + Jamie Hill, 2026-08-07 | original; all source images original (see rows above); background music original (lo-fi folk, generated) | ☑ `artifacts/chai-chasers-video/public/chai-chasers-showcase.mp4` |
+| Chai Chasers showcase video | 45-second 16:9 animated build-in-public promo; 5 scenes; React + Framer Motion export from Replit Design (Chai-Chasers-Showcase project) | Replit Agent + Jamie Hill, 2026-08-07 | original; all source images original (see rows above); background music original (lo-fi folk, generated) | ☑ `artifacts/chai-chasers-video/public/chai-chasers-v3-showcase.mp4` |
 
 ## Provenance audit (release gate)
 

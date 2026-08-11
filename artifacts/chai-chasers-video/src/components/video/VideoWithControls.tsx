@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, Download, Repeat, Volume2, VolumeX } from 'lucide-react';
 
-const VIDEO_FILE = `${import.meta.env.BASE_URL}chai-chasers-showcase.mp4`;
+const VIDEO_FILE = `${import.meta.env.BASE_URL}chai-chasers-v3-showcase.mp4`;
 import VideoTemplate, { SCENE_DURATIONS } from './VideoTemplate';
 import { useSceneControls } from './useSceneControls';
 
