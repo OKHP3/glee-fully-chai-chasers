@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "skill": {
+    "name": "okhp3-replit-repl-janitor",
+    "version": "1.0.1",
+    "maturity": "draftable",
+    "evidence_status": "benchmarked-live"
+  },
+  "source": {
+    "repository": "glee-fully-chai-chasers (this Replit project)",
+    "package_path": ".agents/skills/okhp3-replit-repl-janitor",
+    "selected_as_canonical_incubator": true,
+    "selection_reason": "Runtime source is the editable authority during incubation. SKILL.md and all package files are byte-equal with the publication mirror (aggregate SHA-256 960898a5). Mirror was already complete — all 8 files present and matching at time of promotion check on 2026-08-11. No competing edits found in destination."
+  },
+  "mirrors": [
+    {
+      "path": "skills/okhp3-replit-repl-janitor",
+      "role": "publication-mirror",
+      "authorized": true,
+      "aggregate_sha256": "960898a5c5c32cb6fd80e815007201123e0430f64416eec4bc2b36d007c14e85"
+    }
+  ],
+  "canonical_target": {
+    "repository": "OKHP3/skillz",
+    "family": "replit",
+    "package_path": "replit/okhp3-replit-repl-janitor",
+    "pull_request_url": null,
+    "branch_commit": null,
+    "accepted_commit_or_hash": null,
+    "accepted_commit_note": "This skill was not included in PR #43 (which covers the four other replit/ skills). It should be added to PR #43 before merge or submitted as a follow-up PR to the same replit/ family. Update this field with the accepted merge commit SHA after owner merges."
+  },
+  "inventory": [
+    { "file": "SKILL.md", "sha256": "0a9b7c94e0b23a34a1630a36db3b1016fddddbdbddadcf8bd2eaf1d0c2b7ab8c", "role": "core" },
+    { "file": "evals/evals.json", "sha256": "6256f8e356db31ec5472595fb7392598ef2d1b258497749c2b1f3e3a6f583c0c", "role": "eval" },
+    { "file": "evals/trigger-evals.json", "sha256": "c8b52e3f32f650a3542f18e0ec9333538688fa08c2d232a241a95359f93e4293", "role": "eval" },
+    { "file": "benchmarks/benchmark.json", "sha256": "ab6eaceb8e86095ca3fdea1a8d909673324b84170ee458bd70f9eac2136a7441", "role": "benchmark" },
+    { "file": "references/foundry-architecture.md", "sha256": "e469f8e005efc2c414c0443f8db73470555e5b2c4b36d61650bbc2e54ac98d2e", "role": "reference" },
+    { "file": "references/naming-conventions.md", "sha256": "9cb54fe001a8eed1c028c43227d307c3d0c67979e0e26c778d02adfa38bbbf72", "role": "reference" },
+    { "file": "scripts/audit-repo.py", "sha256": "6dfc5904a962f41e786448531d05ea867e75bff2079385b81f453cc82a398cc5", "role": "script" },
+    { "file": "tests/test_audit_repo.py", "sha256": "c1521edf4fa3e3ef5a9b6f9be85cd3a41ede95fb7d616cfa9581f206edd6cce2", "role": "test" }
+  ],
+  "decision": {
+    "status": "ready",
+    "alternatives_considered": [
+      "skills/okhp3-replit-repl-janitor — rejected as source; publication mirrors are managed output during incubation, not second authoring locations. Both are byte-equal so there is no divergence, but the runtime source is the designated authority."
+    ],
+    "unresolved_items": [
+      "OKHP3/skillz replit/ family may already exist after PR #43 merges — no name collision check is possible from local context.",
+      "This skill was intentionally excluded from PR #43 to keep that batch focused. Owner must decide whether to amend PR #43 before merge or open a follow-up PR.",
+      "audit-repo.py is a deterministic bundled script — canonical consumers must have Python 3 available. This is already noted in the okhp3-skill-promotion compatibility field and should appear in the replit/ FAMILY.md adapter note.",
+      "The --fetch flag in audit-repo.py is Replit-specific in practice (network access is appropriate in a Replit checkout). Canonical docs should note it as an opt-in requiring explicit network authorization."
+    ]
+  },
+  "safety": {
+    "license": "MIT",
+    "public_safety": "passed",
+    "private_material_found": false,
+    "public_safety_notes": "All URLs are public (overkillhill.com, github.com/OKHP3). Grep scan found 'token' only in illustrative filename examples (site-tokens.css in naming-conventions.md, evals.json, and tests) and in benchmark.json metadata field names — no credentials, API keys, bearer tokens, or session data. No private URLs, internal ticket IDs, employer data, or proprietary examples found.",
+    "external_writes": "none-declared",
+    "adapter_differences": [
+      "scripts/audit-repo.py invokes Python 3 and Git — canonical consumers must have both installed. The script is read-only by default; --fetch and --sync are explicit opt-ins.",
+      "The --fetch flag is relevant mainly in Replit workspaces where network access is expected. Non-Replit consumers should treat --fetch as an opt-in that requires explicit network authorization.",
+      "Workflow restart verification (Step 7) references Replit-managed workflows. Canonical consumers on other platforms should substitute their equivalent service restart and health-check step.",
+      "Branch naming patterns (subrepl-*, replit-agent, agent/*) are Replit-generated conventions documented as hints, not verdicts — this framing is universal and intentional."
+    ]
+  },
+  "authorization": {
+    "requested_actions": ["verify-mirror", "create-promotion-manifest", "update-contribution-brief"],
+    "approved_actions": ["verify-mirror", "create-promotion-manifest", "update-contribution-brief"],
+    "withheld_actions": ["commit", "push", "pull-request", "external-publication"]
+  },
+  "verification": {
+    "checks": [
+      { "name": "sync_skill_mirror --check", "result": "passed", "notes": "Source and destination byte-equal on 2026-08-11. Aggregate SHA-256: 960898a5c5c32cb6fd80e815007201123e0430f64416eec4bc2b36d007c14e85. All 8 files match exactly; zero changed, zero missing, zero extra." },
+      { "name": "public-safety grep scan", "result": "passed", "notes": "No credentials, private URLs, internal IDs, or employer data found. All 'token' matches are illustrative naming examples and benchmark metadata field names." },
+      { "name": "structural: SKILL.md present, name field matches directory", "result": "passed", "notes": "name: okhp3-replit-repl-janitor matches directory. Frontmatter is well-formed." }
+    ],
+    "review_record": null,
+    "verified_at": "2026-08-11",
+    "limitations": [
+      "Foundry architecture review not run — okhp3-skill-foundry eval not executed for this promotion task.",
+      "Benchmark runs are live delegation-subagent runs (all 3 evals), not analytical stubs. with_skill mean pass rate: 0.9167; without_skill mean: 0.1667; delta: +0.75.",
+      "Eval 3 (safe-execution-verification) with_skill pass rate is 0.75 — one expectation (git rm / git mv file-action rule with untracked carve-out) was not fully restated in the benchmark run. Version 1.0.1 addresses this emphasis gap at the NON-NEGOTIABLE callout level; the gap is in benchmark verbosity, not skill correctness.",
+      "Python 3 runtime requirement for audit-repo.py is not enforced at install time."
+    ]
+  },
+  "recovery": {
+    "path": "Inspect the diff and restore only reviewed files; do not delete destination-only files automatically.",
+    "pre_sync_git_status_recorded": true,
+    "pre_sync_mirror_state": "skills/okhp3-replit-repl-janitor was already complete and byte-equal with the runtime source on 2026-08-11. No sync operation was necessary."
+  }
+}
