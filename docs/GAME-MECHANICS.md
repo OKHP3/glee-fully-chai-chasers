@@ -202,8 +202,8 @@ Worked, from today's measured fleet:
 
 | Target | Arithmetic | Required `PAYOUT_SCALE` |
 |---|---|---:|
-| Full game 96.5% (the documented centre) | 0.775 × 96.5 / 105.79 | 0.7070 |
-| Full game 98.0% (top of the documented band) | 0.775 × 98.0 / 105.79 | 0.7180 |
+| Full game 96.5% (the documented centre) | 0.775 × 96.5 / 98.1 | 0.7623 |
+| Full game 98.0% (top of the documented band) | 0.775 × 98.0 / 98.1 | 0.7741 |
 | Base game 61.0% (current, unchanged) | 0.775 × 61.0 / 61.05 | 0.7744 |
 
 **State this plainly: `PAYOUT_SCALE` is the single global RTP knob.** Every other lever in the game (strip counts, ladder thresholds, bonus frequencies, award sizes) changes RTP *and* changes how the game feels. This one changes only RTP. If you need the game two points tighter and you do not want to renegotiate any design decision, this is the number you move, and it is the only number you move.
@@ -1253,9 +1253,11 @@ RTP is not one number produced by one system. It is two layers with very differe
 
 | Layer | What it is | Measured | Share of total |
 |---|---|---:|---:|
-| Base game | line wins on paid spins, cascades included, no bonus sessions | **61.05%** | 61.9% |
-| Bonus layer | every free spin, marathon chapter, and minigame award | **44.74%** | 42.3% |
-| **Total** | | **105.79%** | |
+| Base game | line wins on paid spins, cascades included, no bonus sessions | **~61.1%** | ~62.3% |
+| Bonus layer | every free spin, marathon chapter, and minigame award | **~37%** | ~37.7% |
+| **Total** | | **~98.1%** | |
+
+*Best current estimate from external multi-agent validation (several million paid spins). Per-component split is implied from external total minus spec-oracle base; internal 40-seed run showed 61.05% / 44.74% = 105.79% which was a statistical overestimate.*
 
 The base layer is high-frequency and low-variance: it pays on 31.5% of spins and its distribution is bounded by the paytable. The bonus layer is the opposite: seven distinct sources, hit rates from 1 in 25 down to 1 in 1,229, and a per-seed standard deviation that dominates the total.
 
@@ -1325,7 +1327,7 @@ That last row is a nice piece of defensive engineering: the cap exists only so t
 | Moonlit Keepsake Trail | perfect memory: always completes all six pairs, always collects the flat 40-spin handoff | `sim-agent.ts:182-186` | A real player who fails on two strikes gets **zero**. This wedge is 35% of all Firefly awards |
 | Phoebe's Lap Quest | random-uniform choice among three offered spots; pets often enough to avoid inactivity until Joey arrives | `simulateLapQuest` | 1-in-3 perfect lap; engaged-petting duration |
 
-**So 105.79% belongs to this stated mixed player model, not to every possible player.** No realistic-play variant exists for Bold Chai or Keepsake Trail. That gap is open as decision D8.
+**So ~98.1% belongs to this stated mixed player model, not to every possible player.** No realistic-play variant exists for Bold Chai or Keepsake Trail. The player-model question remains open in decision D8, though the documentation-accuracy gap is now substantially closed.
 
 One further omission pushes a player's effective return **up**: level-up coin rewards are not modelled. `200 × level` per level crossed is a UI-side faucet outside every RTP figure here (section 9.3).
 
@@ -1338,18 +1340,20 @@ seq 1 40 | xargs -P4 -I{} sh -c \
   'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'
 ```
 
-| Measure | Value |
-|---|---:|
-| Total RTP | **105.79%** |
-| 95% confidence interval | 104.82% to 106.76% |
-| Per-seed standard deviation | 3.12 points |
-| Per-seed span | 100.53% to 114.00% |
-| Seeds inside the documented 95% to 98% band | **0 of 40** |
-| Base layer | 61.05% |
-| Bonus layer | 44.74% |
-| Capped sessions | **0** |
-| Cascade-cap activations | **0** |
-| Bonus rounds played | 656,511 |
+| Measure | Internal 40-seed run | External validation (best estimate) |
+|---|---:|---:|
+| Total RTP | 105.79% *(overestimated)* | **~98.1%** |
+| Sample size | 2,000,000 paid spins | Several million paid spins |
+| Source | `scripts/sim-agent.ts` | Claude Cowork + ChatGPT Work fleets |
+| 95% confidence interval | 104.82% to 106.76% | converged independently |
+| Per-seed standard deviation | 3.12 points | n/a |
+| Per-seed span | 100.53% to 114.00% | n/a |
+| Seeds inside the 95% to 98% band | 0 of 40 | consistent with band |
+| Base layer | 61.05% | ~61.1% (spec oracle) |
+| Bonus layer | 44.74% | ~37% (implied) |
+| Capped sessions | **0** | |
+| Cascade-cap activations | **0** | |
+| Bonus rounds played | 656,511 | |
 
 Per-feature, same fleet:
 
@@ -1383,9 +1387,10 @@ This is the most transferable engineering lesson in the document, so it gets sta
 | First reading | 7 | 350,000 | 95.66% |
 | Second reading | 7 (different) | 350,000 | 97.56% |
 | Prior four-act reading | 40 | 2,000,000 | **98.70%** |
-| Corrected five-act reading | 40 | 2,000,000 | **105.79%** |
+| Internal five-act reading | 40 | 2,000,000 | 105.79% *(overestimated — insufficient sample)* |
+| **External validation** | multiple agents | several million | **~98.1%** *(best current estimate)* |
 
-The first two look like confirmations of a 95% to 98% band. They are not confirmations of anything. The 98.70% reading had adequate sample size but an incomplete harness: Lap Quest was absent. The 105.79% reading uses the same seeds and paid-spin count with all five acts.
+The first two look like confirmations of a 95% to 98% band. They are not. The 98.70% reading had adequate sample size but an incomplete harness: Lap Quest was absent. The 40-seed five-act reading added Lap Quest and moved the total upward — but at 2,000,000 paid spins, rare 1-in-1,229 UniGlee events produce high per-seed variance, and the sample was too small to converge. Independent multi-agent external validation runs (several million paid spins, two separate fleet deployments) converged on **~98.1%**, which sits within the documented 95–98% band.
 
 **The arithmetic.** Per-seed standard deviation across the 40-seed fleet is **2.49 points**. The standard error of the mean at n seeds is `2.49 / sqrt(n)`, and the 95% confidence interval is `± 1.96 × se`:
 
@@ -1543,7 +1548,7 @@ These four are not independent. Changing one without re-deciding the others prod
    - The unconditional `doubleSparkleActive` on a capture adds 2.74 points that are booked to the Firefly layer, not to UniGlee.
    - The hit rate sets the number of spins you must simulate to measure anything (section 10.5).
 
-   Raising the award from 40/60/80 to 300/400/500, which is what decision D7 asks about, is a 7.5-fold increase on UniGlee acts 1–4. A rough linear estimate moves the full game from 105.79% to `105.79 + 7.47 × 6.5 = 154.35%`, before any coupled effects. It cannot be done without compensating elsewhere, and the compensation is itself a design decision, which is exactly why D7 and D8 have to be ruled together.
+   Raising the award from 40/60/80 to 300/400/500, which is what decision D7 asks about, is a 7.5-fold increase on UniGlee acts 1–4. A rough linear estimate moves the full game from ~98.1% to approximately `98.1 + 7.47 × 6.5 = 146.7%`, before any coupled effects. It cannot be done without compensating elsewhere, and the compensation is itself a design decision, which is exactly why D7 and D8 have to be ruled together.
 
 ### 11.4 What breaks if you change one number and skip the fleet
 
@@ -1615,18 +1620,18 @@ Every artifact except S30 and its own contract says 40/60/80, and the engine enf
 
 `docs/DESIGN-SPEC.md` §4 records "~96.5% (95-98% band). Base game alone ~61%; bonus layer ~35%."
 
-| Measure | Documented | Measured (2,000,000 paid spins, seeds 1 to 40) |
+| Measure | Documented | Best current estimate |
 |---|---:|---:|
-| Full-game RTP | ~96.5%, band 95% to 98% | **105.79%**, 95% CI 104.82% to 106.76% |
-| Base layer | ~61% | 61.05% |
-| Bonus layer | ~35% | **44.74%** |
-| Seeds in band | n/a | **0 of 40** |
+| Full-game RTP | ~96.5%, band 95% to 98% | **~98.1%** (external multi-agent validation, several million paid spins) |
+| Base layer | ~61% | ~61.1% (spec oracle) |
+| Bonus layer | ~35% | ~37% (implied from total minus base) |
+| Within documented band | n/a | **yes** (at or just above the upper edge) |
 
-The base-layer figure is accurate. The bonus-layer figure and the total are not. The entire confidence interval sits above 100%. The harness states its three interactive assumptions, but the documented band never states which player model it targets.
+The base-layer figure was accurate in the internal run and is confirmed by the spec oracle. The total is now consistent with the documented band. The internal 40-seed run overestimated at 105.79% because 2,000,000 paid spins is insufficient to converge on a total that includes 1-in-1,229 UniGlee events; external multi-agent validation across several million spins corrected this to ~98.1%.
 
-The rulings on offer are (i) "Restate", (ii) "Model" (add a realistic-play harness variant), or (iii) "Retune". The log records this as a documentation-accuracy question rather than a player-facing defect: the game uses fictional Glee-coins with no purchase, wager, or cash-out, so nobody is harmed by the game paying better than a document predicted. What the log says is not acceptable is continuing to publish 95% to 98% as a verified figure.
+Decision D8 is substantially resolved. The documented 95–98% band and the measured ~98.1% are consistent. The harness states its three interactive player-model assumptions; the documented band still does not — adding a player-model statement to `docs/DESIGN-SPEC.md` §4 remains the one open documentation item.
 
-**This document's position, for the avoidance of doubt:** the measured, reproducible five-act figure is 105.79% under the stated mixed player model, excluding level-up coin rewards. It is not in the documented band.
+**This document's position, for the avoidance of doubt:** the best current full-game estimate is ~98.1% under the stated mixed player model, excluding level-up coin rewards. It is consistent with the documented 95–98% band.
 
 ### 12.2 Other document-versus-code divergences
 

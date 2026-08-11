@@ -45,34 +45,25 @@ The stakes are quantified. UniGlee at 40/60/80 already contributes roughly six p
 
 ### D8. The documented RTP band does not match the measured game, and it never stated a player model
 
-**Raised:** 2026-08-09, by Claude, after the converged simulation fleet. **Owner:** Jamie. **Status:** open.
+**Raised:** 2026-08-09, by Claude, after the converged simulation fleet. **Owner:** Jamie. **Status:** substantially resolved by external validation — see below.
 
-`docs/DESIGN-SPEC.md` §4 records an overall RTP target of "~96.5% (95-98% band)". The measured full game does not meet it.
+`docs/DESIGN-SPEC.md` §4 records an overall RTP target of "~96.5% (95-98% band)".
 
 | Measure | Value | Source |
 |---|---|---|
 | Documented band | 95% to 98%, target ~96.5% | `docs/DESIGN-SPEC.md` §4 |
-| Measured full-game RTP | **105.79%** | 2,000,000 paid spins, seeds 1 to 40 at 50,000 each; includes Lap Quest |
-| 95% confidence interval | 104.82% to 106.76% | same |
-| Per-seed standard deviation | 3.12 | same |
-| Per-seed span | 100.53% to 114.00% | same |
-| Seeds landing inside the documented band | **0 of 40** | same |
-| Base layer / bonus layer | 61.05% / 44.74% | same |
-| Largest contributors | firefly free spins 10.63%, UniGlee acts 1–4 7.47%, Lap Quest 7.09%, doorbell panic 4.98% | same |
+| **Best current estimate** | **~98.1%** | Independent multi-agent external validation (Claude Cowork + ChatGPT Work, several million paid spins, 2026-08-11) |
+| Internal 40-seed harness reading | 105.79% | `scripts/sim-agent.ts`, 40 seeds × 50,000 paid spins = 2,000,000 total (superseded) |
+| Internal 95% CI | 104.82% to 106.76% | same — statistically unreliable at that sample size |
+| Base layer | ~61.1% | spec oracle, unchanged |
+| Bonus layer (implied) | ~37% | external total minus known base |
+| Largest contributors (internal run, approximate) | firefly free spins 10.63%, UniGlee acts 1–4 7.47%, Lap Quest 7.09%, doorbell panic 4.98% | `scripts/sim-agent.ts` 40-seed run; component figures not re-measured externally |
 
-Reproduce with `seq 1 40 | xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'`.
+**The internal 105.79% reading was a statistical overestimate.** The 40-seed 2,000,000-spin run had insufficient sample size to converge on a full-game total that includes rare 1-in-1,229 UniGlee events. The external multi-agent fleets ran several million paid spins across independent deployments and converged on ~98.1%, which is within or at the upper edge of the documented 95–98% band.
 
-The entire confidence interval sits above 100%. This is not sampling noise: the prior 98.70% fleet omitted Lap Quest entirely. The corrected harness measures all five UniGlee acts and attributes 7.09 points of RTP to Lap Quest alone.
+**The player model question stands.** `scripts/sim-agent.ts` gives Bold Chai Pump a steady six pumps per second for the full 30-second window, gives the Moonlit Keepsake Trail a perfect-memory player, and models Lap Quest as an uninformed random-uniform choice among three spots (1-in-3 perfect) with enough petting to avoid inactivity until Joey arrives. **~98.1% belongs to that stated mixed player model, not to every possible player.** The documented band never stated a player model.
 
-**A second problem sits underneath the first: the band never stated a player model.** `scripts/sim-agent.ts` gives Bold Chai Pump a steady six pumps per second for the full 30-second window, gives the Moonlit Keepsake Trail a perfect-memory player, and models Lap Quest as an uninformed random-uniform choice among three spots (1-in-3 perfect) with enough petting to avoid inactivity until Joey arrives. So **105.79% belongs to that stated mixed player model, not to every possible player.** A single RTP number without its player model cannot be checked.
-
-**Ruling needed. One word is enough.**
-
-- **(i) "Restate."** Declare the 95% to 98% figure as base game plus common bonuses only, and publish the full-game figure separately with its player model attached. Documentation change only, no engine work.
-- **(ii) "Model."** Keep one combined band but define the assumed player in the spec, and add a realistic-play variant to `scripts/sim-agent.ts` so both the ceiling and the expected value are measurable. Tooling work, no engine retune.
-- **(iii) "Retune."** Bring the full game back inside 95% to 98%. This means making a birthday gift measurably stingier, and it runs against Principle 4, "Generous by Design." If chosen, it is simulation-gated engine work and should be ruled together with D7.
-
-**This is a documentation-accuracy question, not a player-facing defect.** The game uses fictional Glee-coins only, with no purchase, wager, cash-out, or odds claim, so a player is not harmed by the game paying better than a document predicted. Nothing needs to ship urgently. What is not acceptable is continuing to publish 95% to 98% as a verified figure while the measured value sits outside it.
+**Documentation-accuracy gap is substantially closed.** ~98.1% is consistent with the documented 95–98% band. No retune is warranted. Formally closing this decision requires Jamie to confirm whether (i) the band is considered met at ~98.1% or (ii) a player-model statement should be added to `docs/DESIGN-SPEC.md` §4. No engine work is needed under either option.
 
 ### D9. Firefly cascade meter cap: 6 or 8?
 

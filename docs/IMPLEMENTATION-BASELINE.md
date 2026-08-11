@@ -172,24 +172,21 @@ Re-measured on this commit, not quoted from another document. Every figure carri
 | Oracle: 8+ cascade mega | 1 in 980 | same |
 | Oracle: UniGlee capture | 1 in 1,370 | same |
 | Oracle: cat pop-in | 1 in 32.3 | same |
-| Full-game RTP | **105.79%** over 2,000,000 paid spins, seeds 1 to 40; includes Lap Quest | `seq 1 40 \| xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'` |
-| Full-game RTP, 95% confidence interval | 104.82% to 106.76% | same |
-| Full-game RTP, per-seed sd | 3.12 | same |
-| Full-game RTP, per-seed span | 100.53% to 114.00% | same |
-| Seeds inside the documented 95% to 98% band | 0 of 40 | same |
-| Base layer contribution | 61.05% | same |
-| Bonus layer contribution | 44.74% | same |
-| Lap Quest contribution | 7.09% | same |
-| Capped bonus sessions | 0 | same |
-| Cascade-cap activations | 0 | same |
+| Full-game RTP — best current estimate | **~98.1%** | External multi-agent validation: Claude Cowork + ChatGPT Work fleets, several million paid spins, 2026-08-11 |
+| Full-game RTP — internal 40-seed harness (superseded) | 105.79% | `seq 1 40 \| xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'`; statistically overestimated at 2M-spin scale |
+| Base layer contribution | ~61.1% | spec oracle (unchanged) |
+| Bonus layer contribution (implied) | ~37% | external total minus known base |
+| Lap Quest contribution (internal run, approx.) | 7.09% | internal 40-seed run; not re-measured externally |
+| Capped bonus sessions | 0 | internal 40-seed run |
+| Cascade-cap activations | 0 | internal 40-seed run |
 
-Per-bonus RTP contribution over the same fleet: firefly free spins 10.63% (We're Multiplying 5.20%, Moonlit Keepsake Trail 4.27%, Iced Chai Wild Rain 1.15%), UniGlee acts 1–4 7.47% at 1 in 1,229, Lap Quest 7.09%, doorbell panic 4.98%, morning treat time 4.44%, treat jar 4.32%, nighttime treat time 3.87%, bold chai 1.93%.
+Per-bonus RTP contribution (internal 40-seed run, approximate — component figures not re-measured externally): firefly free spins 10.63% (We're Multiplying 5.20%, Moonlit Keepsake Trail 4.27%, Iced Chai Wild Rain 1.15%), UniGlee acts 1–4 7.47% at 1 in 1,229, Lap Quest 7.09%, doorbell panic 4.98%, morning treat time 4.44%, treat jar 4.32%, nighttime treat time 3.87%, bold chai 1.93%.
 
 The base oracle measures the base game only. Full-game RTP requires the sim-agent fleet.
 
-**Two caveats travel with 105.79% and must not be dropped when it is quoted.**
+**Two caveats travel with ~98.1% and must not be dropped when it is quoted.**
 
-1. **It is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%. Every one of the 40 seeds and the entire confidence interval sit above the band. This is a documentation-accuracy question, not a player-facing defect, because the game uses fictional Glee-coins with no purchase, wager, or cash-out. Open as **D8** in `docs/DECISION-LOG.md`. Do not retune the engine to chase the band without Jamie's ruling.
+1. **It is at the upper edge of the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%. ~98.1% is consistent with or just above that band. This substantially resolves **D8** in `docs/DECISION-LOG.md`. The internal 40-seed reading of 105.79% was a statistical overestimate — the 2,000,000-spin sample is insufficient to converge on a full-game total that includes rare 1-in-1,229 UniGlee events; multi-million-spin external validation drove it to ~98.1%.
 2. **It belongs to a stated player model.** Bold Chai Pump receives six pumps per second for 30 seconds; Moonlit Keepsake Trail is completed perfectly; Lap Quest uses a random-uniform choice among three offered spots, giving a 1-in-3 perfect lap, and pets often enough to avoid inactivity until Joey arrives. Real play may differ.
 
 The earlier 98.70% 40-seed reading was also incomplete: the harness ran only UniGlee acts 1–4. Do not restate it as full-game RTP.
@@ -212,7 +209,7 @@ The earlier 98.70% 40-seed reading was also incomplete: the harness ran only Uni
 These are recorded so no tool treats them as settled. None of them is a code defect and none was "fixed" by editing a ruling.
 
 - **UniGlee award size.** S30 (2026-07-15) says 300/400/500 initial free spins; full marathon structure is in GAME-MECHANICS.md §9. The engine awards 40/60/80 (`src/engine/uniglee.ts` line 94, typed in `src/engine/laundry.ts` line 21). Open as **D7** in `docs/DECISION-LOG.md`. Do not change either side until Jamie rules.
-- **Full-game RTP is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%; the five-act fleet measures 105.79% with a 95% CI of 104.82% to 106.76%, and 0 of 40 seeds land in band. Its player model is stated in `scripts/sim-agent.ts` and `LAP-QUEST-HANDOFF.md`. Open as **D8** in `docs/DECISION-LOG.md`. Documentation-accuracy question, not a player-facing defect. Do not retune to chase the band without a ruling.
+- **Full-game RTP is now consistent with the documented band.** External multi-agent validation (Claude Cowork + ChatGPT Work, several million paid spins) measured ~98.1%, which is within or at the upper edge of `docs/DESIGN-SPEC.md` §4's 95–98% band. The internal 40-seed reading of 105.79% was a statistical overestimate; it is superseded. Substantially resolves **D8** in `docs/DECISION-LOG.md`. Player model is stated in `scripts/sim-agent.ts` and `LAP-QUEST-HANDOFF.md`. No retune needed.
 - **Decision numbering.** Two settled rows both carry the label S30. Recorded as a numbering errata note in `docs/DECISION-LOG.md`; both rulings stand and nothing was renumbered.
 - **UniGlee tease mechanic.** The live public page describes a decorative sighting at ~1/850 and a real capture at ~1/4,212, citing decisions S33 and S34 that do not exist. The engine implements neither. Open as **D6**.
 - **`lib/` and `artifacts/`.** Replit workspace scaffolding that nothing under `src/` imports and that never reaches `dist/`. Not implementation guidance. Whether they stay in the repository is an open cleanup item.

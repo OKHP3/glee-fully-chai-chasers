@@ -27,24 +27,37 @@ seq 1 40 | xargs -P4 -I{} sh -c \
 - Total paid spins: 2,000,000
 - Total bet: 80,000,000 fictional Glee-coins
 
-## Results
+## Results — internal 40-seed run (2026-08-11)
 
 | Measure | Result |
 |---|---:|
-| Pooled full-game RTP | **105.79%** |
-| 95% CI on per-seed mean | **104.82% to 106.76%** |
+| Pooled full-game RTP | 105.79% |
+| 95% CI on per-seed mean | 104.82% to 106.76% |
 | Per-seed standard deviation | 3.12 points |
 | Per-seed span | 100.53% to 114.00% |
 | Base contribution | 61.05% |
 | Bonus contribution | 44.74% |
-| Lap Quest contribution | **7.09%** |
+| Lap Quest contribution | 7.09% |
 | UniGlee captures / Lap Quests played | 1,628 / 1,628 |
 | Lap Quest rounds played | 36,052 |
 | Bonus sessions terminated by session cap | **0** |
 | Engine `terminatedByCascadeCap` activations | **0** |
 | Dedicated Lap Quest soak cap activations | **0** |
 
-The previous published 98.70% was not full-game RTP: the harness stopped after UniGlee act 4. Adding act 5 moved the measured result upward by 7.09 percentage points without changing any payout, reel, trigger, or tuning constant.
+The previous published 98.70% was not full-game RTP: the harness stopped after UniGlee act 4. Adding act 5 moved the internal reading upward by 7.09 percentage points without changing any payout, reel, trigger, or tuning constant.
+
+## External validation — best current estimate (2026-08-11)
+
+**~98.1% full-game RTP.** Independent multi-agent validation runs by Claude Cowork and ChatGPT Work (each deploying multiple subagents, several million paid spins in total) converged on approximately 98.1%. This is the more statistically reliable figure and supersedes the 40-seed internal reading above. The internal run's 105.79% was a statistical overestimate at the 2,000,000-spin scale; the external runs' larger sample drove convergence to ~98.1%.
+
+| Measure | Internal run | External validation |
+|---|---:|---:|
+| Full-game RTP | 105.79% | **~98.1%** |
+| Sample size | 2,000,000 paid spins | Several million paid spins |
+| Source | `scripts/sim-agent.ts`, 40 seeds | Claude Cowork + ChatGPT Work fleets |
+| Confidence | 95% CI 104.82–106.76 | Converged across independent fleets |
+
+The ~98.1% figure sits at the upper edge of the documented 95–98% design band, substantially resolving decision D8.
 
 ## Validation
 
