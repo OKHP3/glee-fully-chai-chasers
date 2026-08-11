@@ -164,7 +164,7 @@ Re-measured on this commit, not quoted from another document. Every figure carri
 
 | Check | Result | Command |
 |---|---|---|
-| Test suite | 170 tests, 24 files, all passing | `npx vitest run src` |
+| Test suite | 360 tests, 28 files, all passing | `pnpm test` |
 | Type check and production build | Clean | `npm run build` |
 | Oracle: base RTP | 61.08% | `npx vitest run src/engine/simulation.test.ts --reporter=verbose` |
 | Oracle: any-win rate | 1 in 3.15 | same |
@@ -172,25 +172,27 @@ Re-measured on this commit, not quoted from another document. Every figure carri
 | Oracle: 8+ cascade mega | 1 in 980 | same |
 | Oracle: UniGlee capture | 1 in 1,370 | same |
 | Oracle: cat pop-in | 1 in 32.3 | same |
-| Full-game RTP | **98.70%** over 2,000,000 paid spins, seeds 1 to 40 | `for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done` |
-| Full-game RTP, 95% confidence interval | 97.93% to 99.47% | same |
-| Full-game RTP, per-seed sd | 2.49 | same |
-| Full-game RTP, per-seed span | 94.16% to 106.78% | same |
-| Seeds inside the documented 95% to 98% band | 10 of 40 | same |
+| Full-game RTP | **105.79%** over 2,000,000 paid spins, seeds 1 to 40; includes Lap Quest | `seq 1 40 \| xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'` |
+| Full-game RTP, 95% confidence interval | 104.82% to 106.76% | same |
+| Full-game RTP, per-seed sd | 3.12 | same |
+| Full-game RTP, per-seed span | 100.53% to 114.00% | same |
+| Seeds inside the documented 95% to 98% band | 0 of 40 | same |
 | Base layer contribution | 61.05% | same |
-| Bonus layer contribution | 37.65% | same |
+| Bonus layer contribution | 44.74% | same |
+| Lap Quest contribution | 7.09% | same |
 | Capped bonus sessions | 0 | same |
+| Cascade-cap activations | 0 | same |
 
-Per-bonus RTP contribution over the same fleet: firefly free spins 10.64% (We're Multiplying 5.21%, Moonlit Keepsake Trail 4.28%, Iced Chai Wild Rain 1.15%), UniGlee 7.47% at 1 in 1,229, doorbell panic 4.98%, morning treat time 4.44%, treat jar 4.32%, nighttime treat time 3.87%, bold chai 1.93%.
+Per-bonus RTP contribution over the same fleet: firefly free spins 10.63% (We're Multiplying 5.20%, Moonlit Keepsake Trail 4.27%, Iced Chai Wild Rain 1.15%), UniGlee acts 1–4 7.47% at 1 in 1,229, Lap Quest 7.09%, doorbell panic 4.98%, morning treat time 4.44%, treat jar 4.32%, nighttime treat time 3.87%, bold chai 1.93%.
 
 The base oracle measures the base game only. Full-game RTP requires the sim-agent fleet.
 
-**Two caveats travel with 98.70% and must not be dropped when it is quoted.**
+**Two caveats travel with 105.79% and must not be dropped when it is quoted.**
 
-1. **It is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%. The entire confidence interval sits above 98%, and only 10 of 40 seeds land in band. This is a documentation-accuracy question, not a player-facing defect, because the game uses fictional Glee-coins with no purchase, wager, or cash-out. Open as **D8** in `docs/DECISION-LOG.md`. Do not retune the engine to chase the band without Jamie's ruling.
-2. **It assumes a perfect player.** The harness models both interactive bonuses at their ceiling: Bold Chai Pump at a steady six pumps per second for the full 30-second window (`scripts/sim-agent.ts` lines 72 to 79), and the Moonlit Keepsake Trail always completed by a perfect-memory player who always collects the 40-spin handoff (line 183). 98.70% is a generous-play ceiling. Real play sits below it by an unmeasured amount, because no realistic-play variant of the harness exists yet.
+1. **It is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%. Every one of the 40 seeds and the entire confidence interval sit above the band. This is a documentation-accuracy question, not a player-facing defect, because the game uses fictional Glee-coins with no purchase, wager, or cash-out. Open as **D8** in `docs/DECISION-LOG.md`. Do not retune the engine to chase the band without Jamie's ruling.
+2. **It belongs to a stated player model.** Bold Chai Pump receives six pumps per second for 30 seconds; Moonlit Keepsake Trail is completed perfectly; Lap Quest uses a random-uniform choice among three offered spots, giving a 1-in-3 perfect lap, and pets often enough to avoid inactivity until Joey arrives. Real play may differ.
 
-Earlier readings of 95.66% and 97.56%, both over seven seeds, were small-sample noise. At a per-seed sd of 2.49, seven seeds cannot resolve a band 3 points wide. Do not restate them.
+The earlier 98.70% 40-seed reading was also incomplete: the harness ran only UniGlee acts 1–4. Do not restate it as full-game RTP.
 
 ### 9.4 Corrections to §4's "planned or only partially visualized" list
 
@@ -210,7 +212,7 @@ Earlier readings of 95.66% and 97.56%, both over seven seeds, were small-sample 
 These are recorded so no tool treats them as settled. None of them is a code defect and none was "fixed" by editing a ruling.
 
 - **UniGlee award size.** S30 (2026-07-15) says 300/400/500 initial free spins; full marathon structure is in GAME-MECHANICS.md §9. The engine awards 40/60/80 (`src/engine/uniglee.ts` line 94, typed in `src/engine/laundry.ts` line 21). Open as **D7** in `docs/DECISION-LOG.md`. Do not change either side until Jamie rules.
-- **Full-game RTP is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%; the converged fleet measures 98.70% with a 95% CI of 97.93% to 99.47%, and only 10 of 40 seeds land in band. The figure also assumes a perfect player on the two interactive bonuses. Open as **D8** in `docs/DECISION-LOG.md`. Documentation-accuracy question, not a player-facing defect. Do not retune to chase the band without a ruling.
+- **Full-game RTP is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%; the five-act fleet measures 105.79% with a 95% CI of 104.82% to 106.76%, and 0 of 40 seeds land in band. Its player model is stated in `scripts/sim-agent.ts` and `LAP-QUEST-HANDOFF.md`. Open as **D8** in `docs/DECISION-LOG.md`. Documentation-accuracy question, not a player-facing defect. Do not retune to chase the band without a ruling.
 - **Decision numbering.** Two settled rows both carry the label S30. Recorded as a numbering errata note in `docs/DECISION-LOG.md`; both rulings stand and nothing was renumbered.
 - **UniGlee tease mechanic.** The live public page describes a decorative sighting at ~1/850 and a real capture at ~1/4,212, citing decisions S33 and S34 that do not exist. The engine implements neither. Open as **D6**.
 - **`lib/` and `artifacts/`.** Replit workspace scaffolding that nothing under `src/` imports and that never reaches `dist/`. Not implementation guidance. Whether they stay in the repository is an open cleanup item.

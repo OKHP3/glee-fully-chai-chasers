@@ -202,8 +202,8 @@ Worked, from today's measured fleet:
 
 | Target | Arithmetic | Required `PAYOUT_SCALE` |
 |---|---|---:|
-| Full game 96.5% (the documented centre) | 0.775 × 96.5 / 98.70 | 0.7577 |
-| Full game 98.0% (top of the documented band) | 0.775 × 98.0 / 98.70 | 0.7695 |
+| Full game 96.5% (the documented centre) | 0.775 × 96.5 / 105.79 | 0.7070 |
+| Full game 98.0% (top of the documented band) | 0.775 × 98.0 / 105.79 | 0.7180 |
 | Base game 61.0% (current, unchanged) | 0.775 × 61.0 / 61.05 | 0.7744 |
 
 **State this plainly: `PAYOUT_SCALE` is the single global RTP knob.** Every other lever in the game (strip counts, ladder thresholds, bonus frequencies, award sizes) changes RTP *and* changes how the game feels. This one changes only RTP. If you need the game two points tighter and you do not want to renegotiate any design decision, this is the number you move, and it is the only number you move.
@@ -784,7 +784,7 @@ With no memory at all, the first pick pair is a match with probability 1/11, and
 
 **Design intent.** A change of pace: stop the reels, make the player do something with their attention, and reward it with the game's most generous flat award.
 
-**Measured RTP contribution: 4.28%**, but read that against the player model. `scripts/sim-agent.ts:183` models a perfect-memory player who always completes. Real play sits below this, possibly far below. It is the largest single reason 98.70% is a ceiling and not an expectation. Mean session 40.00 spins, 0.637 times the total bet per free spin, the low per-spin value being the point: this wedge pays in volume, not in multipliers.
+**Measured RTP contribution: 4.27%**, but read that against the player model. `scripts/sim-agent.ts` models a perfect-memory player who always completes. Real play sits below this, possibly far below. Mean session 40.00 spins, 0.637 times the total bet per free spin, the low per-spin value being the point: this wedge pays in volume, not in multipliers.
 
 ### 7.5 Wedge 3: Iced Chai Wild Rain
 
@@ -1000,7 +1000,7 @@ Measured perfect-lap share over 400,000 draws: 33.37%.
 
 Positions are chosen uniformly without replacement from all 20 cells (`chooseComfortWilds`, `lap-quest.ts:75-83`), which means **Lap Quest can place wilds on reel 1**, with the `matchSymbol = tumbler` consequence from 4.3. The wilds are `sticky: "lap_quest"` and are re-fixed after every cascade step, so they are the only symbols in the game that genuinely never leave the board.
 
-In production the chapter is an **open-ended loop**, not a fixed spin count (`board.ts:1679-1684`): it plays one round, then keeps playing another round roughly every 900ms until the ledge timer ends the chapter. The ledge (`lap-quest-ledge.ts:43-57`) runs a 15-second grace, then a 5-second inactivity watchdog that resets on every pet, with Joey arriving at a uniform time between 15 and 90 seconds (`board.ts:1656`). **Each round re-rolls the choice and the wilds.**
+In production the chapter is an **open-ended loop**, not a fixed spin count (`runLapQuestChapter` in `board.ts`): it plays one round, then keeps playing another round after each 900ms wait until the ledge timer ends the chapter. Joey arrives at a uniform time between 15 and 90 seconds. The player chooses one spot once for the whole chapter; each round re-rolls the comfort-wild positions while preserving that selection.
 
 The timing model (`src/ui/lap-quest-ledge.ts`) owns a DOM interval that runs the grace period, the 5-second inactivity watchdog, and the Joey arrival clock. The engine owns only the round engine (`lap-quest.ts`): it rolls the choice, places sticky wilds, and runs the cascade. No coin-ladder is supplied; Lap Quest pays only what its cascade rounds pay.
 
@@ -1008,9 +1008,7 @@ The timing model (`src/ui/lap-quest-ledge.ts`) owns a DOM interval that runs the
 
 **Design intent.** End the marathon on affection rather than on arithmetic. It is the only bonus whose length is set by the player continuing to touch the screen.
 
-**Measured RTP contribution: not measured, and not measurable today.** `scripts/sim-agent.ts` does not run Lap Quest at all: its UniGlee bucket only sums `runUniGleeBaseMarathon`'s four chapters (`sim-agent.ts:139-143`), and the marathon runner deliberately excludes act 5 (`uniglee-marathon.ts:52`). So **the whole of Lap Quest sits outside the 98.70% figure**, and the true full-game RTP is higher than 98.70% by an unmeasured amount.
-
-Partial measurement, excluding the non-terminating configurations described in section 12: 6.615 times the total bet per round, split 14.029 on a perfect lap and 3.216 on a cozy lap. At a typical 15 to 30 rounds per chapter that is somewhere between 100 and 400 times the total bet per marathon, which at 1 in 1,229 would be roughly **0.08 to 0.33 additional points of RTP**. Treat that as an order of magnitude, not a measurement.
+**Measured RTP contribution: 7.09%.** The five-act fleet played 1,628 Lap Quests and 36,052 Lap Quest rounds, averaging 22.14 rounds and 87.13 times the paid-spin total bet per chapter. The simulated player picks randomly and uniformly among the three offered spots, giving a 1-in-3 perfect lap. No cascade-cap or session-cap alarm fired.
 
 ### 7.14 The UniGlee marathon
 
@@ -1256,8 +1254,8 @@ RTP is not one number produced by one system. It is two layers with very differe
 | Layer | What it is | Measured | Share of total |
 |---|---|---:|---:|
 | Base game | line wins on paid spins, cascades included, no bonus sessions | **61.05%** | 61.9% |
-| Bonus layer | every free spin, marathon chapter, and minigame award | **37.65%** | 38.1% |
-| **Total** | | **98.70%** | |
+| Bonus layer | every free spin, marathon chapter, and minigame award | **44.74%** | 42.3% |
+| **Total** | | **105.79%** | |
 
 The base layer is high-frequency and low-variance: it pays on 31.5% of spins and its distribution is bounded by the paytable. The bonus layer is the opposite: seven distinct sources, hit rates from 1 in 25 down to 1 in 1,229, and a per-seed standard deviation that dominates the total.
 
@@ -1319,54 +1317,55 @@ Structural differences from the oracle:
 
 That last row is a nice piece of defensive engineering: the cap exists only so that a nonzero `cappedSessions` would prove the retrigger block regressed. It has never fired.
 
-**Player-model assumptions.** Two bonuses need a player, and the harness plays both at their ceiling. This is stated in its own header comment and it is the most important caveat attached to every number below.
+**Player-model assumptions.** Three bonuses need a player. The harness prints all three assumptions in every report.
 
 | Bonus | Model | Source | Effect |
 |---|---|---|---|
 | Bold Chai Pump | steady 6 pumps per second for the full 30-second window, yielding exactly 18 free spins every time | `sim-agent.ts:71-80` | A real player at 3 taps per second gets 12 spins, a third less |
 | Moonlit Keepsake Trail | perfect memory: always completes all six pairs, always collects the flat 40-spin handoff | `sim-agent.ts:182-186` | A real player who fails on two strikes gets **zero**. This wedge is 35% of all Firefly awards |
+| Phoebe's Lap Quest | random-uniform choice among three offered spots; pets often enough to avoid inactivity until Joey arrives | `simulateLapQuest` | 1-in-3 perfect lap; engaged-petting duration |
 
-**So 98.70% is a generous-play ceiling, not an expected value.** No realistic-play variant of the harness exists, so nobody has measured how far below the ceiling real play sits. That gap is open as decision D8.
+**So 105.79% belongs to this stated mixed player model, not to every possible player.** No realistic-play variant exists for Bold Chai or Keepsake Trail. That gap is open as decision D8.
 
-Two further omissions to be aware of, both of which push the true figure **up**:
-
-- **Phoebe's Lap Quest is not run at all.** The harness sums only `runUniGleeBaseMarathon`'s four chapters, and act 5 is deliberately outside that runner. Roughly 0.08 to 0.33 unmeasured points (section 7.13).
-- **Level-up coin rewards are not modelled.** `200 × level` per level crossed is a UI-side faucet outside every figure here (section 9.3).
+One further omission pushes a player's effective return **up**: level-up coin rewards are not modelled. `200 × level` per level crossed is a UI-side faucet outside every RTP figure here (section 9.3).
 
 ### 10.4 Measured results
 
-**Fleet:** 40 seeds × 50,000 paid spins = **2,000,000 paid spins**, `betPerLine = 1`, total bet 80,000,000 coins. Verified 2026-08-09 on commit `1ee084d`.
+**Fleet:** 40 seeds × 50,000 paid spins = **2,000,000 paid spins**, `betPerLine = 1`, total bet 80,000,000 coins. Verified 2026-08-11.
 
 ```
-for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done
+seq 1 40 | xargs -P4 -I{} sh -c \
+  'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'
 ```
 
 | Measure | Value |
 |---|---:|
-| Total RTP | **98.70%** |
-| 95% confidence interval | 97.93% to 99.47% |
-| Per-seed standard deviation | 2.49 points |
-| Per-seed span | 94.16% to 106.78% |
-| Seeds inside the documented 95% to 98% band | **10 of 40** |
+| Total RTP | **105.79%** |
+| 95% confidence interval | 104.82% to 106.76% |
+| Per-seed standard deviation | 3.12 points |
+| Per-seed span | 100.53% to 114.00% |
+| Seeds inside the documented 95% to 98% band | **0 of 40** |
 | Base layer | 61.05% |
-| Bonus layer | 37.65% |
+| Bonus layer | 44.74% |
 | Capped sessions | **0** |
-| Free spins played | 620,639 |
+| Cascade-cap activations | **0** |
+| Bonus rounds played | 656,511 |
 
 Per-feature, same fleet:
 
 | Feature | Sessions | Hit rate | Mean win (× total bet) | Mean spins | Win per bonus spin | RTP contribution |
 |---|---:|---|---:|---:|---:|---:|
-| Firefly free spins (all wedges) | 9,674 | 1 in 207 | 879.8 | 22.82 | 0.964 | **10.64%** |
+| Firefly free spins (all wedges) | 9,673 | 1 in 207 | 879.2 | 22.81 | 0.964 | **10.63%** |
 | UniGlee marathon (acts 1 to 4) | 1,628 | 1 in 1,229 | 3,670.6 | 53.61 | 1.712 | **7.47%** |
-| We're Multiplying wedge | 3,866 | 1 in 517 | 1,077.5 | 13.65 | 1.973 | 5.21% |
-| Doorbell Panic | 3,970 | 1 in 504 | 1,003.7 | 4.49 | 5.589 | 4.98% |
-| Morning Treat Time | 8,096 | 1 in 247 | 438.9 | 6.47 | 1.697 | 4.44% |
-| Treat Jar free spins | 79,010 | 1 in 25 | 43.7 | 1.72 | 0.636 | 4.32% |
-| Moonlit Keepsake Trail wedge | 3,359 | 1 in 595 | 1,019.1 | 40.00 | 0.637 | 4.28% |
-| Nighttime Treat Time | 4,035 | 1 in 496 | 767.4 | 11.03 | 1.740 | 3.87% |
+| Phoebe's Lap Quest | 1,628 | 1 in 1,229 | 3,485.2 | 22.14 | 3.935 | **7.09%** |
+| We're Multiplying wedge | 3,867 | 1 in 517 | 1,076.1 | 13.64 | 1.972 | 5.20% |
+| Doorbell Panic | 3,971 | 1 in 504 | 1,004.0 | 4.49 | 5.590 | 4.98% |
+| Morning Treat Time | 8,093 | 1 in 247 | 439.1 | 6.47 | 1.697 | 4.44% |
+| Treat Jar free spins | 79,014 | 1 in 25 | 43.7 | 1.72 | 0.636 | 4.32% |
+| Moonlit Keepsake Trail wedge | 3,355 | 1 in 596 | 1,019.3 | 40.00 | 0.637 | 4.27% |
+| Nighttime Treat Time | 4,032 | 1 in 496 | 767.6 | 11.02 | 1.741 | 3.87% |
 | Bold Chai Pump | 3,464 | 1 in 577 | 446.6 | 17.97 | 0.621 | 1.93% |
-| Iced Chai Wild Rain wedge | 2,449 | 1 in 817 | 376.4 | 13.73 | 0.686 | 1.15% |
+| Iced Chai Wild Rain wedge | 2,451 | 1 in 816 | 376.6 | 13.73 | 0.685 | 1.15% |
 | Cat pop-ins | 90,528 | 1 in 22 | 0 | 0 | n/a | 0.00% |
 
 The three wedge rows are components of the Firefly row, not additions to it.
@@ -1383,9 +1382,10 @@ This is the most transferable engineering lesson in the document, so it gets sta
 |---|---:|---:|---:|
 | First reading | 7 | 350,000 | 95.66% |
 | Second reading | 7 (different) | 350,000 | 97.56% |
-| Converged reading | 40 | 2,000,000 | **98.70%** |
+| Prior four-act reading | 40 | 2,000,000 | **98.70%** |
+| Corrected five-act reading | 40 | 2,000,000 | **105.79%** |
 
-The first two look like confirmations of a 95% to 98% band. They are not confirmations of anything. They are two draws from a distribution whose standard error at that sample size is larger than the band they appear to confirm.
+The first two look like confirmations of a 95% to 98% band. They are not confirmations of anything. The 98.70% reading had adequate sample size but an incomplete harness: Lap Quest was absent. The 105.79% reading uses the same seeds and paid-spin count with all five acts.
 
 **The arithmetic.** Per-seed standard deviation across the 40-seed fleet is **2.49 points**. The standard error of the mean at n seeds is `2.49 / sqrt(n)`, and the 95% confidence interval is `± 1.96 × se`:
 
@@ -1403,7 +1403,7 @@ The first two look like confirmations of a 95% to 98% band. They are not confirm
 
 You need roughly **11 seeds (550,000 spins) to resolve a 3-point band at all**, and roughly **95 seeds (4,750,000 spins) to pin the figure to ±0.5 points**. The 40-seed fleet lands at ±0.77, which is enough to say the answer is above 98% and not enough to say whether it is 98.7% or 99.3%.
 
-Here is the same instability shown directly, using contiguous seven-seed windows from the actual 40-seed fleet:
+Here is the same instability shown directly, using contiguous seven-seed windows from the prior four-act 40-seed fleet. These rows are retained as historical sample-size evidence, not as the current full-game result:
 
 | Window | RTP |
 |---|---:|
@@ -1543,7 +1543,7 @@ These four are not independent. Changing one without re-deciding the others prod
    - The unconditional `doubleSparkleActive` on a capture adds 2.74 points that are booked to the Firefly layer, not to UniGlee.
    - The hit rate sets the number of spins you must simulate to measure anything (section 10.5).
 
-   Raising the award from 40/60/80 to 300/400/500, which is what decision D7 asks about, is a 7.5-fold increase on a contributor that is already the largest in the game. That single change would move the full game from 98.70% to roughly 98.70 + 7.47 × 6.5 = **147%**, before the doubled-Firefly term. It cannot be done without compensating elsewhere, and the compensation is itself a design decision, which is exactly why D7 and D8 have to be ruled together.
+   Raising the award from 40/60/80 to 300/400/500, which is what decision D7 asks about, is a 7.5-fold increase on UniGlee acts 1–4. A rough linear estimate moves the full game from 105.79% to `105.79 + 7.47 × 6.5 = 154.35%`, before any coupled effects. It cannot be done without compensating elsewhere, and the compensation is itself a design decision, which is exactly why D7 and D8 have to be ruled together.
 
 ### 11.4 What breaks if you change one number and skip the fleet
 
@@ -1617,22 +1617,22 @@ Every artifact except S30 and its own contract says 40/60/80, and the engine enf
 
 | Measure | Documented | Measured (2,000,000 paid spins, seeds 1 to 40) |
 |---|---:|---:|
-| Full-game RTP | ~96.5%, band 95% to 98% | **98.70%**, 95% CI 97.93% to 99.47% |
+| Full-game RTP | ~96.5%, band 95% to 98% | **105.79%**, 95% CI 104.82% to 106.76% |
 | Base layer | ~61% | 61.05% |
-| Bonus layer | ~35% | **37.65%** |
-| Seeds in band | n/a | **10 of 40** |
+| Bonus layer | ~35% | **44.74%** |
+| Seeds in band | n/a | **0 of 40** |
 
-The base-layer figure is accurate. The bonus-layer figure and the total are not. The entire confidence interval sits above 98%, which is not sampling noise: it is the first adequately powered measurement (section 10.5). Underneath that sits a second problem, which is that the band never stated a player model, and `scripts/sim-agent.ts` plays both interactive bonuses at their ceiling, so 98.70% is a generous-play ceiling rather than an expected value.
+The base-layer figure is accurate. The bonus-layer figure and the total are not. The entire confidence interval sits above 100%. The harness states its three interactive assumptions, but the documented band never states which player model it targets.
 
 The rulings on offer are (i) "Restate", (ii) "Model" (add a realistic-play harness variant), or (iii) "Retune". The log records this as a documentation-accuracy question rather than a player-facing defect: the game uses fictional Glee-coins with no purchase, wager, or cash-out, so nobody is harmed by the game paying better than a document predicted. What the log says is not acceptable is continuing to publish 95% to 98% as a verified figure.
 
-**This document's position, for the avoidance of doubt:** the measured, reproducible, converged figure is 98.70% under a stated perfect-player model, excluding Phoebe's Lap Quest and excluding level-up coin rewards. The true figure is higher than that. It is not in the documented band.
+**This document's position, for the avoidance of doubt:** the measured, reproducible five-act figure is 105.79% under the stated mixed player model, excluding level-up coin rewards. It is not in the documented band.
 
 ### 12.2 Other document-versus-code divergences
 
 | # | Document claim | Code reality | Evidence |
 |---:|---|---|---|
-| 1 | `docs/DESIGN-SPEC.md` §4: bonus layer ~35% | 37.65% measured | 40-seed fleet |
+| 1 | `docs/DESIGN-SPEC.md` §4: bonus layer ~35% | 44.74% measured | five-act 40-seed fleet |
 | 2 | `docs/DESIGN-SPEC.md` §4 event table: "Chai Tea Bonus (3+ scatters) ~1 in 110 spins" | **No scatter mechanic exists.** There is no scatter symbol, no 3-plus-scatter count, and no bonus of that name. The two chai bonuses are Bold Chai Pump (a blocker pair) and Iced Chai Wild Rain (a wheel wedge) | `grep -rn "scatter" src/engine/` returns only a comment in `cascade.ts:71` |
 | 3 | `docs/DESIGN-SPEC.md` §5: saucer-cat wilds "arrive in stacks up to 6-7 high" | Runs are 5 and 6 on reels 2 to 4, and 6 and 6 on reel 5. Never 7 | `reels.ts:86-92` |
 | 4 | S30 contract (2026-07-15) per-act table: 75 / 100 / 125 | 10 / 15 / 20 | `laundry.ts:23-25` |
@@ -1722,7 +1722,7 @@ Also worth stating: `CatVisit.assist` is populated by `rollCatVisit` and read by
 
 | What | Command |
 |---|---|
-| Full engine test suite, 24 files, 170 tests | `npx vitest run src` |
+| Full engine test suite, 28 files, 360 tests | `pnpm test` |
 | The oracle with its six actual values printed | `npx vitest run src/engine/simulation.test.ts --reporter=verbose` |
 | One simulation seed | `npx tsx scripts/sim-agent.ts a1 1 50000` |
 | The full 40-seed fleet, 2,000,000 paid spins | `for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done` |

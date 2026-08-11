@@ -73,14 +73,14 @@ The game is a Vite + TypeScript single-page app with no framework. Game math liv
 
 ## Engineering status
 
-Verified 2026-08-09 against `main`:
+Verified 2026-08-11 against `main`:
 
-- **Tests:** 170 tests across 24 files, all green.
+- **Tests:** 360 tests across 28 files, all green.
 - **Build:** `tsc --noEmit` and the Vite production build both clean.
 - **Spec oracle** (seeded 200,000-spin run in `src/engine/simulation.test.ts`, all six gates green): base-game RTP 61.08%, any win 1 in 3.15 spins, free spins 1 in 151, eight-plus cascade 1 in 980, UniGlee capture 1 in 1,370, cat pop-in 1 in 32.3.
-- **Full-game RTP:** 98.70% across 2,000,000 paid spins. Reproduce with `npx tsx scripts/sim-agent.ts <id> <seed> 50000` for seeds 1 through 40, which plays every bonus end to end through the same engine entry points the UI uses. The 95% confidence interval on the mean is 97.93% to 99.47%. Base game contributes 61.05%, the bonus layer 37.65%. Per-seed totals span 94.16% to 106.78%, because the rarest event is worth about 7.5 points of RTP by itself and short samples swing hard: a seven-seed sample of this same engine returned 95.66%.
-- **What that figure assumes.** The harness models a perfect player on the two interactive bonuses. Bold Chai is pumped at a steady six per second for the full 30-second window, and the Moonlit Keepsake Trail is always completed. Real play sits below 98.70%. The 95% to 98% design band recorded in `docs/DESIGN-SPEC.md` predates this measurement and does not state a player model, so read 98.70% as the generous-play ceiling rather than a band violation. Reconciling the band with a stated player model is open as decision D8.
-- **Runaway check:** zero capped bonus sessions across the fleet, confirming the engine-wide retrigger block holds.
+- **Full-game RTP:** 105.79% across 2,000,000 paid spins, now including Phoebe's Lap Quest as UniGlee act 5. Reproduce with `seq 1 40 | xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'`. The 95% confidence interval on the per-seed mean is 104.82% to 106.76%. Base game contributes 61.05%, the bonus layer 44.74%, and Lap Quest alone contributes 7.09%. Per-seed totals span 100.53% to 114.00%.
+- **What that figure assumes.** Bold Chai is pumped at a steady six times per second for the full 30-second window; the Moonlit Keepsake Trail is always completed; and an uninformed Lap Quest player picks randomly and uniformly among the three offered spots, finding the perfect lap 1 time in 3, while petting often enough to avoid inactivity so Joey's seeded arrival ends the chapter. Real play may differ. The 95% to 98% design band predates this full-game measurement and never stated a player model; reconciling it remains open as decision D8.
+- **Runaway check:** zero capped bonus sessions and zero `terminatedByCascadeCap` activations across the fleet.
 
 The oracle is a deliberately strict gate. It was written to fail, and it is not weakened to reach green.
 

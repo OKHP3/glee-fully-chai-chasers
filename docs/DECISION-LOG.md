@@ -52,19 +52,19 @@ The stakes are quantified. UniGlee at 40/60/80 already contributes roughly six p
 | Measure | Value | Source |
 |---|---|---|
 | Documented band | 95% to 98%, target ~96.5% | `docs/DESIGN-SPEC.md` §4 |
-| Measured full-game RTP | **98.70%** | 2,000,000 paid spins, seeds 1 to 40 at 50,000 each |
-| 95% confidence interval | 97.93% to 99.47% | same |
-| Per-seed standard deviation | 2.49 | same |
-| Per-seed span | 94.16% to 106.78% | same |
-| Seeds landing inside the documented band | **10 of 40** | same |
-| Base layer / bonus layer | 61.05% / 37.65% | same |
-| Largest contributors | firefly free spins 10.64%, UniGlee 7.47%, doorbell panic 4.98% | same |
+| Measured full-game RTP | **105.79%** | 2,000,000 paid spins, seeds 1 to 40 at 50,000 each; includes Lap Quest |
+| 95% confidence interval | 104.82% to 106.76% | same |
+| Per-seed standard deviation | 3.12 | same |
+| Per-seed span | 100.53% to 114.00% | same |
+| Seeds landing inside the documented band | **0 of 40** | same |
+| Base layer / bonus layer | 61.05% / 44.74% | same |
+| Largest contributors | firefly free spins 10.63%, UniGlee acts 1–4 7.47%, Lap Quest 7.09%, doorbell panic 4.98% | same |
 
-Reproduce with `for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done`.
+Reproduce with `seq 1 40 | xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'`.
 
-The entire confidence interval sits above 98%. This is not sampling noise: earlier seven-seed readings of 95.66% and 97.56% appeared to confirm the band, but at a per-seed sd of 2.49 a seven-seed sample cannot resolve a band 3 points wide. The first adequately powered measurement puts the game out of band.
+The entire confidence interval sits above 100%. This is not sampling noise: the prior 98.70% fleet omitted Lap Quest entirely. The corrected harness measures all five UniGlee acts and attributes 7.09 points of RTP to Lap Quest alone.
 
-**A second problem sits underneath the first: the band never stated a player model.** `scripts/sim-agent.ts` plays both interactive bonuses at their ceiling. Bold Chai Pump receives a steady six pumps per second for the entire 30-second window (lines 72 to 79), and the Moonlit Keepsake Trail is played by a perfect-memory player who always completes all six pairs and always collects the 40-spin handoff (line 183). So **98.70% is a generous-play ceiling, not an expected value.** Real play sits below it by an amount nobody has measured, because no realistic-play variant of the harness exists. A single RTP number without a stated player model cannot be checked by anyone, which is how three successive figures went unchallenged.
+**A second problem sits underneath the first: the band never stated a player model.** `scripts/sim-agent.ts` gives Bold Chai Pump a steady six pumps per second for the full 30-second window, gives the Moonlit Keepsake Trail a perfect-memory player, and models Lap Quest as an uninformed random-uniform choice among three spots (1-in-3 perfect) with enough petting to avoid inactivity until Joey arrives. So **105.79% belongs to that stated mixed player model, not to every possible player.** A single RTP number without its player model cannot be checked.
 
 **Ruling needed. One word is enough.**
 

@@ -15,6 +15,10 @@ description: Non-obvious couplings between trigger frequencies, base RTP, and th
 
 - **Lesson:** Additive per-reel trigger odds combine as the sum — three "rare" rates are dominated by the most frequent one; rarity must be set on the combined rate.
 
+- **Rule:** Full-game simulation must keep player-input RNG separate from engine RNG and reproduce any presentation timing that controls bonus length.
+  - **Why:** A human Lap Quest choice does not consume the seeded chapter stream, while the ledge's Joey-arrival clock and per-round animation time determine how many paying rounds finish. Sharing RNG or treating it as one round changes both outcomes and RTP.
+  - **How to apply:** Give modeled player actions their own seeded stream, state every interaction assumption in report output, and translate live waits/animation durations into deterministic headless elapsed time.
+
 ## Retrigger blocking (2026-07)
 Retriggers are blocked engine-wide: `runFreeSpinSession` and
 `runJoeyLaundrySession` zero each round's `freeSpinsAwarded` and never extend

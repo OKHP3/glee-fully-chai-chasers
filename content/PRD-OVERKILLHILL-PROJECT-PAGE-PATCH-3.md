@@ -48,7 +48,7 @@ Reverts Patch 2 Change 2b. The full-game figure is now measured end to end rathe
 
 - **Section:** "What It Does" → card titled "A simulation oracle as the definition of done."
 - **FIND (exact):** ` The legendary event above is deliberately excluded from that figure: there's no real money in this game, so its rare, generous payout is allowed to push measured full-game RTP to roughly 103% on the runs where it lands.`
-- **REPLACE (exact):** ` A second harness plays every bonus end to end through the same engine entry points the UI uses. Across 2,000,000 paid spins on forty seeds it measures full-game RTP at 98.70%, assuming a perfect player on the two interactive bonuses. Per-seed results run from 94.2% to 106.8%, because the rarest event is worth about 7.5 points of RTP by itself. A seven-seed sample of the same engine returned 95.66%, which is precisely why the figure now ships with its seed list attached.`
+- **REPLACE (exact):** ` A second harness plays every bonus end to end through the same engine entry points the UI uses. Across 2,000,000 paid spins on forty seeds it measures full-game RTP at 105.79%, including all five UniGlee acts. The player model pumps Bold Chai at six taps per second, completes the memory trail perfectly, and picks Lap Quest spots randomly for a one-in-three perfect lap while petting through to Joey's arrival. Per-seed results run from 100.53% to 114.00%; the figure ships with its seed range and assumptions attached.`
 
 ### Change 3. Oracle card, what the oracle actually asserts
 
@@ -99,7 +99,7 @@ The oracle asserts the layered model's base leg, not a total. Its base gate is 6
 | Commits since ship | 152 |
 | Tests, ship week to today | 149 → 170 |
 | Bonus chapters added | 5 |
-| Full-game RTP, re-measured | 98.70% over 2,000,000 spins |
+| Full-game RTP, re-measured | 105.79% over 2,000,000 spins |
 
 ## 4. Validation loop (both cycles required)
 

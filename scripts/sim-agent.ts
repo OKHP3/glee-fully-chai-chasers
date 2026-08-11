@@ -9,6 +9,9 @@
  * Player models for interactive bonuses (noted in the report):
  *  - Bold Chai Pump: steady 6 pumps/second for the full 30s window.
  *  - Moonlit Keepsake Trail: perfect-memory player (always completes, +40 spins).
+ *  - Phoebe's Lap Quest: uninformed random-uniform choice among the three
+ *    offered spots, so the player finds the perfect lap 1 time in 3; pets often
+ *    enough to prevent inactivity, so the chapter ends at Joey's arrival.
  */
 import { spin } from "../src/engine/cascade";
 import { LINES } from "../src/engine/economy";
@@ -65,11 +68,12 @@ const bonuses = {
   treatTimeMorning: tally(),
   treatTimeNighttime: tally(),
   uniglee: tally(),
+  lapQuest: tally(),
   treatJar: tally(),
   catVisits: tally(),             // encountered = visits, played = fed visits
 };
 
-function simulateBoldChaiPlayer(rngSeedMix: number): number {
+function simulateBoldChaiPlayer(): number {
   // 6 pumps/second, deterministic cadence — no RNG used by the pump engine.
   let state = createBoldChaiPumpState();
   const start = 0;
@@ -78,6 +82,63 @@ function simulateBoldChaiPlayer(rngSeedMix: number): number {
     state = pumpBoldChai(state, t).state;
   }
   return completeBoldChaiPump(state, start + BOLD_CHAI_DURATION_MS).freeSpinsAwarded;
+}
+
+interface CascadeCapResult {
+  terminatedByCascadeCap?: boolean;
+}
+
+let terminatedByCascadeCap = 0;
+
+function recordCascadeCap(result: CascadeCapResult): void {
+  if (result.terminatedByCascadeCap) terminatedByCascadeCap++;
+}
+
+function recordRoundCascadeCaps(rounds: readonly CascadeCapResult[]): void {
+  for (const round of rounds) recordCascadeCap(round);
+}
+
+/**
+ * Mirrors board.ts runLapQuestChapter without its DOM delays. The ledge clock
+ * starts after the choice/reveal and first round are generated. A round already
+ * in progress when Joey arrives finishes before the chapter returns.
+ */
+function simulateLapQuest(
+  rng: ReturnType<typeof mulberry32>,
+  playerChoiceRng: ReturnType<typeof mulberry32>,
+): {
+  totalWin: number;
+  totalSpins: number;
+  terminatedByCascadeCap: number;
+} {
+  const challenge = createLapQuestChallenge(rng);
+  // Explicit player model: random uniform, not always-perfect (1-in-3 perfect).
+  // The player's tap is independent of the chapter RNG, matching live play.
+  const selectedSpot = challenge.choices[Math.floor(playerChoiceRng() * challenge.choices.length)];
+  const firstRound = spinLapQuestRound(rng, challenge, selectedSpot, BET_PER_LINE);
+  const interruptAtMs = 15_000 + Math.floor(rng() * 75_001);
+  let elapsedMs = 0;
+  let totalWin = 0;
+  let totalSpins = 0;
+  let cappedCascades = 0;
+
+  const playRound = (round: ReturnType<typeof spinLapQuestRound>): void => {
+    totalWin += round.totalWin;
+    totalSpins++;
+    if (round.terminatedByCascadeCap) cappedCascades++;
+    // playLapQuestRound: 360ms per cascade step, then a 420ms result hold.
+    elapsedMs += round.steps.length * 360 + 420;
+  };
+
+  playRound(firstRound);
+  while (elapsedMs < interruptAtMs) {
+    // runLapQuestChapter waits up to 900ms before beginning the next round.
+    elapsedMs += Math.min(900, interruptAtMs - elapsedMs);
+    if (elapsedMs >= interruptAtMs) break;
+    playRound(spinLapQuestRound(rng, challenge, selectedSpot, BET_PER_LINE));
+  }
+
+  return { totalWin, totalSpins, terminatedByCascadeCap: cappedCascades };
 }
 
 const rootRng = mulberry32(SEED);
@@ -109,6 +170,7 @@ for (let i = 0; i < PAID_SPINS; i++) {
     treatJar: jar,
     spinsSincePopIn,
   });
+  recordCascadeCap(result);
 
   totalBet += TOTAL_BET_PER_SPIN;
   baseWin += result.totalWin;
@@ -141,13 +203,25 @@ for (let i = 0; i < PAID_SPINS; i++) {
     for (const chapter of marathon.chapters) {
       bonuses.uniglee.win += chapter.totalWin;
       bonuses.uniglee.freeSpinsPlayed += chapter.totalSpins;
+      if (chapter.session.terminatedByCap) bonuses.uniglee.cappedSessions++;
+      recordRoundCascadeCaps(chapter.session.rounds);
     }
+    const lapQuest = simulateLapQuest(
+      mulberry32(seed ^ 0x6a09e667),
+      mulberry32(seed ^ 0xbb67ae85),
+    );
+    bonuses.lapQuest.encountered++;
+    bonuses.lapQuest.played++;
+    bonuses.lapQuest.freeSpinsPlayed += lapQuest.totalSpins;
+    bonuses.lapQuest.win += lapQuest.totalWin;
+    bonuses.lapQuest.cappedSessions += lapQuest.terminatedByCascadeCap > 0 ? 1 : 0;
+    terminatedByCascadeCap += lapQuest.terminatedByCascadeCap;
   } else if (result.doorbellPanic) {
     // UI shows the doorbell banner here; the session itself runs below only if freeSpinsAwarded > 0.
   } else if (result.boldChaiPump) {
     bonuses.boldChaiPump.encountered++;
     bonuses.boldChaiPump.played++;
-    boldChaiSpinsAwarded = simulateBoldChaiPlayer(seed);
+    boldChaiSpinsAwarded = simulateBoldChaiPlayer();
   }
 
   if (result.treatTimeBonus) {
@@ -159,6 +233,7 @@ for (let i = 0; i < PAID_SPINS; i++) {
     bucket.freeSpinsPlayed += session.totalSpins;
     bucket.win += session.totalWin;
     if (session.terminatedByCap) bucket.cappedSessions++;
+    recordRoundCascadeCaps(session.rounds);
   }
 
   if (result.freeSpinsAwarded > 0) {
@@ -168,6 +243,7 @@ for (let i = 0; i < PAID_SPINS; i++) {
       const session = runFreeSpinSession(mulberry32(nextSeed()), "doorbell_panic", BET_PER_LINE, result.freeSpinsAwarded);
       bonuses.doorbellPanic.freeSpinsPlayed += session.totalSpins;
       bonuses.doorbellPanic.win += session.totalWin;
+      recordRoundCascadeCaps(session.rounds);
     } else {
       bonuses.fireflyFreeSpins.encountered++;
       bonuses.fireflyFreeSpins.played++;
@@ -185,10 +261,12 @@ for (let i = 0; i < PAID_SPINS; i++) {
         const session = runFreeSpinSession(wheelRng, "standard", BET_PER_LINE, 40);
         wedgeBucket.freeSpinsPlayed += session.totalSpins;
         wedgeBucket.win += session.totalWin;
+        recordRoundCascadeCaps(session.rounds);
       } else {
         const session = runFreeSpinSession(wheelRng, wedge, BET_PER_LINE, result.freeSpinsAwarded);
         wedgeBucket.freeSpinsPlayed += session.totalSpins;
         wedgeBucket.win += session.totalWin;
+        recordRoundCascadeCaps(session.rounds);
       }
       bonuses.fireflyFreeSpins.freeSpinsPlayed += wedgeBucket.freeSpinsPlayed;
     }
@@ -199,6 +277,7 @@ for (let i = 0; i < PAID_SPINS; i++) {
     const session = runFreeSpinSession(mulberry32(nextSeed()), "chai_back", BET_PER_LINE, boldChaiSpinsAwarded, { allowChaiStorm: false });
     bonuses.boldChaiPump.freeSpinsPlayed += session.totalSpins;
     bonuses.boldChaiPump.win += session.totalWin;
+    recordRoundCascadeCaps(session.rounds);
   }
 
   if (treatJarSpins > 0) {
@@ -207,6 +286,7 @@ for (let i = 0; i < PAID_SPINS; i++) {
     const session = runFreeSpinSession(mulberry32(nextSeed()), "chai_back", BET_PER_LINE, treatJarSpins, { allowChaiStorm: false, allowRetriggers: false });
     bonuses.treatJar.freeSpinsPlayed += session.totalSpins;
     bonuses.treatJar.win += session.totalWin;
+    recordRoundCascadeCaps(session.rounds);
   }
 }
 
@@ -229,6 +309,7 @@ bonusWin =
   bonuses.treatTimeMorning.win +
   bonuses.treatTimeNighttime.win +
   bonuses.uniglee.win +
+  bonuses.lapQuest.win +
   bonuses.treatJar.win;
 
 const totalFreeSpins =
@@ -238,6 +319,7 @@ const totalFreeSpins =
   bonuses.treatTimeMorning.freeSpinsPlayed +
   bonuses.treatTimeNighttime.freeSpinsPlayed +
   bonuses.uniglee.freeSpinsPlayed +
+  bonuses.lapQuest.freeSpinsPlayed +
   bonuses.treatJar.freeSpinsPlayed;
 
 const totalWin = baseWin + bonusWin;
@@ -271,6 +353,13 @@ console.log(JSON.stringify({
   baseWinningSpins,
   mega8,
   totalFreeSpinsPlayed: totalFreeSpins,
+  playerModel: {
+    boldChaiPump: "steady 6 pumps/second for the full 30-second window",
+    moonlitKeepsakeTrail: "perfect memory; always completes and receives the 40-spin handoff",
+    lapQuestChoice: "random uniform among three offered spots; 1-in-3 perfect lap",
+    lapQuestPetting: "pets often enough to prevent inactivity; chapter ends at seeded Joey arrival",
+  },
+  terminatedByCascadeCap,
   lapQuestCappedCascades,
   bonuses,
 }, null, 2));
