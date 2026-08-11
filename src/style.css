@@ -401,6 +401,9 @@ body {
     height: 48dvh;
     min-height: 320px;
   }
+  .chai-splash__art img {
+    object-position: center center;
+  }
   .chai-splash__art::after {
     background:
       linear-gradient(0deg, #070d20 0%, rgba(7, 13, 32, .36) 22%, transparent 63%),
