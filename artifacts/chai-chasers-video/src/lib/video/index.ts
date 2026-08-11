@@ -20,4 +20,6 @@ export {
   staggerDelay,
   customSpring,
   withDelay,
+  getSceneTransition,
+  REDUCED_MOTION_TRANSITION,
 } from './animations';

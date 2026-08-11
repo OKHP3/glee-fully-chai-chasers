@@ -229,6 +229,42 @@ export const itemVariants: Variants = {
   } as TargetAndTransition,
 };
 
+// Reduced-motion scene transition helper
+//
+// When `prefersReducedMotion` is true every scene transition collapses to an
+// instant opacity cross-dissolve (duration: 0) so no heavy blur, scale, clip,
+// or 3D rotation effect can freeze on a low-motion device.  The animate state
+// is identical in both paths, which means downstream assertions about "did the
+// scene reach its final state?" work the same way regardless of motion mode.
+//
+// Usage:
+//   const prefersReduced = useReducedMotion();  // from framer-motion
+//   <motion.div {...getSceneTransition('fadeBlur', prefersReduced ?? false)} />
+export const REDUCED_MOTION_TRANSITION = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0 },
+} as const;
+
+export function getSceneTransition(
+  name: keyof typeof sceneTransitions,
+  prefersReducedMotion: boolean,
+): {
+  initial: Record<string, unknown>;
+  animate: Record<string, unknown>;
+  exit: Record<string, unknown>;
+  transition: Record<string, unknown>;
+} {
+  if (prefersReducedMotion) return REDUCED_MOTION_TRANSITION;
+  return sceneTransitions[name] as {
+    initial: Record<string, unknown>;
+    animate: Record<string, unknown>;
+    exit: Record<string, unknown>;
+    transition: Record<string, unknown>;
+  };
+}
+
 // Utilities
 export function staggerDelay(index: number, baseDelay: number = 0.1): number {
   return index * baseDelay;
