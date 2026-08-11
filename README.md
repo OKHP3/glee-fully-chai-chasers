@@ -90,6 +90,10 @@ Free. Fan-made. Fictional currency only, saved in your browser. **No wagering. N
 
 All shipped art, sound, names, and game presentation are original. The project does not include photos of Glee, copyrighted clips or music, brand identities, or real-money gambling. See the [IP guardrails](./docs/IP-GUARDRAILS.md).
 
+## Community Skills
+
+Five portable [Agent Skills](https://docs.replit.com/agent-skills) were extracted from this project and published in [`skills/`](./skills/README.md) for any Replit user to copy into their own project. They encode the non-obvious rules that caused real multi-turn debugging sessions during the build — covering multi-artifact monorepo setup, the design-iteration loop, canvas presentation layout, Designathon submission discipline, and the skill-promotion workflow itself. Copy any skill folder into `.agents/skills/` in your Repl and it is immediately available to the Replit AI agent.
+
 ## Credits and project notes
 
 **Glee:** the muse, the reason, the whole point.
