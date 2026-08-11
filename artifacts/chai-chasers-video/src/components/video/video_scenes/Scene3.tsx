@@ -1,12 +1,13 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { getSceneTransition } from '@/lib/video/animations';
+import { getSceneTransition, reducedTransition } from '@/lib/video/animations';
 
 export function Scene3() {
   const prefersReduced = useReducedMotion();
+  const rm = prefersReduced ?? false;
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center z-10"
-      {...getSceneTransition('slideLeft', prefersReduced ?? false)}
+      {...getSceneTransition('slideLeft', rm)}
     >
       <div className="absolute inset-0 bg-[#120d36]/80" />
 
@@ -16,7 +17,7 @@ export function Scene3() {
         initial={{ opacity: 0, x: 100, rotate: 2 }}
         animate={{ opacity: 1, x: 0, rotate: -2 }}
         exit={{ opacity: 0, x: -100, rotate: 0 }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        transition={reducedTransition(rm, { duration: 1, ease: [0.16, 1, 0.3, 1] })}
       >
         <img
           src={`${import.meta.env.BASE_URL}images/replay-captures/treat-time.png`}
@@ -32,7 +33,7 @@ export function Scene3() {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
-        transition={{ duration: 0.8, delay: 0.5, ease: 'circOut' }}
+        transition={reducedTransition(rm, { duration: 0.8, delay: 0.5, ease: 'circOut' })}
       >
         <p className="font-mono text-cyan-300 tracking-[0.2em] text-sm md:text-base uppercase mb-2">
           Collect to Unlock

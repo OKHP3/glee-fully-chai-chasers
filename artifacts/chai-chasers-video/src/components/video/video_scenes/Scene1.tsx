@@ -1,12 +1,13 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { getSceneTransition } from '@/lib/video/animations';
+import { getSceneTransition, reducedTransition } from '@/lib/video/animations';
 
 export function Scene1() {
   const prefersReduced = useReducedMotion();
+  const rm = prefersReduced ?? false;
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center z-10"
-      {...getSceneTransition('fadeBlur', prefersReduced ?? false)}
+      {...getSceneTransition('fadeBlur', rm)}
     >
       <div className="absolute bottom-0 left-0 right-0 h-[80vh] bg-gradient-to-t from-[#0a0a20] via-[#0a0a20]/90 to-transparent z-10 pointer-events-none" />
 
@@ -16,7 +17,7 @@ export function Scene1() {
         initial={{ opacity: 0, scale: 1.1, y: 50 }}
         animate={{ opacity: 0.6, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 1.05, filter: 'blur(20px)' }}
-        transition={{ duration: 2, ease: 'easeOut' }}
+        transition={reducedTransition(rm, { duration: 2, ease: 'easeOut' })}
       >
         <img
           src={`${import.meta.env.BASE_URL}images/glee-fully-arcade.png`}
@@ -30,14 +31,14 @@ export function Scene1() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -30, filter: 'blur(10px)' }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 1 }}
+          transition={reducedTransition(rm, { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 1 })}
           className="text-center z-20"
         >
-          <motion.h1 
+          <motion.h1
             className="font-display font-bold text-[7vw] leading-none tracking-tight text-white mb-6 drop-shadow-[0_0_30px_rgba(251,191,36,0.4)]"
             initial={{ opacity: 0, scale: 0.9, rotateX: 20 }}
             animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-            transition={{ duration: 1, delay: 1.5, type: 'spring', stiffness: 100 }}
+            transition={reducedTransition(rm, { duration: 1, delay: 1.5, type: 'spring', stiffness: 100 })}
           >
             Glee-fully<br />
             <span className="text-gradient-gold">Chai Chasers</span>
@@ -47,7 +48,7 @@ export function Scene1() {
             className="flex flex-col gap-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 2.2 }}
+            transition={reducedTransition(rm, { duration: 1, delay: 2.2 })}
           >
             <p className="text-[2vw] text-slate-200 font-medium tracking-wide">
               A cozy slot game with a night-garden aesthetic.

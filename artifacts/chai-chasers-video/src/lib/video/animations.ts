@@ -255,6 +255,26 @@ export function getSceneTransition(
   return sceneTransitions[name];
 }
 
+// Inner-element reduced-motion helper
+//
+// Use this for every inner <motion.*> transition prop inside a scene so that
+// heavy duration/delay/spring effects collapse to an instant opacity swap on
+// low-motion devices.  The outer scene wrapper is already handled by
+// getSceneTransition(); this helper covers all nested elements.
+//
+// Usage:
+//   transition={reducedTransition(prefersReduced ?? false, { duration: 1.2, ease: 'circOut' })}
+//
+// For infinite-loop animations (repeat: Infinity) use a ternary instead:
+//   animate={prefersReduced ? {} : { scale: [1, 1.1, 1] }}
+//   transition={prefersReduced ? { duration: 0 } : { repeat: Infinity, duration: 3 }}
+export function reducedTransition(
+  prefersReducedMotion: boolean,
+  normal: Transition,
+): Transition {
+  return prefersReducedMotion ? { duration: 0 } : normal;
+}
+
 // Utilities
 export function staggerDelay(index: number, baseDelay: number = 0.1): number {
   return index * baseDelay;

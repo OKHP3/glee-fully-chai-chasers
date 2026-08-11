@@ -11,6 +11,7 @@ import {
   sceneTransitions,
   getSceneTransition,
   REDUCED_MOTION_TRANSITION,
+  reducedTransition,
 } from './animations';
 
 type SceneTransitionName = keyof typeof sceneTransitions;
@@ -118,6 +119,63 @@ describe('getSceneTransition — full motion', () => {
       }
     },
   );
+});
+
+// ─── reducedTransition — inner-element helper ─────────────────────────────────
+
+describe('reducedTransition — prefers-reduced-motion: reduce', () => {
+  it('returns { duration: 0 } regardless of the normal transition shape', () => {
+    const cases: Parameters<typeof reducedTransition>[1][] = [
+      { duration: 2, ease: 'easeOut' },
+      { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 1 },
+      { duration: 1, delay: 1.5, type: 'spring', stiffness: 100 },
+      { type: 'spring', stiffness: 300, damping: 20, delay: 2 },
+      { delay: 0.3 },
+      { duration: 0.8, type: 'spring' },
+    ];
+    for (const normal of cases) {
+      expect(reducedTransition(true, normal)).toEqual({ duration: 0 });
+    }
+  });
+
+  it('duration is exactly 0 — element cannot freeze mid-animation', () => {
+    const result = reducedTransition(true, { duration: 3.5, ease: 'circOut', delay: 2 });
+    expect((result as { duration: number }).duration).toBe(0);
+  });
+
+  it('strips delay so the element is immediately visible', () => {
+    const result = reducedTransition(true, { duration: 1, delay: 2 });
+    expect(result).not.toHaveProperty('delay');
+  });
+
+  it('strips ease so no easing curve can drag out the animation', () => {
+    const result = reducedTransition(true, { duration: 1, ease: [0.16, 1, 0.3, 1] });
+    expect(result).not.toHaveProperty('ease');
+  });
+
+  it('strips type:spring so spring physics cannot extend the duration', () => {
+    const result = reducedTransition(true, { type: 'spring', stiffness: 300, damping: 20 });
+    expect(result).not.toHaveProperty('type');
+    expect(result).not.toHaveProperty('stiffness');
+    expect(result).not.toHaveProperty('damping');
+  });
+});
+
+describe('reducedTransition — full motion', () => {
+  it('returns the normal transition unchanged', () => {
+    const normal = { duration: 1.2, ease: [0.16, 1, 0.3, 1] as number[], delay: 0.5 };
+    expect(reducedTransition(false, normal)).toEqual(normal);
+  });
+
+  it('preserves spring params in full-motion mode', () => {
+    const normal = { type: 'spring' as const, stiffness: 400, damping: 30, delay: 0.2 };
+    expect(reducedTransition(false, normal)).toEqual(normal);
+  });
+
+  it('preserves delay in full-motion mode', () => {
+    const normal = { duration: 0.8, delay: 1.5 };
+    expect(reducedTransition(false, normal)).toHaveProperty('delay', 1.5);
+  });
 });
 
 // ─── REDUCED_MOTION_TRANSITION constant ───────────────────────────────────────

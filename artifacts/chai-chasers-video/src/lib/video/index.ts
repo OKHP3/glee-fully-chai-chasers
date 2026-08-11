@@ -22,4 +22,5 @@ export {
   withDelay,
   getSceneTransition,
   REDUCED_MOTION_TRANSITION,
+  reducedTransition,
 } from './animations';

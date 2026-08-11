@@ -1,13 +1,14 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { getSceneTransition } from '@/lib/video/animations';
+import { getSceneTransition, reducedTransition } from '@/lib/video/animations';
 import wheelHeroArt from '@game-assets/optimized/joey-phoebe-wheel.webp';
 
 export function Scene4() {
   const prefersReduced = useReducedMotion();
+  const rm = prefersReduced ?? false;
   return (
     <motion.div
       className="absolute inset-0 flex items-center justify-center z-10"
-      {...getSceneTransition('perspectiveFlip', prefersReduced ?? false)}
+      {...getSceneTransition('perspectiveFlip', rm)}
     >
       <div className="absolute inset-0 bg-[#22102b]/80" />
 
@@ -17,7 +18,7 @@ export function Scene4() {
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -50 }}
-        transition={{ duration: 1, delay: 0.2, ease: 'circOut' }}
+        transition={reducedTransition(rm, { duration: 1, delay: 0.2, ease: 'circOut' })}
       >
         <h2 className="font-display font-bold text-[5vw] text-white leading-tight mb-4">
           The <span className="text-gradient-magenta">Sparkle Wheel</span>
@@ -33,14 +34,14 @@ export function Scene4() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        transition={reducedTransition(rm, { duration: 1.2, ease: [0.16, 1, 0.3, 1] })}
       >
         {/* Real Screenshot Behind */}
         <motion.div
           className="absolute inset-0 rounded-[2rem] overflow-hidden border border-white/20 shadow-[0_30px_80px_rgba(217,70,239,0.3)] opacity-60 mix-blend-screen"
           initial={{ rotate: -5 }}
           animate={{ rotate: 0 }}
-          transition={{ duration: 2, ease: 'easeOut' }}
+          transition={reducedTransition(rm, { duration: 2, ease: 'easeOut' })}
         >
           <img
             src={`${import.meta.env.BASE_URL}images/replay-captures/joey-phoebe-sparkle-wheel.png`}
@@ -54,13 +55,13 @@ export function Scene4() {
           className="relative z-30 w-full h-full flex items-center justify-center"
           initial={{ y: 50, scale: 0.9 }}
           animate={{ y: 0, scale: 1 }}
-          transition={{ delay: 0.5, duration: 1, type: 'spring', bounce: 0.4 }}
+          transition={reducedTransition(rm, { delay: 0.5, duration: 1, type: 'spring', bounce: 0.4 })}
         >
-          {/* Animated rim around the wheel */}
+          {/* Animated rim — paused when motion is reduced */}
           <motion.div
             className="absolute w-[60%] h-[60%] rounded-full border-4 border-dashed border-accent/80"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+            animate={rm ? {} : { rotate: 360 }}
+            transition={rm ? { duration: 0 } : { duration: 15, repeat: Infinity, ease: 'linear' }}
           />
           <img
             src={wheelHeroArt}
