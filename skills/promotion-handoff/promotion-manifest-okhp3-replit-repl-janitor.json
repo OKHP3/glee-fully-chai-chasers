@@ -26,8 +26,8 @@
     "package_path": "replit/okhp3-replit-repl-janitor",
     "pull_request_url": "https://github.com/OKHP3/skillz/pull/44",
     "branch_commit": "d927b44384232bbaecc0bf4c89094ac4f1ba1a79",
-    "accepted_commit_or_hash": null,
-    "accepted_commit_note": "Follow-up PR #44 submitted 2026-08-11 — branch feat/replit-repl-janitor. Update with merge commit SHA after owner merges."
+    "accepted_commit_or_hash": "93eff2ed68e21c67d034cd9a2c39d076704476cf",
+    "accepted_commit_note": "PR #44 merged 2026-08-11. Merge commit 93eff2ed68e21c67d034cd9a2c39d076704476cf on OKHP3/skillz main."
   },
   "inventory": [
     { "file": "SKILL.md", "sha256": "0a9b7c94e0b23a34a1630a36db3b1016fddddbdbddadcf8bd2eaf1d0c2b7ab8c", "role": "core" },
