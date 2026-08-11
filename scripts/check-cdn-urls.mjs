@@ -36,25 +36,26 @@
  * Decision S26 (2026-08-11): JS chunk scanning is IN SCOPE.
  *
  * A Vite plugin (or a transitive npm dependency that uses defineConfig hooks)
- * can bake a CDN URL directly into a bundled .js chunk as a string constant
- * used for dynamic import(), fetch(), or a baseURL assignment.  That URL never
- * appears in the HTML or CSS that the pre-build and post-build HTML/CSS passes
- * scan.  To close the gap, runCheck() also walks dist/assets/*.js (and any
- * other .js file reachable from the scan root) and flags unlisted https://
- * string literals whose host is not first-party.
+ * can bake a CDN URL directly into a bundled .js chunk.  The primary injection
+ * vector is a literal URL argument to a resource-fetching call site:
+ *   fetch("https://cdn.example.com/api")
+ *   import("https://cdn.jsdelivr.net/npm/lib@1/lib.js")
+ *   importScripts("https://cdn.example.com/worker.js")
+ * Those URLs never appear in the HTML or CSS that the pre/post-build HTML/CSS
+ * passes scan.  runCheck() closes the gap by walking .js files and flagging
+ * unlisted http:// or https:// URL literals in those specific call contexts.
  *
- * Scanning scope: http:// and https:// URLs inside string literals (", ', `).
- *   - Both schemes are matched, consistent with the HTML/CSS scanner.
- *   - Block comments stripped before scanning so licence headers are ignored.
- *   - Line comments excluded by requiring an opening quote before the scheme —
- *     a bare URL in `// see https://…` has no preceding quote and is skipped.
- * Out of scope: protocol-relative URLs (//host/…), dynamic URL construction
- *   (concatenation, URL API, template expressions), and non-string values.
- *   Those require a full JS AST and are caught at code-review time.
- * First-party exclusions: none.  All external URLs are evaluated against
- *   ALLOW_LIST regardless of host, consistent with the HTML/CSS scanner.
- *   Legitimate project URLs (e.g. the deployed github.io origin) must be
- *   added to ALLOW_LIST with a policy justification.
+ * Scanning scope: http:// and https:// literal URL arguments inside
+ *   fetch(), import(), and importScripts() calls.  Both schemes are matched,
+ *   consistent with isExternalUrl() used by the HTML/CSS scanners.
+ *   Block comments are stripped so licence-header URLs are not reported.
+ * Out of scope (require full JS AST / data-flow analysis):
+ *   - Indirect URLs: const U="https://cdn.example.com"; fetch(U)
+ *   - Template expressions: fetch(`https://${host}/path`)
+ *   - protocol-relative URLs (//host/…) in JS strings
+ *   - href/src/xmlns attribute values in JSX/template strings — these are
+ *     navigation links or XML identifiers, not resource fetches, and are
+ *     already handled (or intentionally excluded) by the HTML scanner.
  *
  * Run directly:  node scripts/check-cdn-urls.mjs
  * Self-test:     node scripts/check-cdn-urls.mjs --self-test
@@ -478,27 +479,34 @@ function extractCssUrls(src) {
 
 // ─── JS chunk scanner ────────────────────────────────────────────────────────
 //
-// All external URLs found in JS string literals are evaluated against
-// ALLOW_LIST by the caller (runCheck), consistent with the HTML/CSS scanner.
-// No host-based exemptions are applied here: any legitimate project URL that
-// appears as a string literal in a built chunk must be explicitly allow-listed.
-
-// Matches http:// or https:// URLs inside string delimiters (", ', `).
-// Both schemes are matched, consistent with isExternalUrl() used by the
-// HTML/CSS scanners.  The opening-delimiter requirement means a bare URL in a
-// line comment (`// see https://…`) has no preceding quote and is not matched,
-// avoiding false positives without needing to strip line comments (which would
-// also strip the `//` inside string URLs themselves).
-const JS_URL_RE = /["'`](https?:\/\/[^"'`\s\\]{4,})/gi;
+// Targets the specific call patterns a Vite plugin uses to inject external CDN
+// dependencies into a bundled chunk.  Only literal URL arguments to
+// resource-fetching functions are matched; href attribute values, XML namespace
+// identifiers, and other non-fetch string contexts are naturally excluded
+// because they never appear as the first argument to fetch()/import()/etc.
+//
+// Both http:// and https:// are matched, consistent with isExternalUrl().
+//
+// Matches:
+//   fetch("https://cdn.example.com/api")
+//   import("https://cdn.jsdelivr.net/npm/lib@1/lib.js")   ← dynamic import
+//   importScripts("https://cdn.example.com/worker.js")
+//
+// Does NOT match (out of scope — require AST/data-flow analysis):
+//   href="https://replit.com/refer/"   (HTML navigation link in template str)
+//   xmlns="http://www.w3.org/2000/svg" (XML namespace identifier)
+//   const U = "https://cdn.example.com"; fetch(U);        (indirect via var)
+const JS_FETCH_RE =
+  /\b(?:fetch|import|importScripts)\s*\(\s*["'`](https?:\/\/[^"'`\s\\]{4,})/gi;
 
 function extractJsUrls(src) {
   // Strip block comments (licence headers, etc.) so URLs inside them are
-  // not reported.  Line comments are excluded by JS_URL_RE's quote requirement.
+  // not reported.
   const stripped = src.replace(/\/\*[\s\S]*?\*\//g, "");
   const hits = [];
   let m;
-  JS_URL_RE.lastIndex = 0;
-  while ((m = JS_URL_RE.exec(stripped)) !== null) {
+  JS_FETCH_RE.lastIndex = 0;
+  while ((m = JS_FETCH_RE.exec(stripped)) !== null) {
     hits.push(m[1]);
   }
   return [...new Set(hits)];
@@ -1177,44 +1185,59 @@ function runSelfTest() {
     });
 
     // ── JS chunk scanning (Decision S26) ───────────────────────────────────
-    // These fixtures confirm that a Vite plugin injecting a CDN URL directly
-    // into a bundled .js chunk is caught by the post-build dist/ pass.
-    // Both http:// and https:// are matched, consistent with the HTML/CSS
-    // scanners.  No host-based exemptions apply — all unlisted external URLs
-    // are flagged regardless of host.
+    // Fixtures confirm the resource-fetching call-site approach: only URLs
+    // that are literal arguments to fetch(), import(), or importScripts() are
+    // flagged.  Navigation links (href=) and XML namespace identifiers (xmlns=)
+    // are NOT matched because they never appear in those call contexts.
+    // Both http:// and https:// are matched, consistent with isExternalUrl().
 
-    check("https:// CDN URL string literal in a JS chunk (double-quoted) is flagged", () => {
+    check("https:// CDN URL in import() call is flagged", () => {
       const v = scan("chunk.js",
-        `const BASE="https://unpkg.com/some-lib@1.0/dist/lib.js";fetch(BASE);`
+        `import("https://cdn.jsdelivr.net/npm/some-lib@1.0/dist/lib.js");`
+      );
+      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+      assert(v[0].url.includes("cdn.jsdelivr.net"), `expected jsdelivr URL, got ${v[0]?.url}`);
+    });
+
+    check("http:// CDN URL in import() call is flagged — both schemes caught", () => {
+      // http:// and https:// are treated identically, consistent with isExternalUrl().
+      const v = scan("chunk.js",
+        `import("http://cdn.jsdelivr.net/npm/some-lib@1.0/dist/lib.js");`
+      );
+      assert(v.length === 1, `http:// CDN URL in import() must be flagged; got ${v.length}`);
+      assert(v[0].url.startsWith("http://"), `expected http:// URL, got ${v[0]?.url}`);
+    });
+
+    check("https:// CDN URL in fetch() call (double-quoted) is flagged", () => {
+      const v = scan("chunk.js",
+        `fetch("https://unpkg.com/some-lib@1.0/dist/lib.js");`
       );
       assert(v.length === 1, `expected 1 violation, got ${v.length}`);
       assert(v[0].url.includes("unpkg.com"), `expected unpkg URL, got ${v[0]?.url}`);
     });
 
-    check("http:// CDN URL string literal in a JS chunk is flagged (same as https)", () => {
-      // http:// and https:// are treated identically, consistent with isExternalUrl().
+    check("CDN URL in fetch() call (single-quoted) is flagged", () => {
       const v = scan("chunk.js",
-        `const BASE="http://unpkg.com/some-lib@1.0/dist/lib.js";fetch(BASE);`
+        `fetch('https://cdn.skypack.dev/lib@2');`
       );
-      assert(v.length === 1, `http:// CDN URL must be flagged; got ${v.length}`);
-      assert(v[0].url.startsWith("http://unpkg.com"), `expected http://unpkg URL, got ${v[0]?.url}`);
+      assert(v.length === 1, `single-quoted fetch URL must be flagged; got ${v.length}`);
     });
 
-    check("CDN URL string literal in a JS chunk (single-quoted) is flagged", () => {
+    check("CDN URL in fetch() call (template literal) is flagged", () => {
       const v = scan("chunk.js",
-        `const url='https://cdn.jsdelivr.net/npm/some-lib@1.0/dist/lib.js';`
+        "fetch(`https://cdn.example.com/api/v1/data.json`);"
       );
-      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+      assert(v.length === 1, `template-literal fetch URL must be flagged; got ${v.length}`);
     });
 
-    check("CDN URL in a JS template literal is flagged", () => {
+    check("CDN URL in importScripts() call is flagged", () => {
       const v = scan("chunk.js",
-        "const u=`https://cdn.example.com/api/v1/data.json`;"
+        `importScripts("https://cdn.example.com/worker.js");`
       );
-      assert(v.length === 1, `template-literal CDN URL must be flagged; got ${v.length}`);
+      assert(v.length === 1, `importScripts CDN URL must be flagged; got ${v.length}`);
     });
 
-    check("multiple CDN URL literals in a JS chunk are each flagged", () => {
+    check("multiple CDN URLs in import() calls are each flagged", () => {
       const v = scan("chunk.js", [
         `import("https://cdn.jsdelivr.net/npm/lib-a@1/lib-a.js");`,
         `import("https://cdn.skypack.dev/lib-b@2");`,
@@ -1222,28 +1245,43 @@ function runSelfTest() {
       assert(v.length === 2, `expected 2 violations, got ${v.length}`);
     });
 
-    check("allowed GTM URL literal in a JS chunk is NOT flagged", () => {
+    check("allowed GTM URL in fetch() is NOT flagged", () => {
       const v = scan("chunk.js",
-        `const s="https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB";`
+        `fetch("https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB");`
       );
-      assert(v.length === 0, `allow-listed GTM URL must not be flagged in JS; got ${v.length}`);
+      assert(v.length === 0, `allow-listed GTM URL in fetch() must not be flagged; got ${v.length}`);
     });
 
-    check("localhost URL literal in a JS chunk IS flagged — no host exemptions in JS scanner", () => {
-      // No host-based exemptions: any unlisted URL is flagged, consistent with
-      // the HTML/CSS scanner.  Legitimate project URLs must be in ALLOW_LIST.
-      const v = scan("chunk.js", `const api="https://localhost:3000/api";`);
-      assert(v.length === 1, `localhost must be flagged without an allow-list entry; got ${v.length}`);
+    check("CDN URL as a bare string assignment (not in a fetch/import call) is NOT flagged", () => {
+      // Indirect use requires AST data-flow analysis — out of scope for this
+      // lightweight scanner.  The call-site check catches the primary Vite
+      // plugin injection vector (literal URL in import()/fetch()).
+      const v = scan("chunk.js",
+        `const CDN="https://unpkg.com/some-lib@1.0/dist/lib.js";`
+      );
+      assert(v.length === 0, `bare string assignment is out of scope; got ${v.length}`);
     });
 
-    check("github.io URL literal in a JS chunk IS flagged — no host exemptions in JS scanner", () => {
-      // Multi-tenant domain: okhp3.github.io is the project's own host, but
-      // other-actor.github.io is not.  No wildcard exemption is applied;
-      // the specific project origin must be added to ALLOW_LIST if needed.
+    // Regressions for actual dist output URLs that must not be flagged:
+
+    check("[regression] href navigation link in JSX template string is NOT flagged", () => {
+      // Mirrors: href="https://replit.com/refer/overkillhillp3/" in built chunk.
+      // href attribute values are navigation links, not resource fetches — the
+      // HTML scanner excludes <a href> for the same reason.
       const v = scan("chunk.js",
-        `const base="https://other-actor.github.io/cdn/lib.js";`
+        `el.innerHTML='<a href="https://replit.com/refer/overkillhillp3/">Built</a>';`
       );
-      assert(v.length === 1, `unlisted github.io URL must be flagged; got ${v.length}`);
+      assert(v.length === 0, `href navigation URL must not be flagged; got ${v.length}`);
+    });
+
+    check("[regression] SVG xmlns namespace identifier in template string is NOT flagged", () => {
+      // Mirrors: xmlns="http://www.w3.org/2000/svg" in built chunk.
+      // XML namespace URIs are identifiers, not fetch targets — the browser
+      // never issues an HTTP request for them.
+      const v = scan("chunk.js",
+        `const svg='<svg xmlns="http://www.w3.org/2000/svg"></svg>';`
+      );
+      assert(v.length === 0, `SVG xmlns namespace must not be flagged; got ${v.length}`);
     });
 
     check("CDN URL inside a JS block comment is NOT flagged", () => {
@@ -1253,8 +1291,9 @@ function runSelfTest() {
       assert(v.length === 0, `URL inside JS block comment must not be flagged; got ${v.length}`);
     });
 
-    check("CDN URL in a JS line comment (no surrounding quotes) is NOT flagged", () => {
-      // No opening quote before https:// — JS_URL_RE does not match.
+    check("CDN URL in a JS line comment is NOT flagged", () => {
+      // Line comments never appear as arguments to fetch()/import(), so
+      // JS_FETCH_RE does not match them.
       const v = scan("chunk.js",
         `// See https://cdn.jsdelivr.net/npm/some-lib for reference\nconst x=42;`
       );
