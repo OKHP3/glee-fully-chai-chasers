@@ -15,6 +15,7 @@ cp -r skills/okhp3-replit-canvas-board .agents/skills/
 
 | Skill | Description | Primary triggers |
 |---|---|---|
+| [okhp3-replit-repl-janitor](okhp3-replit-repl-janitor/SKILL.md) | Safely audit and tidy one Replit Git checkout — branch/PR classification, generated-branch safeguards, naming cleanup, nested detritus detection, and exact owner-approved execution. | "clean up this Repl", "purge stale subrepl branches", "decrapify this repo", "fix inconsistent filenames", "one-time repository cleanup" |
 | [okhp3-replit-canvas-board](okhp3-replit-canvas-board/SKILL.md) | Plan and build a structured multi-frame Replit canvas presentation board — hero rows, labeled zones, iframe lifecycle, and focusCanvasShapes for audience navigation. | "organise the canvas", "arrange the frames", "set up the board", "label the zones", "focus the viewport", "designathon layout" |
 | [okhp3-replit-design-pipeline](okhp3-replit-design-pipeline/SKILL.md) | The complete Replit design iteration loop as a single coherent workflow — extract → sandbox → variant → graduate. Covers the "extract first, never approximate" rule, DESIGN subagent brief anatomy, and the graduation decision gate. | "redesign", "improve this component", "show me options", "create variants", "put on canvas", "graduate", "mockup", "design alternatives" |
 | [okhp3-replit-multi-artifact](okhp3-replit-multi-artifact/SKILL.md) | Navigate a Replit pnpm multi-artifact monorepo without silent failures. Covers BASE_URL prefix discipline, PORT env var reading, managed workflow naming, pnpm catalog drift, and shared library wiring. | "add an artifact", "preview path", "port conflict", "blank preview", "shared package", "workflow naming", "pnpm catalog", "cross-artifact" |
@@ -25,9 +26,14 @@ cp -r skills/okhp3-replit-canvas-board .agents/skills/
 
 ## Where these came from
 
-All four Replit skills were extracted from the [Glee-fully Chai Chasers](https://glee-fully-chai-chasers.replit.app) Designathon project — a full-stack slot game with a pitch deck, showcase video, and canvas presentation board, all built as a Replit multi-artifact pnpm monorepo.
+All five Replit skills were extracted or matured through the [Glee-fully Chai Chasers](https://glee-fully-chai-chasers.replit.app) Designathon project — a full-stack slot game with a pitch deck, showcase video, canvas presentation board, and reusable repository operations.
 
-Each skill encodes exactly what caused a real multi-turn debugging session during that build. The canvas-board skill came from layout correction cycles. The design-pipeline skill came from discovering the extract→graduate loop piecemeal. The multi-artifact skill came from blank-preview failures and catalog drift. The build-in-public skill came from learning what judges actually look at.
+Each skill encodes a real operational lesson from the build. The Repl janitor
+skill protects branch, naming, and detritus cleanup with live Foundry evidence.
+The canvas-board skill came from layout correction cycles. The design-pipeline
+skill came from discovering the extract→graduate loop piecemeal. The
+multi-artifact skill came from blank-preview failures and catalog drift. The
+build-in-public skill came from learning what judges actually look at.
 
 ---
 

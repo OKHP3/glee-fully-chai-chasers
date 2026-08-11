@@ -1,7 +1,7 @@
 ---
 name: okhp3-repository-garden
 description: >
-  OverKill Hill P³ single-repository maintenance and reconciliation workflow. Use when a repository needs a daily or weekly health check of local-versus-origin/main variants, worktrees, pull requests, branches, stale locks, temporary files, or accumulated generated material. Also activate when a user asks to garden, tidy, prune, reconcile, or keep one active repository from becoming confusing for human and agent collaborators. This is the authoritative scheduled-maintenance layer for one checkout; use okhp3-repository-janitor instead for a multi-repository mirror estate and okhp3-repl-repo-janitor for a one-time Replit cleanup.
+  OverKill Hill P³ single-repository maintenance and reconciliation workflow. Use when a repository needs a daily or weekly health check of local-versus-origin/main variants, worktrees, pull requests, branches, stale locks, temporary files, or accumulated generated material. Also activate when a user asks to garden, tidy, prune, reconcile, or keep one active repository from becoming confusing for human and agent collaborators. This is the authoritative scheduled-maintenance layer for one checkout; use okhp3-repository-janitor instead for a multi-repository mirror estate and okhp3-replit-repl-janitor for a one-time Replit cleanup.
 license: MIT
 metadata:
   author: Jamie Hill (OverKill Hill P³)
@@ -55,7 +55,7 @@ git branch -avv
 git log --left-right --cherry-pick --oneline origin/main...HEAD
 git stash list
 git fsck --no-reflogs --unreachable --no-progress
-python3 .agents/skills/okhp3-repl-repo-janitor/scripts/audit-repo.py --root . --base origin/main
+python3 .agents/skills/okhp3-replit-repl-janitor/scripts/audit-repo.py --root . --base origin/main
 ```
 
 If GitHub access is available, query every non-main remote branch for its PR state, checks, and merge status. Do not infer a closed or merged PR from a missing local tracking branch.

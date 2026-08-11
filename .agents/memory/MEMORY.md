@@ -6,3 +6,4 @@
 - [Publish package-manager detection](publish-package-manager-detection.md) — dual root npm/pnpm lockfiles can make publishing choose npm, which cannot install pnpm catalog dependencies.
 - [Root-game artifact registration](root-game-artifact.md) — registering the root Vite game as a Replit artifact requires seeding the toml via shell cp then validating with verifyAndReplaceArtifactToml.
 - [Replit dev-banner artifact subpaths](replit-dev-banner-subpaths.md) — the dev-banner plugin hardcodes a root script URL; subpath artifacts must preserve the banner while normalizing its routed request.
+- [Foundry benchmark score integrity](foundry-benchmark-score-integrity.md) — recompute aggregate pass rates from expectation booleans after any regrade; never infer a missing conjunct.
