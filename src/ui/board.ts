@@ -233,6 +233,7 @@ export function renderBoard(
   document.documentElement.dataset.theme = resolvedTheme;
   const level = xpIntoLevel(state.xp);
   const bets = availableBetLevels(level.level);
+  const showFirstSpinInvite = (state.totalSpins ?? 0) === 0;
   const settledGrid = visibleGrid ?? spin({
     rng: mulberry32(20260717),
     betPerLine: 1,
@@ -267,7 +268,7 @@ export function renderBoard(
               </svg>
             </button>
           </div>
-          <div id="marquee-status" class="marquee-status" aria-live="polite"></div>
+          <div id="marquee-status" class="marquee-status" aria-live="polite">${showFirstSpinInvite ? "Tap SPARKLE to begin your chase ✦" : ""}</div>
         </header>
 
         <div class="cabinet-shell">
@@ -311,7 +312,7 @@ export function renderBoard(
           <button id="bet-down" class="chrome-btn" aria-label="Decrease bet">−</button>
           <span class="bet-display" id="bet-display">${state.bet}</span>
           <button id="bet-up" class="chrome-btn" aria-label="Increase bet">+</button>
-          <button id="sparkle-btn" class="sparkle-btn">
+          <button id="sparkle-btn" class="sparkle-btn${showFirstSpinInvite ? " sparkle-btn--invite" : ""}">
             <span>SPARKLE!</span>
           </button>
         </footer>
@@ -574,6 +575,11 @@ function wireControls(root: HTMLElement, state: GameState, bets: number[]): void
     // sparkleBtn.disabled return so the chime cannot fire while the reel
     // is mid-spin or locked. Do not move this call above the guard.
     if (sparkleBtn.disabled) return;
+    sparkleBtn.classList.remove("sparkle-btn--invite");
+    const marqueeStatus = root.querySelector<HTMLElement>("#marquee-status");
+    if ((state.totalSpins ?? 0) === 0 && marqueeStatus) {
+      marqueeStatus.textContent = "";
+    }
     playSpinStart();
     // Per-spin settlement guard — shared between the click-handler catch and
     // runSpin itself.  runSpin sets preDeductionBalance before deducting and
@@ -938,6 +944,7 @@ async function runSpin(
   // Any crash from this point onward leaves balance in a known-good state
   // (bet paid, win credited).  Signal the outer catch to NOT refund.
   settlementGuard.settled = true;
+  state.totalSpins = (state.totalSpins ?? 0) + 1;
   const levelBefore = levelForXp(state.xp);
   state.xp += sparksForSpin(state.bet);
   const levelAfter = levelForXp(state.xp);

@@ -38,6 +38,16 @@ beforeEach(() => {
 });
 
 describe("game state persistence", () => {
+  it("treats saves without a spin counter as a brand-new game", () => {
+    expect(loadGameState().totalSpins).toBe(0);
+  });
+
+  it("recognizes a progressed legacy save even without a spin counter", () => {
+    storage.setItem("ccv1.xp", JSON.stringify(25));
+
+    expect(loadGameState().totalSpins).toBe(1);
+  });
+
   it("keeps the firefly meter across a save/load boundary", () => {
     const state: GameState = {
       balance: 500_000,
@@ -48,6 +58,7 @@ describe("game state persistence", () => {
       fireflyMeter: 3,
       bestCascade: 3,
       spinsSincePopIn: 2,
+      totalSpins: 7,
       soundOn: true,
       paylineGuideOn: true,
       musicVolume: 0.72,
@@ -62,6 +73,7 @@ describe("game state persistence", () => {
     expect(loadGameState().theme).toBe("dark");
     expect(loadGameState().musicVolume).toBe(0.72);
     expect(loadGameState().paylineGuideOn).toBe(true);
+    expect(loadGameState().totalSpins).toBe(7);
   });
 
   it("migrates the old Boogie Bites save key without losing treats", () => {

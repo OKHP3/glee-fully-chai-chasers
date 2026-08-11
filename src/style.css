@@ -1535,15 +1535,19 @@ body {
   background: linear-gradient(160deg, #f0824a, var(--cc-orange) 60%, #a63f1c);
   border: 1px solid rgba(255, 244, 224, 0.4);
   box-shadow: 0 0 0 2px rgba(211, 91, 45, 0.25), 0 4px 0 #7a2f16, 0 6px 14px rgba(211, 91, 45, 0.5);
-  animation: sparkle-idle 2.4s ease-in-out infinite;
   transition: transform 90ms ease-out;
 }
 .sparkle-btn:active { transform: translateY(2px) scale(0.97); box-shadow: 0 0 0 2px rgba(211, 91, 45, 0.25), 0 2px 0 #7a2f16; }
 .sparkle-btn.is-spinning { animation: sparkle-spin-pulse 0.5s ease-in-out infinite; }
 
-@keyframes sparkle-idle {
+@media (prefers-reduced-motion: no-preference) {
+  .sparkle-btn--invite {
+    animation: sparkle-invite 1.4s ease-in-out 2;
+  }
+}
+@keyframes sparkle-invite {
   0%, 100% { box-shadow: 0 0 0 2px rgba(211, 91, 45, 0.25), 0 4px 0 #7a2f16, 0 6px 14px rgba(211, 91, 45, 0.5); }
-  50% { box-shadow: 0 0 0 5px rgba(245, 213, 118, 0.28), 0 4px 0 #7a2f16, 0 6px 22px rgba(245, 213, 118, 0.6); }
+  50% { box-shadow: 0 0 0 7px rgba(245, 213, 118, 0.3), 0 4px 0 #7a2f16, 0 6px 28px rgba(245, 213, 118, 0.72); }
 }
 @keyframes sparkle-spin-pulse {
   0%, 100% { filter: brightness(1); }

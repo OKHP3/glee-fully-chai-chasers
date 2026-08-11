@@ -46,6 +46,8 @@ export interface GameState {
   fireflyMeter: number;
   bestCascade: number;
   spinsSincePopIn: number;
+  /** Settled base-game spins; gates one-time first-spin guidance. */
+  totalSpins: number;
   soundOn: boolean;
   /** Optional payline guide; disabled by default for a clean board. */
   paylineGuideOn: boolean;
@@ -77,6 +79,7 @@ function loadTreatJar(): TreatJar {
 
 export function loadGameState(): GameState {
   const soundOn = load("soundOn", true);
+  const xp = load("xp", 0);
   const settledTreatJar = settleTreatJar(loadTreatJar());
   const pendingTreatJarSpins = load("pendingTreatJarSpins", 0) + settledTreatJar.freeSpinsAwarded;
   if (settledTreatJar.freeSpinsAwarded > 0) {
@@ -86,12 +89,15 @@ export function loadGameState(): GameState {
   return {
     balance: load("balance", STARTING_BALANCE),
     bet: load("bet", 1),
-    xp: load("xp", 0),
+    xp,
     treatJar: settledTreatJar.jar,
     pendingTreatJarSpins,
     fireflyMeter: load("fireflyMeter", 0),
     bestCascade: load("bestCascade", 0),
     spinsSincePopIn: load("spinsSincePopIn", 0),
+    // Legacy saves predate totalSpins. Any earned XP proves at least one spin
+    // settled, so returning players do not receive first-spin onboarding.
+    totalSpins: load("totalSpins", xp > 0 ? 1 : 0),
     soundOn,
     paylineGuideOn: load("paylineGuideOn", false),
     musicVolume: load("musicVolume", soundOn ? 4.0 : 0),
@@ -113,6 +119,7 @@ export function saveGameState(state: GameState): void {
   save("fireflyMeter", state.fireflyMeter);
   save("bestCascade", state.bestCascade);
   save("spinsSincePopIn", state.spinsSincePopIn);
+  save("totalSpins", state.totalSpins);
   save("soundOn", state.soundOn);
   save("paylineGuideOn", state.paylineGuideOn);
   save("musicVolume", state.musicVolume);

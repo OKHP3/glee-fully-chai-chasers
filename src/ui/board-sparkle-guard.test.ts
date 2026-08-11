@@ -52,6 +52,7 @@ function makeState(): GameState {
     fireflyMeter: 0,
     bestCascade: 0,
     spinsSincePopIn: 0,
+    totalSpins: 0,
     soundOn: true,
     paylineGuideOn: false,
     musicVolume: 1,

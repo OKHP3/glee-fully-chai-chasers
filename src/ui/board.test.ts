@@ -103,6 +103,7 @@ function makeSpinState(): GameState {
     fireflyMeter: 0,
     bestCascade: 0,
     spinsSincePopIn: 0,
+    totalSpins: 1,
     soundOn: false,
     paylineGuideOn: false,
     musicVolume: 1,
@@ -113,6 +114,55 @@ function makeSpinState(): GameState {
 }
 
 // ── Volume display and firefly meter ─────────────────────────────────────────
+
+describe("first-spin invitation", () => {
+  it("shows the marquee invitation and pulse class for a fresh game", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.totalSpins = 0;
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+
+    renderBoard(root, state);
+
+    expect(root.querySelector("#marquee-status")?.textContent)
+      .toBe("Tap SPARKLE to begin your chase ✦");
+    expect(root.querySelector("#sparkle-btn")?.classList)
+      .toContain("sparkle-btn--invite");
+    root.remove();
+  });
+
+  it("does not show first-spin guidance for a returning game", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.totalSpins = 3;
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+
+    renderBoard(root, state);
+
+    expect(root.querySelector("#marquee-status")?.textContent).toBe("");
+    expect(root.querySelector("#sparkle-btn")?.classList)
+      .not.toContain("sparkle-btn--invite");
+    root.remove();
+  });
+
+  it("clears the invitation and pulse immediately on the first valid click", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const state = makeSpinState();
+    state.totalSpins = 0;
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    const sparkle = root.querySelector<HTMLButtonElement>("#sparkle-btn")!;
+    sparkle.click();
+
+    expect(root.querySelector("#marquee-status")?.textContent).toBe("");
+    expect(sparkle.classList).not.toContain("sparkle-btn--invite");
+    root.remove();
+  });
+});
 
 describe("firefly meter display clamping", () => {
   it("shows 6 / 6 when fireflyMeter is above the meter max", () => {
@@ -310,6 +360,7 @@ describe("maybeLevelUpAfterBonus — multi-threshold celebration", () => {
       fireflyMeter: 0,
       bestCascade: 0,
       spinsSincePopIn: 0,
+      totalSpins: 1,
       soundOn: false,
       paylineGuideOn: false,
       musicVolume: 1,
