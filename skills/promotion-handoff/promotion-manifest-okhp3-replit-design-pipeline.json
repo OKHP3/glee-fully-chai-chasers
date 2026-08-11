@@ -24,7 +24,10 @@
     "repository": "OKHP3/skillz",
     "family": "replit",
     "package_path": "replit/okhp3-replit-design-pipeline",
-    "accepted_commit_or_hash": null
+    "pull_request_url": "https://github.com/OKHP3/skillz/pull/43",
+    "branch_commit": "0e796574111a3246b5841fc90b382a3995dc6a73",
+    "accepted_commit_or_hash": null,
+    "accepted_commit_note": "Update with merge commit SHA after owner merges PR #43"
   },
   "inventory": [
     { "file": "SKILL.md", "sha256": "997786ca1fb5893b4ede5ccd53d89916a5305f0c3e329e3ac193f8908a01cb9c", "role": "core" },
