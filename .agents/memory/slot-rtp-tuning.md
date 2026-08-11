@@ -31,9 +31,9 @@ own in-bonus awards); the `allowRetriggers` option is a deprecated no-op, and
 an engine-wide invariant test in freespins.test.ts guards the block.
 
 ## Full-game RTP shape (2026-07 rebalance)
-Target: total RTP (base + bonuses) 95-98%. Landed ~96.1% (210k-spin pooled
-fleets) as base ~61% + bonus layer ~35% with PAYOUT_SCALE as the final linear
-solve knob.
+Target: total RTP (base + bonuses) 95-98%. Best current estimate: **~98.1%**
+(external multi-agent validation, several million paid spins, 2026-08-11).
+Base ~61% + bonus layer ~37%. PAYOUT_SCALE is the final linear solve knob.
 **Why:** every win (base and bonus) flows through the same paytable ×
 PAYOUT_SCALE, so total RTP is exactly linear in it — do structural cuts first
 (award spins, trigger rates, ladder values), then solve scale =
@@ -42,3 +42,15 @@ old_scale × target/measured in one step.
 variance swings ±8pp); pool ≥150k spins before trusting the mean. Player-facing
 copy (board meter text) and DESIGN-SPEC/IMPLEMENTATION-BASELINE tables hardcode
 old numbers — grep them after every retune.
+
+## Sample-size warning for full-game RTP with rare events
+The internal 40-seed 2,000,000-spin fleet measured 105.79% — a statistical
+overestimate. With 1-in-1,229 UniGlee events, per-seed variance is ~3 points sd;
+2M paid spins is not enough to converge. The external multi-agent fleets (several
+million spins, two independent deployments) converged on ~98.1%.
+**Why:** rare bonus triggers create high per-seed variance. The standard error
+of the mean at 40 seeds with sd=3.12 is ±0.77pp (95% CI), which means a run
+that oversamples rare seeds will sit well above true RTP.
+**How to apply:** treat any internal fleet below ~5,000,000 paid spins as an
+estimate with meaningful uncertainty when UniGlee-class events (1-in-1,000+)
+contribute significantly to total RTP. Cross-validate with independent runs.
