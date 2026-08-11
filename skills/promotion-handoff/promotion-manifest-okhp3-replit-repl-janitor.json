@@ -24,10 +24,10 @@
     "repository": "OKHP3/skillz",
     "family": "replit",
     "package_path": "replit/okhp3-replit-repl-janitor",
-    "pull_request_url": null,
-    "branch_commit": null,
+    "pull_request_url": "https://github.com/OKHP3/skillz/pull/44",
+    "branch_commit": "d927b44384232bbaecc0bf4c89094ac4f1ba1a79",
     "accepted_commit_or_hash": null,
-    "accepted_commit_note": "This skill was not included in PR #43 (which covers the four other replit/ skills). It should be added to PR #43 before merge or submitted as a follow-up PR to the same replit/ family. Update this field with the accepted merge commit SHA after owner merges."
+    "accepted_commit_note": "Follow-up PR #44 submitted 2026-08-11 — branch feat/replit-repl-janitor. Update with merge commit SHA after owner merges."
   },
   "inventory": [
     { "file": "SKILL.md", "sha256": "0a9b7c94e0b23a34a1630a36db3b1016fddddbdbddadcf8bd2eaf1d0c2b7ab8c", "role": "core" },
@@ -45,10 +45,12 @@
       "skills/okhp3-replit-repl-janitor — rejected as source; publication mirrors are managed output during incubation, not second authoring locations. Both are byte-equal so there is no divergence, but the runtime source is the designated authority."
     ],
     "unresolved_items": [
-      "OKHP3/skillz replit/ family may already exist after PR #43 merges — no name collision check is possible from local context.",
-      "This skill was intentionally excluded from PR #43 to keep that batch focused. Owner must decide whether to amend PR #43 before merge or open a follow-up PR.",
-      "audit-repo.py is a deterministic bundled script — canonical consumers must have Python 3 available. This is already noted in the okhp3-skill-promotion compatibility field and should appear in the replit/ FAMILY.md adapter note.",
-      "The --fetch flag in audit-repo.py is Replit-specific in practice (network access is appropriate in a Replit checkout). Canonical docs should note it as an opt-in requiring explicit network authorization."
+      "audit-repo.py is a deterministic bundled script — canonical consumers must have Python 3 available. Noted in adapter_differences and in replit/FAMILY.md.",
+      "The --fetch flag in audit-repo.py is Replit-specific in practice (network access is appropriate in a Replit checkout). Non-Replit consumers should treat it as an opt-in requiring explicit network authorization."
+    ],
+    "resolved_items": [
+      "replit/ family existence and name collision: replit/ was created by PR #43; no name collisions found. okhp3-replit-repl-janitor was not present.",
+      "PR strategy: follow-up PR #44 (branch feat/replit-repl-janitor) submitted 2026-08-11 after PR #43 merged. replit/FAMILY.md updated to include the fifth skill row and an extended summary."
     ]
   },
   "safety": {
@@ -65,9 +67,9 @@
     ]
   },
   "authorization": {
-    "requested_actions": ["verify-mirror", "create-promotion-manifest", "update-contribution-brief"],
-    "approved_actions": ["verify-mirror", "create-promotion-manifest", "update-contribution-brief"],
-    "withheld_actions": ["commit", "push", "pull-request", "external-publication"]
+    "requested_actions": ["verify-mirror", "create-promotion-manifest", "update-contribution-brief", "pull-request"],
+    "approved_actions": ["verify-mirror", "create-promotion-manifest", "update-contribution-brief", "pull-request"],
+    "withheld_actions": ["external-publication"]
   },
   "verification": {
     "checks": [

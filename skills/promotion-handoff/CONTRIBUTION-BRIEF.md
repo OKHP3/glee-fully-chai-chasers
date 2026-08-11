@@ -1,9 +1,14 @@
 # OKHP3/skillz Contribution Brief — Replit Family (5 Skills)
 
-**Prepared:** 2026-08-11  
-**Updated:** 2026-08-11 — fifth skill (`okhp3-replit-repl-janitor`) added  
-**Status:** Ready for owner review and authorized submission  
-**No autonomous commits, pushes, or PRs have been made.**
+**Prepared:** 2026-08-11
+
+**Updated:** 2026-08-11 — fifth skill (`okhp3-replit-repl-janitor`) added; PR #44 submitted
+
+**Status:** PR #44 open — awaiting owner merge
+
+**PR #43 (4 skills):** merged — accepted commit `7ef60c8e`
+
+**PR #44 (janitor):** https://github.com/OKHP3/skillz/pull/44 — branch `feat/replit-repl-janitor`, commit `d927b44`
 
 ---
 
