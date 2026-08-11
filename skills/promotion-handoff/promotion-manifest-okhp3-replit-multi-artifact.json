@@ -26,8 +26,8 @@
     "package_path": "replit/okhp3-replit-multi-artifact",
     "pull_request_url": "https://github.com/OKHP3/skillz/pull/43",
     "branch_commit": "0e796574111a3246b5841fc90b382a3995dc6a73",
-    "accepted_commit_or_hash": null,
-    "accepted_commit_note": "Update with merge commit SHA after owner merges PR #43"
+    "accepted_commit_or_hash": "7ef60c8e56602ec8acce7ada409c6e9318c55df4",
+    "accepted_commit_note": "Merge commit SHA recorded after PR #43 was merged on 2026-08-11"
   },
   "inventory": [
     { "file": "SKILL.md", "sha256": "5c3358946718ba352e194d41ce26ab4c4813cf510052fe8019f85997e07c84a6", "role": "core" },
