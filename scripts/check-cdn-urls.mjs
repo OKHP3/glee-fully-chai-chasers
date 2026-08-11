@@ -31,6 +31,28 @@
  * Any external URL not in ALLOW_LIST causes the script to exit 1.
  * ALLOW_LIST entries must include a justification tied to a policy document.
  *
+ * ── JS chunks checked (post-build dist/ pass) ────────────────────────────
+ *
+ * Decision S26 (2026-08-11): JS chunk scanning is IN SCOPE.
+ *
+ * A Vite plugin (or a transitive npm dependency that uses defineConfig hooks)
+ * can bake a CDN URL directly into a bundled .js chunk as a string constant
+ * used for dynamic import(), fetch(), or a baseURL assignment.  That URL never
+ * appears in the HTML or CSS that the pre-build and post-build HTML/CSS passes
+ * scan.  To close the gap, runCheck() also walks dist/assets/*.js (and any
+ * other .js file reachable from the scan root) and flags unlisted https://
+ * string literals whose host is not first-party.
+ *
+ * Scanning scope: https:// URLs inside string literals (", ', `).
+ *   - Block comments stripped before scanning so licence headers are ignored.
+ *   - Line comments excluded by requiring an opening quote before https:// —
+ *     a bare URL in `// see https://…` has no preceding quote and is skipped.
+ * Out of scope: protocol-relative URLs (//host/…), dynamic URL construction
+ *   (concatenation, URL API, template expressions), and non-string values.
+ *   Those require a full JS AST and are caught at code-review time.
+ * First-party exclusions: localhost, 127.0.0.1, *.github.io, *.replit.dev,
+ *   *.replit.app — hosts the project's own code legitimately references.
+ *
  * Run directly:  node scripts/check-cdn-urls.mjs
  * Self-test:     node scripts/check-cdn-urls.mjs --self-test
  * npm alias:     npm run validate:cdn
@@ -119,6 +141,7 @@ const SKIP_DIRS = new Set([
 // ─── File extensions to scan ─────────────────────────────────────────────────
 const HTML_EXT = new Set([".html"]);
 const CSS_EXT  = new Set([".css"]);
+const JS_EXT   = new Set([".js"]); // bundled Vite output; see JS chunk decision above
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -450,6 +473,47 @@ function extractCssUrls(src) {
   return [...new Set(hits)];
 }
 
+// ─── JS chunk scanner ────────────────────────────────────────────────────────
+//
+// First-party hostnames are excluded so the project's own legitimate URL
+// references (API base, asset base on the deploy host) are not flagged.
+function isFirstPartyJsHost(urlStr) {
+  let hostname;
+  try {
+    hostname = new URL(urlStr).hostname;
+  } catch {
+    return true; // malformed URL — not a real fetch target, don't flag
+  }
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname.endsWith(".github.io") ||
+    hostname.endsWith(".replit.dev") ||
+    hostname.endsWith(".replit.app")
+  );
+}
+
+// Matches an https:// URL that is immediately preceded by a string delimiter
+// (", ', or `).  The opening-delimiter requirement means a URL that appears
+// in a line comment (`// see https://…`) has no preceding quote and is not
+// matched — avoiding false positives without needing to strip line comments
+// (which would also strip the `//` inside string URLs and break them).
+const JS_URL_RE = /["'`](https:\/\/[^"'`\s\\]{4,})/g;
+
+function extractJsUrls(src) {
+  // Strip block comments (licence headers, etc.) so URLs inside them are
+  // not reported.  Line comments are excluded by JS_URL_RE's quote requirement.
+  const stripped = src.replace(/\/\*[\s\S]*?\*\//g, "");
+  const hits = [];
+  let m;
+  JS_URL_RE.lastIndex = 0;
+  while ((m = JS_URL_RE.exec(stripped)) !== null) {
+    const url = m[1];
+    if (!isFirstPartyJsHost(url)) hits.push(url);
+  }
+  return [...new Set(hits)];
+}
+
 // ─── Main check ──────────────────────────────────────────────────────────────
 
 function runCheck(root) {
@@ -467,6 +531,15 @@ function runCheck(root) {
   for (const file of walk(root, CSS_EXT)) {
     const src = readFileSync(file, "utf8");
     for (const url of extractCssUrls(src)) {
+      if (!isAllowed(url)) {
+        violations.push({ file: relative(root, file), url });
+      }
+    }
+  }
+
+  for (const file of walk(root, JS_EXT)) {
+    const src = readFileSync(file, "utf8");
+    for (const url of extractJsUrls(src)) {
       if (!isAllowed(url)) {
         violations.push({ file: relative(root, file), url });
       }
@@ -1111,6 +1184,86 @@ function runSelfTest() {
         `/* See: https://fonts.googleapis.com/css2?family=Inter */`
       );
       assert(v.length === 0, `CSS comments should not be flagged`);
+    });
+
+    // ── JS chunk scanning (Decision S26) ───────────────────────────────────
+    // These fixtures confirm that a Vite plugin injecting a CDN URL directly
+    // into a bundled .js chunk is caught by the post-build dist/ pass.
+
+    check("CDN URL string literal in a JS chunk (double-quoted) is flagged", () => {
+      const v = scan("chunk.js",
+        `const BASE="https://unpkg.com/some-lib@1.0/dist/lib.js";fetch(BASE);`
+      );
+      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+      assert(v[0].url.includes("unpkg.com"), `expected unpkg URL, got ${v[0]?.url}`);
+    });
+
+    check("CDN URL string literal in a JS chunk (single-quoted) is flagged", () => {
+      const v = scan("chunk.js",
+        `const url='https://cdn.jsdelivr.net/npm/some-lib@1.0/dist/lib.js';`
+      );
+      assert(v.length === 1, `expected 1 violation, got ${v.length}`);
+    });
+
+    check("CDN URL in a JS template literal is flagged", () => {
+      const v = scan("chunk.js",
+        "const u=`https://cdn.example.com/api/v1/data.json`;"
+      );
+      assert(v.length === 1, `template-literal CDN URL must be flagged; got ${v.length}`);
+    });
+
+    check("multiple CDN URL literals in a JS chunk are each flagged", () => {
+      const v = scan("chunk.js", [
+        `import("https://cdn.jsdelivr.net/npm/lib-a@1/lib-a.js");`,
+        `import("https://cdn.skypack.dev/lib-b@2");`,
+      ].join("\n"));
+      assert(v.length === 2, `expected 2 violations, got ${v.length}`);
+    });
+
+    check("allowed GTM URL literal in a JS chunk is NOT flagged", () => {
+      const v = scan("chunk.js",
+        `const s="https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB";`
+      );
+      assert(v.length === 0, `allow-listed GTM URL must not be flagged in JS; got ${v.length}`);
+    });
+
+    check("localhost URL literal in a JS chunk is NOT flagged (first-party)", () => {
+      const v = scan("chunk.js", `const api="https://localhost:3000/api";`);
+      assert(v.length === 0, `localhost must not be flagged; got ${v.length}`);
+    });
+
+    check("github.io URL literal in a JS chunk is NOT flagged (first-party)", () => {
+      const v = scan("chunk.js",
+        `const base="https://okhp3.github.io/glee-fully-chai-chasers/";`
+      );
+      assert(v.length === 0, `github.io must not be flagged; got ${v.length}`);
+    });
+
+    check("replit.dev URL literal in a JS chunk is NOT flagged (first-party)", () => {
+      const v = scan("chunk.js",
+        `const dev="https://my-repl.username.replit.dev/api";`
+      );
+      assert(v.length === 0, `replit.dev must not be flagged; got ${v.length}`);
+    });
+
+    check("CDN URL inside a JS block comment is NOT flagged", () => {
+      const v = scan("chunk.js",
+        `/* Injected from https://unpkg.com/some-lib@1.0 */\nconst x=42;`
+      );
+      assert(v.length === 0, `URL inside JS block comment must not be flagged; got ${v.length}`);
+    });
+
+    check("CDN URL in a JS line comment (no surrounding quotes) is NOT flagged", () => {
+      // No opening quote before https:// — JS_URL_RE does not match.
+      const v = scan("chunk.js",
+        `// See https://cdn.jsdelivr.net/npm/some-lib for reference\nconst x=42;`
+      );
+      assert(v.length === 0, `URL in JS line comment must not be flagged; got ${v.length}`);
+    });
+
+    check("local relative path in a JS string is NOT flagged", () => {
+      const v = scan("chunk.js", `const p="/assets/images/sprite.svg";`);
+      assert(v.length === 0, `local path in JS must not be flagged; got ${v.length}`);
     });
 
   } finally {
