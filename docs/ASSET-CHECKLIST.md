@@ -33,7 +33,7 @@ Generated source prompts were constrained to original, unbranded illustration; n
 |---|---|---|---|
 | Chai Chase splash background — Joey, Phoebe, iced mermaid tumbler, PNW night, music/books/cardigan/aurora keepsakes | ChatGPT imagegen, 2026-07-12 | original; derived only from existing original game art | ☑ `public/assets/chai-chase-splash.png` |
 | Cascade meter, wheel, Treat Jar, app icon + PWA icon set | mixed project implementation | original | ☑ `public/icons/` (including iPhone touch and browser favicon sizes) |
-| GitHub + web social preview — Joey, Phoebe, jewel-toned iced chai, rainbow butterfly, and keepsakes | ChatGPT imagegen, 2026-07-13 | original | ☑ `public/assets/social-preview.jpg` |
+| GitHub + web social preview — refined Joey, Phoebe, jewel-toned iced chai, rainbow butterfly, and keepsakes | ChatGPT imagegen, 2026-08-10; refined using the repository's original game art as references | original | ☑ `public/assets/social-preview.jpg` |
 | Keepsake Trail memory card back — deep-purple/gold card with original butterfly-and-crystal-ball motif | ChatGPT imagegen, 2026-07-15 | original; chroma-key removed locally; no private references | ☑ `public/assets/keepsake-memory-card-back.png` |
 | Keepsake Trail mismatch overlay — red circular strike-through for two mismatched cards | ChatGPT imagegen, 2026-07-15 | original; chroma-key removed locally; no private references | ☑ `public/assets/keepsake-memory-mismatch-overlay.png` |
 | Chai Bonus shelf, daily wheel, birthday reveal screen | assigned when implemented | original required | ☐ |
