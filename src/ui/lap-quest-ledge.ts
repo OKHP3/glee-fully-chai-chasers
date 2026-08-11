@@ -25,6 +25,13 @@ export interface LapQuestLedgeOptions {
   maxMs?: number;
   /** Parent-selected Joey arrival time. Keeping this injectable keeps RNG out of UI. */
   interruptAtMs?: number;
+  /**
+   * Seeded RNG to use when computing Joey's arrival time if `interruptAtMs`
+   * is not supplied.  Routing through the injected RNG makes the timing
+   * deterministic under test.  Falls back to `Math.random` when absent so
+   * existing production call sites are unaffected.
+   */
+  rng?: () => number;
   reducedMotion?: boolean;
   onPet?: (snapshot: LapQuestLedgeSnapshot) => void;
   onTick?: (snapshot: LapQuestLedgeSnapshot) => void;
@@ -53,7 +60,7 @@ export function mountLapQuestLedge(root: HTMLElement, options: LapQuestLedgeOpti
   const graceMs = Math.max(0, options.graceMs ?? DEFAULT_GRACE_MS);
   const inactivityMs = Math.max(1_000, options.inactivityMs ?? DEFAULT_INACTIVITY_MS);
   const maxMs = Math.max(graceMs, options.maxMs ?? DEFAULT_MAX_MS);
-  const suppliedInterrupt = options.interruptAtMs ?? graceMs + Math.floor(Math.random() * (maxMs - graceMs + 1));
+  const suppliedInterrupt = options.interruptAtMs ?? graceMs + Math.floor((options.rng ?? Math.random)() * (maxMs - graceMs + 1));
   const interruptAtMs = Math.min(maxMs, Math.max(graceMs, suppliedInterrupt));
   const reducedMotion = options.reducedMotion
     ?? (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
