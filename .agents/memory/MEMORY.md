@@ -1,6 +1,6 @@
 - [Slot-game engine/UI verification approach](slot-game-qa-hooks.md) — for canvas-only screenshot QA, temporarily export overlay-trigger functions from the UI module, verify, then remove before finishing.
 - [Doubling/multiplier fields need explicit test support](spin-result-doubling-fields.md) — when a modifier can scale an awarded value, expose an explicit boolean/flag on the result type rather than loosening assertions.
 - [Slot RTP tuning coupling](slot-rtp-tuning.md) — UniGlee trigger frequency feeds base RTP via guaranteed line wins; the base-only spec oracle misses bonus-session RTP, so retunes need the sim-agent fleet.
-- [Git push approach](git-push.md) — shell git push works via GITHUB_PAT credential helper; gitPush callback is a fallback if the PAT is ever missing.
+- [Git push and stale subrepl remotes](git-push.md) — use shell push with the configured helper; stale subrepl remotes can hang broad fetches on SSH prompts.
 - [pnpm root catalog drift](pnpm-root-catalog-drift.md) — root package.json is an implicit workspace member; off-catalog pins (vite, @types/node) duplicate store instances and break plugin typechecks.
 - [Root-game artifact registration](root-game-artifact.md) — registering the root Vite game as a Replit artifact requires seeding the toml via shell cp then validating with verifyAndReplaceArtifactToml.
