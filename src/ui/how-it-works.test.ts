@@ -114,6 +114,17 @@ describe("How It Works guide — content accuracy", () => {
     expect(html).toContain("cat-pop-asset--joey");
   });
 
+  it("uses custom SVG economy icons instead of system emoji", () => {
+    const economySection = document.getElementById("hiw-econ-title")?.closest(".hiw-section");
+    const icons = economySection?.querySelectorAll(".hiw-econ-item__icon");
+
+    expect(icons).toHaveLength(3);
+    icons?.forEach((icon) => {
+      expect(icon.querySelector("svg.hiw-econ-icon-svg")).not.toBeNull();
+    });
+    expect(economySection?.textContent).not.toMatch(/[🪙✨⚙️]/u);
+  });
+
   // ── Modal shell ──────────────────────────────────────────────────────────
 
   it("renders a dialog overlay with correct ARIA attributes", () => {

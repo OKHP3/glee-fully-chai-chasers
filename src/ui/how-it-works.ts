@@ -140,13 +140,36 @@ function buildFreeForever(): string {
   // so the guide can never drift from what the engine enforces.
   const topTier = BET_LEVELS[BET_LEVELS.length - 1];
   const standardTiers = BET_LEVELS.slice(0, BET_LEVELS.length - 1).join(' · ');
+  const coinStackIcon = `
+    <svg class="hiw-econ-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+      <ellipse cx="10" cy="6.5" rx="6.5" ry="3.2" fill="#f5d576"/>
+      <path d="M3.5 6.5v4c0 1.8 2.9 3.2 6.5 3.2s6.5-1.4 6.5-3.2v-4c0 1.8-2.9 3.2-6.5 3.2S3.5 8.3 3.5 6.5Z" fill="#d9a93f"/>
+      <path d="M7.5 14.2v3.3c0 1.7 2.8 3 6.3 3s6.2-1.3 6.2-3v-3.3c0 1.7-2.8 3-6.2 3s-6.3-1.3-6.3-3Z" fill="#41b8b7"/>
+      <ellipse cx="13.8" cy="14.2" rx="6.2" ry="3" fill="#9fe8c5"/>
+      <path d="M10 4.8v3.4M8.4 6.5h3.2" stroke="#20163a" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>`;
+  const refillIcon = `
+    <svg class="hiw-econ-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2.7 13.6 8l5.1 1.7-5.1 1.7L12 16.7l-1.6-5.3-5.1-1.7L10.4 8 12 2.7Z" fill="#f5d576"/>
+      <path d="m18.2 14 .8 2.5 2.4.8-2.4.8-.8 2.5-.8-2.5-2.4-.8 2.4-.8.8-2.5Z" fill="#e8a5b8"/>
+      <path d="M4.8 14.1a6.8 6.8 0 0 0 7.8 6.4 6.7 6.7 0 0 0 3.8-2.2" fill="none" stroke="#41b8b7" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="m3.8 17.1 1-3 3 1" fill="none" stroke="#41b8b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  const betTierIcon = `
+    <svg class="hiw-econ-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="14.5" width="4.5" height="6" rx="1.2" fill="#41b8b7"/>
+      <rect x="9.7" y="10" width="4.5" height="10.5" rx="1.2" fill="#9fe8c5"/>
+      <rect x="16.5" y="5.5" width="4.5" height="15" rx="1.2" fill="#f5d576"/>
+      <path d="m5.2 11 5.8-5.7 3 2.5 5-5" fill="none" stroke="#e8a5b8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M16.5 2.8H19v2.5" fill="none" stroke="#e8a5b8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
 
   return `
   <section class="hiw-section" aria-labelledby="hiw-econ-title">
     <h2 class="hiw-section__title" id="hiw-econ-title">Free Forever</h2>
     <ul class="hiw-econ-list" role="list">
       <li class="hiw-econ-item">
-        <span class="hiw-econ-item__icon" aria-hidden="true">🪙</span>
+        <span class="hiw-econ-item__icon" aria-hidden="true">${coinStackIcon}</span>
         <div>
           <strong>Glee-coins only.</strong> No real money, no purchases,
           no wagering, no cash-out, no account. The coins are fictional —
@@ -154,7 +177,7 @@ function buildFreeForever(): string {
         </div>
       </li>
       <li class="hiw-econ-item">
-        <span class="hiw-econ-item__icon" aria-hidden="true">✨</span>
+        <span class="hiw-econ-item__icon" aria-hidden="true">${refillIcon}</span>
         <div>
           <strong>AskJamie makes sure play can continue.</strong> If your
           balance falls too low to cover the current bet, AskJamie finds
@@ -163,7 +186,7 @@ function buildFreeForever(): string {
         </div>
       </li>
       <li class="hiw-econ-item">
-        <span class="hiw-econ-item__icon" aria-hidden="true">⚙️</span>
+        <span class="hiw-econ-item__icon" aria-hidden="true">${betTierIcon}</span>
         <div>
           <strong>Bet size.</strong> Tap the coin icon to pick your bet:
           ${standardTiers} coins per spin — available from the start. The
@@ -494,9 +517,18 @@ const STYLES = `
   line-height: 1.65;
 }
 .hiw-econ-item__icon {
-  font-size: 1.4rem;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
   margin-top: .1rem;
+}
+.hiw-econ-icon-svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  overflow: visible;
 }
 .hiw-econ-item strong { color: var(--hiw-butter); }
 
