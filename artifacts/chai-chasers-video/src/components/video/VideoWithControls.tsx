@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, Download, Repeat, Volume2, VolumeX } from 'lucide-react';
 
-const VIDEO_FILE = `${import.meta.env.BASE_URL}chai-chasers-v3-showcase.mp4`;
+// Single source of truth for the exported MP4 filename.
+// Update this constant when re-exporting under a new name — the build
+// guard script (scripts/check-video-asset.mjs) reads this value and
+// verifies the file exists in public/ before the build proceeds.
+export const EXPORT_FILENAME = 'chai-chasers-v3-showcase.mp4';
+const VIDEO_FILE = `${import.meta.env.BASE_URL}${EXPORT_FILENAME}`;
 import VideoTemplate, { SCENE_DURATIONS } from './VideoTemplate';
 import { useSceneControls } from './useSceneControls';
 
@@ -165,9 +170,6 @@ function ControlBar({
 }
 
 export default function VideoWithControls() {
-  // v3 export filename — used in both the non-iframed export view and the control-bar download button
-  const EXPORT_FILENAME = 'chai-chasers-v3-showcase.mp4';
-
   const isIframed = typeof window !== 'undefined' && window.self !== window.top;
 
   const {
