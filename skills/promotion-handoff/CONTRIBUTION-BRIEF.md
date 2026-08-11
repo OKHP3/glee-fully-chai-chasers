@@ -176,9 +176,24 @@ All five skills passed:
 ## Required actions before submission (owner authorization needed)
 
 1. **Review this brief and the 5 manifests** — confirm the `replit/` family path and any name collision check in the live `OKHP3/skillz` repo.
-2. **Decide on PR strategy for the fifth skill** — `okhp3-replit-repl-janitor` was not included in PR #43 (which covers the other four skills). Owner must choose: amend PR #43 before merge to add the fifth skill, or submit a follow-up PR to the same `replit/` family after PR #43 merges.
-3. **Authorize the PR(s)** — this brief is a local diff only. No commit, push, or PR has been made.
+
+2. **Run the pre-promotion manifest validator** (required gate — must pass before any PR is opened):
+
+   ```bash
+   cd skills/promotion-handoff
+   for skill in canvas-board build-in-public design-pipeline multi-artifact repl-janitor; do
+     python3 validate_promotion_manifest.py \
+       --manifest "promotion-manifest-okhp3-replit-${skill}.json" \
+       --skill-path "../../.agents/skills/okhp3-replit-${skill}"
+   done
+   ```
+
+   All five must exit 0. If any exit 1, fix the drift before proceeding. Exit 2 means the manifest file itself is missing or malformed.
+
+3. **Authorize the PR(s)** — no commit, push, or PR is made until the owner authorizes.
+
 4. **Run `--full` catalog** after placing files in `OKHP3/skillz` to regenerate `README.md` and `replit/FAMILY.md`.
+
 5. **Record accepted commit hash** in each manifest's `canonical_target.accepted_commit_or_hash` field after merge.
 
 ---

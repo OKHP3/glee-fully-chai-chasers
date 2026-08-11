@@ -1,32 +1,48 @@
 #!/usr/bin/env python3
-"""Validate a promotion manifest before opening a PR to OKHP3/skillz.
+"""Pre-promotion gate: validate a promotion manifest before opening a PR.
 
-Checks:
-  1. Required manifest fields are present and non-empty.
-  2. inventory is non-empty and each entry has ``file`` and ``sha256``.
-  3. mirrors[0].aggregate_sha256 is present.
-  4. (Optional) If --skill-path is supplied, walks the local directory,
-     computes SHA-256 for every file, recomputes the aggregate hash using the
-     canonical formula, and compares it to mirrors[0].aggregate_sha256.  Also
-     reports files present on disk but absent from the inventory, and inventory
-     entries whose file is missing on disk.
+By default, both schema/field validation AND local skill directory verification
+are required.  Pass ``--schema-only`` to skip the local directory check (useful
+for inspecting a manifest that has no local mirror available).
+
+Checks performed
+----------------
+Schema / field checks (always run):
+  - Root JSON is a plain object (not array, string, etc.)
+  - schema_version present and non-empty
+  - skill.name present, non-empty string
+  - canonical_target.repository present, non-empty, in "owner/repo" format
+  - canonical_target.package_path present, non-empty
+  - mirrors is a non-empty list with a valid 64-hex aggregate_sha256 in mirrors[0]
+  - inventory is a non-empty list; each entry has a non-empty "file" string and
+    a valid 64-hex "sha256" string; no duplicate filenames; no path-traversal
+    (relative paths only, no ".." components)
+
+Local skill directory checks (default; skipped with --schema-only):
+  - skill_path exists and is a directory
+  - Every inventory file exists on disk with a matching SHA-256
+  - No extra files on disk that are not in the inventory
+  - Aggregate hash of disk files matches mirrors[0].aggregate_sha256
 
 Exit codes
 ----------
 0  All checks passed.
-1  One or more validation failures (field missing, hash mismatch, drift).
-2  Fatal error (manifest unreadable, bad JSON, unexpected exception).
+1  One or more validation failures.
+2  Fatal error (manifest missing, unreadable, invalid JSON, or the root JSON
+   value is not an object).  A structured ``{"overall":"ERROR","error":"..."}``
+   JSON report is always emitted on exit 2.
 
 Usage examples
 --------------
-# Schema-only check (no local files):
-    python3 validate_promotion_manifest.py \\
-        --manifest promotion-manifest-okhp3-replit-repl-janitor.json
-
-# Full check including local skill directory:
+# Full check (default) — manifest + local skill directory:
     python3 validate_promotion_manifest.py \\
         --manifest promotion-manifest-okhp3-replit-repl-janitor.json \\
         --skill-path ../../.agents/skills/okhp3-replit-repl-janitor
+
+# Schema-only check (no local files):
+    python3 validate_promotion_manifest.py \\
+        --manifest promotion-manifest-okhp3-replit-repl-janitor.json \\
+        --schema-only
 
 # Write JSON report to a file:
     python3 validate_promotion_manifest.py \\
@@ -45,9 +61,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional
+
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 # ---------------------------------------------------------------------------
@@ -74,78 +93,114 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _is_safe_relative(rel: str) -> bool:
+    """Return True if rel is a non-empty, relative, non-traversing path."""
+    if not rel or rel.startswith("/"):
+        return False
+    parts = rel.replace("\\", "/").split("/")
+    return not any(p in ("", ".", "..") for p in parts)
+
+
 # ---------------------------------------------------------------------------
-# Schema validation
+# Schema / field validation
 # ---------------------------------------------------------------------------
 
-def validate_schema(manifest: dict) -> List[dict]:
-    """Return a list of field-check results for the manifest structure."""
+def validate_schema(manifest: dict) -> List[dict]:  # noqa: C901
     checks: List[dict] = []
 
     def chk(name: str, ok: bool, message: str) -> None:
-        checks.append({"check": name, "status": "PASS" if ok else "FAIL", "message": message})
+        checks.append({"check": name, "status": "PASS" if ok else "FAIL",
+                       "message": message})
 
     # schema_version
     sv = manifest.get("schema_version")
-    chk("field:schema_version", bool(sv),
-        f"schema_version = {sv!r}" if sv else "Required field 'schema_version' is missing or empty")
+    chk("field:schema_version", isinstance(sv, str) and bool(sv),
+        f"schema_version = {sv!r}" if (isinstance(sv, str) and sv)
+        else "Required field 'schema_version' must be a non-empty string")
 
     # skill.name
-    skill = manifest.get("skill", {})
+    skill = manifest.get("skill")
     if not isinstance(skill, dict):
-        chk("field:skill", False, "'skill' must be a JSON object")
+        chk("field:skill", False,
+            f"'skill' must be a JSON object, got {type(skill).__name__}")
     else:
         name = skill.get("name")
-        chk("field:skill.name", bool(name),
-            f"skill.name = {name!r}" if name else "Required field 'skill.name' is missing or empty")
+        chk("field:skill.name", isinstance(name, str) and bool(name),
+            f"skill.name = {name!r}" if (isinstance(name, str) and name)
+            else f"'skill.name' must be a non-empty string, got {name!r}")
 
     # canonical_target
     ct = manifest.get("canonical_target")
     if not isinstance(ct, dict):
-        chk("field:canonical_target", False, "'canonical_target' must be a JSON object")
+        chk("field:canonical_target", False,
+            f"'canonical_target' must be a JSON object, got {type(ct).__name__}")
     else:
         chk("field:canonical_target", True, "canonical_target present")
         for sub in ("repository", "package_path"):
             val = ct.get(sub)
-            chk(f"field:canonical_target.{sub}", bool(val),
-                f"canonical_target.{sub} = {val!r}" if val
-                else f"Required field 'canonical_target.{sub}' is missing or empty")
+            chk(f"field:canonical_target.{sub}",
+                isinstance(val, str) and bool(val),
+                f"canonical_target.{sub} = {val!r}" if (isinstance(val, str) and val)
+                else f"'canonical_target.{sub}' must be a non-empty string, got {val!r}")
         repo = ct.get("repository", "")
-        if repo:
-            ok = "/" in repo
+        if isinstance(repo, str) and repo:
+            ok = "/" in repo and len(repo.split("/", 1)) == 2
             chk("field:canonical_target.repository_format", ok,
                 "repository is in 'owner/repo' format" if ok
-                else f"canonical_target.repository must be 'owner/repo', got {repo!r}")
+                else f"Must be 'owner/repo', got {repo!r}")
 
-    # mirrors[0].aggregate_sha256
-    mirrors = manifest.get("mirrors", [])
-    chk("field:mirrors_non_empty", bool(mirrors),
-        f"{len(mirrors)} mirror(s) declared" if mirrors else "'mirrors' is empty or missing")
-    if mirrors:
-        first = mirrors[0] if isinstance(mirrors[0], dict) else {}
-        agg = first.get("aggregate_sha256", "")
-        chk("field:mirrors[0].aggregate_sha256", bool(agg),
-            f"aggregate_sha256 present ({agg[:16]}…)" if agg
-            else "mirrors[0].aggregate_sha256 is missing or empty")
+    # mirrors
+    mirrors = manifest.get("mirrors")
+    if not isinstance(mirrors, list):
+        chk("field:mirrors_non_empty", False,
+            f"'mirrors' must be a JSON array, got {type(mirrors).__name__}")
+    else:
+        chk("field:mirrors_non_empty", bool(mirrors),
+            f"{len(mirrors)} mirror(s) declared" if mirrors else "'mirrors' is empty")
+        if mirrors:
+            first = mirrors[0]
+            if not isinstance(first, dict):
+                chk("field:mirrors[0].aggregate_sha256", False,
+                    f"mirrors[0] must be an object, got {type(first).__name__}")
+            else:
+                agg = first.get("aggregate_sha256")
+                valid = isinstance(agg, str) and bool(_SHA256_RE.match(agg or ""))
+                chk("field:mirrors[0].aggregate_sha256", valid,
+                    f"aggregate_sha256 present ({agg[:16]}…)" if valid
+                    else f"Must be a 64-hex string, got {agg!r}")
 
     # inventory
-    inventory = manifest.get("inventory", [])
-    chk("field:inventory_non_empty", bool(inventory),
-        f"{len(inventory)} file(s) in inventory" if inventory else "'inventory' is empty or missing")
-    if inventory:
-        bad: List[str] = []
-        for i, entry in enumerate(inventory):
-            if not isinstance(entry, dict):
-                bad.append(f"inventory[{i}] is not an object")
-            else:
-                if not entry.get("file"):
-                    bad.append(f"inventory[{i}] missing 'file'")
-                if not entry.get("sha256"):
-                    bad.append(f"inventory[{i}] missing 'sha256'")
-        chk("field:inventory_entries",
-            not bad,
-            f"All {len(inventory)} entries have 'file' and 'sha256'" if not bad
-            else "; ".join(bad))
+    inventory = manifest.get("inventory")
+    if not isinstance(inventory, list):
+        chk("field:inventory_non_empty", False,
+            f"'inventory' must be a JSON array, got {type(inventory).__name__}")
+    else:
+        chk("field:inventory_non_empty", bool(inventory),
+            f"{len(inventory)} file(s) in inventory" if inventory
+            else "'inventory' is empty")
+        if inventory:
+            bad: List[str] = []
+            seen_files: set = set()
+            for i, entry in enumerate(inventory):
+                if not isinstance(entry, dict):
+                    bad.append(f"inventory[{i}] is not an object")
+                    continue
+                rel = entry.get("file")
+                h = entry.get("sha256")
+                if not isinstance(rel, str) or not rel:
+                    bad.append(f"inventory[{i}].file missing or not a string")
+                elif not _is_safe_relative(rel):
+                    bad.append(f"inventory[{i}].file is unsafe/absolute: {rel!r}")
+                elif rel in seen_files:
+                    bad.append(f"inventory[{i}].file duplicate: {rel!r}")
+                else:
+                    seen_files.add(rel)
+                if not isinstance(h, str) or not _SHA256_RE.match(h or ""):
+                    bad.append(
+                        f"inventory[{i}].sha256 must be 64-hex, got {h!r}")
+            chk("field:inventory_entries", not bad,
+                f"All {len(inventory)} entries valid" if not bad
+                else "; ".join(bad))
 
     return checks
 
@@ -155,19 +210,20 @@ def validate_schema(manifest: dict) -> List[dict]:
 # ---------------------------------------------------------------------------
 
 def validate_local(manifest: dict, skill_path: Path) -> List[dict]:
-    """Walk skill_path and compare against manifest inventory + mirrors aggregate."""
     checks: List[dict] = []
 
     def chk(name: str, ok: bool, message: str) -> None:
-        checks.append({"check": name, "status": "PASS" if ok else "FAIL", "message": message})
+        checks.append({"check": name, "status": "PASS" if ok else "FAIL",
+                       "message": message})
 
     if not skill_path.is_dir():
-        chk("local:skill_path_exists", False, f"Skill path not found: {skill_path}")
+        chk("local:skill_path_exists", False,
+            f"Skill path not found or not a directory: {skill_path}")
         return checks
 
     chk("local:skill_path_exists", True, f"Directory exists: {skill_path}")
 
-    # Collect disk files (relative paths → sha256)
+    # Collect disk files
     disk_files: Dict[str, str] = {}
     for p in sorted(skill_path.rglob("*")):
         if p.is_file():
@@ -176,11 +232,10 @@ def validate_local(manifest: dict, skill_path: Path) -> List[dict]:
 
     # Collect expected files from inventory
     inventory = manifest.get("inventory", [])
-    inv_files: Dict[str, str] = {
-        e["file"]: e["sha256"]
-        for e in inventory
-        if isinstance(e, dict) and e.get("file") and e.get("sha256")
-    }
+    inv_files: Dict[str, str] = {}
+    for e in inventory:
+        if isinstance(e, dict) and isinstance(e.get("file"), str) and isinstance(e.get("sha256"), str):
+            inv_files[e["file"]] = e["sha256"]
 
     # Per-file match
     for rel, expected in inv_files.items():
@@ -194,32 +249,32 @@ def validate_local(manifest: dict, skill_path: Path) -> List[dict]:
                 "check": f"local:file:{rel}",
                 "status": "PASS" if matched else "FAIL",
                 "message": (f"SHA-256 matches ({actual[:16]}…)" if matched
-                            else f"SHA-256 mismatch — expected {expected[:16]}…, actual {actual[:16]}…"),
+                            else f"Mismatch — expected {expected[:16]}…, actual {actual[:16]}…"),
             })
 
-    # Extra files on disk not in inventory
+    # Extra files not in inventory
     extra = sorted(set(disk_files) - set(inv_files))
-    chk("local:extra_files",
-        not extra,
-        "No extra files on disk outside inventory" if not extra
+    chk("local:extra_files", not extra,
+        "No extra files outside inventory" if not extra
         else f"{len(extra)} file(s) on disk not in inventory: {', '.join(extra)}")
 
     # Aggregate hash
     expected_agg = ""
     mirrors = manifest.get("mirrors", [])
     if mirrors and isinstance(mirrors[0], dict):
-        expected_agg = mirrors[0].get("aggregate_sha256", "")
+        v = mirrors[0].get("aggregate_sha256", "")
+        if isinstance(v, str):
+            expected_agg = v
 
     if expected_agg:
         actual_agg = aggregate_hash(disk_files)
         matched = actual_agg == expected_agg
-        chk("local:aggregate_sha256",
-            matched,
-            (f"Aggregate SHA-256 matches mirrors[0] ({actual_agg[:16]}…)" if matched
-             else f"Aggregate mismatch — expected {expected_agg[:16]}…, actual {actual_agg[:16]}…"))
+        chk("local:aggregate_sha256", matched,
+            f"Aggregate matches mirrors[0] ({actual_agg[:16]}…)" if matched
+            else f"Aggregate mismatch — expected {expected_agg[:16]}…, actual {actual_agg[:16]}…")
     else:
         checks.append({"check": "local:aggregate_sha256", "status": "SKIP",
-                       "message": "No expected aggregate in mirrors — skipped"})
+                       "message": "No valid expected aggregate in mirrors — skipped"})
 
     return checks
 
@@ -236,7 +291,8 @@ def _print_section(heading: str, checks: List[dict]) -> None:
 
 
 def _emit_fatal(message: str, report_path: Optional[Path]) -> None:
-    payload = json.dumps({"overall": "ERROR", "error": message}, indent=2, sort_keys=True) + "\n"
+    payload = json.dumps({"overall": "ERROR", "error": message},
+                         indent=2, sort_keys=True) + "\n"
     print(f"ERROR: {message}", file=sys.stderr)
     if report_path:
         try:
@@ -255,33 +311,65 @@ def _emit_fatal(message: str, report_path: Optional[Path]) -> None:
 def run(
     manifest_path: Path,
     skill_path: Optional[Path],
+    schema_only: bool,
     report_path: Optional[Path],
     verbose: bool,
 ) -> int:
-    # Parse manifest
+    # --- Parse manifest (fatal errors → exit 2) ---
+    if not manifest_path.exists():
+        _emit_fatal(f"Manifest file not found: {manifest_path}", report_path)
+        return 2
     try:
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        raw = manifest_path.read_text(encoding="utf-8")
     except OSError as exc:
         _emit_fatal(f"Cannot read manifest: {exc}", report_path)
         return 2
+    try:
+        manifest = json.loads(raw)
     except json.JSONDecodeError as exc:
         _emit_fatal(f"Manifest is not valid JSON: {exc}", report_path)
         return 2
     except Exception as exc:  # noqa: BLE001
-        _emit_fatal(f"Unexpected error: {exc}", report_path)
+        _emit_fatal(f"Unexpected error parsing manifest: {exc}", report_path)
         return 2
 
-    skill_name: str = manifest.get("skill", {}).get("name", "<unknown>")
+    # Root must be a JSON object
+    if not isinstance(manifest, dict):
+        _emit_fatal(
+            f"Manifest root must be a JSON object, got {type(manifest).__name__}",
+            report_path,
+        )
+        return 2
+
+    skill_name: str = ""
+    try:
+        skill_name = manifest.get("skill", {}).get("name", "") or "<unknown>"
+    except Exception:  # noqa: BLE001
+        skill_name = "<unknown>"
 
     if verbose:
         print(f"validate_promotion_manifest: {skill_name}")
-        print(f"  manifest  : {manifest_path}")
-        if skill_path:
-            print(f"  skill_path: {skill_path}")
+        print(f"  manifest   : {manifest_path}")
+        if not schema_only:
+            effective_path = skill_path or "<required — see --skill-path>"
+            print(f"  skill_path : {effective_path}")
+        else:
+            print("  mode       : schema-only (local checks skipped)")
 
+    # --- Schema validation ---
     schema_checks = validate_schema(manifest)
+
+    # --- Local validation ---
     local_checks: List[dict] = []
-    if skill_path is not None:
+    if not schema_only:
+        if skill_path is None:
+            # No --skill-path provided and not --schema-only: fatal
+            _emit_fatal(
+                "Local skill directory is required for pre-promotion validation. "
+                "Provide --skill-path <dir> or pass --schema-only to skip local checks.",
+                report_path,
+            )
+            return 2
         local_checks = validate_local(manifest, skill_path)
 
     all_checks = schema_checks + local_checks
@@ -302,6 +390,7 @@ def run(
         "manifest": str(manifest_path.resolve()),
         "skill": skill_name,
         "skill_path": str(skill_path.resolve()) if skill_path else None,
+        "schema_only": schema_only,
         "overall": "PASS" if overall_pass else "FAIL",
         "checks_passed": passed,
         "checks_failed": failed,
@@ -314,7 +403,8 @@ def run(
         try:
             report_path.parent.mkdir(parents=True, exist_ok=True)
             report_path.write_text(
-                json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+                json.dumps(report, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
             )
             if verbose:
                 print(f"\n  report written: {report_path}")
@@ -344,9 +434,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--skill-path", type=Path, metavar="PATH", default=None,
         help=(
-            "Path to the local skill directory. When supplied, every file is "
-            "hashed and compared to the manifest inventory and "
-            "mirrors[0].aggregate_sha256."
+            "Path to the local skill directory. Required unless --schema-only "
+            "is passed. Files are hashed and compared to the manifest inventory "
+            "and mirrors[0].aggregate_sha256."
+        ),
+    )
+    parser.add_argument(
+        "--schema-only", action="store_true",
+        help=(
+            "Skip local directory checks. Validates only manifest field presence "
+            "and types. Use when no local skill copy is available."
         ),
     )
     parser.add_argument(
@@ -365,6 +462,7 @@ def main() -> int:
     return run(
         manifest_path=args.manifest,
         skill_path=args.skill_path,
+        schema_only=args.schema_only,
         report_path=args.report,
         verbose=not args.quiet,
     )
