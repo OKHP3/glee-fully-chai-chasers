@@ -308,6 +308,21 @@
       "path": "/__mockup/scenes/lap-quest-round-play.html"
     },
     {
+      "shapeId": "scene-lap-quest-dir-a-raster",
+      "name": "Lap Quest — Direction A (Raster)",
+      "path": "/__mockup/scenes/lap-quest-dir-a-raster.html"
+    },
+    {
+      "shapeId": "scene-lap-quest-dir-b-tuxedo",
+      "name": "Lap Quest — Direction B (Tuxedo)",
+      "path": "/__mockup/scenes/lap-quest-dir-b-tuxedo.html"
+    },
+    {
+      "shapeId": "scene-lap-quest-dir-c-silhouette",
+      "name": "Lap Quest — Direction C (Silhouette)",
+      "path": "/__mockup/scenes/lap-quest-dir-c-silhouette.html"
+    },
+    {
       "shapeId": "scene-lap-quest-ledge-exit-inactivity",
       "name": "Lap Quest — Ledge Exit (Inactivity)",
       "path": "/__mockup/scenes/lap-quest-ledge-exit-inactivity.html"

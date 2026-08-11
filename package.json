@@ -34,6 +34,7 @@
     "prettier": "^3.9.6",
     "sharp": "^0.35.3",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "typescript": "^7.0.2",
     "vite": "catalog:",
     "vitest": "^4.1.10"
