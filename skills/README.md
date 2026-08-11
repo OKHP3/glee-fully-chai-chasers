@@ -1,6 +1,6 @@
 # OKHP3 Community Skills for Replit
 
-Portable [Agent Skills](https://docs.replit.com/agent-skills) built retrospectively from the **Glee-fully Chai Chasers** Designathon project. Each skill encodes a non-obvious rule — something that caused a real multi-turn debugging session — so you don't have to discover it the hard way.
+Portable [Agent Skills](https://docs.replit.com/agent-skills) collected and matured through the **Glee-fully Chai Chasers** Designathon project. The collection combines lessons extracted directly from the build with reusable skill-maintenance workflows.
 
 **How to install:** copy any skill folder into `.agents/skills/` in your Repl. The skill is immediately available to the Replit AI agent.
 
@@ -26,14 +26,20 @@ cp -r skills/okhp3-replit-canvas-board .agents/skills/
 
 ## Where these came from
 
-All five Replit skills were extracted or matured through the [Glee-fully Chai Chasers](https://glee-fully-chai-chasers.replit.app) Designathon project — a full-stack slot game with a pitch deck, showcase video, canvas presentation board, and reusable repository operations.
+This collection currently contains six skills: five Replit-focused workflows
+and the pre-existing `okhp3-skill-promotion` publication workflow.
 
-Each skill encodes a real operational lesson from the build. The Repl janitor
-skill protects branch, naming, and detritus cleanup with live Foundry evidence.
-The canvas-board skill came from layout correction cycles. The design-pipeline
-skill came from discovering the extract→graduate loop piecemeal. The
-multi-artifact skill came from blank-preview failures and catalog drift. The
-build-in-public skill came from learning what judges actually look at.
+Four Replit skills were extracted directly from debugging the
+[Glee-fully Chai Chasers](https://glee-fully-chai-chasers.replit.app)
+Designathon project: canvas-board came from layout correction cycles,
+design-pipeline from discovering the extract→graduate loop piecemeal,
+multi-artifact from blank-preview failures and catalog drift, and
+build-in-public from learning what judges actually look at.
+
+The Repl janitor was a separate repository-cleanup workflow matured in this
+project through the Foundry process and live evaluation. Skill-promotion
+already existed and is included here to support moving the other skills from
+project-local runtime copies to public and canonical distribution packages.
 
 ---
 
