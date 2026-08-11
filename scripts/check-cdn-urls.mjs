@@ -43,15 +43,18 @@
  * other .js file reachable from the scan root) and flags unlisted https://
  * string literals whose host is not first-party.
  *
- * Scanning scope: https:// URLs inside string literals (", ', `).
+ * Scanning scope: http:// and https:// URLs inside string literals (", ', `).
+ *   - Both schemes are matched, consistent with the HTML/CSS scanner.
  *   - Block comments stripped before scanning so licence headers are ignored.
- *   - Line comments excluded by requiring an opening quote before https:// —
+ *   - Line comments excluded by requiring an opening quote before the scheme —
  *     a bare URL in `// see https://…` has no preceding quote and is skipped.
  * Out of scope: protocol-relative URLs (//host/…), dynamic URL construction
  *   (concatenation, URL API, template expressions), and non-string values.
  *   Those require a full JS AST and are caught at code-review time.
- * First-party exclusions: localhost, 127.0.0.1, *.github.io, *.replit.dev,
- *   *.replit.app — hosts the project's own code legitimately references.
+ * First-party exclusions: none.  All external URLs are evaluated against
+ *   ALLOW_LIST regardless of host, consistent with the HTML/CSS scanner.
+ *   Legitimate project URLs (e.g. the deployed github.io origin) must be
+ *   added to ALLOW_LIST with a policy justification.
  *
  * Run directly:  node scripts/check-cdn-urls.mjs
  * Self-test:     node scripts/check-cdn-urls.mjs --self-test
@@ -475,30 +478,18 @@ function extractCssUrls(src) {
 
 // ─── JS chunk scanner ────────────────────────────────────────────────────────
 //
-// First-party hostnames are excluded so the project's own legitimate URL
-// references (API base, asset base on the deploy host) are not flagged.
-function isFirstPartyJsHost(urlStr) {
-  let hostname;
-  try {
-    hostname = new URL(urlStr).hostname;
-  } catch {
-    return true; // malformed URL — not a real fetch target, don't flag
-  }
-  return (
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    hostname.endsWith(".github.io") ||
-    hostname.endsWith(".replit.dev") ||
-    hostname.endsWith(".replit.app")
-  );
-}
+// All external URLs found in JS string literals are evaluated against
+// ALLOW_LIST by the caller (runCheck), consistent with the HTML/CSS scanner.
+// No host-based exemptions are applied here: any legitimate project URL that
+// appears as a string literal in a built chunk must be explicitly allow-listed.
 
-// Matches an https:// URL that is immediately preceded by a string delimiter
-// (", ', or `).  The opening-delimiter requirement means a URL that appears
-// in a line comment (`// see https://…`) has no preceding quote and is not
-// matched — avoiding false positives without needing to strip line comments
-// (which would also strip the `//` inside string URLs and break them).
-const JS_URL_RE = /["'`](https:\/\/[^"'`\s\\]{4,})/g;
+// Matches http:// or https:// URLs inside string delimiters (", ', `).
+// Both schemes are matched, consistent with isExternalUrl() used by the
+// HTML/CSS scanners.  The opening-delimiter requirement means a bare URL in a
+// line comment (`// see https://…`) has no preceding quote and is not matched,
+// avoiding false positives without needing to strip line comments (which would
+// also strip the `//` inside string URLs themselves).
+const JS_URL_RE = /["'`](https?:\/\/[^"'`\s\\]{4,})/gi;
 
 function extractJsUrls(src) {
   // Strip block comments (licence headers, etc.) so URLs inside them are
@@ -508,8 +499,7 @@ function extractJsUrls(src) {
   let m;
   JS_URL_RE.lastIndex = 0;
   while ((m = JS_URL_RE.exec(stripped)) !== null) {
-    const url = m[1];
-    if (!isFirstPartyJsHost(url)) hits.push(url);
+    hits.push(m[1]);
   }
   return [...new Set(hits)];
 }
@@ -1189,13 +1179,25 @@ function runSelfTest() {
     // ── JS chunk scanning (Decision S26) ───────────────────────────────────
     // These fixtures confirm that a Vite plugin injecting a CDN URL directly
     // into a bundled .js chunk is caught by the post-build dist/ pass.
+    // Both http:// and https:// are matched, consistent with the HTML/CSS
+    // scanners.  No host-based exemptions apply — all unlisted external URLs
+    // are flagged regardless of host.
 
-    check("CDN URL string literal in a JS chunk (double-quoted) is flagged", () => {
+    check("https:// CDN URL string literal in a JS chunk (double-quoted) is flagged", () => {
       const v = scan("chunk.js",
         `const BASE="https://unpkg.com/some-lib@1.0/dist/lib.js";fetch(BASE);`
       );
       assert(v.length === 1, `expected 1 violation, got ${v.length}`);
       assert(v[0].url.includes("unpkg.com"), `expected unpkg URL, got ${v[0]?.url}`);
+    });
+
+    check("http:// CDN URL string literal in a JS chunk is flagged (same as https)", () => {
+      // http:// and https:// are treated identically, consistent with isExternalUrl().
+      const v = scan("chunk.js",
+        `const BASE="http://unpkg.com/some-lib@1.0/dist/lib.js";fetch(BASE);`
+      );
+      assert(v.length === 1, `http:// CDN URL must be flagged; got ${v.length}`);
+      assert(v[0].url.startsWith("http://unpkg.com"), `expected http://unpkg URL, got ${v[0]?.url}`);
     });
 
     check("CDN URL string literal in a JS chunk (single-quoted) is flagged", () => {
@@ -1227,23 +1229,21 @@ function runSelfTest() {
       assert(v.length === 0, `allow-listed GTM URL must not be flagged in JS; got ${v.length}`);
     });
 
-    check("localhost URL literal in a JS chunk is NOT flagged (first-party)", () => {
+    check("localhost URL literal in a JS chunk IS flagged — no host exemptions in JS scanner", () => {
+      // No host-based exemptions: any unlisted URL is flagged, consistent with
+      // the HTML/CSS scanner.  Legitimate project URLs must be in ALLOW_LIST.
       const v = scan("chunk.js", `const api="https://localhost:3000/api";`);
-      assert(v.length === 0, `localhost must not be flagged; got ${v.length}`);
+      assert(v.length === 1, `localhost must be flagged without an allow-list entry; got ${v.length}`);
     });
 
-    check("github.io URL literal in a JS chunk is NOT flagged (first-party)", () => {
+    check("github.io URL literal in a JS chunk IS flagged — no host exemptions in JS scanner", () => {
+      // Multi-tenant domain: okhp3.github.io is the project's own host, but
+      // other-actor.github.io is not.  No wildcard exemption is applied;
+      // the specific project origin must be added to ALLOW_LIST if needed.
       const v = scan("chunk.js",
-        `const base="https://okhp3.github.io/glee-fully-chai-chasers/";`
+        `const base="https://other-actor.github.io/cdn/lib.js";`
       );
-      assert(v.length === 0, `github.io must not be flagged; got ${v.length}`);
-    });
-
-    check("replit.dev URL literal in a JS chunk is NOT flagged (first-party)", () => {
-      const v = scan("chunk.js",
-        `const dev="https://my-repl.username.replit.dev/api";`
-      );
-      assert(v.length === 0, `replit.dev must not be flagged; got ${v.length}`);
+      assert(v.length === 1, `unlisted github.io URL must be flagged; got ${v.length}`);
     });
 
     check("CDN URL inside a JS block comment is NOT flagged", () => {
