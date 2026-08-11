@@ -1800,6 +1800,9 @@ export async function runLapQuestChapter(
   state: GameState,
   rng = mulberry32(productionSeed()),
 ): Promise<LapQuestChapterSummary | undefined> {
+  // Canonical Lap Quest phase 1: board.ts owns the spot choice, reveal, and
+  // reel-round presentation. The ledge mounted immediately afterward is the
+  // intentional phase-2 petting/end-condition layer, not a competing UI path.
   const challenge = createLapQuestChallenge(rng);
   const selectedSpot = await showLapQuestChoice(root, challenge);
   const round = spinLapQuestRound(rng, challenge, selectedSpot, betPerLine(state.bet));

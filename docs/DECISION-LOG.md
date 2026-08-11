@@ -99,22 +99,6 @@ The comment likely reflects an earlier design target that predates the award-siz
 - If D7 rules "40/60/80": the comment is wrong; delete or correct it so it matches the code.
 - If D7 is withdrawn: rule this independently by stating which number is the design intent.
 
-### D11. Which Lap Quest presentation layer is the live canon path?
-
-**Raised:** 2026-08-11, by Claude during Task #211 (Lap Quest cascade hang fix). **Owner:** Jamie. **Status:** open.
-
-During Task #211 three distinct Lap Quest presentation paths were found in the codebase:
-1. **`src/ui/board.ts` choice/reveal flow** — the board mounts a choice and reveal step driven by `SpinResult` state; this is the path currently exercised by unit tests.
-2. **`mountLapQuestLedge` in `src/ui/lap-quest-ledge.ts`** — a standalone overlay component wired to its own `LapQuestLedgeOptions` interface; patched in Task #211 to accept an injectable `rng` for test isolation.
-3. **A session file** — referenced in commit history but not found in the current tree; likely deleted in an earlier cleanup pass.
-
-The engine (`spinLapQuestRound` in `src/engine/lap-quest.ts`) is path-agnostic. Both UI paths call it correctly. The risk is that board.ts and mountLapQuestLedge diverge silently as the UI evolves.
-
-**Ruling needed — one of:**
-- (i) `board.ts` is canon; `mountLapQuestLedge` is a legacy stub and should be removed.
-- (ii) `mountLapQuestLedge` is canon; board.ts is the integration shim and should delegate to it.
-- (iii) Both paths are intentional (modal overlay vs. inline board reveal) and should be kept in sync via a shared test.
-
 ## Settled decisions
 
 > ### Numbering errata (recorded 2026-08-09, nothing renumbered)
@@ -173,6 +157,7 @@ The engine (`spinLapQuestRound` in `src/engine/lap-quest.ts`) is path-agnostic. 
 | S33 | 2026-07-12 | **Feature branch + PR is the canonical integration workflow when tool workspaces diverge from `origin/main`.** When approved local work and remote `main` diverge: (1) stash unrelated changes by explicit path, (2) create an `agent/*` branch, (3) commit only the approved deliverable in small conventional commits, (4) rebase onto current `origin/main`, (5) resolve only genuine conflicts, (6) run full tests + build + diff checks, (7) merge via reviewed PR, (8) let GitHub Actions deploy from `main`, (9) restore stashed changes after the PR lands. **Rejected approaches:** pulling into a dirty local `main` (overwrites in-flight approved work), force-pushing (discards remote history and violates GitHub's role as the canonical source), and whole-file copying between tools (hides ancestry, makes conflicts unreviewable, risks restoring superseded content). All tools must pull the resulting `main` descendant before accepting a new bounded assignment. | ADR-0001 (2026-07-12); `docs/adr/` purged after absorption |
 | S34 | 2026-07-17 | **UniGlee decorative tease: the butterfly appears on the board without landing on a paying line, at roughly 1-in-850 spins.** The sighting is non-paying and purely atmospheric — the butterfly is visible to the player but does not trigger the marathon. This mirrors the pattern of the Bold Chai Pump and Doorbell Panic icons, which can appear on the board without paying out. Jamie's ruling (2026-08-10): "there should be occasional appearances of the UNI-GLEE Butterfly that don't appear on a paying line, much like there are times where the Chai Pump and the Doorbell icons may appear but not actually payout." Exact rate and visual treatment are subject to engine implementation and RTP simulation gate. | Ruled 2026-08-10 via D6 |
 | S35 | 2026-07-17 | **UniGlee real capture re-rated to roughly 1-in-4,212 spins.** The three independent per-reel capture rolls (currently 1/2,500, 1/4,000, 1/7,500 combining to ~1-in-1,277) are adjusted so the true marathon capture is rarer than a tease sighting. Award size of 40/60/80 spins (current engine, per D7) or 300/400/500 (per S30, pending D7 ruling) is unchanged by this decision. Exact rates are engine work gated by a full-game RTP simulation sweep; the oracle upper bound in `src/engine/simulation.test.ts` must be updated to match the new target. | Ruled 2026-08-10 via D6; resolve alongside D7 |
+| S37 (was D11) | 2026-08-11 | **Both live Lap Quest presentation layers are intentional phases of one canonical chapter.** `board.ts` owns the opening cozy-spot choice, reveal, and reel-round presentation. `mountLapQuestLedge` owns the concurrent timed petting interaction and chapter end condition while later reel rounds continue beneath it. Neither is a legacy or alternate implementation; their sequence is protected by a shared integration test. The previously referenced standalone session file remains deleted. | Jamie ruled option (iii) on 2026-08-11 after the production call graph confirmed that `runLapQuestChapter` deliberately composes both layers. S37 avoids the S36 identifier reserved by the numbering errata above. |
 
 ## Workstream owners
 

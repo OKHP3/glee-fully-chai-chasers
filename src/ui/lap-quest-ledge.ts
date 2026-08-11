@@ -52,9 +52,11 @@ const DEFAULT_INACTIVITY_MS = 5_000;
 const DEFAULT_MAX_MS = 90_000;
 
 /**
- * Mounts Phoebe's ledge directly over the live cabinet. The surface is
- * pointer-transparent except for the small pet target, so reel controls remain
- * available to the parent session beneath it.
+ * Canonical Lap Quest phase 2: mounts the timed petting/end-condition layer
+ * over the live cabinet after board.ts completes the spot choice and reveal.
+ * This is intentionally composed with (not an alternative to) board.ts's
+ * choice/reveal/reel presentation. The surface is pointer-transparent except
+ * for the pet target so later reel rounds remain visible beneath it.
  */
 export function mountLapQuestLedge(root: HTMLElement, options: LapQuestLedgeOptions = {}): LapQuestLedgeController {
   const graceMs = Math.max(0, options.graceMs ?? DEFAULT_GRACE_MS);

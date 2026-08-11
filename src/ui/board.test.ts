@@ -7,9 +7,10 @@ import { mulberry32 } from "../engine/rng";
 import { sparksForSpin } from "../engine/economy";
 import { BOLD_CHAI_DURATION_MS, BOLD_CHAI_PUMPS_PER_CUP } from "../engine/bold-chai-pump";
 import { spin } from "../engine/cascade";
-import { createKeepsakeMemoryController, maybeLevelUpAfterBonus, renderBoard, renderGridHtml } from "./board";
+import { createKeepsakeMemoryController, maybeLevelUpAfterBonus, renderBoard, renderGridHtml, runLapQuestChapter } from "./board";
 import * as stateModule from "../state";
 import { resolveShowcaseUrl } from "../splash";
+import * as lapQuestLedgeModule from "./lap-quest-ledge";
 
 // ── Module-level mocks ────────────────────────────────────────────────────────
 // Audio modules require Web Audio API unavailable in jsdom.  Replace every
@@ -37,6 +38,10 @@ vi.mock("../audio/synth", () => ({
   playPhoebeCue: vi.fn(),
   playLapQuestReveal: vi.fn(),
   playLapQuestWildLand: vi.fn(),
+  playLapQuestStart: vi.fn(),
+  playLapQuestPet: vi.fn(),
+  playLapQuestJoeyInterrupt: vi.fn(),
+  playLapQuestSelfExit: vi.fn(),
   playTreatLand: vi.fn(),
   playTreatTimeCue: vi.fn(),
   playLevelUpFanfare: vi.fn(),
@@ -160,6 +165,88 @@ describe("first-spin invitation", () => {
 
     expect(root.querySelector("#marquee-status")?.textContent).toBe("");
     expect(sparkle.classList).not.toContain("sparkle-btn--invite");
+    root.remove();
+  });
+});
+
+describe("canonical Lap Quest presentation sequence", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it("composes choice and reveal before the ledge while reel rounds continue beneath it", async () => {
+    const state = makeSpinState();
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, state);
+
+    let finishLedge!: () => void;
+    const ledgeFinished = new Promise<{
+      phase: "ending";
+      elapsedMs: number;
+      petCount: number;
+      graceRemainingMs: number;
+      activeRemainingMs: number;
+      reason: "engine_end";
+    }>((resolve) => {
+      finishLedge = () => resolve({
+        phase: "ending",
+        elapsedMs: 1_500,
+        petCount: 1,
+        graceRemainingMs: 0,
+        activeRemainingMs: 0,
+        reason: "engine_end",
+      });
+    });
+    const ledgeElement = document.createElement("section");
+    ledgeElement.className = "lap-quest-ledge";
+    const mountLedge = vi.spyOn(lapQuestLedgeModule, "mountLapQuestLedge")
+      .mockImplementation(() => {
+        root.querySelector(".cabinet-frame")?.appendChild(ledgeElement);
+        return {
+          element: ledgeElement,
+          finished: ledgeFinished,
+          pet: vi.fn(),
+          end: vi.fn(),
+          snapshot: () => ({
+            phase: "active",
+            elapsedMs: 0,
+            petCount: 0,
+            graceRemainingMs: 0,
+            activeRemainingMs: 1_500,
+          }),
+          destroy: vi.fn(),
+        };
+      });
+
+    const chapter = runLapQuestChapter(root, state, mulberry32(220));
+    expect(root.querySelector(".lap-quest-overlay")).not.toBeNull();
+    expect(root.querySelector(".lap-quest-reveal")).toBeNull();
+    expect(mountLedge).not.toHaveBeenCalled();
+
+    root.querySelector<HTMLButtonElement>("[data-lap-spot]")!.click();
+    await Promise.resolve();
+    expect(root.querySelector(".lap-quest-overlay")).toBeNull();
+    expect(root.querySelector(".lap-quest-reveal")).not.toBeNull();
+    expect(mountLedge).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(1_050);
+    expect(root.querySelector(".lap-quest-reveal")).toBeNull();
+    expect(mountLedge).toHaveBeenCalledOnce();
+    expect(root.querySelector(".lap-quest-ledge")).toBe(ledgeElement);
+
+    finishLedge();
+    await vi.runAllTimersAsync();
+    const summary = await chapter;
+
+    expect(summary?.totalSpins).toBe(1);
+    expect(summary?.endReason).toBe("engine_end");
     root.remove();
   });
 });
