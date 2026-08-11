@@ -1,6 +1,6 @@
 {
   "skill_name": "okhp3-replit-build-in-public",
-  "skill_version": "1.0.0",
+  "skill_version": "1.0.1",
   "evals": [
     {
       "id": 1,
@@ -19,8 +19,8 @@
       "prompt": "I want my Designathon project live on two public URLs — one Replit-hosted and one GitHub Pages. Walk me through setting up both and what goes in the README.",
       "expectations": [
         { "id": 1, "text": "Response says to set base in vite.config.ts to /<repo-name>/ for GitHub Pages subdirectory routing." },
-        { "id": 2, "text": "Response provides the GitHub Pages URL pattern: https://<github-username>.github.io/<repo-name>/" },
-        { "id": 3, "text": "Response states both URLs must be kept in README.md so judges browsing the GitHub repo can reach the live app in one click without going to Replit." },
+        { "id": 2, "text": "Response says to get the exact published Replit URL from the deployment skill rather than constructing or guessing it from the project name." },
+        { "id": 3, "text": "Response gives the exact three-step sync discipline after a feature is merged: verify the GitHub Actions deployment completed successfully, publish on Replit when the change is significant, and update README.md when measured figures such as RTP, test count, or decision count changed." },
         { "id": 4, "text": "Response explains the GitHub Actions deploy workflow triggers on every push to main, and references the okhp3-vite-github-pages skill for the full runbook." }
       ]
     },
