@@ -29,6 +29,8 @@ if (!basePath) {
   );
 }
 
+const DEV_BANNER_SCRIPT = '/@replit/vite-plugin-dev-banner/banner-script.js';
+
 export default defineConfig({
   base: basePath,
   plugins: [
@@ -39,6 +41,28 @@ export default defineConfig({
     ...(process.env.NODE_ENV !== 'production' &&
     process.env.REPL_ID !== undefined
       ? [
+          {
+            name: 'replit-dev-banner-base-path',
+            enforce: 'pre' as const,
+            configureServer(server) {
+              server.middlewares.use((req, _res, next) => {
+                const prefixedScript = `${basePath}${DEV_BANNER_SCRIPT.slice(1)}`;
+                if (req.url === prefixedScript) {
+                  req.url = DEV_BANNER_SCRIPT;
+                }
+                next();
+              });
+            },
+            transformIndexHtml: {
+              order: 'post' as const,
+              handler(html: string) {
+                return html.replace(
+                  `src="${DEV_BANNER_SCRIPT}"`,
+                  `src="${basePath}${DEV_BANNER_SCRIPT.slice(1)}"`,
+                );
+              },
+            },
+          },
           await import('@replit/vite-plugin-cartographer').then((m) =>
             m.cartographer({
               root: path.resolve(import.meta.dirname, '..'),

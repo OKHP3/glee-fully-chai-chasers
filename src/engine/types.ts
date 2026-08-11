@@ -243,6 +243,9 @@ export interface SpinResult {
   boldChaiPump?: BoldChaiTrigger;
   treatTimeBonus?: TreatTimeTrigger;
   stickyWilds?: StickyWild[];
+  /** True when Guard 2 (hard 52-cascade cap) terminated this spin early.
+   *  Absent / undefined on all normally-terminating spins. */
+  terminatedByCascadeCap?: boolean;
 }
 
 export interface EngineConfig {

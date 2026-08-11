@@ -27,6 +27,7 @@ import {
   BOLD_CHAI_DURATION_MS,
 } from "../src/engine/bold-chai-pump";
 import { runUniGleeBaseMarathon } from "../src/engine/uniglee-marathon";
+import { spinLapQuestRound, createLapQuestChallenge, LAP_QUEST_SPOTS } from "../src/engine/lap-quest";
 import type { TreatKind } from "../src/engine/types";
 
 const [, , agentIdArg, seedArg, spinsArg] = process.argv;
@@ -241,6 +242,22 @@ const totalFreeSpins =
 
 const totalWin = baseWin + bonusWin;
 
+// ── Lap Quest dedicated fleet ─────────────────────────────────────────────────
+// Run 50 rounds per spot (150 total) to verify Guard 1b prevents Guard 2 (the
+// hard cascade cap) from firing.  lapQuestCappedCascades === 0 in every report
+// means Guard 1b resolved every sticky-wild anchor loop before Guard 2 was
+// needed.  A nonzero value indicates a regression.
+const LAP_QUEST_ROUNDS_PER_SPOT = 50;
+let lapQuestCappedCascades = 0;
+for (const spot of LAP_QUEST_SPOTS) {
+  for (let r = 0; r < LAP_QUEST_ROUNDS_PER_SPOT; r++) {
+    const lapRng = mulberry32(nextSeed());
+    const challenge = createLapQuestChallenge(lapRng);
+    const lapResult = spinLapQuestRound(lapRng, challenge, spot, BET_PER_LINE);
+    if (lapResult.terminatedByCascadeCap) lapQuestCappedCascades++;
+  }
+}
+
 console.log(JSON.stringify({
   agent: AGENT_ID,
   seed: SEED,
@@ -254,5 +271,6 @@ console.log(JSON.stringify({
   baseWinningSpins,
   mega8,
   totalFreeSpinsPlayed: totalFreeSpins,
+  lapQuestCappedCascades,
   bonuses,
 }, null, 2));

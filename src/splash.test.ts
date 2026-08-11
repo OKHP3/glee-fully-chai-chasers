@@ -14,7 +14,7 @@
  * @vitest-environment jsdom
  */
 import { describe, expect, it, beforeEach } from "vitest";
-import { renderSplash, BIRTHDAY_MESSAGE } from "./splash";
+import { renderSplash, BIRTHDAY_MESSAGE, resolveShowcaseUrl } from "./splash";
 
 function makeContainer(): HTMLDivElement {
   const div = document.createElement("div");
@@ -63,5 +63,51 @@ describe("renderSplash – birthday bonus block", () => {
 
     const panel = container.querySelector(".chai-bday-panel");
     expect(panel).toBeNull();
+  });
+});
+
+describe("renderSplash – Designathon showcase links", () => {
+  it("renders keyboard-accessible new-tab links without an iframe", () => {
+    const container = makeContainer();
+    renderSplash(container, () => {}, /* showBirthday */ false);
+
+    const slides =
+      container.querySelector<HTMLAnchorElement>("#chai-slides-link");
+    const video =
+      container.querySelector<HTMLAnchorElement>("#chai-video-link");
+
+    expect(slides?.tagName).toBe("A");
+    expect(slides?.getAttribute("href")).toBe("/chai-chasers-slides/");
+    expect(slides?.target).toBe("_blank");
+    expect(slides?.rel).toContain("noopener");
+    expect(video?.tagName).toBe("A");
+    expect(video?.getAttribute("href")).toBe("/chai-chasers-video/");
+    expect(video?.target).toBe("_blank");
+    expect(video?.rel).toContain("noopener");
+    expect(container.querySelector("iframe")).toBeNull();
+  });
+
+  it("uses the validated Replit destinations on GitHub Pages", () => {
+    expect(resolveShowcaseUrl("/chai-chasers-slides/", "okhp3.github.io")).toBe(
+      "https://glee-fully-chai-chasers.replit.app/chai-chasers-slides/",
+    );
+    expect(resolveShowcaseUrl("/chai-chasers-video/", "okhp3.github.io")).toBe(
+      "https://glee-fully-chai-chasers.replit.app/chai-chasers-video/",
+    );
+  });
+
+  it("keeps same-origin paths on Replit-hosted builds", () => {
+    expect(
+      resolveShowcaseUrl(
+        "/chai-chasers-slides/",
+        "glee-fully-chai-chasers.replit.app",
+      ),
+    ).toBe("/chai-chasers-slides/");
+    expect(
+      resolveShowcaseUrl(
+        "/chai-chasers-video/",
+        "glee-fully-chai-chasers.replit.app",
+      ),
+    ).toBe("/chai-chasers-video/");
   });
 });

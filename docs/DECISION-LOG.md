@@ -99,6 +99,22 @@ The comment likely reflects an earlier design target that predates the award-siz
 - If D7 rules "40/60/80": the comment is wrong; delete or correct it so it matches the code.
 - If D7 is withdrawn: rule this independently by stating which number is the design intent.
 
+### D11. Which Lap Quest presentation layer is the live canon path?
+
+**Raised:** 2026-08-11, by Claude during Task #211 (Lap Quest cascade hang fix). **Owner:** Jamie. **Status:** open.
+
+During Task #211 three distinct Lap Quest presentation paths were found in the codebase:
+1. **`src/ui/board.ts` choice/reveal flow** — the board mounts a choice and reveal step driven by `SpinResult` state; this is the path currently exercised by unit tests.
+2. **`mountLapQuestLedge` in `src/ui/lap-quest-ledge.ts`** — a standalone overlay component wired to its own `LapQuestLedgeOptions` interface; patched in Task #211 to accept an injectable `rng` for test isolation.
+3. **A session file** — referenced in commit history but not found in the current tree; likely deleted in an earlier cleanup pass.
+
+The engine (`spinLapQuestRound` in `src/engine/lap-quest.ts`) is path-agnostic. Both UI paths call it correctly. The risk is that board.ts and mountLapQuestLedge diverge silently as the UI evolves.
+
+**Ruling needed — one of:**
+- (i) `board.ts` is canon; `mountLapQuestLedge` is a legacy stub and should be removed.
+- (ii) `mountLapQuestLedge` is canon; board.ts is the integration shim and should delegate to it.
+- (iii) Both paths are intentional (modal overlay vs. inline board reveal) and should be kept in sync via a shared test.
+
 ## Settled decisions
 
 > ### Numbering errata (recorded 2026-08-09, nothing renumbered)

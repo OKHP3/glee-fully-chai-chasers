@@ -303,68 +303,6 @@ body {
   user-select: none;
 }
 
-/* iframe modal — pitch deck / build story */
-.chai-iframe-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.chai-iframe-modal[hidden] { display: none; }
-.chai-iframe-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(4, 7, 20, .82);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.chai-iframe-modal__box {
-  position: relative;
-  z-index: 1;
-  width: min(96vw, 1200px);
-  height: min(90dvh, 820px);
-  border-radius: 16px;
-  overflow: hidden;
-  background: #080e24;
-  box-shadow:
-    0 0 0 1px rgba(245, 213, 118, .14),
-    0 32px 80px rgba(0, 0, 0, .7);
-  display: flex;
-  flex-direction: column;
-}
-.chai-iframe-modal__close {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  z-index: 2;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 238, 197, .22);
-  background: rgba(8, 14, 36, .82);
-  color: rgba(255, 238, 197, .7);
-  font-size: 14px;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: background .15s ease, color .15s ease;
-}
-.chai-iframe-modal__close:hover {
-  background: rgba(40, 28, 70, .9);
-  color: #fff1cf;
-}
-.chai-iframe-modal__close:focus-visible {
-  outline: 2px solid var(--cc-mint);
-  outline-offset: 3px;
-}
-.chai-iframe-modal__frame {
-  flex: 1;
-  width: 100%;
-  border: 0;
-}
-
 /* creator / built-with credit line */
 .chai-splash__credit {
   position: absolute;

@@ -25,3 +25,16 @@ The shipped tag explicitly disables Google signals and advertising-personalizati
 - Public copy must say that limited aggregate reach measurement is used; it must not claim the game has “no tracking.”
 - The deployer is responsible for providing any notices, consent controls, or other compliance measures required where the game is offered. This document is a product policy, not legal advice.
 - Before adding a new measurement feature, Jamie must review exactly what it collects and why. If the need is not simply aggregate reach, it does not belong in this game by default.
+
+## Allow-list sign-off records
+
+`scripts/check-cdn-urls.mjs` reads the structured records below to verify that
+every entry in `ALLOW_LIST` has an explicit, per-URL policy sign-off before the
+build ships.  Each record binds **one Decision to one exact URL**.  Adding a new
+URL to `ALLOW_LIST` requires a new matching record here; reusing an existing
+Decision number for a different URL is not sufficient — the guard checks the
+(Decision, URL) pair, not the Decision alone.
+
+Format: `<!-- ALLOW_LIST_SIGN_OFF: Decision SNN | exact-url-from-ALLOW_LIST -->`
+
+<!-- ALLOW_LIST_SIGN_OFF: Decision S25 | https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB -->

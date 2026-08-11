@@ -81,6 +81,10 @@ import { tmpdir } from "node:os";
 const SELF = fileURLToPath(import.meta.url);
 const DEFAULT_ROOT = resolve(dirname(SELF), "..");
 
+// Default path to the policy document that must carry a sign-off for every
+// new ALLOW_LIST entry.  Overridable via runPolicyCheck() for self-tests.
+const POLICY_DOC_PATH = resolve(DEFAULT_ROOT, "docs/ANALYTICS-PRIVACY.md");
+
 // ─── Allow-list ──────────────────────────────────────────────────────────────
 //
 // Each entry is an exact URL string (or a prefix ending with *).
@@ -589,6 +593,116 @@ function runCheck(root) {
     }
   }
 
+  return violations;
+}
+
+// ─── Policy sign-off check ───────────────────────────────────────────────────
+//
+// Every ALLOW_LIST entry must have an explicit per-URL sign-off record in
+// docs/ANALYTICS-PRIVACY.md that binds the exact approved URL to an exact
+// Decision reference.  The guard checks the (Decision, URL) pair, not the
+// Decision token alone — a developer cannot bypass the check by reusing an
+// existing Decision number for a new URL without also adding a new sign-off
+// record for that URL.
+//
+// Sign-off record format (HTML comment, anywhere in the policy doc):
+//   <!-- ALLOW_LIST_SIGN_OFF: Decision SNN | https://exact-url-from-ALLOW_LIST -->
+
+/** Extracts all "Decision SNN" tokens from an allow-list justification string. */
+const DECISION_REF_RE = /Decision\s+S\d+/g;
+
+/**
+ * Parses the structured per-URL sign-off records from the policy document.
+ *
+ * Returns a Set of normalised "Decision SNN|url" membership keys so that
+ * callers can test whether a (decision, url) pair is approved with a single
+ * has() call.
+ *
+ * @param {string} policyText - Full text of docs/ANALYTICS-PRIVACY.md.
+ * @returns {Set<string>}
+ */
+const SIGN_OFF_LINE_RE =
+  /<!--\s*ALLOW_LIST_SIGN_OFF:\s*(Decision\s+S\d+)\s*\|\s*(.+?)\s*-->/gi;
+
+function parseSignOffs(policyText) {
+  const signOffs = new Set();
+  SIGN_OFF_LINE_RE.lastIndex = 0;
+  let m;
+  while ((m = SIGN_OFF_LINE_RE.exec(policyText)) !== null) {
+    signOffs.add(`${m[1].trim()}|${m[2].trim()}`);
+  }
+  return signOffs;
+}
+
+/**
+ * Verifies that every ALLOW_LIST entry has a machine-verifiable per-URL sign-off
+ * in the policy document.  Returns an array of human-readable violation strings
+ * (empty array = clean).
+ *
+ * The check enforces the (Decision, URL) binding — not just the presence of a
+ * Decision token in the policy prose.  A developer who adds a new URL to
+ * ALLOW_LIST and labels it "Decision S25" will see a failure unless the policy
+ * document also carries a sign-off record that pairs S25 with that exact URL.
+ *
+ * @param {string}             [policyDocPath]    - Path to ANALYTICS-PRIVACY.md.
+ *                                                  Overridable for self-tests.
+ * @param {Map<string,string>} [allowListOverride] - Allow-list to check.
+ *                                                  Defaults to module-level
+ *                                                  ALLOW_LIST; overridable for
+ *                                                  self-tests.
+ */
+function runPolicyCheck(
+  policyDocPath = POLICY_DOC_PATH,
+  allowListOverride = ALLOW_LIST,
+) {
+  let policyText;
+  try {
+    policyText = readFileSync(policyDocPath, "utf8");
+  } catch {
+    return [
+      `Policy document not found: ${policyDocPath}\n` +
+      `  Create docs/ANALYTICS-PRIVACY.md and add ALLOW_LIST_SIGN_OFF records\n` +
+      `  before adding entries to ALLOW_LIST in scripts/check-cdn-urls.mjs.`,
+    ];
+  }
+
+  const signOffs = parseSignOffs(policyText);
+  const violations = [];
+
+  for (const [url, justification] of allowListOverride) {
+    // Reset lastIndex — the regex is module-level and stateful when used with g.
+    DECISION_REF_RE.lastIndex = 0;
+    const refs = [...justification.matchAll(DECISION_REF_RE)].map((m) => m[0]);
+
+    if (refs.length === 0) {
+      violations.push(
+        `ALLOW_LIST entry for:\n` +
+        `    ${url}\n` +
+        `  has no "Decision SNN" reference in its justification string.\n` +
+        `  Add a "Decision SNN" reference to the value in check-cdn-urls.mjs\n` +
+        `  and a matching sign-off record in:\n` +
+        `    ${policyDocPath}`,
+      );
+      continue;
+    }
+
+    // Every (Decision, URL) pair must have an explicit sign-off record.
+    // This prevents reusing an existing Decision number for a new URL.
+    for (const ref of refs) {
+      const key = `${ref}|${url}`;
+      if (!signOffs.has(key)) {
+        violations.push(
+          `ALLOW_LIST entry for:\n` +
+          `    ${url}\n` +
+          `  references "${ref}" but no matching per-URL sign-off was found in:\n` +
+          `    ${policyDocPath}\n` +
+          `  Add this line to the policy document (reusing an existing Decision\n` +
+          `  number for a different URL is not enough):\n` +
+          `    <!-- ALLOW_LIST_SIGN_OFF: ${ref} | ${url} -->`,
+        );
+      }
+    }
+  }
   return violations;
 }
 
@@ -1401,6 +1515,120 @@ function runSelfTest() {
       assert(v.length === 0, `local path in JS must not be flagged; got ${v.length}`);
     });
 
+    // ── Policy sign-off check ─────────────────────────────────────────────
+    // The guard checks the (Decision, URL) pair — not the Decision token alone.
+    // A developer who labels a new URL "Decision S25" still fails unless the
+    // policy doc carries an ALLOW_LIST_SIGN_OFF record pairing S25 with that
+    // exact URL.
+
+    check("policy check passes: live GTM entry matches real policy doc sign-off", () => {
+      // The real ALLOW_LIST entry (GTM URL, Decision S25) must match the
+      // ALLOW_LIST_SIGN_OFF record in docs/ANALYTICS-PRIVACY.md.
+      const policyViolations = runPolicyCheck();
+      assert(
+        policyViolations.length === 0,
+        `live ALLOW_LIST + real policy doc should pass; got: ${policyViolations.join("; ")}`,
+      );
+    });
+
+    check("policy check passes: (Decision S25, GTM URL) sign-off present in fixture doc", () => {
+      const dir = join(tmp, String(counter++));
+      mkdirSync(dir, { recursive: true });
+      const policyPath = join(dir, "ANALYTICS-PRIVACY.md");
+      // Write a valid per-URL sign-off record for GTM.
+      writeFileSync(
+        policyPath,
+        "# Privacy\n\n" +
+        "<!-- ALLOW_LIST_SIGN_OFF: Decision S25 | " +
+        "https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB -->\n",
+        "utf8",
+      );
+      const fakeList = new Map([
+        [
+          "https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB",
+          "Google Analytics — Decision S25",
+        ],
+      ]);
+      const policyViolations = runPolicyCheck(policyPath, fakeList);
+      assert(
+        policyViolations.length === 0,
+        `expected 0 violations, got ${policyViolations.length}: ${policyViolations.join("; ")}`,
+      );
+    });
+
+    check("policy check fails: new URL labeled 'Decision S25' but no matching sign-off", () => {
+      // Regression: a developer adds a new URL to ALLOW_LIST and labels it
+      // "Decision S25".  The policy doc has a sign-off for S25 + GTM URL, but
+      // NOT for S25 + cdn.example.com.  The check must fail.
+      const dir = join(tmp, String(counter++));
+      mkdirSync(dir, { recursive: true });
+      const policyPath = join(dir, "ANALYTICS-PRIVACY.md");
+      // Policy doc has S25 signed off for GTM only — NOT for cdn.example.com.
+      writeFileSync(
+        policyPath,
+        "# Privacy\n\n" +
+        "<!-- ALLOW_LIST_SIGN_OFF: Decision S25 | " +
+        "https://www.googletagmanager.com/gtag/js?id=G-89W66VMGPB -->\n",
+        "utf8",
+      );
+      // New URL reuses "Decision S25" — must be rejected.
+      const fakeList = new Map([
+        ["https://cdn.example.com/lib.js", "Some CDN library — Decision S25"],
+      ]);
+      const policyViolations = runPolicyCheck(policyPath, fakeList);
+      assert(
+        policyViolations.length === 1,
+        `expected 1 violation (new URL with reused Decision S25), got ${policyViolations.length}`,
+      );
+      assert(
+        policyViolations[0].includes("cdn.example.com"),
+        `violation must name the offending URL`,
+      );
+      assert(
+        policyViolations[0].includes("Decision S25"),
+        `violation must name the referenced decision`,
+      );
+    });
+
+    check("policy check fails: sign-off record absent from policy doc entirely (Decision S99)", () => {
+      const dir = join(tmp, String(counter++));
+      mkdirSync(dir, { recursive: true });
+      const policyPath = join(dir, "ANALYTICS-PRIVACY.md");
+      // Policy doc has no sign-off at all for S99 + cdn.example.com.
+      writeFileSync(policyPath, "# Privacy\n\nNo sign-off records here.\n", "utf8");
+      const fakeList = new Map([
+        ["https://cdn.example.com/lib.js", "Some CDN library — Decision S99"],
+      ]);
+      const policyViolations = runPolicyCheck(policyPath, fakeList);
+      assert(
+        policyViolations.length === 1,
+        `expected 1 violation, got ${policyViolations.length}`,
+      );
+      assert(
+        policyViolations[0].includes("Decision S99"),
+        `violation must name Decision S99`,
+      );
+    });
+
+    check("policy check fails: justification has no Decision reference at all", () => {
+      const dir = join(tmp, String(counter++));
+      mkdirSync(dir, { recursive: true });
+      const policyPath = join(dir, "ANALYTICS-PRIVACY.md");
+      writeFileSync(policyPath, "# Privacy\n", "utf8");
+      const fakeList = new Map([
+        ["https://cdn.example.com/lib.js", "No decision reference in this string"],
+      ]);
+      const policyViolations = runPolicyCheck(policyPath, fakeList);
+      assert(
+        policyViolations.length === 1,
+        `expected 1 violation for missing Decision ref, got ${policyViolations.length}`,
+      );
+      assert(
+        policyViolations[0].includes("Decision SNN"),
+        `violation message must mention the expected format "Decision SNN"`,
+      );
+    });
+
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
@@ -1421,21 +1649,42 @@ if (selfTest) {
   const ok = runSelfTest();
   process.exit(ok ? 0 : 1);
 } else {
-  const violations = runCheck(root);
-  if (violations.length === 0) {
-    console.log("check-cdn-urls: no unlisted third-party CDN URLs found ✓");
-    process.exit(0);
-  } else {
+  const cdnViolations    = runCheck(root);
+  // Policy check always runs against the source allow-list and policy doc,
+  // regardless of whether --root points at a dist/ directory.
+  const policyViolations = runPolicyCheck();
+
+  let anyFailure = false;
+
+  if (cdnViolations.length > 0) {
+    anyFailure = true;
     console.error(
-      `check-cdn-urls: ${violations.length} unlisted external runtime URL(s) found:\n`,
+      `check-cdn-urls: ${cdnViolations.length} unlisted external runtime URL(s) found:\n`,
     );
-    for (const { file, url } of violations) {
+    for (const { file, url } of cdnViolations) {
       console.error(`  ${file}\n    ${url}`);
     }
     console.error(
       "\nIf this URL is intentional, add it to ALLOW_LIST in scripts/check-cdn-urls.mjs" +
       " with a justification comment referencing docs/ANALYTICS-PRIVACY.md.",
     );
+  }
+
+  if (policyViolations.length > 0) {
+    anyFailure = true;
+    console.error(
+      `\ncheck-cdn-urls: ${policyViolations.length} allow-list policy sign-off violation(s):\n`,
+    );
+    for (const msg of policyViolations) {
+      console.error(`  ${msg}\n`);
+    }
+  }
+
+  if (!anyFailure) {
+    console.log("check-cdn-urls: no unlisted third-party CDN URLs found ✓");
+    console.log("check-cdn-urls: all allow-list entries have policy sign-off ✓");
+    process.exit(0);
+  } else {
     process.exit(1);
   }
 }

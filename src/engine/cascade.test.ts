@@ -361,6 +361,55 @@ describe("Lap Quest infinite-loop guard", () => {
     }
   });
 
+  it("Guard 1b prevents Guard 2 from firing across all spot choices and 100 seeds — machine-readable lapQuestCappedCascades=0 verification", () => {
+    // This is the deterministic regression gate for Guard 1b.
+    //
+    // Guard 1b (src/engine/cascade.ts) fires when the same set of board cells
+    // wins on two consecutive winning cascades while sticky wilds are present.
+    // This terminates the cascade loop BEFORE Guard 2 (the hard 52-cascade cap)
+    // becomes necessary.
+    //
+    // SpinResult.terminatedByCascadeCap is set to true ONLY when Guard 2 fires.
+    // A passing run proves Guard 1b intercepted every sticky-wild anchor loop.
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      for (let seed = 0; seed < 100; seed++) {
+        for (const spot of LAP_QUEST_SPOTS) {
+          const rng = mulberry32(seed);
+          const challenge = createLapQuestChallenge(rng);
+          const result = spinLapQuestRound(rng, challenge, spot, 1);
+
+          // Guard 2 must never fire — terminatedByCascadeCap must be absent.
+          expect(result.terminatedByCascadeCap).toBeUndefined();
+          // Every round must terminate on a dead board.
+          expect(result.steps[result.steps.length - 1].wins).toHaveLength(0);
+        }
+      }
+      // Belt-and-suspenders: the hard-cap warning must not appear in any round.
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("Hard cascade cap"),
+      );
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("spin() without stickyWilds does not throw — Guard 1b null-guard regression", () => {
+    // Guard 1b initially accessed stickyWilds.length without a null-check.
+    // spin() is valid without a stickyWilds argument; cloneStickyWilds returns
+    // undefined in that case.  If the null-guard ever regresses, this throws a
+    // TypeError and the test fails.
+    expect(() =>
+      spin({
+        rng: mulberry32(20260811),
+        betPerLine: 1,
+        treatJar: emptyTreatJar(),
+        spinsSincePopIn: 0,
+        // stickyWilds: intentionally omitted
+      }),
+    ).not.toThrow();
+  });
+
   it("does not fire Guard 1 during non-mutating specialty steps between winning cascades", () => {
     // Guard 1 must be scoped to WINNING cascade iterations only.  If it compared
     // grids on every loop iteration (including queue-draining steps), a

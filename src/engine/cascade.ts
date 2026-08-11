@@ -311,10 +311,16 @@ export function spin({
   // advance this snapshot, or Guard 1 could fire before queued sparkle_sort /
   // drop_in effects have had a chance to run.
   let prevWinCascadeGrid: string | undefined;
+  // Guard 1b: tracks which board cells won in the previous winning cascade when
+  // sticky wilds are present.  Guard 1 (full-grid snapshot) can miss the case
+  // where random refills produce a different grid each iteration, yet the same
+  // cells keep winning because sticky wilds anchor them.
+  let prevWinCellKey: string | undefined;
   // Counts WINNING cascades only — sparkle_sort also increments `cascades` (for
   // the cascade meter / ladder), so Guard 2 must use its own counter to avoid
   // hitting the cap earlier than the number of player-facing winning cascades warrants.
   let winningCascades = 0;
+  let terminatedByCascadeCapFlag = false;
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -384,6 +390,29 @@ export function spin({
       break;
     }
     prevWinCascadeGrid = currentWinGrid;
+
+    // Guard 1b — sticky-wild win-anchor detection.
+    // Guard 1 (full-grid snapshot) misses the case where random refills create
+    // a slightly different grid each iteration yet the same board cells keep
+    // winning because sticky wilds anchor them.  When sticky wilds are present,
+    // compare the sorted set of winning cell positions between consecutive
+    // winning cascades: an identical set means the wilds are the sole structural
+    // anchor and the loop is effectively infinite.
+    if (stickyWilds && stickyWilds.length > 0) {
+      const winCellKey = wins
+        .flatMap(w => w.positions.map(([r, row]: [number, number]) => `${r},${row}`))
+        .sort()
+        .join("|");
+      if (prevWinCellKey !== undefined && winCellKey === prevWinCellKey) {
+        console.warn(
+          `[cascade] Sticky-wild anchor guard: identical winning cells on cascade ` +
+          `${winningCascades + 1}. Breaking to prevent infinite loop.`,
+        );
+        steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
+        break;
+      }
+      prevWinCellKey = winCellKey;
+    }
     // ── End of winning cascade guards ────────────────────────────────────────
 
     winningCascades++;
@@ -429,6 +458,7 @@ export function spin({
         `[cascade] Hard cascade cap reached (${winningCascades} winning cascades). ` +
         `Breaking to prevent infinite loop.`,
       );
+      terminatedByCascadeCapFlag = true;
       steps.push({ grid, wins: [], meterAfter: cascades, specialtyAwarded: [], keepsakeZone: cloneKeepsakeZone(keepsakeZone), stickyWilds: cloneStickyWilds(stickyWilds) });
       break;
     }
@@ -464,6 +494,7 @@ export function spin({
     boldChaiPump,
     treatTimeBonus,
     stickyWilds: cloneStickyWilds(stickyWilds),
+    ...(terminatedByCascadeCapFlag ? { terminatedByCascadeCap: true } : {}),
   };
 }
 

@@ -10,6 +10,17 @@
 import { load, save, loadGameState } from "./state";
 import { renderHowItWorks } from "./ui/how-it-works";
 
+const REPLIT_SHOWCASE_ORIGIN = "https://glee-fully-chai-chasers.replit.app";
+
+export function resolveShowcaseUrl(
+  pathname: "/chai-chasers-slides/" | "/chai-chasers-video/",
+  hostname = window.location.hostname,
+): string {
+  return hostname.endsWith(".github.io")
+    ? `${REPLIT_SHOWCASE_ORIGIN}${pathname}`
+    : pathname;
+}
+
 /**
  * Jamie's birthday message to Glee. Written by Jamie. Do not edit, translate,
  * summarize, or "improve" this string. It is the whole point.
@@ -74,6 +85,8 @@ export function renderSplash(
   const base = typeof import.meta !== "undefined" && import.meta.env?.BASE_URL
     ? import.meta.env.BASE_URL
     : "/";
+  const slidesUrl = resolveShowcaseUrl("/chai-chasers-slides/");
+  const videoUrl = resolveShowcaseUrl("/chai-chasers-video/");
 
   container.innerHTML = `
     <div class="chai-splash">
@@ -112,21 +125,13 @@ export function renderSplash(
             </button>
           </div>
           <div class="chai-splash__showcase" role="navigation" aria-label="Designathon showcase">
-            <button class="chai-splash__showcase-link chai-splash__showcase-link--btn" type="button" id="chai-slides-btn">📊 Pitch deck</button>
+            <a class="chai-splash__showcase-link" id="chai-slides-link" href="${slidesUrl}" target="_blank" rel="noopener noreferrer">Open the design deck ↗</a>
             <span class="chai-splash__showcase-sep" aria-hidden="true">·</span>
             <button class="chai-splash__showcase-link chai-splash__showcase-link--btn" type="button" id="chai-how-it-works-btn">⚙️ How it works</button>
             <span class="chai-splash__showcase-sep" aria-hidden="true">·</span>
-            <button class="chai-splash__showcase-link chai-splash__showcase-link--btn" type="button" id="chai-video-btn">🎬 Build story</button>
+            <a class="chai-splash__showcase-link" id="chai-video-link" href="${videoUrl}" target="_blank" rel="noopener noreferrer">Watch the build story ↗</a>
           </div>
 
-          <!-- Iframe modal for pitch deck / build story -->
-          <div class="chai-iframe-modal" id="chai-iframe-modal" role="dialog" aria-modal="true" aria-label="Designathon showcase" hidden>
-            <div class="chai-iframe-modal__backdrop" id="chai-iframe-modal-backdrop"></div>
-            <div class="chai-iframe-modal__box">
-              <button class="chai-iframe-modal__close" id="chai-iframe-modal-close" type="button" aria-label="Close">✕</button>
-              <iframe class="chai-iframe-modal__frame" id="chai-iframe-modal-frame" src="" title="Designathon showcase" allowfullscreen></iframe>
-            </div>
-          </div>
           <div class="chai-splash__loop" aria-label="The three-step chai chase loop">
             <div class="chai-splash__step">
               <span class="chai-splash__step-icon">✦</span>
@@ -148,41 +153,9 @@ export function renderSplash(
     </div>
   `;
 
-  // Helper: open/close the iframe modal.
-  const modal = container.querySelector("#chai-iframe-modal") as HTMLElement;
-  const frame = container.querySelector("#chai-iframe-modal-frame") as HTMLIFrameElement;
-  const openModal = (src: string, label: string) => {
-    frame.src = src;
-    frame.title = label;
-    (modal.querySelector(".chai-iframe-modal__box") as HTMLElement).setAttribute("aria-label", label);
-    modal.hidden = false;
-    document.body.style.overflow = "hidden";
-    (container.querySelector("#chai-iframe-modal-close") as HTMLElement)?.focus();
-  };
-  const closeModal = () => {
-    modal.hidden = true;
-    frame.src = "";
-    document.body.style.overflow = "";
-  };
-  container.querySelector("#chai-iframe-modal-close")?.addEventListener("click", closeModal);
-  container.querySelector("#chai-iframe-modal-backdrop")?.addEventListener("click", closeModal);
-  modal.addEventListener("keydown", (e) => {
-    if ((e as KeyboardEvent).key === "Escape") closeModal();
-  });
-
-  // "Pitch deck" opens slides in modal.
-  container.querySelector("#chai-slides-btn")?.addEventListener("click", () => {
-    openModal("/chai-chasers-slides/", "Pitch Deck");
-  });
-
   // "How it works" opens the full interactive guide overlay.
   container.querySelector("#chai-how-it-works-btn")?.addEventListener("click", () => {
     renderHowItWorks(container);
-  });
-
-  // "Build story" opens video in modal.
-  container.querySelector("#chai-video-btn")?.addEventListener("click", () => {
-    openModal("/chai-chasers-video/", "Build Story");
   });
 
   // iOS requires a user gesture to unlock AudioContext — this button is that gesture.
