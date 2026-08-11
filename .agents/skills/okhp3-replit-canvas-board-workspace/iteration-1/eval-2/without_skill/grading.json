@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Response provides an applyCanvasActions update action with shapeType: 'iframe', state: 'live', and a url field to flip a building iframe to live.",
+      "passed": false,
+      "evidence": "Response describes clicking the tile, opening settings panel, and toggling a status field — no mention of applyCanvasActions, no shapeType field, no programmatic update action with state: 'live'."
+    },
+    {
+      "text": "Response specifies the mockup-sandbox URL pattern without a port number: https://${REPLIT_DOMAINS}/__mockup/preview/{folder}/{ComponentName}",
+      "passed": false,
+      "evidence": "Response shows general artifact preview URLs like 'https://<slug>.repl.co/' and 'https://<slug>.repl.co/chai-chasers-slides/' — no mention of /__mockup/preview/{folder}/{ComponentName} path pattern or REPLIT_DOMAINS."
+    },
+    {
+      "text": "Response states that all frames must be 'live' before calling focusCanvasShapes — a mix of building and live states signals an incomplete build.",
+      "passed": false,
+      "evidence": "focusCanvasShapes is not mentioned anywhere in the response. The response discusses general iframe URL management without the Replit-specific canvas presentation API."
+    },
+    {
+      "text": "Response mentions obtaining REPLIT_DOMAINS at runtime (e.g. via 'echo $REPLIT_DOMAINS') to construct the full https:// URL.",
+      "passed": false,
+      "evidence": "REPLIT_DOMAINS is not mentioned. Response uses placeholder '<repl-slug>.<username>.repl.co' format instead."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 4, "total": 4, "pass_rate": 0.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [
+      "Without-skill response describes clicking a settings panel to flip building→live — this would not work in Replit Canvas where the programmatic applyCanvasActions API is the correct mechanism."
+    ],
+    "workarounds": []
+  }
+}

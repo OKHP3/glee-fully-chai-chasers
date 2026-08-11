@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Response lists the required DESIGN subagent brief anatomy fields: Product/brand identity, Goal, Vibe, Target location, and Variant hypothesis.",
+      "passed": true,
+      "evidence": "Response explicitly lists and defines all five: 'Product / Brand Identity (1–2 vivid sentences)', 'Goal', 'Vibe (one natural-language feeling — NOT a design style name)', 'Target Location (file path, canvas shape ID, dev server URL)', 'Variant Hypothesis'."
+    },
+    {
+      "text": "Response explicitly states NOT to include specific CSS values, colours, font names, pixel spacing, layout prescriptions, section names, or design style names.",
+      "passed": true,
+      "evidence": "Response provides a full 'Must Omit' table listing: 'Specific CSS values (colours, hex codes, px spacing, opacity)', 'Font names or typography specs', 'Layout prescriptions', 'Section names or content order', 'Design style names (\"minimalist\", \"material design\", \"flat\", \"neumorphic\")'."
+    },
+    {
+      "text": "Response says each subagent must get a distinct brief — a different variant hypothesis — so they produce genuinely distinct output rather than three nearly identical variants.",
+      "passed": true,
+      "evidence": "Response states: 'Each subagent gets a different vibe. Giving both subagents the same vibe produces nearly identical variants — a documented mistake in the skill.' and shows distinct briefs for each subagent."
+    },
+    {
+      "text": "Response describes the variant labelling convention: label by design hypothesis not letter alone — e.g. 'A — Minimal' / 'B — Editorial' / 'C — Bold' — so the user can say 'I prefer B' precisely.",
+      "passed": true,
+      "evidence": "Response states: 'Never label variants by letter alone (\"A\", \"B\") — the design hypothesis name makes approval conversations precise. When the user says \"I prefer B,\" they mean the editorial direction, not an anonymous slot.' Shows example labels 'A — Cockpit' and 'B — Editorial'."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": { "uncertainties": [], "needs_review": [], "workarounds": [] }
+}

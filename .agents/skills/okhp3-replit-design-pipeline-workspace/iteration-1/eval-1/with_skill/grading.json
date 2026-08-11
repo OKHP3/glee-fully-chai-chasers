@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Response states the golden rule: if the component exists in the codebase, extract it — never rebuild from memory.",
+      "passed": true,
+      "evidence": "Response quotes the skill: '\"The golden rule: if the component exists in the codebase, extract it. Never rebuild from memory. You will get dimensions, colours, spacing, opacity values, and font sizes wrong.\"'"
+    },
+    {
+      "text": "Response warns that rebuilding from scratch produces wrong values: specifically dimensions, colours, spacing, opacity values, and font sizes.",
+      "passed": true,
+      "evidence": "Response states verbatim from skill: 'You will get dimensions, colours, spacing, opacity values, and font sizes wrong. The real source code has the correct values.'"
+    },
+    {
+      "text": "Response mentions creating Current.tsx in the group folder as the extracted baseline, imported alongside _group.css with the app's :root CSS variables.",
+      "passed": true,
+      "evidence": "Response describes: 'Create Current.tsx in the same group folder, with import ./_group.css at the top (forgetting this import is a listed common mistake — it causes silent wrong rendering with no error)' and 'Create _group.css at artifacts/mockup-sandbox/src/components/mockups/{group}/_group.css. Populate it with your app's :root CSS custom properties'."
+    },
+    {
+      "text": "Response directs the user to read the mockup-extract skill for the full extraction process (import chain tracing, dependency classification as inline/copy/stub).",
+      "passed": true,
+      "evidence": "Response states: 'Read .local/skills/mockup-extract/SKILL.md for the detailed process' and mentions classifying each import as 'Inline — paste dependency directly into the mockup / Copy — copy the file as-is / Stub — replace with a minimal no-op'."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": { "uncertainties": [], "needs_review": [], "workarounds": [] }
+}

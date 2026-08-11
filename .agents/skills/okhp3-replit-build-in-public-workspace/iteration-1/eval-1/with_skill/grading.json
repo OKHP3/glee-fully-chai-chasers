@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Response distinguishes between building mode (frames scattered, some building, labels missing) and judging mode (all iframes live, zones labeled and numbered, focusCanvasShapes called), and says to switch to judging mode before any public review.",
+      "passed": true,
+      "evidence": "Response states: 'The canvas must be switched from building mode to judging mode before submission. In building mode iframes are scattered and labels are missing... In judging mode every iframe is live, every zone is labeled and numbered, and a focusCanvasShapes call navigates judges to the layout automatically.'"
+    },
+    {
+      "text": "Response describes the hero row with the three primary deliverables: the interactive app, the pitch deck (slides), and the showcase video — placed at y = 100 with a section label above at y = 20.",
+      "passed": true,
+      "evidence": "Response states: 'The hero row sits at the top strip of the board (y = 100). It holds exactly three primary deliverables: (1) live interactive artifact, (2) portfolio/pitch deck (slides), (3) showcase video'. Section label: 'y = 20, h = 60, color = grey'."
+    },
+    {
+      "text": "Response specifies the zone label convention: text shape, color: 'grey', h: 60, placed 40 units above the zone's frame baseline, numbered with pattern '01 — ZONE NAME'.",
+      "passed": true,
+      "evidence": "Response shows: 'color = \"grey\", h = 60, y = (zone baseline y) - 40, text = \"01 — ZONE NAME\" ← increment the number in reading order'."
+    },
+    {
+      "text": "Response specifies standard gutters: 80 px between sibling frames (within the same zone) and 160 px between zones.",
+      "passed": true,
+      "evidence": "Response states: '80 px between sibling frames within a zone' and '160 px between zones' as distinct gutter values."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": { "uncertainties": [], "needs_review": [], "workarounds": [] }
+}

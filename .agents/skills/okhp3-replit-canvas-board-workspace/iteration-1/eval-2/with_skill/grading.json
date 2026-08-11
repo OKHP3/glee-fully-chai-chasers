@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Response provides an applyCanvasActions update action with shapeType: 'iframe', state: 'live', and a url field to flip a building iframe to live.",
+      "passed": true,
+      "evidence": "Response shows exact code: `{ type: \"update\", shapeId: \"my-frame-1\", updates: { shapeType: \"iframe\", state: \"live\", url: \"https://.../__mockup/preview/ui/ComponentOne\" } }` inside an applyCanvasActions call."
+    },
+    {
+      "text": "Response specifies the mockup-sandbox URL pattern without a port number: https://${REPLIT_DOMAINS}/__mockup/preview/{folder}/{ComponentName}",
+      "passed": true,
+      "evidence": "Response explicitly shows: `https://${REPLIT_DOMAINS}/__mockup/preview/{folder}/{ComponentName}` and warns 'do NOT use the main app dev URL... Always use /__mockup/preview/{folder}/{ComponentName}'."
+    },
+    {
+      "text": "Response states that all frames must be 'live' before calling focusCanvasShapes — a mix of building and live states signals an incomplete build.",
+      "passed": true,
+      "evidence": "Response states: 'Every frame must be \"live\" before you call focusCanvasShapes' and explains a mix 'signals an incomplete build to judges, even when the underlying work is finished'."
+    },
+    {
+      "text": "Response mentions obtaining REPLIT_DOMAINS at runtime (e.g. via 'echo $REPLIT_DOMAINS') to construct the full https:// URL.",
+      "passed": true,
+      "evidence": "Response shows: 'Get your domain: `echo $REPLIT_DOMAINS`' as a distinct step, and notes 'The mockup-sandbox URL uses REPLIT_DOMAINS (no port number). Retrieve it at runtime'."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": { "uncertainties": [], "needs_review": [], "workarounds": [] }
+}

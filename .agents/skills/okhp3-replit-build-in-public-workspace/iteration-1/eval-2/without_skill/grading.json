@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Response says to set base in vite.config.ts to /<repo-name>/ for GitHub Pages subdirectory routing.",
+      "passed": false,
+      "evidence": "vite.config.ts base setting is not mentioned anywhere. Response covers general GitHub Pages setup (branch, folder, gh-pages branch) without the Vite-specific base path requirement needed for subdirectory routing."
+    },
+    {
+      "text": "Response provides the GitHub Pages URL pattern: https://<github-username>.github.io/<repo-name>/",
+      "passed": true,
+      "evidence": "Response shows: `https://<username>.github.io/<repo-name>/` in the GitHub Pages setup steps."
+    },
+    {
+      "text": "Response states both URLs must be kept in README.md so judges browsing the GitHub repo can reach the live app in one click without going to Replit.",
+      "passed": true,
+      "evidence": "Response includes a README template with a 'Live Links' table: 'Replit | https://<project>.replit.app' and 'GitHub Pages | https://<username>.github.io/<repo>/'. Checklist also includes 'README has both URLs'."
+    },
+    {
+      "text": "Response explains the GitHub Actions deploy workflow triggers on every push to main, and references the okhp3-vite-github-pages skill for the full runbook.",
+      "passed": false,
+      "evidence": "Response shows `on: push: branches: [main]` in the deploy.yml — the trigger is correct. But the okhp3-vite-github-pages skill is not referenced; a general Actions workflow is provided inline instead."
+    }
+  ],
+  "summary": { "passed": 2, "failed": 2, "total": 4, "pass_rate": 0.5 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [
+      "Without-skill response omits the vite.config.ts base setting — this would cause asset path 404s on the GitHub Pages subdirectory URL. A developer following this advice without the skill would produce a broken Pages deploy."
+    ],
+    "workarounds": []
+  }
+}
