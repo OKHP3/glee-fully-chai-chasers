@@ -238,20 +238,56 @@ export function mountLapQuestLedge(root: HTMLElement, options: LapQuestLedgeOpti
   };
 }
 
+/**
+ * Phoebe ledge art — Direction B (Tuxedo Vector), chosen after design-canvas review.
+ *
+ * Black-and-white tuxedo Phoebe matching the S18 production art baseline
+ * (public/assets/joey-phoebe-wilds.png):
+ *   · Near-black body (#0d0d0d) with radial sheen gradient
+ *   · Prominent white chest bib — classic tuxedo marking
+ *   · Bright green eyes (#38c97a) matching the production wild-symbol art
+ *   · Dusty-pink inner ears (#c4788a) from the approved palette
+ *   · White paws with toe-line detail draping over the ledge front
+ *   · Long, gracefully sweeping tail curling right behind the body
+ *   · Bold ink outlines — cartoony, not photorealistic (S15)
+ *
+ * Replaces the off-baseline purple SVG (S18 compliance fix).
+ * Only this function changed; board.ts, symbols.ts, and the atlas are untouched.
+ */
 function phoebeLedgeSvg(): string {
   return `<svg viewBox="0 0 320 126" class="lap-quest-phoebe-art" aria-hidden="true" focusable="false">
     <defs>
-      <linearGradient id="lapPhoebeBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#77669d"/><stop offset="1" stop-color="#2d1f4c"/></linearGradient>
-      <linearGradient id="lapPhoebeChest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff4e0"/><stop offset="1" stop-color="#e8c6d4"/></linearGradient>
+      <radialGradient id="lqPhoebeBody" cx="38%" cy="35%" r="55%"><stop offset="0%" stop-color="#2a2a2a"/><stop offset="100%" stop-color="#0d0d0d"/></radialGradient>
+      <radialGradient id="lqPhoebeHead" cx="42%" cy="38%" r="52%"><stop offset="0%" stop-color="#282828"/><stop offset="100%" stop-color="#0d0d0d"/></radialGradient>
     </defs>
-    <path d="M28 91c34-15 83-18 142-10 50 7 91 8 122-4l-7 18H31z" fill="#b9788e" stroke="#20163a" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M42 86c38-20 111-22 165-10 26 6 54 5 77-2-15 22-55 27-95 20-56-10-100-4-147 7z" fill="#e8a5b8" opacity=".72"/>
-    <ellipse cx="160" cy="63" rx="96" ry="30" fill="url(#lapPhoebeBody)" stroke="#20163a" stroke-width="4"/>
-    <path d="M80 73c-20-8-33-21-31-35 2-13 16-20 29-13 10 5 15 17 10 29 16 4 25 10 32 18z" fill="url(#lapPhoebeBody)" stroke="#20163a" stroke-width="4"/>
-    <path d="M60 35l4-20 16 14M84 29l15-14 1 22" fill="#4d3f73" stroke="#20163a" stroke-width="4" stroke-linejoin="round"/>
-    <ellipse cx="72" cy="37" rx="4" ry="3" fill="#f5d576"/><path d="M65 49c6 4 13 4 19 0" fill="none" stroke="#20163a" stroke-width="3" stroke-linecap="round"/>
-    <path d="M76 82c-15 10-28 11-37 3M102 82c-11 10-21 12-30 5" fill="none" stroke="url(#lapPhoebeChest)" stroke-width="9" stroke-linecap="round"/>
-    <path d="M242 51c32-26 53-16 44 1-7 12-21 17-38 19" fill="none" stroke="#4d3f73" stroke-width="14" stroke-linecap="round"/>
-    <path d="M116 54c28-11 76-10 104 2" fill="none" stroke="#d4c0e8" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+    <path d="M242 68 C266 54 288 38 276 18 C264 -1 244 4 248 20 C252 34 268 36 256 52" fill="none" stroke="#0d0d0d" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M242 68 C266 54 288 38 276 18 C264 -1 244 4 248 20 C252 34 268 36 256 52" fill="none" stroke="#242424" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <ellipse cx="156" cy="72" rx="106" ry="33" fill="url(#lqPhoebeBody)" stroke="#0a0a0a" stroke-width="2.5"/>
+    <path d="M120 50 C136 40 162 40 178 52 C186 62 184 78 170 86 C154 94 130 92 118 82 C106 70 106 58 120 50Z" fill="#f0ede8"/>
+    <path d="M120 82 C130 88 154 90 170 84 C160 92 136 94 120 82Z" fill="rgba(200,185,175,0.3)"/>
+    <circle cx="66" cy="52" r="36" fill="url(#lqPhoebeHead)" stroke="#0a0a0a" stroke-width="2.5"/>
+    <path d="M44 28 L32 3 L64 20" fill="#0d0d0d" stroke="#0a0a0a" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M46 26 L38 9 L61 20" fill="#c4788a"/>
+    <path d="M82 24 L90 1 L106 20" fill="#0d0d0d" stroke="#0a0a0a" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M83 22 L90 8 L103 20" fill="#c4788a"/>
+    <ellipse cx="65" cy="64" rx="21" ry="16" fill="#f0ede8"/>
+    <ellipse cx="51" cy="46" rx="10" ry="9" fill="#38c97a"/>
+    <ellipse cx="77" cy="43" rx="10" ry="9" fill="#38c97a"/>
+    <ellipse cx="51" cy="47" rx="5" ry="8" fill="#0a0a0a"/>
+    <ellipse cx="77" cy="44" rx="5" ry="8" fill="#0a0a0a"/>
+    <circle cx="54" cy="43" r="2.8" fill="white"/>
+    <circle cx="80" cy="40" r="2.8" fill="white"/>
+    <path d="M60 64 L65 59 L70 64 Q65 69 60 64Z" fill="#d35b2d"/>
+    <path d="M61 67 Q65 72 69 67" fill="none" stroke="#6a2020" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="44" y1="63" x2="14" y2="57" stroke="#c0b8a6" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+    <line x1="44" y1="67" x2="12" y2="67" stroke="#c0b8a6" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+    <line x1="86" y1="63" x2="116" y2="57" stroke="#c0b8a6" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+    <line x1="86" y1="67" x2="118" y2="67" stroke="#c0b8a6" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+    <path d="M90 90 C80 100 64 112 50 110 C40 108 40 98 50 94 C62 88 78 88 90 90Z" fill="#f0ede8" stroke="#0a0a0a" stroke-width="1.8"/>
+    <path d="M48 108 Q54 113 59 109" fill="none" stroke="#b8a898" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M57 110 Q63 114 68 110" fill="none" stroke="#b8a898" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M124 92 C114 102 98 114 84 112 C74 110 74 100 84 96 C96 90 112 90 124 92Z" fill="#f0ede8" stroke="#0a0a0a" stroke-width="1.8"/>
+    <path d="M82 110 Q88 115 93 111" fill="none" stroke="#b8a898" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M91 112 Q97 116 102 112" fill="none" stroke="#b8a898" stroke-width="1.3" stroke-linecap="round"/>
   </svg>`;
 }
