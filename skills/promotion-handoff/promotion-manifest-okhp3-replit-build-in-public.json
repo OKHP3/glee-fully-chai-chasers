@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "skill": {
+    "name": "okhp3-replit-build-in-public",
+    "version": "1.0.0",
+    "maturity": "draftable",
+    "evidence_status": "benchmarked-not-live"
+  },
+  "source": {
+    "repository": "glee-fully-chai-chasers (this Replit project)",
+    "package_path": ".agents/skills/okhp3-replit-build-in-public",
+    "selected_as_canonical_incubator": true,
+    "selection_reason": "Runtime source is the editable authority during incubation. SKILL.md is byte-equal with the publication mirror (SHA-256 a1665077). Mirror was missing benchmarks/ and evals/ — synced 2026-08-11. No competing edits found in destination."
+  },
+  "mirrors": [
+    {
+      "path": "skills/okhp3-replit-build-in-public",
+      "role": "publication-mirror",
+      "authorized": true,
+      "aggregate_sha256": "0252d78d38928e985c4acf0314d65e960ce88b91186b9f93deee6e1361fc2f9d"
+    }
+  ],
+  "canonical_target": {
+    "repository": "OKHP3/skillz",
+    "family": "replit",
+    "package_path": "replit/okhp3-replit-build-in-public",
+    "accepted_commit_or_hash": null
+  },
+  "inventory": [
+    { "file": "SKILL.md", "sha256": "a1665077d51ffd06d5c5614b00ede758054284b496773b9bb7ba40fba18d7d86", "role": "core" },
+    { "file": "evals/evals.json", "sha256": "0c15e2e223771c338990e73b8f2b384ce7cb8bb302e24dff1e3d7ee9a97adc23", "role": "eval" },
+    { "file": "benchmarks/benchmark.json", "sha256": "a70451aadfb14159fb2354f24b49cc7dd78028824740f2705b6cb5b307d9b250", "role": "benchmark" }
+  ],
+  "decision": {
+    "status": "ready",
+    "alternatives_considered": [
+      "skills/okhp3-replit-build-in-public — rejected as source; it was missing benchmarks/ and evals/, making it less complete than the runtime source."
+    ],
+    "unresolved_items": [
+      "Benchmark run for eval_id 4 (without_skill, dual-deployment) shows pass_rate 0.5 — gap is noted in task backlog for resolution before canonical acceptance.",
+      "OKHP3/skillz replit/ family may not yet exist; creation of the family directory is part of the canonical PR."
+    ]
+  },
+  "safety": {
+    "license": "MIT",
+    "public_safety": "passed",
+    "private_material_found": false,
+    "public_safety_notes": "All URLs are public (overkillhill.com, github.com/OKHP3, replit.com). Commit message examples use fictional project names ('Phoebe's Lap Quest', 'UniGlee') — no real employer or private project data. No credentials, tokens, private network calls, or internal ticket IDs found.",
+    "external_writes": "none-declared",
+    "adapter_differences": [
+      "SKILL.md references okhp3-vite-github-pages skill for GitHub Pages mechanics — this is an OKHP3 companion skill, not a universal dependency. Canonical distribution consumers must install that skill separately."
+    ]
+  },
+  "authorization": {
+    "requested_actions": ["sync-mirror", "create-promotion-manifest", "prepare-contribution-brief"],
+    "approved_actions": ["sync-mirror", "create-promotion-manifest", "prepare-contribution-brief"],
+    "withheld_actions": ["commit", "push", "pull-request", "external-publication"]
+  },
+  "verification": {
+    "checks": [
+      { "name": "sync_skill_mirror --check", "result": "passed", "notes": "Source and destination now byte-equal after sync on 2026-08-11." },
+      { "name": "public-safety grep scan", "result": "passed", "notes": "No credentials, private URLs, internal IDs, or employer data found." },
+      { "name": "structural: SKILL.md present, name field matches directory", "result": "passed", "notes": "name: okhp3-replit-build-in-public matches directory." }
+    ],
+    "review_record": null,
+    "verified_at": "2026-08-11",
+    "limitations": [
+      "Foundry architecture review not run — okhp3-skill-foundry eval not executed.",
+      "Benchmark pass rates are noted as structural (executor_model: delegation-subagent) in benchmark.json, not live end-to-end runs.",
+      "Dual-deployment eval (eval_id 4, without_skill) shows 0.5 pass rate — gap under active investigation."
+    ]
+  },
+  "recovery": {
+    "path": "Inspect the diff and restore only reviewed files; do not delete destination-only files automatically.",
+    "pre_sync_git_status_recorded": true,
+    "pre_sync_mirror_state": "skills/okhp3-replit-build-in-public contained only SKILL.md (byte-equal). benchmarks/ and evals/ were absent."
+  }
+}
