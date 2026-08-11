@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "test": "vitest run src",
-    "build": "node scripts/check-cdn-urls.mjs && tsc --noEmit && vite build",
+    "build": "node scripts/check-cdn-urls.mjs && tsc --noEmit && vite build && node scripts/check-cdn-urls.mjs --root=dist",
     "preview": "vite preview",
     "assets:generate": "node scripts/generate-assets.mjs",
     "validate:assets": "node scripts/validate-assets.mjs",
