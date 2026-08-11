@@ -75,6 +75,22 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .chai-splash--exit {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease-out;
+  }
+
+  .cc-root.board--entering {
+    transition: opacity 280ms ease-in;
+  }
+
+  .cc-root.board--enter {
+    opacity: 0;
+  }
+}
+
 /* subtle star-scatter pattern */
 .chai-splash::before {
   content: "";

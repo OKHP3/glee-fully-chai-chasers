@@ -11,7 +11,40 @@ import { renderSplash, isBirthdayBonusAvailable, claimBirthdayBonus } from "./sp
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
-function tapIn(): void {
+let isEnteringBoard = false;
+
+function prefersReducedMotion(): boolean {
+  return typeof matchMedia === "function"
+    && matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function waitForSplashExit(skipAnimation: boolean): Promise<void> {
+  const splash = app.querySelector<HTMLElement>(".chai-splash");
+  if (!splash || skipAnimation) return Promise.resolve();
+
+  splash.classList.add("chai-splash--exit");
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      splash.removeEventListener("transitionend", onTransitionEnd);
+      window.clearTimeout(fallback);
+      resolve();
+    };
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (event.target === splash && event.propertyName === "opacity") finish();
+    };
+    const fallback = window.setTimeout(finish, 220);
+    splash.addEventListener("transitionend", onTransitionEnd);
+  });
+}
+
+async function tapIn(): Promise<void> {
+  if (isEnteringBoard) return;
+  isEnteringBoard = true;
+
   const state = loadGameState();
   if (isBirthdayBonusAvailable()) {
     claimBirthdayBonus(state);
@@ -23,7 +56,10 @@ function tapIn(): void {
   unlock();
   playChaiChaseStart();
   startBaseMusic();
-  renderBoard(app, state);
+
+  const skipAnimation = state.reducedMotion || prefersReducedMotion();
+  await waitForSplashExit(skipAnimation);
+  renderBoard(app, state, undefined, !skipAnimation);
 }
 
 // Dev-only QA aids: these hashes skip the splash tap-in gate so screenshots/

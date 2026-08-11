@@ -227,6 +227,7 @@ export function renderBoard(
   root: HTMLElement,
   state: GameState,
   visibleGrid?: CascadeStep["grid"],
+  animateEntrance = false,
 ): void {
   const resolvedTheme = resolveTheme(state.theme);
   document.documentElement.dataset.theme = resolvedTheme;
@@ -240,7 +241,7 @@ export function renderBoard(
   }).steps[0].grid;
 
   root.innerHTML = `
-    <div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden cc-root" data-theme="${resolvedTheme}" data-reduced-motion="${state.reducedMotion}">
+    <div class="relative h-full w-full flex flex-col text-amber-100 overflow-hidden cc-root${animateEntrance ? " board--entering board--enter" : ""}" data-theme="${resolvedTheme}" data-reduced-motion="${state.reducedMotion}">
       <div class="night-garden" id="bg-layer">${gardenDecor()}</div>
       <div class="relative z-10 h-full w-full flex flex-col cc-shell">
         <header class="marquee">
@@ -322,6 +323,14 @@ export function renderBoard(
   `;
 
   wireControls(root, state, bets);
+
+  if (animateEntrance) {
+    const board = root.querySelector<HTMLElement>(".cc-root");
+    requestAnimationFrame(() => {
+      board?.classList.remove("board--enter");
+      window.setTimeout(() => board?.classList.remove("board--entering"), 300);
+    });
+  }
 }
 
 function bulbRow(): string {
