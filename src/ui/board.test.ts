@@ -9,6 +9,7 @@ import { BOLD_CHAI_DURATION_MS, BOLD_CHAI_PUMPS_PER_CUP } from "../engine/bold-c
 import { spin } from "../engine/cascade";
 import { createKeepsakeMemoryController, maybeLevelUpAfterBonus, renderBoard, renderGridHtml } from "./board";
 import * as stateModule from "../state";
+import { resolveShowcaseUrl } from "../splash";
 
 // ── Module-level mocks ────────────────────────────────────────────────────────
 // Audio modules require Web Audio API unavailable in jsdom.  Replace every
@@ -140,6 +141,34 @@ describe("firefly meter display clamping", () => {
 });
 
 describe("volume output label initialization", () => {
+  it("uses the shared host-aware destinations for the About showcase links", () => {
+    vi.mocked(spin).mockReturnValue(noBonusResult());
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    renderBoard(root, makeSpinState());
+
+    root.querySelector<HTMLButtonElement>("#settings-btn")?.click();
+
+    const slides = root.querySelector<HTMLAnchorElement>(
+      '[data-showcase-link="slides"]',
+    );
+    const video = root.querySelector<HTMLAnchorElement>(
+      '[data-showcase-link="video"]',
+    );
+
+    expect(slides?.getAttribute("href")).toBe(
+      resolveShowcaseUrl("/chai-chasers-slides/"),
+    );
+    expect(video?.getAttribute("href")).toBe(
+      resolveShowcaseUrl("/chai-chasers-video/"),
+    );
+    expect(slides?.target).toBe("_blank");
+    expect(video?.target).toBe("_blank");
+    expect(slides?.rel).toContain("noopener");
+    expect(video?.rel).toContain("noopener");
+    root.remove();
+  });
+
   it("shows the stored percentage rather than '(max)' when settings page opens", () => {
     vi.mocked(spin).mockReturnValue(noBonusResult());
     const state = makeSpinState();

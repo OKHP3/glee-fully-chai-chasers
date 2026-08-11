@@ -58,6 +58,7 @@ import {
 } from "../engine/lap-quest";
 import { mountLapQuestLedge } from "./lap-quest-ledge";
 import { renderHowItWorks } from "./how-it-works";
+import { resolveShowcaseUrl } from "../splash";
 import { trapFocus } from "./focus-trap";
 import { beginKeepsakeMemory, createKeepsakeMemory, KEEPSAKE_MEMORY_PREVIEW_MS, pickKeepsakeMemoryCard, resolveKeepsakeMemoryMismatchResult } from "../engine/keepsake-memory";
 import type { GameState, ThemeMode } from "../state";
@@ -600,6 +601,8 @@ function resolveTheme(theme: ThemeMode): "dark" | "light" {
 }
 
 function openSettingsPage(root: HTMLElement, state: GameState): void {
+  const slidesUrl = resolveShowcaseUrl("/chai-chasers-slides/");
+  const videoUrl = resolveShowcaseUrl("/chai-chasers-video/");
   const page = document.createElement("section");
   page.className = "game-page settings-page";
   page.setAttribute("role", "dialog");
@@ -645,8 +648,8 @@ function openSettingsPage(root: HTMLElement, state: GameState): void {
         <h3>About this gift</h3>
         <p>A cozy, original Chai Chase for Glee — fictional Glee-coins only, with no purchases or ads. Basic reach measurement helps Jamie understand how the gift is finding people.</p>
         <div class="about-card__links">
-          <a href="/chai-chasers-slides/" target="_blank" rel="noopener noreferrer" class="about-card__link">📊 Pitch deck ↗</a>
-          <a href="/chai-chasers-video/" target="_blank" rel="noopener noreferrer" class="about-card__link">🎬 Build story ↗</a>
+          <a href="${slidesUrl}" target="_blank" rel="noopener noreferrer" class="about-card__link" data-showcase-link="slides">📊 Pitch deck ↗</a>
+          <a href="${videoUrl}" target="_blank" rel="noopener noreferrer" class="about-card__link" data-showcase-link="video">🎬 Build story ↗</a>
         </div>
       </section>
 
