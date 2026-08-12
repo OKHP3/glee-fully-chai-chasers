@@ -14,3 +14,10 @@ uri = "file://artifacts/chai-chasers-video/public/audio/chai-chasers-v3-voiceove
 type = "audio"
 title = "chai chasers v3 voiceover"
 description = "Text-to-speech audio: Welcome to Glee-fully Chai Chasers — a cozy slot game with a night-garden aesthetic. The chase is on. Meet Joey and Phoebe. Spin the reels in this moonlit garden, where floating…"
+
+[[outputs]]
+id = "oKtDmuacnlgABzTSroVTD"
+uri = "file://attached_assets/uniglee-wanted-poster.jpg"
+type = "image"
+title = "WANTED: The UniGlee — Discord Marketing Poster"
+description = "Wild West wanted poster for the 1,000 Replicash UniGlee Buildathon challenge. Stats are real engine output (seed 2020: 40 spins, 45,504 Glee-coins). Watermarked EXAMPLE · NOT A VALID CLAIM throughout."
