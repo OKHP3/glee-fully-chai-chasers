@@ -123,10 +123,10 @@ jobs:
           MATCHED=""
           while IFS= read -r mf; do
             ACCEPTED=$(python3 - "${mf}" <<'PYEOF'
-import json, sys
-data = json.load(open(sys.argv[1]))
-print(data.get("canonical_target", {}).get("accepted_commit_or_hash", ""))
-PYEOF
+          import json, sys
+          data = json.load(open(sys.argv[1]))
+          print(data.get("canonical_target", {}).get("accepted_commit_or_hash", ""))
+          PYEOF
             )
             if [[ "${ACCEPTED}" == "${SKILLZ_SHA}" ]]; then
               MATCHED="${MATCHED} ${mf}"
