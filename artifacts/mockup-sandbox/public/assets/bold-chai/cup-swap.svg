@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 640" role="img" aria-labelledby="title desc">
+  <title id="title">Bold Chai cup swap state</title>
+  <desc id="desc">Empty iced cup with playful motion arcs and lifted ice cubes for the three-second cup replacement beat.</desc>
+  <defs>
+    <linearGradient id="swapGlass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4e0" stop-opacity=".38"/><stop offset="1" stop-color="#8ec9ff" stop-opacity=".3"/></linearGradient>
+    <linearGradient id="swapIce" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d6fff0"/><stop offset="1" stop-color="#8ec9ff"/></linearGradient>
+  </defs>
+  <g stroke="#321738" stroke-linejoin="round">
+    <path d="M92 429c-32-27-37-68-12-99M388 429c32-27 37-68 12-99" fill="none" stroke="#f28bab" stroke-width="9" stroke-linecap="round"/>
+    <path d="M102 333l-20-3 11-17M378 333l20-3-11-17" fill="none" stroke="#f5d576" stroke-width="7" stroke-linecap="round"/>
+    <ellipse cx="240" cy="454" rx="136" ry="30" fill="url(#swapGlass)" fill-opacity=".56" stroke-width="7"/>
+    <path d="M105 454h270l-24 139c-4 25-25 43-50 43h-122c-25 0-46-18-50-43z" fill="url(#swapGlass)" fill-opacity=".4" stroke-width="7"/>
+    <path d="M158 464l32 16-8 32-35-17zM214 458l36 8-7 34-37-5zM274 461l39-10 16 31-37 18z" fill="url(#swapIce)" stroke-width="4"/>
+    <path d="M177 475l-13 16M233 471l-12 18M298 464l-12 25" stroke="#fff4e0" stroke-width="4" opacity=".8"/>
+    <path d="M150 422l13-18 9 21 20-4-13 18-19-2zM329 427l11-15 8 17 17 2-15 10-15-7z" fill="#9fe8c5" stroke-width="3"/>
+    <path d="M140 491l-14 96M340 490l-16 100" fill="none" stroke="#fff4e0" stroke-width="7" stroke-linecap="round" opacity=".6"/>
+  </g>
+</svg>

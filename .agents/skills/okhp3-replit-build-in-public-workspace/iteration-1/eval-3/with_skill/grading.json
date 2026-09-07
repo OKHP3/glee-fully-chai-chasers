@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Response says keep handoffs short — no longer than one page — because a handoff longer than one page will not be read, with the full history in git.",
+      "passed": true,
+      "evidence": "Response states: 'Required Length: One page maximum. A handoff longer than one page will not be read. The full history of what was built lives in git — the handoff is a navigational bridge, not a log.'"
+    },
+    {
+      "text": "Response lists the four handoff sections: What was accomplished, Current state, Open items, and Next action (the single most important thing the next session should do first).",
+      "passed": true,
+      "evidence": "Response lists exactly four sections: '1. What Was Accomplished', '2. Current State', '3. Open Items', '4. Next Action — The single most important thing the next session should do first, stated as one sentence'."
+    },
+    {
+      "text": "Response specifies the naming convention: <DATE>-HANDOFF.md, or appended to an existing HANDOFF.md.",
+      "passed": true,
+      "evidence": "Response shows: 'Dated file per session: <DATE>-HANDOFF.md, Example: 2025-07-15-HANDOFF.md' and 'Single cumulative file (append each session): HANDOFF.md'."
+    },
+    {
+      "text": "Response describes provenance discipline: every measurement, figure, or claim in the README, pitch deck, or project page must be traceable to a source — citing the script, seed range, spin count, test command, or DECISION-LOG.md row range.",
+      "passed": true,
+      "evidence": "Response provides a full provenance table: 'RTP figures — Which fleet produced them and what player model was assumed / Test counts — The exact command that produced the number / Simulation results — The script, the seed range, and the spin count / Decision counts — The exact DECISION-LOG.md row range'."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": { "uncertainties": [], "needs_review": [], "workarounds": [] }
+}

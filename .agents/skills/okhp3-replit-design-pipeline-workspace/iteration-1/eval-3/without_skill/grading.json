@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Response specifies a GENERAL subagent (not a DESIGN subagent) for graduation — explicitly stating DESIGN subagents do not wire APIs or understand routing.",
+      "passed": false,
+      "evidence": "Response describes 'a graduation or promotion subagent — sometimes called a code/implementation subagent or builder subagent' — no mention of GENERAL vs DESIGN distinction, no statement that DESIGN subagents must never be used for graduation."
+    },
+    {
+      "text": "Response lists the three graduation decision gate questions: which variant exactly, whether the main app's component library differs from shadcn/ui, and whether the mockup has real or mock data.",
+      "passed": false,
+      "evidence": "Response lists 7 different question categories (scope/completeness, design fidelity, interaction/behavior, assets, handoff readiness, approval/sign-off, integration impact) — the three specific gate questions from the skill (which variant, shadcn/ui library match, real vs mock data) are not among them."
+    },
+    {
+      "text": "Response states to graduate exactly what was approved — do not improve the design during graduation — preserving colours, gradients, shadows, border radius, spacing, typography, layout structure, animations, hover states, and icons.",
+      "passed": false,
+      "evidence": "The 'graduate exactly what was approved' rule is not stated. Response discusses QA acceptance criteria, stakeholder sign-off, and engineering review — different concerns entirely."
+    },
+    {
+      "text": "Response describes what to transform during graduation: mock data → real API calls, no-op navigation handlers → real router links, local constants → app state, stubbed auth → real auth context.",
+      "passed": false,
+      "evidence": "The specific transform list (mock data → real API calls, no-op navigation → router links, local constants → app state, stubbed auth → real auth context) is not present. Response mentions 'wiring up form logic, validation, and API integration' in general terms."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 4, "total": 4, "pass_rate": 0.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  }
+}

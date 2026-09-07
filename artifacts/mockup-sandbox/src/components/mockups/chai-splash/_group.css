@@ -1,0 +1,204 @@
+@keyframes chai-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: .34; }
+  50% { transform: translate3d(7px, -12px, 0); opacity: .7; }
+}
+
+@keyframes chai-pulse {
+  0%, 100% { transform: scale(1); opacity: .42; }
+  50% { transform: scale(1.08); opacity: .68; }
+}
+
+@keyframes chai-rise {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.chai-splash {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: rgba(255, 238, 197, .86);
+  background:
+    radial-gradient(circle at 22% 33%, rgba(65, 184, 183, .09), transparent 25rem),
+    radial-gradient(circle at 82% 22%, rgba(244, 123, 63, .11), transparent 22rem),
+    linear-gradient(118deg, #070d20 0%, #121437 53%, #21123e 100%);
+  font-family: system-ui, sans-serif;
+}
+
+.chai-splash::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .32;
+  background-image:
+    radial-gradient(circle, rgba(255,241,207,.75) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(65,184,183,.65) 0 1px, transparent 1.5px);
+  background-size: 137px 137px, 211px 211px;
+  background-position: 18px 32px, 70px 5px;
+  mask-image: linear-gradient(130deg, black, transparent 62%);
+}
+
+.chai-splash__orb {
+  position: absolute;
+  width: 31rem;
+  height: 31rem;
+  right: 8%;
+  top: 13%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(65,184,183,.22), rgba(244,123,63,.08) 42%, transparent 70%);
+  filter: blur(14px);
+  animation: chai-pulse 7s ease-in-out infinite;
+}
+
+.chai-splash__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  width: 50%;
+  min-height: 100dvh;
+  padding: 76px clamp(34px, 7vw, 112px);
+}
+
+.chai-splash__inner { max-width: 570px; animation: chai-rise .7s ease both; }
+
+.chai-splash__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 25px;
+  color: #41b8b7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+
+.chai-splash__eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: #41b8b7;
+  box-shadow: 0 0 9px rgba(65,184,183,.8);
+}
+
+.chai-splash h1 {
+  position: relative;
+  margin: 0;
+  max-width: 560px;
+  color: #fff1cf;
+  font-family: "Baloo 2", "Arial Black", sans-serif;
+  font-size: clamp(3.5rem, 5.4vw, 4.6rem);
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: .91;
+  text-shadow: 0 5px 28px rgba(244,123,63,.25);
+}
+
+.chai-splash h1::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 22%;
+  left: -18%;
+  width: 75%;
+  height: 58%;
+  border-radius: 50%;
+  background: rgba(65,184,183,.11);
+  filter: blur(44px);
+}
+
+.chai-splash__hook {
+  max-width: 455px;
+  margin: 25px 0 34px;
+  color: rgba(255,238,197,.86);
+  font-size: 16px;
+  line-height: 1.65;
+  font-weight: 500;
+}
+
+.chai-splash__actions { display: grid; gap: 16px; }
+.chai-splash__primary {
+  min-height: 64px;
+  padding: 0 27px;
+  border: 1px solid rgba(255,206,144,.58);
+  border-radius: 18px;
+  color: #fff4dc;
+  background: linear-gradient(160deg, #f47b3f, #d94d18 58%, #a52e11);
+  box-shadow: 0 10px 0 rgba(95,24,13,.46), 0 18px 35px rgba(217,77,24,.22);
+  cursor: pointer;
+  font: 700 16px system-ui, sans-serif;
+  letter-spacing: .01em;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.chai-splash__primary:hover { transform: translateY(-2px); box-shadow: 0 12px 0 rgba(95,24,13,.4), 0 21px 38px rgba(217,77,24,.3); }
+.chai-splash__primary:active { transform: translateY(5px); box-shadow: 0 3px 0 rgba(95,24,13,.46), 0 8px 18px rgba(217,77,24,.18); }
+.chai-splash__primary:focus-visible { outline: 3px solid #41b8b7; outline-offset: 4px; }
+.chai-splash__secondary {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  color: rgba(255,238,197,.55);
+  background: transparent;
+  cursor: pointer;
+  font: 600 14px system-ui, sans-serif;
+}
+.chai-splash__secondary:hover { color: #fff1cf; text-decoration: underline; text-underline-offset: 5px; }
+
+.chai-splash__loop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 52px;
+}
+.chai-splash__step { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.chai-splash__step-icon {
+  display: grid;
+  flex: 0 0 29px;
+  place-items: center;
+  width: 29px; height: 29px;
+  border: 1px solid rgba(65,184,183,.55);
+  border-radius: 50%;
+  color: #41b8b7;
+  font-size: 14px;
+  box-shadow: 0 0 13px rgba(65,184,183,.16);
+}
+.chai-splash__step svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.chai-splash__step-label { color: rgba(255,238,197,.68); font-size: 12px; font-weight: 600; line-height: 1.2; }
+.chai-splash__connector { width: 24px; height: 1px; flex: 0 0 24px; background: rgba(65,184,183,.3); }
+
+.chai-splash__art {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 0 48%;
+  overflow: hidden;
+}
+.chai-splash__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #070d20 0%, rgba(7,13,32,.78) 4%, transparent 25%), linear-gradient(0deg, rgba(7,13,32,.18), transparent 30%);
+}
+.chai-splash__art img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+
+@media (max-width: 767px) {
+  .chai-splash__art { inset: 0 0 auto; height: 48dvh; min-height: 340px; }
+  .chai-splash__art::after { background: linear-gradient(0deg, #070d20 0%, rgba(7,13,32,.36) 22%, transparent 63%), linear-gradient(90deg, rgba(7,13,32,.3), transparent 55%); }
+  .chai-splash__content { display: block; width: 100%; min-height: 100dvh; padding: calc(48dvh - 18px) 25px 32px; }
+  .chai-splash__inner { max-width: none; }
+  .chai-splash__eyebrow { margin-bottom: 17px; font-size: 10px; }
+  .chai-splash h1 { font-size: clamp(2.7rem, 12vw, 3.35rem); line-height: .94; }
+  .chai-splash__hook { margin: 19px 0 25px; font-size: 15px; line-height: 1.5; }
+  .chai-splash__loop { justify-content: space-between; gap: 5px; margin-top: 35px; }
+  .chai-splash__connector { display: none; }
+  .chai-splash__step { display: grid; justify-items: center; gap: 7px; text-align: center; }
+  .chai-splash__step-label { max-width: 82px; font-size: 10px; }
+  .chai-splash__orb { width: 22rem; height: 22rem; top: 5%; right: -20%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chai-splash__orb, .chai-splash__inner { animation: none; }
+  .chai-splash__primary { transition: none; }
+}

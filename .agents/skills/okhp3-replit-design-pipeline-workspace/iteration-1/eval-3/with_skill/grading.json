@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Response specifies a GENERAL subagent (not a DESIGN subagent) for graduation — explicitly stating DESIGN subagents do not wire APIs or understand routing.",
+      "passed": true,
+      "evidence": "Response states: 'A GENERAL subagent handles graduation — not a DESIGN subagent.' and quotes skill: 'DESIGN subagent — never for graduation. They don't wire APIs or understand routing.'"
+    },
+    {
+      "text": "Response lists the three graduation decision gate questions: which variant exactly, whether the main app's component library differs from shadcn/ui, and whether the mockup has real or mock data.",
+      "passed": true,
+      "evidence": "Response lists all three: '1. Which variant exactly? (confirm if multiple are live)', '2. Is the main app's component library different from shadcn/ui? (every @/components/ui/* import must be translated)', '3. Does the mockup have real data or mock data? (all mock data must become real API calls)'"
+    },
+    {
+      "text": "Response states to graduate exactly what was approved — do not improve the design during graduation — preserving colours, gradients, shadows, border radius, spacing, typography, layout structure, animations, hover states, and icons.",
+      "passed": true,
+      "evidence": "Response states: 'Graduate exactly what was approved. Do not improve the design during graduation.' and lists preserved items: 'colours, gradients, shadows, border radius, spacing, typography (family/weight/size/line-height), layout structure, animations, hover states, and icons'."
+    },
+    {
+      "text": "Response describes what to transform during graduation: mock data → real API calls, no-op navigation handlers → real router links, local constants → app state, stubbed auth → real auth context.",
+      "passed": true,
+      "evidence": "Response lists all four transformations: 'mock data → real API calls, no-op navigation handlers → real router links, local constants → app state, stubbed auth → real auth context'."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": { "uncertainties": [], "needs_review": [], "workarounds": [] }
+}

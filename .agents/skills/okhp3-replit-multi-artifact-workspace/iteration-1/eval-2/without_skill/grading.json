@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Response shows the correct Vite server config reading PORT from env: port: parseInt(process.env.PORT || '5000', 10) — not a hard-coded port number.",
+      "passed": false,
+      "evidence": "Response shows hard-coded ports throughout: 'port: 5173', 'port: 5174', 'port: 5175'. The skill's pattern of process.env.PORT is not mentioned — response recommends assigning unique static port numbers per artifact."
+    },
+    {
+      "text": "Response specifies allowedHosts: true in the Vite server config — distinct from host: '0.0.0.0' — and explains this is required because the preview is a proxied iframe from a different origin.",
+      "passed": false,
+      "evidence": "Response mentions `allowedHosts: \"all\"` under a conditional note 'If needed' — not declared required. Uses the string \"all\" rather than boolean true. Does not explain the proxied-iframe origin mismatch reason."
+    },
+    {
+      "text": "Response references the blank-preview debug checklist, covering at minimum: workflow running state, whether a port was opened (openPorts), allowedHosts setting, and PORT env var reading.",
+      "passed": false,
+      "evidence": "Response has a checklist covering ss/lsof port checking, strictPort, .replit [[ports]] config, and process zombie checking — does not mention getWorkflowStatus, openPorts, or checking that the server reads PORT from the environment variable."
+    },
+    {
+      "text": "Response explains that a hard-coded port in Vite config will either conflict with another artifact or be wrong for the proxy routing, producing a blank preview with no error.",
+      "passed": false,
+      "evidence": "Response recommends using hard-coded unique ports (5173, 5174, 5175) as the solution. Does not explain that the system assigns unique ports via the PORT env var or that hard-coding produces a blank preview."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 4, "total": 4, "pass_rate": 0.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [
+      "Without-skill instructs developers to hard-code ports (5173, 5174, etc.) — directly opposite to the skill's PORT env var rule. A developer following this advice would have port conflicts in Replit's multi-artifact environment."
+    ],
+    "workarounds": []
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@workspace/chai-chasers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cd ../.. && pnpm run dev",
+    "build": "cd ../.. && pnpm run build"
+  }
+}

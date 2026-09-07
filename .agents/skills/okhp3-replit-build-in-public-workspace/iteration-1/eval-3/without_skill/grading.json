@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "Response says keep handoffs short — no longer than one page — because a handoff longer than one page will not be read, with the full history in git.",
+      "passed": false,
+      "evidence": "Response says 'Target: 300-600 words / 1-2 pages' — recommends up to two pages, directly contradicting the skill's 'one page maximum' rule. Does not reference git as the full history source."
+    },
+    {
+      "text": "Response lists the four handoff sections: What was accomplished, Current state, Open items, and Next action (the single most important thing the next session should do first).",
+      "passed": false,
+      "evidence": "Response lists 8 sections: Project Identity, Current State Summary, Decisions Made, Next Session's Immediate Task List (prioritized ≤5 items), File Map, Environment Notes, Open Questions, Session Timestamp. The skill's four-section structure (Accomplished, Current State, Open Items, Next Action as one sentence) is not present."
+    },
+    {
+      "text": "Response specifies the naming convention: <DATE>-HANDOFF.md, or appended to an existing HANDOFF.md.",
+      "passed": false,
+      "evidence": "Response uses `HANDOFF_YYYY-MM-DD_session-N.md` in a `/handoffs/` directory — different from the skill's `<DATE>-HANDOFF.md` or `HANDOFF.md` convention."
+    },
+    {
+      "text": "Response describes provenance discipline: every measurement, figure, or claim in the README, pitch deck, or project page must be traceable to a source — citing the script, seed range, spin count, test command, or DECISION-LOG.md row range.",
+      "passed": false,
+      "evidence": "Provenance discipline is not mentioned. Response discusses not hiding bugs, tech stack decisions, and env var management — no concept of tracing measurements to source scripts, seed ranges, or DECISION-LOG.md rows."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 4, "total": 4, "pass_rate": 0.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  }
+}

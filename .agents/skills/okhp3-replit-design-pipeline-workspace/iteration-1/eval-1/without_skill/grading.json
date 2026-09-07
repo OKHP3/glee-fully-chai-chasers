@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Response states the golden rule: if the component exists in the codebase, extract it — never rebuild from memory.",
+      "passed": false,
+      "evidence": "Response recommends 'HeaderV2.tsx in-repo draft' approach — the opposite of extract-first. No mention of extracting to a mockup sandbox at all; the golden rule is not stated."
+    },
+    {
+      "text": "Response warns that rebuilding from scratch produces wrong values: specifically dimensions, colours, spacing, opacity values, and font sizes.",
+      "passed": false,
+      "evidence": "Response warns about 'no real data, sync burden, divergence risk' as drawbacks of sandbox — different framing, not the skill's specific warning about pixel-level inaccuracies (dimensions, colours, spacing, opacity, font sizes)."
+    },
+    {
+      "text": "Response mentions creating Current.tsx in the group folder as the extracted baseline, imported alongside _group.css with the app's :root CSS variables.",
+      "passed": false,
+      "evidence": "Current.tsx, _group.css, and :root CSS variables are not mentioned anywhere in the response."
+    },
+    {
+      "text": "Response directs the user to read the mockup-extract skill for the full extraction process (import chain tracing, dependency classification as inline/copy/stub).",
+      "passed": false,
+      "evidence": "mockup-extract skill, import chain tracing, and inline/copy/stub classification are not mentioned. Response is entirely about in-repo file management."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 4, "total": 4, "pass_rate": 0.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [
+      "Without-skill recommends HeaderV2.tsx in-repo draft — a completely different workflow from the extract→sandbox→variant→graduate pipeline. Developers following this advice would miss the pixel-accurate baseline extraction step and would not use the canvas for variant comparison."
+    ],
+    "workarounds": []
+  }
+}

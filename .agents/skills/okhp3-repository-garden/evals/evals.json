@@ -1,0 +1,39 @@
+{
+  "skill_name": "okhp3-repository-garden",
+  "skill_version": "1.0.0",
+  "evals": [
+    {
+      "id": 1,
+      "name": "diverged-main-recovery",
+      "prompt": "My local main is ahead three commits and behind five commits from origin/main. What should the scheduled garden do?",
+      "expectations": [
+        {"id": 1, "text": "Response names `git log --left-right --cherry-pick --oneline origin/main...HEAD` as the variant inspection command."},
+        {"id": 2, "text": "Response requires `git merge-base` evidence before classifying the divergence."},
+        {"id": 3, "text": "Response says to create a named recovery branch from local `main`."},
+        {"id": 4, "text": "Response explicitly forbids rebasing, resetting, or fast-forwarding `main` as a maintenance shortcut."}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "branch-pruning-with-worktrees",
+      "prompt": "A branch has been merged, but I also see it in an old linked worktree. Can the weekly task delete it?",
+      "expectations": [
+        {"id": 1, "text": "Response names `git worktree list --porcelain` before considering deletion."},
+        {"id": 2, "text": "Response states that a branch checked out in any linked worktree is not a pruning candidate."},
+        {"id": 3, "text": "Response requires `git cherry -v origin/main <branch>` to establish unique patch value."},
+        {"id": 4, "text": "Response gives the deletion order as verified remote branch first, then local branch."}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "stale-lock-and-sidecar-triage",
+      "prompt": "The repository has an _to_delete folder, Finder files, a malformed ref, and an artifacts folder the app does not import. What gets cleaned?",
+      "expectations": [
+        {"id": 1, "text": "Response classifies `_to_delete/` as confirmed residue only after inspecting exact tracked contents."},
+        {"id": 2, "text": "Response identifies `.git/refs/.DS_Store` as a malformed local ref error rather than a source-file naming violation."},
+        {"id": 3, "text": "Response requires moving untracked OS detritus to a dated temporary recovery hold before permanent removal."},
+        {"id": 4, "text": "Response says `artifacts/` needs an ownership decision and must not be deleted merely because production source does not import it."}
+      ]
+    }
+  ]
+}

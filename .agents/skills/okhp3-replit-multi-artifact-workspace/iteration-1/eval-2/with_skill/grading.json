@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "Response shows the correct Vite server config reading PORT from env: port: parseInt(process.env.PORT || '5000', 10) — not a hard-coded port number.",
+      "passed": true,
+      "evidence": "Response shows exact config: `port: parseInt(process.env.PORT || '5000', 10)` and marks the alternative 'server: { port: 3000 }' as 'Incorrect (causes blank preview)'."
+    },
+    {
+      "text": "Response specifies allowedHosts: true in the Vite server config — distinct from host: '0.0.0.0' — and explains this is required because the preview is a proxied iframe from a different origin.",
+      "passed": true,
+      "evidence": "Response states: 'Without allowedHosts: true, Vite rejects those requests with a 403 and the preview is blank.' and shows it as a distinct config property from host: '0.0.0.0'. Reason given: 'preview pane loads your app in a proxied iframe. Requests arrive from a different origin than localhost'."
+    },
+    {
+      "text": "Response references the blank-preview debug checklist, covering at minimum: workflow running state, whether a port was opened (openPorts), allowedHosts setting, and PORT env var reading.",
+      "passed": true,
+      "evidence": "Response shows 7-item checklist: '1. Is the workflow running? / 2. Did it open a port? → getWorkflowStatus and look for openPorts / 3. Is allowedHosts: true in Vite config? / 4. Is the server reading PORT from the environment?'"
+    },
+    {
+      "text": "Response explains that a hard-coded port in Vite config will either conflict with another artifact or be wrong for the proxy routing, producing a blank preview with no error.",
+      "passed": true,
+      "evidence": "Response states: 'Replit's system assigns each artifact a unique port. If you hard-code a port number, it will either collide with another artifact or simply be the wrong port for the proxy router.' Context notes: 'no useful error message'."
+    }
+  ],
+  "summary": { "passed": 4, "failed": 0, "total": 4, "pass_rate": 1.0 },
+  "execution_metrics": {},
+  "timing": {},
+  "claims": [],
+  "user_notes_summary": { "uncertainties": [], "needs_review": [], "workarounds": [] }
+}

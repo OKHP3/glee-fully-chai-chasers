@@ -1,0 +1,4 @@
+interface:
+  display_name: "HEIC Image Converter"
+  short_description: "Convert HEIC photos into usable web assets"
+  default_prompt: "Use $heic-image-convert to convert these HEIC reference photos to optimized PNG and WebP files."
