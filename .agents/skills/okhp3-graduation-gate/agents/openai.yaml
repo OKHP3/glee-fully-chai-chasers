@@ -1,6 +1,0 @@
-interface:
-  display_name: "OKHP3 Graduation Gate"
-  short_description: "Score readiness for formalization"
-  default_prompt: "Use $okhp3-graduation-gate to score this effort and return GO, HOLD, ARCHIVE, or BLOCKED."
-policy:
-  allow_implicit_invocation: true
