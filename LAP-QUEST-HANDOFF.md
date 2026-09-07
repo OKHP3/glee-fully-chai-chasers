@@ -1,6 +1,6 @@
 # Phoebe's Lap Quest — Measurement Handoff
 
-**Measured:** 2026-08-11  
+**Measured:** 2026-09-07
 **Scope:** Workstream B, add canonical Lap Quest act 5 to the full-game RTP harness.
 
 ## Harness behavior
@@ -27,37 +27,49 @@ seq 1 40 | xargs -P4 -I{} sh -c \
 - Total paid spins: 2,000,000
 - Total bet: 80,000,000 fictional Glee-coins
 
-## Results — internal 40-seed run (2026-08-11)
+## Results — reproducible 40-seed run (2026-09-07)
 
 | Measure | Result |
 |---|---:|
-| Pooled full-game RTP | 105.79% |
-| 95% CI on per-seed mean | 104.82% to 106.76% |
+| Pooled full-game RTP | 105.7904% |
+| 95% CI on per-seed mean | 104.8220% to 106.7588% |
 | Per-seed standard deviation | 3.12 points |
 | Per-seed span | 100.53% to 114.00% |
-| Base contribution | 61.05% |
-| Bonus contribution | 44.74% |
-| Lap Quest contribution | 7.09% |
+| Base contribution | 61.0510% |
+| Bonus contribution | 44.7394% |
+| Lap Quest contribution | 7.0924% |
 | UniGlee captures / Lap Quests played | 1,628 / 1,628 |
 | Lap Quest rounds played | 36,052 |
 | Bonus sessions terminated by session cap | **0** |
 | Engine `terminatedByCascadeCap` activations | **0** |
 | Dedicated Lap Quest soak cap activations | **0** |
 
-The previous published 98.70% was not full-game RTP: the harness stopped after UniGlee act 4. Adding act 5 moved the internal reading upward by 7.09 percentage points without changing any payout, reel, trigger, or tuning constant.
+The previous published 98.70% was not full-game RTP: the harness stopped after UniGlee act 4. Adding act 5 moved this measured reading upward without changing any payout, reel, trigger, or tuning constant.
 
-## External validation — best current estimate (2026-08-11)
+## Reproducibility boundary
 
-**~98.1% full-game RTP.** Independent multi-agent validation runs by Claude Cowork and ChatGPT Work (each deploying multiple subagents, several million paid spins in total) converged on approximately 98.1%. This is the more statistically reliable figure and supersedes the 40-seed internal reading above. The internal run's 105.79% was a statistical overestimate at the 2,000,000-spin scale; the external runs' larger sample drove convergence to ~98.1%.
+The previously recorded `~98.1%` estimate is not included as a measured result here because its
+exact commands, seed range, player model, and pooled totals were not preserved. The result above
+is the reproducible value for this implementation and run definition; it should not be blended with
+that historical estimate when evaluating D8.
 
-| Measure | Internal run | External validation |
-|---|---:|---:|
-| Full-game RTP | 105.79% | **~98.1%** |
-| Sample size | 2,000,000 paid spins | Several million paid spins |
-| Source | `scripts/sim-agent.ts`, 40 seeds | Claude Cowork + ChatGPT Work fleets |
-| Confidence | 95% CI 104.82–106.76 | Converged across independent fleets |
+## Dedicated Lap Quest soak
 
-The ~98.1% figure sits at the upper edge of the documented 95–98% design band, substantially resolving decision D8.
+Exact soak configuration: 5,000 rounds, 20 seeds (`0` through `19`), 250 rounds per seed,
+cycling the three offered spots, with each round using a seeded challenge and seeded round RNG.
+Every round was required to return with a final no-win step.
+
+| Measure | Result |
+|---|---:|
+| Rounds | 5,000 |
+| Seeds / rounds per seed | 20 / 250 |
+| Cascade-cap terminations | **0** |
+| Minimum / maximum step count | 1 / 39 |
+| Known sticky-wild reproduction (`(0,3) (1,2) (2,2) (3,2)`) | 7 steps, cap **false** |
+
+The known reproduction was also exercised directly with `mulberry32(99)`, an all-tumbler
+starting grid, and the four documented `wild_phoebe` sticky positions. It returned a terminal
+no-win step and a finite payout.
 
 ## Validation
 
