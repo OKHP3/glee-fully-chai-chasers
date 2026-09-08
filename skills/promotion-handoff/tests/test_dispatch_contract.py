@@ -17,13 +17,13 @@ HANDOFF = ROOT / 'skills/promotion-handoff'
 class DispatchContractTests(unittest.TestCase):
     def setUp(self):
         self.receiver = yaml.load(
-            (ROOT / '.github/workflows/verify-skill-landing.yml').read_text(),
+            (ROOT / '.github/workflows/verify-skill-landing.yml').read_text(encoding='utf-8'),
             Loader=yaml.BaseLoader)
         self.steps = self.receiver['jobs']['verify']['steps']
         self.resolve = next(step for step in self.steps if step.get('id') == 'resolve')
 
     def test_template_declares_json_and_remains_explicit_only(self):
-        producer = yaml.load((HANDOFF / 'okhp3-skillz-verify-landing.yml').read_text(),
+        producer = yaml.load((HANDOFF / 'okhp3-skillz-verify-landing.yml').read_text(encoding='utf-8'),
                              Loader=yaml.BaseLoader)
         self.assertEqual(set(producer['on']), {'workflow_dispatch'})
         step = next(step for step in producer['jobs']['dispatch-verify']['steps']
@@ -34,7 +34,7 @@ class DispatchContractTests(unittest.TestCase):
         self.assertEqual(step['env']['PROMOTION_SHA'], '${{ inputs.commit_sha }}')
 
     def test_ci_enforces_offline_suite_on_prs_and_main(self):
-        ci = yaml.load((ROOT / '.github/workflows/ci.yml').read_text(),
+        ci = yaml.load((ROOT / '.github/workflows/ci.yml').read_text(encoding='utf-8'),
                        Loader=yaml.BaseLoader)
         self.assertIn('pull_request', ci['on'])
         self.assertIn('main', ci['on']['push']['branches'])
@@ -72,14 +72,15 @@ class DispatchContractTests(unittest.TestCase):
             manifests = root / 'skills/promotion-handoff'
             manifests.mkdir(parents=True)
             (manifests / 'promotion-manifest-test.json').write_text(json.dumps({
-                'canonical_target': {'accepted_commit_or_hash': recorded_sha}}))
+                'canonical_target': {'accepted_commit_or_hash': recorded_sha}}),
+                encoding='utf-8')
             output = root / 'output'
             env = {'PATH': str(Path(sys.executable).parent) + os.pathsep + '/usr/bin:/bin',
                    'GITHUB_OUTPUT': str(output)}
             result = subprocess.run(['/bin/bash', '-c', script], cwd=root, env=env,
-                                    capture_output=True, text=True, timeout=10)
+                                    capture_output=True, encoding='utf-8', timeout=10)
             self.assertEqual(result.returncode, 0, result.stderr)
-            return output.read_text()
+            return output.read_text(encoding='utf-8')
 
     def test_decoded_heredoc_matches_recorded_commit(self):
         output = self.run_resolver('a' * 40)
@@ -89,15 +90,21 @@ class DispatchContractTests(unittest.TestCase):
     def test_missing_manifest_still_reaches_hard_failure(self):
         output = self.run_resolver('b' * 40)
         self.assertIn('no_match_is_failure=true', output)
-        failure = next(step for step in self.steps if step.get('if') ==
-                       "steps.resolve.outputs.no_match_is_failure == 'true'")
+        # An unrelated step can share the condition without becoming our target.
+        self.steps.insert(0, {'name': 'Unrelated guarded step',
+                             'if': "steps.resolve.outputs.no_match_is_failure == 'true'",
+                             'run': 'exit 0'})
+        failure = next(step for step in self.steps if step.get('name') ==
+                       'Fail \u2014 no manifest recorded for dispatched commit')
+        self.assertEqual(failure['if'],
+                         "steps.resolve.outputs.no_match_is_failure == 'true'")
         script = failure['run'].replace('${{ steps.resolve.outputs.skillz_sha }}', 'a' * 40)
         self.assertNotIn('${{', script)
         with tempfile.TemporaryDirectory() as folder:
             result = subprocess.run(['/bin/bash', '-c', script],
                                     env={'PATH': '/usr/bin:/bin',
                                          'GITHUB_STEP_SUMMARY': str(Path(folder) / 'summary')},
-                                    capture_output=True, text=True, timeout=10)
+                                    capture_output=True, encoding='utf-8', timeout=10)
         self.assertEqual(result.returncode, 1)
 
 
