@@ -128,9 +128,9 @@ Never exchange entire source trees between Claude, Codex, and Replit. Exchange n
 
 `dist_old_1783751579/` is a historical build artifact, not source and not a rollback candidate. `attached_assets/` contains empty paste placeholders and is not instruction input. Both should be removed in a dedicated cleanup change after Jamie reviews the deletion. No tool may treat either directory as current implementation guidance.
 
-## 9. 2026-08-09 running-state refresh
+## 9. Historical 2026-08-09 running-state refresh (superseded)
 
-**Status:** current running state. **Date:** 2026-08-09. **Basis commit:** `234ea74` on `main`.
+**Status:** historical record, superseded by §10. **Date:** 2026-08-09. **Basis commit:** `234ea74` on `main`.
 **Scope:** this section supersedes **§4 only**. Sections 1 through 3 remain in force unchanged, including the authority table and the protected-baseline list, with the one addition recorded below. Sections 5 through 8 remain in force.
 
 Added under the governance rule in this repository's own guidance: do not silently replace a settled document, add a dated section. Section 4 is left intact as the 2026-07-12 record.
@@ -193,7 +193,7 @@ The base oracle measures the base game only. Full-game RTP requires the sim-agen
 
 The earlier 98.70% 40-seed reading was also incomplete: the harness ran only UniGlee acts 1–4. Do not restate it as full-game RTP.
 
-### 9.4 Corrections to §4's "planned or only partially visualized" list
+### 9.4 Corrections to §4's "planned or only partially visualized" list (historical)
 
 | §4 entry | Correct status as of 2026-08-09 |
 |---|---|
@@ -206,7 +206,7 @@ The earlier 98.70% 40-seed reading was also incomplete: the harness ran only Uni
 | Production music loops and final mix, service-worker/offline verification, asset-size optimization, device-regression gallery | Still open. |
 | In-flight UniGlee reload persistence and fast/skip controls | Still open, as the marathon contract states. |
 
-### 9.5 Known documentation deltas, not resolved here
+### 9.5 Known documentation deltas, not resolved here (historical)
 
 These are recorded so no tool treats them as settled. None of them is a code defect and none was "fixed" by editing a ruling.
 
@@ -215,3 +215,12 @@ These are recorded so no tool treats them as settled. None of them is a code def
 - **Decision numbering.** Two settled rows both carry the label S30. Recorded as a numbering errata note in `docs/DECISION-LOG.md`; both rulings stand and nothing was renumbered.
 - **UniGlee tease mechanic.** The live public page describes a decorative sighting at ~1/850 and a real capture at ~1/4,212, citing decisions S33 and S34 that do not exist. The engine implements neither. Open as **D6**.
 - **`lib/` and `artifacts/`.** Replit workspace scaffolding that nothing under `src/` imports and that never reaches `dist/`. Not implementation guidance. Whether they stay in the repository is an open cleanup item.
+
+## 10. 2026-09-08 running-state reconciliation
+
+This section is the current handoff for the shipped tree. The engine/UI boundary and protected presentation baseline in §§1–3 remain in force; this section supersedes the dated running-state claims in §9.
+
+- **UniGlee:** real captures award 300 / 400 / 500 initial spins on reels 3 / 4 / 5. Acts 1–4 receive 75 / 100 / 125 spins each, and Phoebe's Lap Quest is the additive fifth act. Decorative sightings remain non-paying at roughly 1 in 850; combined capture odds are roughly 1 in 4,212.
+- **Firefly meter:** the visible jar and label cap at six. Higher cascade counts still select the existing ladder awards, and retriggers remain blocked.
+- **Full-game fleet:** seeds 1–40 × 50,000 paid spins = 2,000,000 spins, measured 106.54% RTP with a per-seed 95% confidence interval of 104.94% to 108.14%. The model uses six Bold Chai pumps per second for 30 seconds, always completes Keepsake Trail, and chooses uniformly among three Lap Quest spots while petting through Joey's arrival. This is above the 95–98% design target and does not authorize a mechanics retune.
+- **Public handoffs:** the target repositories for the OverKill Hill Patch 3 and Glee-fully Arcade refresh are not present in this checkout. `PATCH-3-HANDOFF.md` and `ARCADE-REFRESH-HANDOFF.md` record the verified external blocker; no application or publish claim is made.

@@ -6,6 +6,8 @@
 
 > **APPROVED AMENDMENT — 2026-07-12:** `GAME-REALIGNMENT-2026-07-12.md` and decisions S20-S23 supersede this document wherever it uses GPT-Toolbox metaphors, treats twelve as sacred/system-wide, or describes the earlier short UniGlee package. Claude owns the eventual v3 math/spec integration; no tool may use the older language to roll back the approved Chai Chase direction.
 
+> **RUNNING-STATE NOTE — 2026-09-08:** This document remains the design authority, but its RTP and event-frequency rows are targets, not measurements. The current five-act implementation and its measured 106.54% full-game fleet result are recorded in `README.md`, `AGENTS.md`, and `docs/IMPLEMENTATION-BASELINE.md`.
+
 ---
 
 ## 1. Vision & design pillars
@@ -39,8 +41,8 @@ Five pillars, in priority order:
 ## 3. Game structure & screen flow
 
 ```
-Splash ("Tap to open the Toolbox 🧰", unlocks audio)
-  └─ Birthday Reveal (first launch on/after 07/17 only — §12)
+Splash (audio unlock and Chai Chase entry)
+  └─ Birthday message and coin grant during July 17–31 (shipped; §12)
        └─ MAIN BOARD (the game; 95% of time lives here)
             ├─ Free Spins (wheel → modifier → spins; same board, night-shifts to aurora)
             ├─ Bold Chai Bonus (12-pump barista scene)
@@ -73,7 +75,7 @@ Paytable (× line bet; tuned by simulation, these are the starting values):
 | Handbag Wild | — | — | — | Rare non-cat wild; multiplies a winning line by ×3, ×5, or ×10 |
 | UniGlee 🦋🌈 | — | — | — | Legend, not a line symbol (§5) |
 
-Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%):
+Design-target event frequencies (the seeded oracle checks the amended base-game gates; the full-game fleet is separate evidence):
 
 | Event | Frequency |
 |---|---|
@@ -84,7 +86,7 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 | Cat pop-in | ~1 in 30 spins (pity-weighted, §6) |
 | UniGlee decorative sighting | ~1 in 850 spins (non-paying; never starts the marathon) |
 | UniGlee capture | ~1 in 4,212 spins (independent per-reel rolls) |
-| Overall RTP (base + all bonuses) | ~96.5% (95-98% band). Base game alone ~61%; bonus layer ~35%. |
+| Overall RTP target (base + all bonuses) | ~96.5% (95-98% design band). Base game alone ~61%; bonus layer ~35%. Current fleet measurement is documented separately. |
 
 ## 5. Cascades, wilds & the UniGlee
 
@@ -167,9 +169,9 @@ Scenes award nothing but delight and a collection checkmark. That's the point.
 - **Audio:** Web Audio synth per src/audio/README.md. Base loop: dreamy 70s soft-rock progression (Rhodes-ish pad, brushed rhythm). Free spins: 90s-grunge-tinged loop (low fuzzed fifths, still warm). Theremin saucers, banjo-twang plucks, rising cascade arpeggio, purr-trill and boogie-riff cat motifs, brass fanfare. Vibes, never samples.
 - **Copy deck registers** (per site persona): Glee-Lite for routine wins ("Done and sparkling."), Glee-Rich default ("Do you love this? Wait. No. *Really* love it?"), Bleeds Glee for bonuses and UniGlee ("OMG. This is SO Glee-coded. Freak'n facts on FACTS."). Homage lines nod at her shows by energy, never verbatim quotes.
 
-## 12. The Birthday Reveal
+## 12. The Birthday Reveal (planned scene)
 
-First launch on/after 2026-07-17 (date check, one-time flag): night sky, two saucers fly in carrying a banner — **"Happy Birthday, Glee"** — Joey and Phoebe pop out, a chai tumbler descends into her hand silhouette, and one line from Jamie (text he writes himself, stored in one obvious constant: `BIRTHDAY_MESSAGE`). Then the Toolbox opens and the game begins with a full Treat Jar and 500 coins. Skippable after first view; re-watchable from the scene shelf.
+The animated Birthday Reveal scene remains planned. The shipped splash instead shows the birthday message and grants 10,000 Glee-coins once per device per year during July 17–31, then enters the Chai Chase after audio unlock. The message is stored in `BIRTHDAY_MESSAGE`; the scene described here is not evidence of a shipped feature.
 
 ## 13. Settings & accessibility
 

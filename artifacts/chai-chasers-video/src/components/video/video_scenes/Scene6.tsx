@@ -47,7 +47,7 @@ export function Scene6() {
           animate={{ opacity: 1 }}
           transition={reducedTransition(rm, { delay: 1.5, duration: 1 })}
         >
-          A rainbow butterfly opens an 80-spin marathon. Chains of wins unlock the mega cascade.
+          A rainbow butterfly opens a 300, 400, or 500-spin, five-act marathon. Phoebe's Lap Quest always closes it out.
         </motion.p>
       </div>
 
@@ -65,7 +65,7 @@ export function Scene6() {
           className="block w-full"
         />
         <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-[#080515] via-[#080515]/85 to-transparent">
-          <h2 className="font-display text-5xl font-bold text-white">12 cascades. <span className="text-gradient-gold">60 free spins.</span></h2>
+          <h2 className="font-display text-5xl font-bold text-white">12 cascades. <span className="text-gradient-gold">Five-act marathon.</span></h2>
         </div>
       </motion.div>
 

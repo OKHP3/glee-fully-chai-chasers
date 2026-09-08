@@ -549,6 +549,19 @@ function SceneGallery() {
           </div>
         </div>
 
+        <div
+          style={{
+            padding: "8px 12px",
+            color: "#b8f4dc",
+            background: "#102b2b",
+            borderBottom: "1px solid #25454a",
+            fontSize: 11,
+            lineHeight: 1.45,
+          }}
+        >
+          <strong>Design reference.</strong> Scenes marked as shipped mirror the current game. Other visuals are presentation references, not proof of a live feature.
+        </div>
+
         <div style={S.sidebarScroll}>
           {fetchError && (
             <div

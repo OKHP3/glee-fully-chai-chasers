@@ -75,7 +75,7 @@ export default function Slide06Uniglee() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '2vw', lineHeight: 1.55 }}>
-            Triggered when a UniGlee butterfly symbol fills a reel
+            Triggered by a real UniGlee capture on a payline at reel 3, 4, or 5
           </div>
         </div>
         <div className="flex items-start" style={{ gap: '1.2vw', marginBottom: '2.2vh' }}>
@@ -84,7 +84,7 @@ export default function Slide06Uniglee() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '2vw', lineHeight: 1.55 }}>
-            The screen fills with rising butterflies; a full-screen takeover announces the marathon
+            The screen fills with rising butterflies; a full-screen takeover announces a five-act marathon
           </div>
         </div>
         <div className="flex items-start" style={{ gap: '1.2vw', marginBottom: '2.2vh' }}>
@@ -93,7 +93,7 @@ export default function Slide06Uniglee() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '2vw', lineHeight: 1.55 }}>
-            6–15 free spins play out automatically with enhanced win multipliers
+            The capture awards 300, 400, or 500 initial free spins, split across four 75, 100, or 125-spin acts
           </div>
         </div>
         <div className="flex items-start" style={{ gap: '1.2vw' }}>
@@ -102,7 +102,7 @@ export default function Slide06Uniglee() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '2vw', lineHeight: 1.55 }}>
-            A chapter-style narrative (Joey's Laundry Helper) plays out during the marathon with its own header and cabinet skin
+            Joey's Laundry Helper opens, three seeded middle chapters shuffle through the center, and Phoebe's Lap Quest always closes the marathon
           </div>
         </div>
       </div>

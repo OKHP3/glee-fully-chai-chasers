@@ -1,7 +1,7 @@
 # Glee-fully Chai Chasers: Complete Game Mechanics and Engine Specification
 
 **Version:** 1.0
-**Date:** 2026-08-09
+**Date:** 2026-09-08
 **Repo state:** `1ee084d` (engine last touched at `234ea74`)
 **Scope:** everything under `src/engine/`, plus `scripts/sim-agent.ts` and the engine/UI boundary in `src/ui/board.ts`.
 **Brand:** OverKill Hill P³.
@@ -99,7 +99,7 @@ Copy that discipline. When you add a feature, either put its rolls on a separate
 | `features.ts` | treat jar, cat pop-ins, quip pools | 194 |
 | `freespins.ts` | Sparkle Wheel, wedge modifiers, free-spin sessions, retrigger block | 444 |
 | `uniglee.ts` | per-reel capture rates, trigger placement, five-act marathon plan | 176 |
-| `uniglee-marathon.ts` | acts 1 to 4 runner | 82 |
+| `uniglee-marathon.ts` | acts 1 to 4 runner; Lap Quest is the additive fifth act | 82 |
 | `laundry.ts` | Joey's Laundry Helper effects, quarter allocation | 120 |
 | `lap-quest.ts` | Phoebe's Lap Quest choice and sticky-wild round | 139 |
 | `treattime.ts` | Treat Time trigger rates and wild casting | 98 |
@@ -198,7 +198,7 @@ That linearity is what makes the knob solvable in one step. Measure the game at 
 scale_target = scale_current × (RTP_target / RTP_measured)
 ```
 
-Illustrative global-scale arithmetic from the 2026-09-08 fleet (not an authorized retune):
+Illustrative global-scale arithmetic from the 2026-09-08 fleet (not an authorized retune; the owner decision remains open):
 
 | Target | Arithmetic | Required `PAYOUT_SCALE` |
 |---|---|---:|

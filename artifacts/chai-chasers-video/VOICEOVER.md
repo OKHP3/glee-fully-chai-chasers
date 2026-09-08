@@ -22,8 +22,9 @@ cash prizes.
 > Hit the right moment and Joey and Phoebe take their places on the Sparkle
 > Wheel. That can lead to multiplying wilds, a Moonlit Keepsake Trail, or Iced
 > Chai Wild Rain. A rare UniGlee capture turns the whole board into a rainbow
-> butterfly marathon. And when the screen asks for Bold Chai, it is time to
-> pump fast.
+> butterfly marathon: 300, 400, or 500 initial free spins across five acts,
+> with Phoebe's Lap Quest always last. And when the screen asks for Bold Chai,
+> it is time to pump fast.
 >
 > These are not canned claims. The moments in this video come from current
 > engine replays: real cascades, real bonuses, real cat assists, all built from

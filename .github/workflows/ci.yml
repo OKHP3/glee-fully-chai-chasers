@@ -64,6 +64,18 @@ jobs:
         working-directory: artifacts/mockup-sandbox
         run: pnpm run typecheck
 
+      - name: Typecheck portfolio slides — keep the public deck buildable
+        run: pnpm --filter @workspace/chai-chasers-slides run typecheck
+
+      - name: Validate portfolio slide manifest — catch missing or orphaned slides
+        run: pnpm --filter @workspace/chai-chasers-slides run validate-slides
+
+      - name: Typecheck showcase video — keep the public video source buildable
+        run: pnpm --filter @workspace/chai-chasers-video run typecheck
+
+      - name: Validate showcase video asset — catch a missing rendered handoff
+        run: pnpm --filter @workspace/chai-chasers-video run validate:video-asset
+
       - name: Run full test suite — catch game logic and UI regressions before merge
         run: pnpm test
 

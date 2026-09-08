@@ -76,6 +76,14 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden}
 .uniglee-begin-btn{
   margin-top:12px;
 }
+.scene-status{
+  margin:8px 16px 0;
+  color:#b8f4dc;
+  font:600 11px/1.4 'Baloo 2',sans-serif;
+  letter-spacing:.08em;
+  text-align:center;
+  text-transform:uppercase;
+}
 </style>
 </head>
 <body>
@@ -162,7 +170,7 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden}
         <span class="askjamie-label">AskJamie</span>
       </button>
     </div>
-    <div id="status-line" class="status-line" aria-live="polite">UNI-GLEE! · 60 SPIN MARATHON · REEL 3</div>
+    <div id="status-line" class="status-line" aria-live="polite">UNI-GLEE! · 300 / 400 / 500 INITIAL SPINS · REEL 3, 4, OR 5</div>
     <footer class="bet-console">
       <div class="coin-chip" aria-label="Glee-coin balance">12,480<em>coins</em></div>
       <div class="flex-1"></div>
@@ -176,7 +184,7 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden}
       <div class="ice-notes-body">
         <div class="ice-notes-header">
           <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
-          <span class="ice-notes-name-group"><span class="ice-notes-name">UniGlee</span> <span class="ice-notes-text">The mythical capture — three UniGlee symbols across reels 3–5 unlock the 60-spin marathon.</span></span>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">UniGlee</span> <span class="ice-notes-text">A real capture on reel 3, 4, or 5 unlocks 300, 400, or 500 initial spins across the five-act marathon.</span></span>
         </div>
       </div>
     </aside>
@@ -223,12 +231,13 @@ html,body{margin:0;padding:0;width:390px;overflow:hidden}
     </div>
 
     <!-- Subtitle -->
-    <p class="uniglee-trigger-subtitle">The mythical capture begins the marathon</p>
+    <p class="uniglee-trigger-subtitle">A real capture begins the five-act marathon</p>
+    <p class="scene-status">Shipped behavior reference • current contract</p>
 
     <!-- Stats panel: trigger details -->
     <div class="uniglee-trigger-stats" role="list">
-      <span role="listitem"><b>60</b><small>Spin Marathon</small></span>
-      <span role="listitem"><b>Reel 3</b><small>trigger position</small></span>
+      <span role="listitem"><b>300–500</b><small>Initial spins</small></span>
+      <span role="listitem"><b>Reel 3 / 4 / 5</b><small>capture position</small></span>
     </div>
 
     <button class="sparkle-btn uniglee-begin-btn">Begin the Marathon</button>

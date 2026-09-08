@@ -100,7 +100,7 @@
     "position": 13,
     "title": "The RTP Simulation",
     "filepath": "src/pages/slides/Slide13RTPSimulation.tsx",
-    "description": "Monte Carlo simulation — 2,000,000 spins, 40 seeds, 98.70% full-game RTP, per-feature breakdown",
+    "description": "Monte Carlo simulation — 2,000,000 paid spins, 40 seeds, 106.54% five-act full-game RTP under a stated player model",
     "speakerNotes": ""
   },
   {

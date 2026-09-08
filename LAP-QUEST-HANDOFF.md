@@ -1,6 +1,10 @@
 # Phoebe's Lap Quest — Measurement Handoff
 
 **Measured:** 2026-09-07
+**Status:** Historical measurement handoff, superseded by the 2026-09-08
+five-act reconciliation in `README.md`, `AGENTS.md`, and
+`docs/IMPLEMENTATION-BASELINE.md` §10. The result table below is preserved for
+traceability and must not be quoted as the current full-game measurement.
 **Scope:** Workstream B, add canonical Lap Quest act 5 to the full-game RTP harness.
 
 ## Harness behavior
@@ -27,7 +31,7 @@ seq 1 40 | xargs -P4 -I{} sh -c \
 - Total paid spins: 2,000,000
 - Total bet: 80,000,000 fictional Glee-coins
 
-## Results — reproducible 40-seed run (2026-09-07)
+## Historical results — reproducible 40-seed run (2026-09-07)
 
 | Measure | Result |
 |---|---:|
@@ -44,14 +48,14 @@ seq 1 40 | xargs -P4 -I{} sh -c \
 | Engine `terminatedByCascadeCap` activations | **0** |
 | Dedicated Lap Quest soak cap activations | **0** |
 
-The previous published 98.70% was not full-game RTP: the harness stopped after UniGlee act 4. Adding act 5 moved this measured reading upward without changing any payout, reel, trigger, or tuning constant.
+The previous published 98.70% was not full-game RTP: the harness stopped after UniGlee act 4. Adding act 5 moved this historical reading upward without changing any payout, reel, trigger, or tuning constant. The current contract result is 106.54% under the reconciled measurement definition; see the current handoff cited above.
 
 ## Reproducibility boundary
 
 The previously recorded `~98.1%` estimate is not included as a measured result here because its
 exact commands, seed range, player model, and pooled totals were not preserved. The result above
-is the reproducible value for this implementation and run definition; it should not be blended with
-that historical estimate when evaluating D8.
+was the reproducible value for the then-current run definition; it should not be blended with
+that historical estimate or treated as the current contract result when evaluating D8.
 
 ## Dedicated Lap Quest soak
 

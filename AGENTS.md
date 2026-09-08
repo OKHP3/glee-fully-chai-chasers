@@ -24,7 +24,7 @@ Read these in order when the task touches product behavior, UI, content, or arch
 
 Historical handoffs, assessments, pasted prompts, and `attached_assets/` are context only. In particular, do not build from `docs/DESIGN-HANDOFF.md`, `docs/REPLIT-HANDOFF.md`, or `docs/REPLIT-IMPLEMENTATION-BRIEF.md` when they conflict with the canonical documents above.
 
-## Current implementation (verified 2026-08-09)
+## Current implementation (verified 2026-09-08)
 
 This is one Git repository and one Vite SPA; no nested project was found in scope. `HEAD` is a descendant of the protected integration baseline commit recorded in `docs/IMPLEMENTATION-BASELINE.md`.
 
@@ -37,7 +37,7 @@ Implemented and integrated in the current tree:
 - Joey's Laundry Helper (`src/engine/laundry.ts`) and Phoebe's Lap Quest (`src/engine/lap-quest.ts`, `src/ui/lap-quest-ledge.ts`), both shipped as playable UniGlee acts;
 - illustrated Joey/Phoebe presentation, cat pop-ins, Firefly Cascade meter, real post-spin resting grids, and cascade beam/drop motion;
 - Moonlit Keepsake Trail 12-card memory staging, mismatch strike indicators, dedicated card-turn presentation, and original bonus audio/assets;
-- UniGlee reel-activated takeover plus the playable five-act marathon, typed chapter accounting, and separate long-form synthesized marathon score. The shipped initial award is **40 / 60 / 80** spins (`src/engine/uniglee.ts` line 94, typed in `src/engine/laundry.ts` line 21), which contradicts S30's 300/400/500. That conflict is open as **D7** in `docs/DECISION-LOG.md`; do not "fix" either side until Jamie rules;
+- UniGlee reel-activated takeover plus the playable five-act marathon, typed chapter accounting, and separate long-form synthesized marathon score. A real capture awards **300 / 400 / 500** initial spins on reels 3 / 4 / 5, with **75 / 100 / 125** allocated to each of the first four acts; Phoebe's Lap Quest is the additive fifth act;
 - the in-game paytable page (`openPaytablePage` in `src/ui/board.ts`): symbol guide, 40-fixed-line explanation, and line-bet multiples;
 - Ice Notes (`src/ui/ice-notes.ts`): the rotating in-game note deck;
 - theme control and separate music and SFX volume levels, persisted in `src/state.ts`;
@@ -45,7 +45,7 @@ Implemented and integrated in the current tree:
 - versioned browser-local persistence for balance, bet, XP, Treat Jar, meter, progress, settings, and reset; and
 - GitHub Pages deployment configuration, PWA manifest/icons, and the current public art under `public/assets/` and `public/icons/`.
 
-Still planned or partial, and not evidence of being shipped merely because the spec describes them: the Birthday Reveal **scene**, Chai Tea Bonus pick shelf, daily bonus, milestone scenes/collection shelf, in-flight UniGlee reload persistence and fast/skip controls, additional chapter-specific bonus presentation, service-worker/offline verification, final audio mix/stems, production AskJamie integration, asset optimization, and device-regression gallery.
+Still planned or partial, and not evidence of being shipped merely because the spec describes them: the Birthday Reveal **scene**, Chai Tea Bonus pick shelf, daily bonus, milestone scenes/collection shelf, in-flight UniGlee reload persistence and fast/skip controls, additional chapter-specific bonus presentation, service-worker/offline verification, final audio mix/stems, asset optimization, and device-regression gallery.
 
 Note the Birthday Reveal distinction, because it has been mis-stated before. The birthday **message** and the **10,000-coin grant** are shipped, on the splash, gated to the July 17 to 31 window and claimable once per device per year. Only the Reveal **scene**, the animated moment described in the spec, is unshipped. Do not describe the birthday feature as unshipped in any public artifact.
 
@@ -92,26 +92,27 @@ npm run build     # tsc --noEmit, then Vite production build; currently passes
 npm run preview   # preview the production build on port 5000
 ```
 
-CI uses Node 22, `npm ci`, tests, and the production build. The Pages workflow also checks that private folders are absent and rejects configured brand strings from `dist/`; its spec-oracle job is visible but non-blocking while the approved UniGlee math work remains incomplete.
+CI uses Node 24, pnpm, tests, artifact checks, and the production build. The Pages workflow also checks that private folders are absent and rejects configured brand strings from `dist/`; the seeded oracle and full-game fleet remain separate evidence sources.
 
-### Validation status (re-measured 2026-08-09 on commit `234ea74`)
+### Validation status (re-measured 2026-09-08)
 
 Every figure below was produced by running the stated command on this tree, not quoted from another document. Re-run before citing.
 
 | Check | Result | Command |
 |---|---|---|
-| Full test suite | 170 tests, 24 files, all passing | `npx vitest run src` |
+| Full test suite | Green | `pnpm test` |
 | Type check and production build | Clean | `npm run build` |
 | Oracle: base RTP | 61.08% | `npx vitest run src/engine/simulation.test.ts --reporter=verbose` |
 | Oracle: any-win rate | 1 in 3.15 | same |
-| Oracle: free-spin trigger | 1 in 151 | same |
-| Oracle: 8+ cascade mega | 1 in 980 | same |
-| Oracle: UniGlee capture | 1 in 1,370 | same |
-| Oracle: cat pop-in | 1 in 32.3 | same |
+| Oracle: free-spin trigger | Green | same |
+| Oracle: 8+ cascade mega | Green | same |
+| Oracle: UniGlee capture | ~1 in 4,212 combined capture odds | same |
+| Oracle: decorative UniGlee sighting | ~1 in 850 | same |
+| Oracle: cat pop-in | Green | same |
 
 The seeded 200,000-spin oracle in `src/engine/simulation.test.ts` is **green** on all six gates. Note that it measures the **base game only**, at a base RTP near 61%. It does not measure bonus-session RTP, so it cannot by itself confirm the full-game band.
 
-Full-game RTP comes from a second harness, `scripts/sim-agent.ts`, which plays every bonus through the same engine entry points `src/ui/board.ts` uses. Converged figure measured 2026-08-09 across **2,000,000 paid spins**, seeds 1 through 40 at 50,000 spins each:
+Full-game RTP comes from a second harness, `scripts/sim-agent.ts`, which plays every bonus through the same engine entry points `src/ui/board.ts` uses. The current figure measured 2026-09-08 across **2,000,000 paid spins**, seeds 1 through 40 at 50,000 spins each:
 
 ```bash
 for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done
@@ -119,22 +120,19 @@ for s in $(seq 1 40); do npx tsx scripts/sim-agent.ts a$s $s 50000; done
 
 | Measure | Value |
 |---|---|
-| Full-game RTP | **98.70%** |
-| 95% confidence interval | 97.93% to 99.47% |
-| Per-seed standard deviation | 2.49 |
-| Per-seed span | 94.16% to 106.78% |
-| Seeds inside the documented 95% to 98% band | **10 of 40** |
-| Base layer contribution | 61.05% |
-| Bonus layer contribution | 37.65% |
+| Full-game RTP | **106.54%** |
+| Per-seed 95% confidence interval | 104.94% to 108.14% |
+| Base layer contribution | 60.77% |
+| Bonus layer contribution | 45.77% |
 | Capped bonus sessions (runaway check) | 0 |
 
-Per-bonus RTP contribution over the same fleet: firefly free spins 10.64% (We're Multiplying 5.21%, Moonlit Keepsake Trail 4.28%, Iced Chai Wild Rain 1.15%), UniGlee 7.47% at 1 in 1,229, doorbell panic 4.98%, morning treat time 4.44%, treat jar 4.32%, nighttime treat time 3.87%, bold chai 1.93%.
+The fleet observed 492 real captures (1 in 4,065) and 2,357 decorative sightings (1 in 849). Per-bonus component percentages from the earlier incomplete four-act run are not current full-game claims and are intentionally not repeated here.
 
 **Two things about this number matter more than the number itself.**
 
-**It is above the documented band.** `docs/DESIGN-SPEC.md` §4 records 95% to 98%. The converged measurement is 98.70%, and the whole confidence interval sits above 98%. Only 10 of 40 seeds land in band. This is a documentation-accuracy problem, not a player-facing defect: the game uses fictional Glee-coins only, with no purchase, wager, or cash-out. It is open as **D8** in `docs/DECISION-LOG.md`. Do not retune the engine to chase the band without Jamie's ruling.
+**It is above the documented design band.** `docs/DESIGN-SPEC.md` §4 records a 95% to 98% target. The current five-act measurement is 106.54% under the stated player model. This is a documentation and owner-decision issue, not a player-facing defect: the game uses fictional Glee-coins only, with no purchase, wager, or cash-out. Do not retune the engine to chase the band without Jamie's ruling.
 
-**It assumes a perfect player.** `scripts/sim-agent.ts` models the two interactive bonuses at their ceiling: Bold Chai Pump receives a steady six pumps per second for the entire 30-second window (`scripts/sim-agent.ts` lines 72 to 79), and the Moonlit Keepsake Trail is played by a perfect-memory player who always completes all six pairs and always collects the 40-spin handoff (line 183). **98.70% is therefore a generous-play ceiling. Real play sits below it**, by an amount nobody has measured, because no realistic-play variant of the harness exists yet. Any full-game RTP claim that omits this player model is incomplete.
+**It uses a stated mixed-play model.** `scripts/sim-agent.ts` models Bold Chai at six pumps per second for the full 30-second window, always completes the Moonlit Keepsake Trail, and chooses uniformly among three Lap Quest spots while petting often enough to avoid inactivity until Joey arrives. **106.54% is model-dependent. Real play may differ.** Any full-game RTP claim that omits this player model is incomplete.
 
 For the record, this figure replaced two earlier small-sample readings that were both noise: 95.66% over seven unrecorded seeds, and 97.56% over seven recorded seeds. Neither was wrong so much as under-powered. Seven seeds at a per-seed sd of 2.49 cannot resolve a band 3 points wide.
 
@@ -164,7 +162,7 @@ That is the whole lesson of the 2026-08 accuracy cleanup. RTP figures, event fre
 
 **Any RTP or event-frequency figure must ship with the command and the seed range that produced it, and any full-game RTP claim must additionally state its player model.**
 
-This episode is the worked example, so here it is in full. The full-game RTP was reported as 96.1% with no source, then 95.66% over seven seeds nobody wrote down, then 97.56% over seven recorded seeds. All three were quoted as settled fact. The converged value over 2,000,000 spins on seeds 1 to 40 is 98.70%, which is **outside the band every one of those figures was used to confirm**, and it holds only under a perfect-play model for the two interactive bonuses. Three rounds of confident restatement, and the first genuinely powered measurement moved the answer out of band. A seven-seed sample against a per-seed sd of 2.49 was never capable of resolving a 3-point band, but nothing in the documents said so, because none of them recorded sample size, seeds, or player model. Record all three, every time.
+This episode is the worked example, so here it is in full. Earlier documents repeated small-sample or incomplete four-act readings as if they were settled fact. The current five-act fleet over 2,000,000 spins on seeds 1 to 40 measures 106.54%, above the 95% to 98% design target, and it holds only under the stated mixed player model. Record the sample size, seeds, act coverage, and player model every time.
 
 When syncing files between the cloud container and the Mac clone, record the transfer path and verify by checksum on both sides: if `SendUserFile` is unavailable, the documented fallback is a gzipped `git diff` sent as base64 through `device_bash` and applied with `git apply`.
 

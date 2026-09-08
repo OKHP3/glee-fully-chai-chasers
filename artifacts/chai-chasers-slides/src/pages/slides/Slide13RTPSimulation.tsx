@@ -38,7 +38,7 @@ export default function Slide13RTPSimulation() {
               letterSpacing: '-0.02em',
             }}
           >
-            98.70%
+            106.54%
           </div>
           <div
             className="font-body"
@@ -50,7 +50,7 @@ export default function Slide13RTPSimulation() {
               textTransform: 'uppercase',
             }}
           >
-            Full-game RTP (perfect-play ceiling)
+            Full-game RTP (stated mixed-play model)
           </div>
         </div>
 
@@ -192,7 +192,7 @@ export default function Slide13RTPSimulation() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '2vw', lineHeight: 1.55 }}>
-            2,000,000 paid spins — 40 seeds × 50,000 each — measured <span style={{ color: '#F2C84B', fontWeight: 700 }}>98.70%</span> under a perfect-play model: Bold Chai maxed for the full 30 s, Keepsake Trail always completed
+            2,000,000 paid spins — 40 seeds × 50,000 each — measured <span style={{ color: '#F2C84B', fontWeight: 700 }}>106.54%</span> under a stated mixed-play model: Bold Chai at six pumps per second for 30 s, Keepsake Trail always completed, and Lap Quest choices uniform 1-in-3 with petting through Joey's arrival
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export default function Slide13RTPSimulation() {
             style={{ width: '1.2vw', height: '2px', borderRadius: '1px', marginTop: '1.1vh' }}
           />
           <div className="font-body text-text text-pretty" style={{ fontSize: '2vw', lineHeight: 1.55 }}>
-            Per-feature: Firefly free spins 10.6% · UniGlee 7.5% · Doorbell Panic 5.0% · Morning Treat Time 4.4% · Treat Jar 4.3%
+            Fleet context: base layer 60.77% · bonus layer 45.77% · 492 real captures (1 in 4,065) · 2,357 decorative sightings (1 in 849) · above the 95–98% design band
           </div>
         </div>
       </div>

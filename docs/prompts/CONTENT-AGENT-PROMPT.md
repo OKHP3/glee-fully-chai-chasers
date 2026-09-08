@@ -39,7 +39,7 @@ Audience: peers, architects, AI practitioners. Angle: **a case study in multi-ag
 **OverKill Hill voice rules (non-negotiable):** decision-memo tone, high density, dry wit welcome, sentimentality minimal. **No em dashes anywhere.** Natural contractions. Short punchy standalone lines are intentional; keep them. No mermaid.ai links in the body. **The article ends hard on its closing line — no reader questions, no soft outro.**
 
 ### 4. content/gleefully-tools-page.md (Glee-fully site draft)
-Audience: the Glee-fully community. Voice: **Glee-Rich, warm and playful** per the persona page — this is a "Today's Sparkle" / showcase entry. Frame: the Toolbox grew an Arcade. The story of a gift, the cats as co-stars, an invitation to play. Include suggested metadata (title, description, nav placement suggestion like "The Arcade 🎰").
+Audience: the Glee-fully community. Voice: **Glee-Rich, warm and playful** per the persona page — this is a "Today's Sparkle" / showcase entry. Frame: the Chai Chase grew an Arcade. The story of a gift, the cats as co-stars, an invitation to play. Include suggested metadata (title, description, nav placement suggestion like "The Arcade 🎰").
 
 ### 5. Repo metadata block (in README PR description or a comment file)
 Suggested GitHub About description (≤350 chars), topics list, and a spec for the social-preview image (1280x640: night-garden scene, title, the two cats, "Play free" — describe it for the design agent, don't build it).
