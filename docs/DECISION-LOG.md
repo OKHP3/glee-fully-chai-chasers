@@ -4,7 +4,7 @@ Single source of truth for product decisions. One owner per deliverable. Jamie r
 
 ## Open decisions
 
-D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table as S8 through S12. D6 was raised on 2026-08-09 and ruled on 2026-08-10. The decisions below were raised on 2026-08-09 by the accuracy audit (`content/AUDIT-2026-08-09.md`) and are awaiting Jamie's ruling. Each is written so a one-word answer settles it.
+D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table as S8 through S12. D6 was ruled on 2026-08-10. D7, D9, and the coupled D10 allocation were ruled on 2026-09-08 and are retained below as decision history. D8 is reopened pending an owner ruling because the 2026-09-08 fleet measured above the documented RTP band.
 
 ### D6. Was the UniGlee tease and rarity redesign ever ruled?
 
@@ -12,7 +12,7 @@ D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table
 
 **Ruling: "Ruled."** The decorative tease and the rarer real capture were real decisions that never reached the engine. Logged as settled **S34** (decorative tease sighting) and **S35** (rare capture rate redesign), both carrying the original ruling date of 2026-07-17. A simulation-gated engine task (#184) is open to implement the tease mechanic and re-rate the capture.
 
-**Interim page state:** Until the S34/S35 engine work ships, the overkillhill.com project page must describe the code that actually runs — not the planned mechanic. `content/PRD-OVERKILLHILL-PROJECT-PAGE-PATCH-3.md` (updated 2026-08-10) is the authoritative correction spec; it rolls back the Patch 2 UniGlee claims to the current shipped 1-in-1,277 behavior while the engine catches up. Patch 3 applies regardless of D6's ruling direction and must be executed in the OverKill-Hill repl before the page's own acceptance criterion passes.
+**Implementation update (2026-09-08):** S34/S35 are implemented. Decorative sightings roll independently at roughly 1-in-850 and never trigger the marathon; real captures use three independent reel rolls combining to roughly 1-in-4,212. The prior interim rollback instruction in Patch 3 is superseded.
 
 **Jamie's exact words (2026-08-10):** "Yes, there should be occasional appearances of the UNI-GLEE Butterfly that don't appear on a paying line, much like there are times where the Chai Pump and the Doorbell icons may appear but not actually payout."
 
@@ -20,7 +20,9 @@ D1 through D5 were ruled by Jamie on 2026-07-10 and now sit in the settled table
 
 ### D7. UniGlee award size: is it 300/400/500 or 40/60/80?
 
-**Raised:** 2026-08-09, by Claude, during the accuracy audit. **Owner:** Jamie. **Status:** open.
+**Raised:** 2026-08-09, by Claude, during the accuracy audit. **Owner:** Jamie. **Status:** ruled 2026-09-08.
+
+**Ruling: "S30."** The original 300 / 400 / 500 initial awards are canon and are implemented for captures on reels 3 / 4 / 5. D10 follows this ruling: acts 1 through 4 receive 75 / 100 / 125 spins each. Logged as settled **S38** without deleting or rewriting the earlier conflict history.
 
 A settled decision, its own structural contract, and the shipped engine disagree about how many free spins a UniGlee capture awards.
 
@@ -45,7 +47,7 @@ The stakes are quantified. UniGlee at 40/60/80 already contributes roughly six p
 
 ### D8. The documented RTP band does not match the measured game, and it never stated a player model
 
-**Raised:** 2026-08-09, by Claude, after the converged simulation fleet. **Owner:** Jamie. **Status:** substantially resolved by external validation — see below.
+**Raised:** 2026-08-09, by Claude, after the converged simulation fleet. **Owner:** Jamie. **Status:** reopened by the 2026-09-08 contract measurement — see below.
 
 `docs/DESIGN-SPEC.md` §4 records an overall RTP target of "~96.5% (95-98% band)".
 
@@ -65,9 +67,13 @@ The stakes are quantified. UniGlee at 40/60/80 already contributes roughly six p
 
 **Documentation-accuracy gap is substantially closed.** ~98.1% is consistent with the documented 95–98% band. No retune is warranted. Formally closing this decision requires Jamie to confirm whether (i) the band is considered met at ~98.1% or (ii) a player-model statement should be added to `docs/DESIGN-SPEC.md` §4. No engine work is needed under either option.
 
+**Superseding measurement (2026-09-08):** After Jamie restored the 300 / 400 / 500 award and the real capture was re-rated to roughly 1 in 4,212, the required 40-seed fleet ran seeds 1–40 at 50,000 paid spins each (`betPerLine = 1`). It measured **106.54% total RTP** with a per-seed 95% confidence interval of **104.94% to 108.14%**: base 60.77%, bonus 45.77%. It observed 492 captures (1 in 4,065) and 2,357 decorative sightings (1 in 849), with zero capped sessions and zero cascade-cap activations. This is above the 95–98% band under the harness's stated mixed player model. No compensating retune is authorized by D7; D8 therefore requires a new owner ruling before any payout or bonus math changes.
+
 ### D9. Firefly cascade meter cap: 6 or 8?
 
-**Raised:** 2026-08-10, surfaced by scene-catalog audit. **Owner:** Jamie. **Status:** open.
+**Raised:** 2026-08-10, surfaced by scene-catalog audit. **Owner:** Jamie. **Status:** ruled 2026-09-08.
+
+**Ruling: "Six."** Six is the canonical visible meter cap and the free-spin entry threshold. The SVG, label, state presentation, and regression tests clamp visible progress to 0–6. Cascades above six still select higher awards from the existing ladder. Logged as settled **S39**.
 
 `fireflyJarSvg()` (`src/ui/symbols.ts`) clamps the fill ratio to the range 0–8, meaning it visually represents up to 8 fireflies. Every instance of the label in the UI hardcodes `{n} / 6`, implying the cap is 6. Scene catalog reference: README §8, PART-A Appendix F.
 
@@ -78,7 +84,9 @@ The stakes are quantified. UniGlee at 40/60/80 already contributes roughly six p
 
 ### D10. UniGlee free-spin allocation: comment says 75/100/125, code yields 10/15/20
 
-**Raised:** 2026-08-10, surfaced by scene-catalog audit. **Owner:** Jamie. **Status:** open. **Resolve alongside D7.**
+**Raised:** 2026-08-10, surfaced by scene-catalog audit. **Owner:** Jamie. **Status:** ruled with D7 on 2026-09-08.
+
+**Ruling:** D7 restored the 300 / 400 / 500 initial award, so the quarter allocation is 75 / 100 / 125. This is part of settled decision **S38**.
 
 `src/engine/uniglee-marathon.ts:18` carries a comment stating per-act free-spin allocations of 75 / 100 / 125. The actual runtime calculation divides the takeover award (40 / 60 / 80 spins from D7's current engine) by 4 (quarter-per-act), yielding 10 / 15 / 20.
 
@@ -149,6 +157,8 @@ The comment likely reflects an earlier design target that predates the award-siz
 | S34 | 2026-07-17 | **UniGlee decorative tease: the butterfly appears on the board without landing on a paying line, at roughly 1-in-850 spins.** The sighting is non-paying and purely atmospheric — the butterfly is visible to the player but does not trigger the marathon. This mirrors the pattern of the Bold Chai Pump and Doorbell Panic icons, which can appear on the board without paying out. Jamie's ruling (2026-08-10): "there should be occasional appearances of the UNI-GLEE Butterfly that don't appear on a paying line, much like there are times where the Chai Pump and the Doorbell icons may appear but not actually payout." Exact rate and visual treatment are subject to engine implementation and RTP simulation gate. | Ruled 2026-08-10 via D6 |
 | S35 | 2026-07-17 | **UniGlee real capture re-rated to roughly 1-in-4,212 spins.** The three independent per-reel capture rolls (currently 1/2,500, 1/4,000, 1/7,500 combining to ~1-in-1,277) are adjusted so the true marathon capture is rarer than a tease sighting. Award size of 40/60/80 spins (current engine, per D7) or 300/400/500 (per S30, pending D7 ruling) is unchanged by this decision. Exact rates are engine work gated by a full-game RTP simulation sweep; the oracle upper bound in `src/engine/simulation.test.ts` must be updated to match the new target. | Ruled 2026-08-10 via D6; resolve alongside D7 |
 | S37 (was D11) | 2026-08-11 | **Both live Lap Quest presentation layers are intentional phases of one canonical chapter.** `board.ts` owns the opening cozy-spot choice, reveal, and reel-round presentation. `mountLapQuestLedge` owns the concurrent timed petting interaction and chapter end condition while later reel rounds continue beneath it. Neither is a legacy or alternate implementation; their sequence is protected by a shared integration test. The previously referenced standalone session file remains deleted. | Jamie ruled option (iii) on 2026-08-11 after the production call graph confirmed that `runLapQuestChapter` deliberately composes both layers. S37 avoids the S36 identifier reserved by the numbering errata above. |
+| S38 | 2026-09-08 | **UniGlee captures award 300 / 400 / 500 initial free spins on reels 3 / 4 / 5.** Acts 1 through 4 each receive one quarter, 75 / 100 / 125 spins; Phoebe's Lap Quest remains additive. This confirms S30 and supersedes the undocumented shipped 40 / 60 / 80 retune. | Jamie selected D7 option "S30"; D10 resolves with it. History is preserved in the D7/D10 entries above. |
+| S39 | 2026-09-08 | **The Firefly cascade meter visibly caps at six.** Six cascades trigger free spins; the jar and label clamp to 0–6, while cascade counts above six continue to select the existing higher ladder awards. | Jamie selected D9 option "Six." |
 
 ## Workstream owners
 

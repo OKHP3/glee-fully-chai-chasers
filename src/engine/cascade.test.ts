@@ -16,6 +16,36 @@ describe("spin", () => {
     expect(a.steps.length).toBe(b.steps.length);
   });
 
+  it("keeps a decorative UniGlee sighting separate from a real capture", () => {
+    const result = spin({
+      rng: mulberry32(123),
+      unigleeCaptureRng: () => 1,
+      unigleeTeaseRng: () => 0,
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+    });
+    expect(result.unigleeTriggered).toBe(false);
+    expect(result.unigleeTrigger).toBeUndefined();
+    expect(result.unigleeTease).toBeDefined();
+    const [reel, row] = result.unigleeTease!.position;
+    expect(result.steps[0].grid[reel][row].symbol).toBe("uniglee");
+  });
+
+  it("gives a real capture precedence when capture and tease both roll", () => {
+    const result = spin({
+      rng: mulberry32(123),
+      unigleeCaptureRng: () => 0,
+      unigleeTeaseRng: () => 0,
+      betPerLine: 1,
+      treatJar: emptyTreatJar(),
+      spinsSincePopIn: 0,
+    });
+    expect(result.unigleeTriggered).toBe(true);
+    expect(result.unigleeTrigger?.initialAwardSpins).toBe(500);
+    expect(result.unigleeTease).toBeUndefined();
+  });
+
   it("always ends on a dead board (last step has no wins)", () => {
     for (let seed = 0; seed < 25; seed++) {
       const result = spin({

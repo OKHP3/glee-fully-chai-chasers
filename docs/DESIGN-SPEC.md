@@ -82,14 +82,15 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 | 8+ cascade mega-trigger | ~1 in 900 spins |
 | Chai Tea Bonus (3+ scatters) | ~1 in 110 spins |
 | Cat pop-in | ~1 in 30 spins (pity-weighted, §6) |
-| UniGlee | ~1 in 1,277 spins (independent per-reel rolls) |
+| UniGlee decorative sighting | ~1 in 850 spins (non-paying; never starts the marathon) |
+| UniGlee capture | ~1 in 4,212 spins (independent per-reel rolls) |
 | Overall RTP (base + all bonuses) | ~96.5% (95-98% band). Base game alone ~61%; bonus layer ~35%. |
 
 ## 5. Cascades, wilds & the UniGlee
 
 **Cascade loop:** evaluate 40 lines → winning symbols beam up into the saucers (float-shrink-flash, 380ms) → columns compress down → new symbols drop from the saucer bays (staggered per reel, 90ms offsets) → re-evaluate. Repeat to dead board. Each cascade tier plays a rising arpeggio one step higher — by cascade 4+ it's musical euphoria.
 
-**Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow. Ladder: **6→6, 7→9, 8→15, 9→25, 10→40, 11+→60 free spins** (2026-07 retune: entry raised from 4 to 6 cascades; awards right-sized for the 95-98% full-game RTP target). At meter 5 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Retriggers are blocked in all bonuses (2026-07 retune): free spins never extend themselves.
+**Cascade meter:** big friendly jar of fireflies center-top; each cascade adds a glow up to the owner-confirmed visible cap of six. Ladder: **6→6, 7→9, 8→15, 9→25, 10→40, 11+→60 free spins** (2026-07 retune: entry raised from 4 to 6 cascades). At meter 5 the fireflies buzz audibly and AskJamie leans in — the honest near-miss. Cascades above six keep the jar at 6 / 6 while selecting the higher ladder award. Retriggers are blocked in all bonuses: free spins never extend themselves.
 
 **Saucer-Cat Wilds:** Joey-saucer and Phoebe-saucer wilds arrive in stacks up to 6-7 high on reels 2-5, substitute for all paying symbols, pay as Mermaid Tumbler when forming their own line.
 
@@ -102,7 +103,7 @@ Target event frequencies (engine must hit these in the 1M-spin simulation, ±15%
 | **Double Sparkle** | Next free-spin award from the ladder is doubled |
 | **Facts-on-Facts** | During free spins, wilds carry coin prizes (collected on beam-up) |
 
-**The UniGlee 🦋🌈** (~1 in 1,277) [editorial correction 2026-08-09: this prose read "(~1/400)", which contradicted the frequency table in §4 of this same document. **§4 is authoritative for all event frequencies.** The engine rolls three independent per-reel captures at 1/2,500, 1/4,000 and 1/7,500, summing to ~1 in 1,277: see `src/engine/uniglee.ts` lines 32 to 38. Measured 1 in 1,370 on the seeded oracle. Prose corrected; no frequency, weight, or gate was changed]: screen dims to deep violet, a rainbow butterfly crosses the board trailing stardust, and the full package lands: Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts. Near-guaranteed monster bonus. This is the legend, the story she tells other people. First UniGlee unlocks the Butterfly Burst scene permanently (§10).
+**The UniGlee 🦋🌈** has two explicitly separate outcomes. A decorative, non-paying sighting appears at roughly 1 in 850 spins and never starts or modifies the marathon. A real capture rolls independently on reels 3, 4, and 5 at 1-in-8,250, 1-in-13,200, and 1-in-24,750, combining to roughly 1 in 4,212. A capture awards 300, 400, or 500 initial free spins by reel, divided into 75, 100, or 125 spins for each of acts 1 through 4; Phoebe's Lap Quest remains additive. On capture the screen dims to deep violet, a rainbow butterfly crosses the board trailing stardust, and the full package lands: Double Sparkle + Facts-on-Facts + Drop-In Saucer + 3 queued Sparkle Sorts. First UniGlee unlocks the Butterfly Burst scene permanently (§10).
 
 ## 6. The Treat Jar & Cat Pop-Ins (signature system)
 
@@ -119,7 +120,7 @@ All shipped cat art is **original illustration** (S15 — no photos or photoreal
 
 ## 7. Free spins & the AskJamie Wheel
 
-Meter hits 4+ → celebration → **AskJamie spins Joey & Phoebe's Sparkle Wheel** (his avatar at the crank; Joey and Phoebe perched on the rim). One modifier per bonus:
+Meter hits 6+ → celebration → **AskJamie spins Joey & Phoebe's Sparkle Wheel** (his avatar at the crank; Joey and Phoebe perched on the rim). One modifier per bonus:
 
 | Wedge | Modifier |
 |---|---|

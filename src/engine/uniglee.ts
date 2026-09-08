@@ -5,7 +5,7 @@
  * contract. Chapter payout/effect math remains in the chapter engines.
  */
 import type { Rng } from "./rng";
-import type { Grid, SymbolId, UniGleeTrigger } from "./types";
+import type { Grid, SymbolId, UniGleeTease, UniGleeTrigger } from "./types";
 import { PAYLINES } from "./paylines";
 import { baseLaundryAllocation, type UniGleeAwardSpins } from "./laundry";
 
@@ -25,17 +25,23 @@ export const UNIGLEE_MIDDLE_SUB_BONUSES = [
 export const UNIGLEE_ACTIVE_REELS = [2, 3, 4] as const;
 
 /**
- * Per-reel independent capture odds: Reel 3 (index 2) 1-in-2,500 → 40 spins,
- * Reel 4 (index 3) 1-in-4,000 → 60 spins, Reel 5 (index 4) 1-in-7,500 → 80
- * spins. Combined per-spin rate is their sum (~1 in 1,277).
+ * Per-reel independent capture odds preserve the original relative reel
+ * weighting while making the real marathon roughly 1-in-4,212 overall.
  */
 export const UNIGLEE_REEL_RATES: readonly [2 | 3 | 4, number][] = [
-  [2, 1 / 2500],
-  [3, 1 / 4000],
-  [4, 1 / 7500],
+  [2, 1 / 8250],
+  [3, 1 / 13200],
+  [4, 1 / 24750],
 ];
 
 export const UNIGLEE_ACTIVE_RATE = UNIGLEE_REEL_RATES.reduce((sum, [, rate]) => sum + rate, 0);
+export const UNIGLEE_TEASE_RATE = 1 / 850;
+
+export const UNIGLEE_AWARD_BY_REEL = {
+  2: 300,
+  3: 400,
+  4: 500,
+} as const satisfies Readonly<Record<2 | 3 | 4, UniGleeAwardSpins>>;
 
 /**
  * Rolls each active reel independently at its own capture rate (one RNG draw
@@ -49,6 +55,19 @@ export function rollUniGleeCapture(rng: Rng): 2 | 3 | 4 | undefined {
     if (rng() < rate) hit = reel;
   }
   return hit;
+}
+
+export function rollUniGleeTease(rng: Rng): boolean {
+  return rng() < UNIGLEE_TEASE_RATE;
+}
+
+/** Places a decorative, non-triggering UniGlee on one active-reel cell. */
+export function placeUniGleeTease(rng: Rng, input: Grid): { grid: Grid; tease: UniGleeTease } {
+  const reel = UNIGLEE_ACTIVE_REELS[Math.floor(rng() * UNIGLEE_ACTIVE_REELS.length)];
+  const row = Math.floor(rng() * input[reel].length);
+  const grid = input.map((column) => column.map((cell) => ({ ...cell })));
+  grid[reel][row] = { symbol: "uniglee" };
+  return { grid, tease: { position: [reel, row] } };
 }
 
 const ACTIVE_REEL_WEIGHTS: readonly [2 | 3 | 4, number][] = UNIGLEE_REEL_RATES;
@@ -91,7 +110,7 @@ export function placeUniGleeTrigger(rng: Rng, input: Grid, capturedReel?: 2 | 3 
       lineIndex,
       position: [reel, row],
       linePositions,
-      initialAwardSpins: reel * 20 as UniGleeAwardSpins,
+      initialAwardSpins: UNIGLEE_AWARD_BY_REEL[reel],
     },
   };
 }
@@ -108,7 +127,7 @@ export interface UniGleeSubBonusPlan {
 
 export interface UniGleeMarathonPlan {
   initialAwardSpins: UniGleeAwardSpins;
-  quarterSpins: 10 | 15 | 20;
+  quarterSpins: 75 | 100 | 125;
   /** Joey first, a seeded permutation of the middle three, Phoebe last. */
   order: readonly UniGleeSubBonusId[];
   baseSubBonuses: readonly UniGleeSubBonusPlan[];

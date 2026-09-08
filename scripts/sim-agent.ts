@@ -152,6 +152,7 @@ let mega8 = 0;
 let jar = emptyTreatJar();
 let spinsSincePopIn = 10;
 let pendingTreatJarSpins = 0;
+let unigleeTeases = 0;
 
 for (let i = 0; i < PAID_SPINS; i++) {
   // --- treat jar settlement before the spin (mirrors runSpin) ---
@@ -165,12 +166,15 @@ for (let i = 0; i < PAID_SPINS; i++) {
   const result = spin({
     rng: mulberry32(seed),
     treatTimeRng: mulberry32(seed ^ 0x9e3779b9),
+    unigleeCaptureRng: mulberry32(seed ^ 0x243f6a88),
+    unigleeTeaseRng: mulberry32(seed ^ 0xb7e15162),
     allowTreatTimeBonus: true,
     betPerLine: BET_PER_LINE,
     treatJar: jar,
     spinsSincePopIn,
   });
   recordCascadeCap(result);
+  if (result.unigleeTease) unigleeTeases++;
 
   totalBet += TOTAL_BET_PER_SPIN;
   baseWin += result.totalWin;
@@ -352,6 +356,7 @@ console.log(JSON.stringify({
   totalRtp: totalWin / totalBet,
   baseWinningSpins,
   mega8,
+  unigleeTeases,
   totalFreeSpinsPlayed: totalFreeSpins,
   playerModel: {
     boldChaiPump: "steady 6 pumps/second for the full 30-second window",

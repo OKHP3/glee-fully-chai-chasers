@@ -198,13 +198,13 @@ That linearity is what makes the knob solvable in one step. Measure the game at 
 scale_target = scale_current × (RTP_target / RTP_measured)
 ```
 
-Worked, from today's measured fleet:
+Illustrative global-scale arithmetic from the 2026-09-08 fleet (not an authorized retune):
 
 | Target | Arithmetic | Required `PAYOUT_SCALE` |
 |---|---|---:|
-| Full game 96.5% (the documented centre) | 0.775 × 96.5 / 98.1 | 0.7623 |
-| Full game 98.0% (top of the documented band) | 0.775 × 98.0 / 98.1 | 0.7741 |
-| Base game 61.0% (current, unchanged) | 0.775 × 61.0 / 61.05 | 0.7744 |
+| Full game 96.5% (the documented centre) | 0.775 × 96.5 / 106.54 | 0.7020 |
+| Full game 98.0% (top of the documented band) | 0.775 × 98.0 / 106.54 | 0.7129 |
+| Base game 61.0% (current, unchanged) | 0.775 × 61.0 / 60.77 | 0.7779 |
 
 **State this plainly: `PAYOUT_SCALE` is the single global RTP knob.** Every other lever in the game (strip counts, ladder thresholds, bonus frequencies, award sizes) changes RTP *and* changes how the game feels. This one changes only RTP. If you need the game two points tighter and you do not want to renegotiate any design decision, this is the number you move, and it is the only number you move.
 
@@ -806,9 +806,9 @@ The storm fires **once, on round one only**, never on a later round (`freespins.
 
 **Trigger condition.** Not on the wheel. It is one of the three middle chapters of the UniGlee marathon, always played exactly once per marathon (`uniglee.ts:19-23`, `uniglee-marathon.ts:56-66`).
 
-**Trigger probability.** 1 per UniGlee capture, so **1 in 1,229** paid spins.
+**Trigger probability.** 1 per UniGlee capture, designed at roughly **1 in 4,212** paid spins and measured at 1 in 4,065 in the 2026-09-08 fleet.
 
-**What it awards.** One quarter of the marathon's initial award (10, 15, or 20 spins), played with a locked giant symbol rolled fresh **each round** (`rollKeepsakeZone`, `keepsake-constellation.ts:57-71`).
+**What it awards.** One quarter of the marathon's initial award (75, 100, or 125 spins), played with a locked giant symbol rolled fresh **each round** (`rollKeepsakeZone`, `keepsake-constellation.ts:57-71`).
 
 Zone weights, total 100 (`keepsake-constellation.ts:11-23`):
 
@@ -960,9 +960,9 @@ The optimal strategy is trivially "tap as fast as you can", but note the shape: 
 
 **Trigger condition.** Not triggerable directly. It is **always act 1** of the UniGlee marathon (`uniglee.ts:133-138`, `buildUniGleeMarathonPlan`).
 
-**Trigger probability.** 1 per UniGlee capture, so **1 in 1,229** paid spins.
+**Trigger probability.** 1 per UniGlee capture, designed at roughly **1 in 4,212** paid spins and measured at 1 in 4,065 in the 2026-09-08 fleet.
 
-**What it awards.** One quarter of the marathon's initial award, `baseLaundryAllocation` = `awardedSpins × 0.25` (`laundry.ts:18, 23-25`), so 10, 15, or 20 spins. Each round rolls two independent opening-grid effects (`rollJoeyLaundryEffect`, `laundry.ts:84-107`) under `DEFAULT_UNIGLEE_LAUNDRY_CONFIG` (`uniglee-marathon.ts:12-16`):
+**What it awards.** One quarter of the marathon's initial award, `baseLaundryAllocation` = `awardedSpins × 0.25`, so 75, 100, or 125 spins. Each round rolls two independent opening-grid effects under `DEFAULT_UNIGLEE_LAUNDRY_CONFIG`:
 
 | Effect | Rate | What it does |
 |---|---:|---|
@@ -985,7 +985,7 @@ Retriggers are explicitly zeroed inside the chapter loop (`freespins.ts:330-332`
 
 **Trigger condition.** Not triggerable directly. It is **always act 5**, the additive sweetener, of the UniGlee marathon (`uniglee.ts:145-156`). It has no quarter allocation: `baseSpins: 0`, `isSweetener: true`.
 
-**Trigger probability.** 1 per UniGlee capture, so **1 in 1,229** paid spins.
+**Trigger probability.** 1 per UniGlee capture, designed at roughly **1 in 4,212** paid spins and measured at 1 in 4,065 in the 2026-09-08 fleet.
 
 **What it awards.** A choose-one-of-three, then an open-ended run of sticky-wild rounds.
 
@@ -1014,17 +1014,19 @@ The timing model (`src/ui/lap-quest-ledge.ts`) owns a DOM interval that runs the
 
 **Trigger condition.** Three independent per-reel rolls, once per spin, on the main board only (`rollUniGleeCapture`, `uniglee.ts:46-52`; called at `cascade.ts:266` under `allowUniGlee && spinArea === "main"`). If more than one reel hits on the same spin, **the highest reel wins**, deterministically, so the tie goes to the rarer and larger award.
 
-**Trigger probability.** `UNIGLEE_REEL_RATES` (`uniglee.ts:32-36`):
+**Trigger probability.** Real captures and decorative sightings use independent RNG streams so neither perturbs the tuned reel/cascade stream. `UNIGLEE_REEL_RATES`:
 
 | Reel (1-based) | Reel index | Rate | Initial award |
 |---:|---:|---:|---:|
-| 3 | 2 | 1/2,500 | 40 spins |
-| 4 | 3 | 1/4,000 | 60 spins |
-| 5 | 4 | 1/7,500 | 80 spins |
+| 3 | 2 | 1/8,250 | 300 spins |
+| 4 | 3 | 1/13,200 | 400 spins |
+| 5 | 4 | 1/24,750 | 500 spins |
 
-`UNIGLEE_ACTIVE_RATE` is their sum, 0.000783333, which is **1 in 1,276.6** (`uniglee.ts:38`). Measured: **1 in 1,229** in the fleet, 1 in 1,221 and 1 in 1,291 on independent engine runs, 1 in 1,370 in the seeded oracle. Award is `reel × 20` (`uniglee.ts:94`), and the reel-rate weighting gives a mean initial award of 53.19 spins; measured 52.90.
+`UNIGLEE_ACTIVE_RATE` is their sum, approximately 0.000237374, which is **1 in 4,212.8** before the negligible overlap correction. The owner-confirmed award is read from an explicit reel-to-award table rather than inferred arithmetically.
 
-On capture, `placeUniGleeTrigger` (`uniglee.ts:75-97`) picks a random payline, overwrites reels 1 through *reel-1* on that line with one randomly chosen paying symbol, and puts the UniGlee symbol on the capturing reel. The prefix is made line-valid deliberately, so the capture reads as a genuine near-line and not as a decorative scatter. The UniGlee symbol itself never pays.
+The separate decorative sighting rolls at `UNIGLEE_TEASE_RATE = 1/850`. It places a non-paying UniGlee symbol on one active-reel cell, returns a typed `unigleeTease` payload, and never sets `unigleeTriggered`, awards spins, or seeds specialty effects. If both independent streams hit on one spin, the real capture takes precedence.
+
+On capture, `placeUniGleeTrigger` picks a random payline, overwrites reels 1 through *reel-1* on that line with one randomly chosen paying symbol, and puts the UniGlee symbol on the capturing reel. The prefix is made line-valid deliberately, while the decorative sighting uses its own non-triggering placement path. The UniGlee symbol itself never pays.
 
 **What it awards.** A five-act marathon (`buildUniGleeMarathonPlan`, `uniglee.ts:122-159`):
 
@@ -1036,17 +1038,17 @@ Acts 1 to 4 each receive exactly one quarter of the initial award:
 
 | Initial award | Capturing reel | Each of acts 1 to 4 | Total acts 1 to 4 |
 |---:|---:|---:|---:|
-| 40 | 3 | 10 | 40 |
-| 60 | 4 | 15 | 60 |
-| 80 | 5 | 20 | 80 |
+| 300 | 3 | 75 | 300 |
+| 400 | 4 | 100 | 400 |
+| 500 | 5 | 125 | 500 |
 
 `UNIGLEE_CHAPTER_SPIN_CAP = 500` per act (`uniglee-marathon.ts:18`) is a deterministic guard that normal play never approaches. Zero capped sessions in 2,000,000 spins.
 
 **Player agency.** Only inside act 5, and only the petting (see 7.13).
 
-**Design intent.** The legend. One event that is rare enough to be a story and long enough to be an experience, structured as five distinct chapters so that a 53-spin marathon does not feel like 53 identical spins.
+**Design intent.** The legend. The player glimpses the butterfly more often than they truly catch it. A real capture is rare enough to be a story and long enough to be an experience, structured as five distinct chapters so that 300 to 500 initial spins do not feel identical.
 
-**Measured RTP contribution: 7.47%** for acts 1 to 4, the second-largest single contributor. Mean 53.61 spins played, 3,670.6 times the total bet per capture. Chapter split, measured over 4,000 marathons:
+**Current measured RTP contribution: 15.25%** for acts 1 to 4. The 2026-09-08 fleet played 492 marathons and 181,500 act spins. The older chapter split below is retained only as historical evidence from the previous 40 / 60 / 80 contract:
 
 | Chapter | Mean spins | Mean win (× total bet) | Share of marathon | Implied RTP |
 |---|---:|---:|---:|---:|
@@ -1055,7 +1057,7 @@ Acts 1 to 4 each receive exactly one quarter of the initial award:
 | Keepsake Collection | 13.22 | 21.34 | 24.0% | 1.79% |
 | Joey's Laundry Helper | 13.22 | 19.99 | 22.4% | 1.67% |
 
-**But 7.47% understates it badly, and this is the single most important accounting point in the document.** A UniGlee capture also seeds a five-item specialty queue and sets `doubleSparkleActive`, so the capturing spin itself cascades to a mean depth of 6.97 and awards a **doubled** Firefly ladder award 73.3% of the time. Those doubled sessions land in the Firefly bucket, not the UniGlee bucket.
+The 15.25% acts bucket still understates total attribution because a capture also seeds a specialty queue and sets `doubleSparkleActive`; resulting Firefly value lands in the Firefly bucket, not the UniGlee bucket.
 
 Measured directly over 1,000,000 paid spins by re-running the harness with the Firefly bucket split by origin:
 
@@ -1066,7 +1068,7 @@ Measured directly over 1,000,000 paid spins by re-running the harness with the F
 | **Total attributable to a UniGlee capture** | **10.224%** |
 | Firefly sessions from ordinary spins | 7.990% |
 
-So a UniGlee capture is worth **10.2 points of RTP at 1 in about 1,229**, not 7.5, and it is not the second-largest contributor: it is the largest by a clear margin. Phoebe's Lap Quest, unmeasured, sits on top of that.
+That split table is historical and must not be quoted for the current contract. Current directly reported buckets are 15.25% for acts 1–4 and 2.16% for Lap Quest, with some additional capture-origin value inside the Firefly bucket.
 
 ### 7.15 Cat pop-ins (not a bonus, but in the table)
 
@@ -1253,32 +1255,33 @@ RTP is not one number produced by one system. It is two layers with very differe
 
 | Layer | What it is | Measured | Share of total |
 |---|---|---:|---:|
-| Base game | line wins on paid spins, cascades included, no bonus sessions | **~61.1%** | ~62.3% |
-| Bonus layer | every free spin, marathon chapter, and minigame award | **~37%** | ~37.7% |
-| **Total** | | **~98.1%** | |
+| Base game | line wins on paid spins, cascades included, no bonus sessions | **60.77%** | 57.0% |
+| Bonus layer | every free spin, marathon chapter, and minigame award | **45.77%** | 43.0% |
+| **Total** | | **106.54%** | |
 
-*Best current estimate from external multi-agent validation (several million paid spins). Per-component split is implied from external total minus spec-oracle base; internal 40-seed run showed 61.05% / 44.74% = 105.79% which was a statistical overestimate.*
+*Current result from the required post-contract fleet on 2026-09-08: seeds 1–40, 50,000 paid spins each, `betPerLine = 1`. The per-seed 95% confidence interval is 104.94% to 108.14%. This measurement belongs to the stated harness player model and is above the 95–98% design band.*
 
-The base layer is high-frequency and low-variance: it pays on 31.5% of spins and its distribution is bounded by the paytable. The bonus layer is the opposite: seven distinct sources, hit rates from 1 in 25 down to 1 in 1,229, and a per-seed standard deviation that dominates the total.
+The base layer is high-frequency and lower-variance: it pays on roughly 31.5% of spins and its distribution is bounded by the paytable. The bonus layer is the opposite: distinct sources with hit rates from roughly 1 in 25 down to a UniGlee capture near 1 in 4,212, and a per-seed standard deviation that dominates the total.
 
 This split is deliberate. The oracle gates the base layer at roughly 61% precisely so that the base game is boring in a measurable way, and every point of excitement is bought with a bonus that can be individually measured and individually retuned. It also means the two layers can be tested by two completely different tools, which is section 10.2 and 10.3.
 
 ### 10.2 The oracle: `src/engine/simulation.test.ts`
 
-**What it is.** 102 lines. One function, `simulate()`, that runs 200,000 spins on seed `20260717` through `spin()` directly, and six `it()` blocks asserting frequency bands on the result. It runs inside the ordinary vitest suite (`npx vitest run src`).
+**What it is.** One function, `simulate()`, runs 200,000 spins on seed `20260717` through `spin()` directly, with separate deterministic capture and tease streams, and seven `it()` blocks asserting frequency bands. It runs inside the ordinary vitest suite (`pnpm vitest run src`).
 
-**What it gates.** Six event frequencies from the design spec's §4 table. Not RTP alone: RTP is one of six.
+**What it gates.** Seven event frequencies from the design spec's §4 table. Not RTP alone: RTP is one of seven.
 
-| Gate | Band | Actual (verified 2026-08-09) | Source |
+| Gate | Band | Actual (verified 2026-09-08) |
 |---|---|---:|---|
-| Base RTP | 0.599 to 0.619 | **61.08%** | `simulation.test.ts:71-74` |
-| Any-win rate | 1 in 2.5 to 1 in 3.4 | **1 in 3.15** | `:76-79` |
-| Free-spin trigger | 1 in 120 to 1 in 188 | **1 in 151** | `:83-86` |
-| 8-plus cascade | 1 in 450 to 1 in 1,800 | **1 in 980** | `:88-91` |
-| UniGlee capture | 1 in 850 to 1 in 2,000 | **1 in 1,370** | `:93-96` |
-| Cat pop-in | 1 in 23 to 1 in 40 | **1 in 32.3** | `:98-101` |
+| Base RTP | 0.599 to 0.619 | **61.05%** |
+| Any-win rate | 1 in 2.5 to 1 in 3.4 | **1 in 3.14** |
+| Free-spin trigger | 1 in 120 to 1 in 188 | **1 in 156** |
+| 8-plus cascade | 1 in 450 to 1 in 1,800 | **1 in 1,026** |
+| UniGlee capture | 1 in 2,800 to 1 in 7,000 | **1 in 3,448** |
+| UniGlee decorative sighting | 1 in 650 to 1 in 1,100 | **1 in 948** |
+| Cat pop-in | 1 in 23 to 1 in 40 | **1 in 33.3** |
 
-All six green. Reproduce with:
+All seven green. Reproduce with:
 
 ```
 npx vitest run src/engine/simulation.test.ts --reporter=verbose
@@ -1327,60 +1330,57 @@ That last row is a nice piece of defensive engineering: the cap exists only so t
 | Moonlit Keepsake Trail | perfect memory: always completes all six pairs, always collects the flat 40-spin handoff | `sim-agent.ts:182-186` | A real player who fails on two strikes gets **zero**. This wedge is 35% of all Firefly awards |
 | Phoebe's Lap Quest | random-uniform choice among three offered spots; pets often enough to avoid inactivity until Joey arrives | `simulateLapQuest` | 1-in-3 perfect lap; engaged-petting duration |
 
-**So ~98.1% belongs to this stated mixed player model, not to every possible player.** No realistic-play variant exists for Bold Chai or Keepsake Trail. The player-model question remains open in decision D8, though the documentation-accuracy gap is now substantially closed.
+**So 106.54% belongs to this stated mixed player model, not to every possible player.** No realistic-play variant exists for Bold Chai or Keepsake Trail. D8 remains open because this result is above the documented band.
 
 One further omission pushes a player's effective return **up**: level-up coin rewards are not modelled. `200 × level` per level crossed is a UI-side faucet outside every RTP figure here (section 9.3).
 
 ### 10.4 Measured results
 
-**Fleet:** 40 seeds × 50,000 paid spins = **2,000,000 paid spins**, `betPerLine = 1`, total bet 80,000,000 coins. Verified 2026-08-11.
+**Fleet:** 40 seeds × 50,000 paid spins = **2,000,000 paid spins**, `betPerLine = 1`, total bet 80,000,000 coins. Verified 2026-09-08 after the UniGlee/Firefly contract implementation.
 
 ```
 seq 1 40 | xargs -P4 -I{} sh -c \
   'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'
 ```
 
-| Measure | Internal 40-seed run | External validation (best estimate) |
-|---|---:|---:|
-| Total RTP | 105.79% *(overestimated)* | **~98.1%** |
-| Sample size | 2,000,000 paid spins | Several million paid spins |
-| Source | `scripts/sim-agent.ts` | Claude Cowork + ChatGPT Work fleets |
-| 95% confidence interval | 104.82% to 106.76% | converged independently |
-| Per-seed standard deviation | 3.12 points | n/a |
-| Per-seed span | 100.53% to 114.00% | n/a |
-| Seeds inside the 95% to 98% band | 0 of 40 | consistent with band |
-| Base layer | 61.05% | ~61.1% (spec oracle) |
-| Bonus layer | 44.74% | ~37% (implied) |
-| Capped sessions | **0** | |
-| Cascade-cap activations | **0** | |
-| Bonus rounds played | 656,511 | |
+| Measure | Current 40-seed result |
+|---|---:|
+| Total RTP | **106.54%** |
+| 95% confidence interval | **104.94% to 108.14%** |
+| Base layer | 60.77% |
+| Bonus layer | 45.77% |
+| Real UniGlee captures | 492, **1 in 4,065** |
+| Decorative UniGlee sightings | 2,357, **1 in 849** |
+| Free spins played | 694,981 |
+| Capped sessions | **0** |
+| Cascade-cap activations | **0** |
 
 Per-feature, same fleet:
 
-| Feature | Sessions | Hit rate | Mean win (× total bet) | Mean spins | Win per bonus spin | RTP contribution |
-|---|---:|---|---:|---:|---:|---:|
-| Firefly free spins (all wedges) | 9,673 | 1 in 207 | 879.2 | 22.81 | 0.964 | **10.63%** |
-| UniGlee marathon (acts 1 to 4) | 1,628 | 1 in 1,229 | 3,670.6 | 53.61 | 1.712 | **7.47%** |
-| Phoebe's Lap Quest | 1,628 | 1 in 1,229 | 3,485.2 | 22.14 | 3.935 | **7.09%** |
-| We're Multiplying wedge | 3,867 | 1 in 517 | 1,076.1 | 13.64 | 1.972 | 5.20% |
-| Doorbell Panic | 3,971 | 1 in 504 | 1,004.0 | 4.49 | 5.590 | 4.98% |
-| Morning Treat Time | 8,093 | 1 in 247 | 439.1 | 6.47 | 1.697 | 4.44% |
-| Treat Jar free spins | 79,014 | 1 in 25 | 43.7 | 1.72 | 0.636 | 4.32% |
-| Moonlit Keepsake Trail wedge | 3,355 | 1 in 596 | 1,019.3 | 40.00 | 0.637 | 4.27% |
-| Nighttime Treat Time | 4,032 | 1 in 496 | 767.6 | 11.02 | 1.741 | 3.87% |
-| Bold Chai Pump | 3,464 | 1 in 577 | 446.6 | 17.97 | 0.621 | 1.93% |
-| Iced Chai Wild Rain wedge | 2,451 | 1 in 816 | 376.6 | 13.73 | 0.685 | 1.15% |
-| Cat pop-ins | 90,528 | 1 in 22 | 0 | 0 | n/a | 0.00% |
+| Feature | Sessions | Hit rate | Free spins played | RTP contribution |
+|---|---:|---|---:|---:|
+| Firefly free spins (all wedges) | 8,915 | 1 in 224 | 190,352 | **8.76%** |
+| UniGlee marathon (acts 1 to 4) | 492 | 1 in 4,065 | 181,500 | **15.25%** |
+| Phoebe's Lap Quest | 492 | 1 in 4,065 | 10,457 | **2.16%** |
+| We're Multiplying wedge | 3,608 | 1 in 554 | 41,574 | 3.96% |
+| Doorbell Panic | 3,973 | 1 in 503 | 17,851 | 5.06% |
+| Morning Treat Time | 8,086 | 1 in 247 | 52,244 | 4.45% |
+| Treat Jar free spins | 79,016 | 1 in 25 | 135,669 | 4.27% |
+| Moonlit Keepsake Trail wedge | 3,087 | 1 in 648 | 123,480 | 3.93% |
+| Nighttime Treat Time | 4,044 | 1 in 495 | 44,574 | 3.88% |
+| Bold Chai Pump | 3,468 | 1 in 577 | 62,334 | 1.94% |
+| Iced Chai Wild Rain wedge | 2,220 | 1 in 901 | 25,298 | 0.88% |
+| Cat pop-ins | 90,676 | 1 in 22 | 0 | 0.00% |
 
 The three wedge rows are components of the Firefly row, not additions to it.
 
-**The correct attribution for UniGlee is 10.22 points, not 7.47** (section 7.14). A capture also doubles the Firefly award on the capturing spin, and those doubled sessions are counted in the Firefly row. Measured by splitting the Firefly bucket by origin over 1,000,000 paid spins: 7.486% marathon + 2.738% doubled Firefly = 10.224% attributable to a UniGlee capture, versus 7.990% for all ordinary Firefly sessions combined.
+The UniGlee acts 1–4 bucket contributes 15.25 points and Lap Quest contributes another 2.16 points under this player model. Capturing-spin effects can also feed the Firefly bucket, so those two rows remain a lower bound on total UniGlee-attributable return.
 
 ### 10.5 The convergence problem
 
 This is the most transferable engineering lesson in the document, so it gets stated plainly and then worked out.
 
-**The observations.** Three measurements of the same engine:
+**Historical observations before the 2026-09-08 contract change.** These measurements belong to earlier engine contracts and are retained only as sample-size evidence:
 
 | Sample | Seeds | Paid spins | Reported RTP |
 |---|---:|---:|---:|
@@ -1390,7 +1390,7 @@ This is the most transferable engineering lesson in the document, so it gets sta
 | Internal five-act reading | 40 | 2,000,000 | 105.79% *(overestimated — insufficient sample)* |
 | **External validation** | multiple agents | several million | **~98.1%** *(best current estimate)* |
 
-The first two look like confirmations of a 95% to 98% band. They are not. The 98.70% reading had adequate sample size but an incomplete harness: Lap Quest was absent. The 40-seed five-act reading added Lap Quest and moved the total upward — but at 2,000,000 paid spins, rare 1-in-1,229 UniGlee events produce high per-seed variance, and the sample was too small to converge. Independent multi-agent external validation runs (several million paid spins, two separate fleet deployments) converged on **~98.1%**, which sits within the documented 95–98% band.
+The current contract cannot reuse any of those totals: the award, capture rate, tease behavior, and RNG boundaries changed. Its dated result is 106.54% with a 104.94% to 108.14% per-seed confidence interval.
 
 **The arithmetic.** Per-seed standard deviation across the 40-seed fleet is **2.49 points**. The standard error of the mean at n seeds is `2.49 / sqrt(n)`, and the 95% confidence interval is `± 1.96 × se`:
 
@@ -1422,9 +1422,9 @@ Here is the same instability shown directly, using contiguous seven-seed windows
 
 A 1.76-point spread between adjacent seven-seed windows of the same engine. Nothing changed but the seed.
 
-**Why: the distribution is dominated by one rare fat-tailed event.**
+**Why the current fleet must remain large: the distribution is dominated by one rare fat-tailed event.**
 
-UniGlee arrives at 1 in 1,229 and carries 10.22 points of RTP (7.47 marathon plus 2.74 doubled Firefly). Work it through for one 50,000-spin seed:
+Under the current contract, UniGlee arrives at roughly 1 in 4,212 and its acts 1–4 alone measured 15.25 points of RTP. The older worked example below is retained as historical methodology, not current arithmetic:
 
 ```
 expected arrivals   = 50,000 / 1,229          = 40.7
@@ -1440,7 +1440,7 @@ share of total variance
 
 The measured decomposition agrees. Across the fleet, UniGlee's own per-seed RTP contribution has mean 7.47 and sd 1.46, and the correlation between a seed's UniGlee count and its total RTP is **+0.501**. Everything-except-UniGlee has a per-seed sd of 2.05, so UniGlee is not the whole story, but it is the single largest identifiable term and it is the one that makes small samples useless.
 
-Payout variance within an event compounds it. The marathon's award depends on which reel captured (40, 60, or 80 spins at very different rates), and each chapter's win is itself a heavy-tailed cascade sum. That is why the measured UniGlee sd of 1.46 exceeds the 1.17 points you would get from marathon arrivals alone.
+Payout variance within an event compounds it. The marathon's award depends on which reel captured (300, 400, or 500 spins at different rates), and each chapter's win is itself a heavy-tailed cascade sum.
 
 **The general lesson.** In any game whose RTP is materially carried by an event rarer than about 1 in 1,000, the sample size required to measure RTP is set by the arrival count of that event, not by the spin count. The rule of thumb:
 
@@ -1460,7 +1460,7 @@ Three practical rules follow, and they are the ones to carry to any other projec
 
 1. **Report the confidence interval, always, and the per-seed standard deviation with it.** A bare RTP number cannot be checked by anyone. Three successive figures went unchallenged in this project precisely because none of them carried an interval.
 2. **Size the fleet from the rarest material contributor, not from a round number of spins.** Compute the required arrival count first, then divide by the hit rate.
-3. **Re-run the whole fleet after any change to a rare bonus.** A change to a 1-in-1,229 event cannot be validated by a 350,000-spin run, no matter how confident the run looks.
+3. **Re-run the whole fleet after any change to a rare bonus.** A change to a roughly 1-in-4,212 event cannot be validated by a 350,000-spin run, no matter how confident the run looks.
 
 ---
 
@@ -1544,11 +1544,11 @@ These four are not independent. Changing one without re-deciding the others prod
 
 **4. UniGlee rarity, its award, its doubling, and your fleet size.** Four things move together:
    - The reel rates set the hit rate.
-   - `reel × 20` sets the award, and `baseLaundryAllocation` divides it by four.
+   - The reel-to-award table sets 300 / 400 / 500, and `baseLaundryAllocation` divides it by four.
    - The unconditional `doubleSparkleActive` on a capture adds 2.74 points that are booked to the Firefly layer, not to UniGlee.
    - The hit rate sets the number of spins you must simulate to measure anything (section 10.5).
 
-   Raising the award from 40/60/80 to 300/400/500, which is what decision D7 asks about, is a 7.5-fold increase on UniGlee acts 1–4. A rough linear estimate moves the full game from ~98.1% to approximately `98.1 + 7.47 × 6.5 = 146.7%`, before any coupled effects. It cannot be done without compensating elsewhere, and the compensation is itself a design decision, which is exactly why D7 and D8 have to be ruled together.
+   The 2026-09-08 owner ruling restored 300 / 400 / 500 while the capture rate was reduced to roughly 1 in 4,212. The required post-change fleet measured the resulting contract directly; no compensating payout retune was made without a separate owner decision.
 
 ### 11.4 What breaks if you change one number and skip the fleet
 
@@ -1559,7 +1559,7 @@ Concrete failure modes, each of which this codebase has either hit or narrowly a
 | Nudge `PAYOUT_SCALE` by 0.02 | Oracle still green: the base RTP band is 2 points wide and 0.02 is worth about 1.6 points | Full game moves 2.5 points. Nothing tests it. Every published RTP figure is now wrong |
 | Add a symbol to a strip | Oracle green, game feels the same | Strip length changed, so **every other symbol's density changed too**, on that reel. Handbag rate, wild-stack probability, and treat accrual all shifted |
 | Move ladder entry from 6 to 5 | Free-spin band goes red, so you notice | Good. This is the one the oracle catches |
-| Raise the UniGlee award | Fleet on 7 seeds still reads "about 96%" | A 350,000-spin sample cannot see a change to a 1-in-1,229 event. You will not detect it until someone runs 40 seeds |
+| Raise the UniGlee award | Fleet on 7 seeds still looks plausible | A 350,000-spin sample cannot reliably measure a 1-in-4,212 event. Run the full 40-seed fleet and report its uncertainty |
 | Add an RNG draw anywhere in `spin()` before the existing ones | Nothing looks wrong | Every seeded test result changes. The oracle goes red for a reason that has nothing to do with the change. You will be tempted to widen the bands. Do not: add the draw at the end, or on a separate stream |
 | Change `BOLD_CHAI_CUP_RESET_MS` from 3,000 to 1,000 | Feels more responsive | Cups per 30 seconds goes from 6 to 10 at 6 taps per second, so the bonus goes from 18 spins to 30. Its RTP contribution rises by two thirds |
 | Add a new bonus at 1 in 10,000 | It hits twice in a 200,000-spin oracle run | Your entire fleet is now under-powered. Recompute the required size from the new arrival rate before you publish any figure |
@@ -1591,30 +1591,9 @@ Specific things that will bite you, in rough order of how much time they will co
 
 Everything in this document was read from source. Where an existing document, a code comment, or a test title disagrees with the code, **the code wins**, and the disagreement is recorded here so a reader is not misled.
 
-### 12.1 Open decisions: D6, D7, D8
+### 12.1 UniGlee and Firefly decisions resolved; D8 measurement wording remains
 
-Three decisions are open in `docs/DECISION-LOG.md` under "Open decisions", raised 2026-08-09, owner Jamie, all three written so a one-word answer settles them. Summarised accurately below; the log holds the authoritative wording.
-
-**D6. Was the UniGlee tease and rarity redesign ever ruled?**
-
-The live overkillhill.com project page was patched on 2026-07-17 describing a UniGlee redesign in two parts: a decorative sighting the player sees often at roughly 1 in 850, and a real capture that is much rarer at roughly 1 in 4,212. The patch PRD attributes that copy to decisions S33 and S34, and neither exists in the log, which ends at S32.
-
-**The code implements neither half.** There is no tease or sighting mechanic anywhere: `grep -rn "tease\|sighting" src/` returns zero hits. The capture rate is three independent per-reel rolls at 1/2,500, 1/4,000 and 1/7,500 combining to 1 in 1,277 (`uniglee.ts:32-38`), not 1 in 4,212. And `placeUniGleeTrigger` (`uniglee.ts:70-97`) deliberately makes the capture land line-valid so that it *cannot* read as a decorative non-paying scatter, which is the opposite of the tease concept.
-
-The two rulings on offer are (i) "Ruled", meaning log it as S33 and S34 and open an engine task to build it, or (ii) "Withdrawn", meaning correct the public page to the shipped 1-in-1,277 behaviour.
-
-**D7. UniGlee award size: 300/400/500 or 40/60/80?**
-
-| Source | Award | Per act 1 to 4 |
-|---|---:|---:|
-| Settled decision S30, 2026-07-15 | 300 / 400 / 500 | 75 / 100 / 125 |
-| S30 contract, 2026-07-15 (absorbed into this document §9) | 300 / 400 / 500 | 75 / 100 / 125 |
-| **Shipped engine** (`uniglee.ts:94`, `reel * 20`) | **40 / 60 / 80** | **10 / 15 / 20** |
-| Shipped type (`laundry.ts:21`, union of 40, 60, 80) | 40 / 60 / 80 | 10 / 15 / 20 |
-| `laundry.ts:20` comment: "2026-07 RTP retune: marathon award reduced from 300/400/500 to 40/60/80" | 40 / 60 / 80 | 10 / 15 / 20 |
-| README and both public pages | 40 / 60 / 80 | |
-
-Every artifact except S30 and its own contract says 40/60/80, and the engine enforces it at the type level. **This document uses 40/60/80 throughout, because that is what the code does.** The rulings on offer are (i) "Code", a documentation change only, or (ii) "S30", which is simulation-gated engine work. See the arithmetic in section 11.3: option (ii) would take the full game to roughly 147% without compensating changes.
+Jamie ruled the disputed contracts on 2026-09-08. S34/S35's decorative sighting and rarer capture are implemented. S38 confirms 300 / 400 / 500 initial awards and 75 / 100 / 125 per act. S39 confirms a visible Firefly cap of six with a six-cascade entry threshold. The original D6, D7, D9, and D10 text remains in `docs/DECISION-LOG.md` as history.
 
 **D8. The documented RTP band does not match the measured game, and it never stated a player model.**
 
@@ -1622,25 +1601,21 @@ Every artifact except S30 and its own contract says 40/60/80, and the engine enf
 
 | Measure | Documented | Best current estimate |
 |---|---:|---:|
-| Full-game RTP | ~96.5%, band 95% to 98% | **~98.1%** (external multi-agent validation, several million paid spins) |
-| Base layer | ~61% | ~61.1% (spec oracle) |
-| Bonus layer | ~35% | ~37% (implied from total minus base) |
-| Within documented band | n/a | **yes** (at or just above the upper edge) |
+| Full-game RTP | ~96.5%, band 95% to 98% | **106.54%** (40 seeds, 2,000,000 paid spins, 2026-09-08) |
+| Base layer | ~61% | 60.77% |
+| Bonus layer | ~35% | 45.77% |
+| Within documented band | n/a | **no under the stated harness player model** |
 
-The base-layer figure was accurate in the internal run and is confirmed by the spec oracle. The total is now consistent with the documented band. The internal 40-seed run overestimated at 105.79% because 2,000,000 paid spins is insufficient to converge on a total that includes 1-in-1,229 UniGlee events; external multi-agent validation across several million spins corrected this to ~98.1%.
-
-Decision D8 is substantially resolved. The documented 95–98% band and the measured ~98.1% are consistent. The harness states its three interactive player-model assumptions; the documented band still does not — adding a player-model statement to `docs/DESIGN-SPEC.md` §4 remains the one open documentation item.
-
-**This document's position, for the avoidance of doubt:** the best current full-game estimate is ~98.1% under the stated mixed player model, excluding level-up coin rewards. It is consistent with the documented 95–98% band.
+The post-contract result is above the documented band. D8 is reopened for an owner decision; this task does not apply an unapproved compensating retune. The harness states its interactive player-model assumptions, and the 106.54% figure must always travel with them. Level-up coin rewards remain excluded.
 
 ### 12.2 Other document-versus-code divergences
 
 | # | Document claim | Code reality | Evidence |
 |---:|---|---|---|
-| 1 | `docs/DESIGN-SPEC.md` §4: bonus layer ~35% | 44.74% measured | five-act 40-seed fleet |
+| 1 | `docs/DESIGN-SPEC.md` §4: bonus layer ~35% | Re-measure after every bonus-contract change; the current dated fleet result is reported in §10 and the README | 40-seed fleet |
 | 2 | `docs/DESIGN-SPEC.md` §4 event table: "Chai Tea Bonus (3+ scatters) ~1 in 110 spins" | **No scatter mechanic exists.** There is no scatter symbol, no 3-plus-scatter count, and no bonus of that name. The two chai bonuses are Bold Chai Pump (a blocker pair) and Iced Chai Wild Rain (a wheel wedge) | `grep -rn "scatter" src/engine/` returns only a comment in `cascade.ts:71` |
 | 3 | `docs/DESIGN-SPEC.md` §5: saucer-cat wilds "arrive in stacks up to 6-7 high" | Runs are 5 and 6 on reels 2 to 4, and 6 and 6 on reel 5. Never 7 | `reels.ts:86-92` |
-| 4 | S30 contract (2026-07-15) per-act table: 75 / 100 / 125 | 10 / 15 / 20 | `laundry.ts:23-25` |
+| 4 | S30 contract (2026-07-15) per-act table: 75 / 100 / 125 | **Resolved:** engine and type now implement 75 / 100 / 125 | `laundry.ts` |
 | 5 | `docs/archive/HANDBAG-WILD-2026-07-14.md`: oracle moved to 95.91% RTP, approved band 95.5% to 96.5% | The oracle reads 61.08% and measures the base game only. The doc's own 2026-08-09 delta already records this, and the mechanic itself still matches its contract exactly | `simulation.test.ts:71-74`; the doc's delta section |
 | 6 | `src/engine/README.md` module table: `reels.ts`, `paylines.ts`, `cascade.ts`, `features.ts`, `economy.ts` marked "☐ TODO", `types.ts` marked "☑ stub" | All six are shipped, complete, and covered by 170 passing tests | `npx vitest run src` |
 | 7 | `src/engine/README.md`: required test is a "1M-spin RTP simulation within ±0.5% of targetRtp" | The oracle runs 200,000 spins and gates base RTP in a 2-point band. There is no `targetRtp` anywhere in executable code | `simulation.test.ts:15, 71-74` |
@@ -1654,9 +1629,9 @@ These are inside `src/engine/` and matter because a reader who trusts a comment 
 | 1 | Strips are "~70-90 symbols long" | 119, 119, 132, 121, 134 | `reels.ts:7` |
 | 2 | Wilds are placed as "contiguous runs of 6-7" | 5 and 6, or 6 and 6 on reel 5 | `reels.ts:8` vs `reels.ts:86-92` |
 | 3 | "Two stacks per wild per reel" | **One** contiguous run per wild per reel | `reels.ts:80` vs `reels.ts:84-94` |
-| 4 | UniGlee "gated separately in cascade.ts as a per-spin event at ~1/400" | 1 in 1,276.6, three independent per-reel rolls | `reels.ts:11` vs `uniglee.ts:32-38` |
+| 4 | UniGlee "gated separately in cascade.ts as a per-spin event at ~1/400" | Real capture is roughly 1 in 4,212; decorative sighting is roughly 1 in 850 on a separate stream | `uniglee.ts` |
 | 5 | `EngineConfig.unigleeRate` documented "~1/400"; `EngineConfig.targetRtp` documented "~0.96, verified by 1M-spin simulation test" | Both stale. `EngineConfig` is also **never used anywhere** | `types.ts:248-255` |
-| 6 | "Per-act ceiling; initial allocations are 75/100/125" | Allocations are 10/15/20. The 500 cap itself is correct | `uniglee-marathon.ts:17` |
+| 6 | "Per-act ceiling; initial allocations are 75/100/125" | **Resolved:** allocations are 75 / 100 / 125; the 500 per-act cap remains | `uniglee-marathon.ts` |
 | 7 | `collectTreat`: "pays/resets only the bag that reaches twelve" | `TREAT_JAR_CAP = 24` | `features.ts:129` vs `features.ts:19` |
 | 8 | `levelForXp`: "level N needs N * 500 cumulative Sparks" | `levelThreshold(level) = (level - 1) * 500`, so level N needs (N−1)×500 | `economy.ts:27` vs `economy.ts:34-36` |
 | 9 | "double_sparkle / facts_on_facts are ladder/coin modifiers" | Both are mechanically inert. `doubleSparkleActive` is set only by the UniGlee branch, never by dequeuing a `double_sparkle` | `cascade.ts:325` vs `cascade.ts:276, 283` |
@@ -1696,7 +1671,7 @@ payline 13 = [3,2,2,2,3]
 
 Only a perfect lap (4 wilds) can reach the hard class; 2 wilds cannot cover 3 reels. Perfect laps are 1/3 of rounds, so the hard rate given a perfect lap is roughly 1 in 9.7.
 
-**Exposure.** `runLapQuestChapter` is called on every UniGlee capture (`board.ts:1584`), so roughly 1 in 1,229 paid spins starts a Lap Quest. The chapter is an open-ended loop that plays a fresh round roughly every 900ms until the ledge timer expires, and **each round re-rolls the wilds**. Over a typical 15 to 30 rounds, the probability that at least one round hits the hard class is on the order of 40% to 65%. In a browser that is a locked tab.
+**Exposure.** `runLapQuestChapter` is called on every real UniGlee capture, so roughly 1 in 4,212 paid spins starts a Lap Quest. The chapter is an open-ended loop that plays a fresh round roughly every 900ms until the ledge timer expires, and **each round re-rolls the wilds**.
 
 **Empirical confirmation.** A measurement loop of 2,000 Lap Quest rounds completes normally. The same loop at 20,000 rounds is killed by the OOM killer, even with the hard class filtered out, because of the soft class.
 
@@ -1756,11 +1731,12 @@ Do not pass `--reporter=basic` to vitest in this repo; it fails to resolve.
 | `rollWildMultiplier` | none 15%, ×2 35%, ×3 30%, ×5 15%, ×10 5% | `freespins.ts:76-83` |
 | `MULTIPLIER_REEL` | ×2→reel 2, ×3→3, ×5→4, ×10→5 | `freespins.ts:86` |
 | Doorbell Panic preload | 3 to 6 cat wilds | `freespins.ts:149` |
-| `UNIGLEE_REEL_RATES` | 1/2500, 1/4000, 1/7500 | `uniglee.ts:32-36` |
-| `UNIGLEE_ACTIVE_RATE` | 1 in 1,276.6 | `uniglee.ts:38` |
-| UniGlee award | `reel × 20` = 40 / 60 / 80 | `uniglee.ts:94` |
+| `UNIGLEE_REEL_RATES` | 1/8250, 1/13200, 1/24750 | `uniglee.ts` |
+| `UNIGLEE_ACTIVE_RATE` | approximately 1 in 4,212.8 | `uniglee.ts` |
+| `UNIGLEE_TEASE_RATE` | 1 in 850 | `uniglee.ts` |
+| UniGlee award | reel 3 / 4 / 5 → 300 / 400 / 500 | `uniglee.ts` |
 | `LAUNDRY_ALLOCATION_FRACTION` | 0.25 | `laundry.ts:18` |
-| `UniGleeAwardSpins` | 40 \| 60 \| 80 | `laundry.ts:21` |
+| `UniGleeAwardSpins` | 300 \| 400 \| 500 | `laundry.ts` |
 | `DEFAULT_UNIGLEE_LAUNDRY_CONFIG` | sock 0.25, paw 0.18, ×2/×3/×5 at 60/30/10 | `uniglee-marathon.ts:12-16` |
 | `UNIGLEE_CHAPTER_SPIN_CAP` | 500 | `uniglee-marathon.ts:18` |
 | `LAP_QUEST_WILD_COUNTS` | cozy 2, perfect 4 | `lap-quest.ts:27-30` |

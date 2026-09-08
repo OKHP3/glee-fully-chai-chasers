@@ -5,6 +5,8 @@
 **Date:** 2026-07-12
 **Integration base commit:** `58970e7eac25d8352371103217d3b70809ff6440` on GitHub `main` (includes Replit's bounded splash pointer-event fix and removes the obsolete raw synchronization-prompt attachment). The approved Chai Chase realignment lands as a reviewed descendant of this base.
 
+> **2026-09-08 supersession for UniGlee and Firefly:** Jamie confirmed 300 / 400 / 500 initial UniGlee spins, 75 / 100 / 125 per act, and a visible Firefly cap of six. Decorative sightings are implemented at roughly 1 in 850 and real captures at roughly 1 in 4,212. The required seeds 1–40 fleet measured 106.54% RTP (95% CI 104.94%–108.14%) under its printed mixed player model, above the 95–98% band. The older UniGlee and RTP passages later in this dated baseline are retained as history and are not current contract statements; use `docs/DECISION-LOG.md`, `docs/DESIGN-SPEC.md`, and `docs/GAME-MECHANICS.md`.
+
 This document answers one question for Claude, Codex, Replit, Copilot, Notion, and every future tool: **what is authoritative now, and how may it be changed without one system overwriting another system's best work?**
 
 The answer is layered. No single tool's entire output owns the product.

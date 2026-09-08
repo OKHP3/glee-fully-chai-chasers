@@ -1,5 +1,7 @@
 # PRD, Patch 3. Reconcile the Chai Chasers Project Page With the Shipped Engine
 
+> **Superseded and reconciled 2026-09-08:** S34/S35 now ship. This patch material is updated below to describe the current engine rather than the former interim rollback.
+
 **Target Repl:** OverKill-Hill (https://replit.com/t/overkill-hill/repls/OverKill-Hill)
 **Target file:** `projects/glee-fully-chai-chasers/index.html` (live at https://overkillhill.com/projects/glee-fully-chai-chasers/)
 **Author:** Claude (PM) · **Date:** 2026-08-09 · **Version:** Patch 3.0
@@ -9,13 +11,13 @@
 
 ## 0. Mission statement (read twice)
 
-Patch 2 (2026-07-17) corrected this page against decisions it called **S33 and S34**, which described a decorative butterfly tease at ~1-in-850 and a rarer real capture at ~1-in-4,212. Those mechanics have not shipped in the engine. The shipped engine rolls a combined ~1-in-1,277 with no non-paying scatter path.
+The current engine implements the two-part UniGlee contract: a decorative non-paying sighting at roughly 1-in-850 and a real capture at roughly 1-in-4,212. Real captures on reels 3, 4, and 5 award 300, 400, or 500 initial spins, divided into 75, 100, or 125 spins for each of acts 1 through 4.
 
-**D6 update (2026-08-10):** The tease and rarer capture were ruled real decisions by Jamie on 2026-08-10, now logged as S34 and S35 in `docs/DECISION-LOG.md`. However, the engine implementation is simulation-gated and not yet built. **This patch still applies in full:** the page must describe the code that actually runs today. Once the S34/S35 engine task lands, the page will become accurate again without further edits.
+**Implementation update (2026-09-08):** S34/S35, S38, and S39 are implemented. The page should state the current rates, awards, six-firefly meter cap, and dated measurement below.
 
 Your job has two parts:
 
-1. **Roll those three claims back to what the code actually does** (§2, required, surgical).
+1. **Reconcile the named claims to what the code now does** (§2, required, surgical).
 2. **Add one new section** that closes the month-long gap between ship week and today (§3, required, additive, self-contained).
 
 Everything else on the page stays exactly as it is. The Origin section's "149 tests" sentence is a deliberate historical claim about the ship-week freeze build and is **out of scope**, same as in Patch 2. Do not touch it.
@@ -36,19 +38,19 @@ Everything else on the page stays exactly as it is. The Origin section's "149 te
 
 ### Change 1. Engine card, UniGlee rarity
 
-Reverts Patch 2 Change 1. The engine rolls three independent per-reel captures at 1-in-2,500, 1-in-4,000, and 1-in-7,500, combining to roughly 1 in 1,277. Measured 1 in 1,370 by the seeded oracle. There is no decorative sighting: `placeUniGleeTrigger` deliberately makes the trigger line-valid so the event cannot look like a non-paying scatter.
+The engine rolls decorative non-paying sightings at roughly 1 in 850 and three independent real-capture rates at 1-in-8,250, 1-in-13,200, and 1-in-24,750, combining to roughly 1 in 4,212.
 
 - **Section:** "What It Does" → card titled "A real cascade engine."
 - **FIND (exact):** `a legendary event that shows itself often but is only truly caught about once every 4,200 spins`
-- **REPLACE (exact):** `a legendary event captured roughly once every 1,300 spins, on three independently rolled reels that size the reward`
+- **REPLACE (exact):** `a legendary butterfly glimpsed roughly once every 850 spins but truly captured about once every 4,212 spins, with three independently rolled reels awarding 300, 400, or 500 initial free spins`
 
-### Change 2. Oracle card, remove the 103% claim
+### Change 2. Oracle card, replace the old 103% claim with the measured result
 
-Reverts Patch 2 Change 2b. The full-game figure is now measured end to end rather than assembled from design math, and it does not reach 103%.
+Reconciles Patch 2 Change 2b. The full-game figure is now measured end to end rather than assembled from design math. The current contract measured 106.54%, above both the former 103% estimate and the documented design band.
 
 - **Section:** "What It Does" → card titled "A simulation oracle as the definition of done."
 - **FIND (exact):** ` The legendary event above is deliberately excluded from that figure: there's no real money in this game, so its rare, generous payout is allowed to push measured full-game RTP to roughly 103% on the runs where it lands.`
-- **REPLACE (exact):** ` A second harness plays every bonus end to end through the same engine entry points the UI uses. Independent multi-agent validation runs totalling several million paid spins converge on a full-game RTP of approximately 98.1%, including all five UniGlee acts — within the game's documented 95-98% design band. The player model pumps Bold Chai at six taps per second, completes the memory trail perfectly, and picks Lap Quest spots randomly for a one-in-three perfect lap while petting through to Joey's arrival. The figure ships with its player model and fleet assumptions attached.`
+- **REPLACE (exact):** ` A second harness plays every bonus end to end through the same engine entry points the UI uses. The post-contract fleet ran seeds 1 through 40 for 50,000 paid spins each and measured 106.54% full-game RTP, with a 95% confidence interval from 104.94% to 108.14%. That is above the documented 95-98% design band. The player model pumps Bold Chai at six taps per second, completes the memory trail perfectly, and picks Lap Quest spots randomly for a one-in-three perfect lap while petting through to Joey's arrival. The figure ships with its player model and fleet assumptions attached.`
 
 ### Change 3. Oracle card, what the oracle actually asserts
 
@@ -60,11 +62,11 @@ The oracle asserts the layered model's base leg, not a total. Its base gate is 6
 
 ### Change 4. Decision log artifact, count
 
-`docs/DECISION-LOG.md` now holds 36 settled rows: S1 through S33 (with the S30 label collision counting as two rows), plus S34 (UniGlee decorative tease, ruled 2026-08-10) and S35 (UniGlee rare capture redesign, ruled 2026-08-10).
+`docs/DECISION-LOG.md` now holds 39 settled rows: S1 through S35 (with the S30 label collision counting as two rows), plus S37 through S39. S38 confirms the UniGlee awards and allocations; S39 confirms the six-firefly meter cap.
 
 - **Section:** "The Orchestration Pattern" → Artifact 2, "The decision log."
 - **FIND (exact):** `Thirty-four settled decisions and counting.`
-- **REPLACE (exact):** `Thirty-six settled decisions and counting.`
+- **REPLACE (exact):** `Thirty-nine settled decisions and counting.`
 
 ### Change 5. Project Info, version string
 
@@ -99,7 +101,7 @@ The oracle asserts the layered model's base leg, not a total. Its base gate is 6
 | Commits since ship | 152 |
 | Tests, ship week to today | 149 → 170 |
 | Bonus chapters added | 5 |
-| Full-game RTP, re-measured | ~98.1% (external multi-agent validation, several million spins) |
+| Full-game RTP, re-measured | 106.54% (seeds 1-40, 2,000,000 paid spins, 2026-09-08) |
 
 ## 4. Validation loop (both cycles required)
 
@@ -113,7 +115,7 @@ Cycle 1, mechanical:
    each REPLACE string appears exactly once.
 4. Confirm "The final build passed 149 tests" is present and UNCHANGED.
 5. Confirm the strings "4,200 spins", "103%", "Thirty-four", "Thirty-three",
-   and "v1.x" no longer appear anywhere in the file. Confirm "Thirty-six"
+   and "v1.x" no longer appear anywhere in the file. Confirm "Thirty-nine"
    appears exactly once.
 
 Cycle 2, rendered:
@@ -139,4 +141,4 @@ A reader who fact-checks this page against `src/engine/uniglee.ts`, `src/engine/
 
 ## 7. Upstream dependency (do not block on it, but flag it)
 
-`docs/DECISION-LOG.md` in the game repo has two rows both labeled S30 and no S33 or S34, while this page's Patch 2 cited S33 and S34 as its authority. That is a governance defect in the game repo, not on this page, and it is being tracked in `content/AUDIT-2026-08-09.md`. This patch makes the page match the code regardless of how the log is reconciled.
+`docs/DECISION-LOG.md` retains the historical S30 label collision and its numbering errata, while S33 through S35 and S37 through S39 are now recorded. This patch follows the latest dated decisions and the measured shipped contract.

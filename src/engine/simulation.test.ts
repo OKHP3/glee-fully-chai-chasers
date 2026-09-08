@@ -21,22 +21,26 @@ interface SimStats {
   freeSpinRate: number;   // triggers / spins
   mega8Rate: number;      // 8+ cascade spins / spins
   unigleeRate: number;    // uniglee spins / spins
+  unigleeTeaseRate: number; // decorative, non-triggering sightings / spins
   catVisitRate: number;   // visits / spins
 }
 
 function simulate(): SimStats {
   const rng = mulberry32(SEED);
+  const unigleeCaptureRng = mulberry32(SEED ^ 0x243f6a88);
+  const unigleeTeaseRng = mulberry32(SEED ^ 0xb7e15162);
   const betPerLine = 1;
-  let totalBet = 0, totalWin = 0, wins = 0, fs = 0, mega = 0, uni = 0, cats = 0;
+  let totalBet = 0, totalWin = 0, wins = 0, fs = 0, mega = 0, uni = 0, teases = 0, cats = 0;
   for (let i = 0; i < SPINS; i++) {
     const jar = { chicken: 6, salmon: 6, bougie: 6 }; // stocked jar, steady-state assumption
-    const r = spin({ rng, betPerLine, treatJar: jar, spinsSincePopIn: 10 });
+    const r = spin({ rng, unigleeCaptureRng, unigleeTeaseRng, betPerLine, treatJar: jar, spinsSincePopIn: 10 });
     totalBet += betPerLine * LINES;
     totalWin += r.totalWin;
     if (r.cascades > 0) wins++;
     if (r.freeSpinsAwarded > 0) fs++;
     if (r.cascades >= 8) mega++;
     if (r.unigleeTriggered) uni++;
+    if (r.unigleeTease) teases++;
     if (r.catVisit) cats++;
   }
   return {
@@ -45,6 +49,7 @@ function simulate(): SimStats {
     freeSpinRate: fs / SPINS,
     mega8Rate: mega / SPINS,
     unigleeRate: uni / SPINS,
+    unigleeTeaseRate: teases / SPINS,
     catVisitRate: cats / SPINS,
   };
 }
@@ -64,8 +69,8 @@ describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded sp
 
   // Full-game RTP retuned 2026-07 to land base + all bonuses in the 95-98%
   // band (~96.5% total). Base game alone now targets ~61%; bonuses carry the
-  // rest. Previously: UniGlee rolled each reel independently
-  // (1/2500, 1/4000, 1/7500; combined ~1/1,277 vs the old single 1/400 roll),
+  // rest. UniGlee capture rolls independently on its own stream at roughly
+  // 1-in-4,212; decorative sightings use a separate 1-in-850 stream.
   // removing most guaranteed trigger-line wins from the base stream and
   // lowering base RTP roughly a point below the original ~96% target.
   it(`base RTP ~60.9% ±1 (actual: ${(s.rtp * 100).toFixed(2)}%)`, () => {
@@ -90,9 +95,14 @@ describe.skipIf(skipOracle)(`spec oracle — ${SPINS.toLocaleString()} seeded sp
     expect(s.mega8Rate).toBeLessThan(1 / 450);
   });
 
-  it(`UniGlee ~1 in 1,277 combined per-reel odds (actual: 1 in ${(1 / Math.max(s.unigleeRate, 1e-9)).toFixed(0)})`, () => {
-    expect(s.unigleeRate).toBeGreaterThan(1 / 2000);
-    expect(s.unigleeRate).toBeLessThan(1 / 850);
+  it(`UniGlee capture ~1 in 4,212 combined per-reel odds (actual: 1 in ${(1 / Math.max(s.unigleeRate, 1e-9)).toFixed(0)})`, () => {
+    expect(s.unigleeRate).toBeGreaterThan(1 / 7000);
+    expect(s.unigleeRate).toBeLessThan(1 / 2800);
+  });
+
+  it(`UniGlee tease ~1 in 850 (actual: 1 in ${(1 / Math.max(s.unigleeTeaseRate, 1e-9)).toFixed(0)})`, () => {
+    expect(s.unigleeTeaseRate).toBeGreaterThan(1 / 1100);
+    expect(s.unigleeTeaseRate).toBeLessThan(1 / 650);
   });
 
   it(`cat pop-in ~1 in 30 ±30% (actual: 1 in ${(1 / Math.max(s.catVisitRate, 1e-9)).toFixed(1)})`, () => {

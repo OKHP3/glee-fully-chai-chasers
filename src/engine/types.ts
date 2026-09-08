@@ -162,7 +162,12 @@ export interface UniGleeTrigger {
   lineIndex: number;
   position: [reel: 2 | 3 | 4, row: number];
   linePositions: Array<[reel: number, row: number]>;
-  initialAwardSpins: 40 | 60 | 80;
+  initialAwardSpins: 300 | 400 | 500;
+}
+
+/** Decorative UniGlee sighting. It never starts or modifies the marathon. */
+export interface UniGleeTease {
+  position: [reel: 2 | 3 | 4, row: number];
 }
 
 export type BoldChaiPumpPhase = "ready" | "pumping" | "resetting" | "ended";
@@ -238,6 +243,7 @@ export interface SpinResult {
   catVisit?: CatVisit;
   unigleeTriggered: boolean;
   unigleeTrigger?: UniGleeTrigger;
+  unigleeTease?: UniGleeTease;
   treatsCollected: TreatKind[];
   doorbellPanic?: DoorbellTrigger;
   boldChaiPump?: BoldChaiTrigger;

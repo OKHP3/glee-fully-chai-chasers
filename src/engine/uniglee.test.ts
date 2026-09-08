@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { buildUniGleeMarathonPlan, placeUniGleeTrigger, rollUniGleeCapture, UNIGLEE_ACTIVE_REELS, UNIGLEE_MIDDLE_SUB_BONUSES, UNIGLEE_REEL_RATES, UNIGLEE_ACTIVE_RATE } from "./uniglee";
+import {
+  buildUniGleeMarathonPlan,
+  placeUniGleeTease,
+  placeUniGleeTrigger,
+  rollUniGleeCapture,
+  rollUniGleeTease,
+  UNIGLEE_ACTIVE_REELS,
+  UNIGLEE_ACTIVE_RATE,
+  UNIGLEE_AWARD_BY_REEL,
+  UNIGLEE_MIDDLE_SUB_BONUSES,
+  UNIGLEE_REEL_RATES,
+  UNIGLEE_TEASE_RATE,
+} from "./uniglee";
 import { mulberry32 } from "./rng";
 import { runUniGleeBaseMarathon } from "./uniglee-marathon";
 import type { Grid } from "./types";
@@ -10,9 +22,9 @@ function blankGrid(): Grid {
 
 describe("UniGlee marathon plan", () => {
   it.each([
-    [40, 10],
-    [60, 15],
-    [80, 20],
+    [300, 75],
+    [400, 100],
+    [500, 125],
   ] as const)("allocates 25%% quarters for a %i-spin award", (award, quarter) => {
     const plan = buildUniGleeMarathonPlan(mulberry32(20260715), award);
 
@@ -28,7 +40,7 @@ describe("UniGlee marathon plan", () => {
   });
 
   it("keeps Joey first and Phoebe last while shuffling only the middle three", () => {
-    const plan = buildUniGleeMarathonPlan(mulberry32(9), 60);
+    const plan = buildUniGleeMarathonPlan(mulberry32(9), 400);
 
     expect(plan.order[0]).toBe("joey_laundry_helper");
     expect(plan.order[4]).toBe("phoebe_lap_quest");
@@ -36,14 +48,14 @@ describe("UniGlee marathon plan", () => {
   });
 
   it("is deterministic for the same seeded RNG", () => {
-    const first = buildUniGleeMarathonPlan(mulberry32(77), 80);
-    const second = buildUniGleeMarathonPlan(mulberry32(77), 80);
+    const first = buildUniGleeMarathonPlan(mulberry32(77), 500);
+    const second = buildUniGleeMarathonPlan(mulberry32(77), 500);
 
     expect(second).toEqual(first);
   });
 
   it("marks the first four sub-bonuses as local retrigger owners", () => {
-    const plan = buildUniGleeMarathonPlan(mulberry32(1), 40);
+    const plan = buildUniGleeMarathonPlan(mulberry32(1), 300);
 
     expect(plan.baseSubBonuses.every((bonus) => bonus.ownsRetriggers && !bonus.isSweetener)).toBe(true);
     expect(plan.lapQuest.ownsRetriggers).toBe(true);
@@ -54,7 +66,7 @@ describe("UniGlee marathon plan", () => {
     const { reel, lineIndex, position, initialAwardSpins, linePositions } = placed.trigger;
     expect(UNIGLEE_ACTIVE_REELS).toContain(reel);
     expect(position[0]).toBe(reel);
-    expect(initialAwardSpins).toBe(reel * 20);
+    expect(initialAwardSpins).toBe(UNIGLEE_AWARD_BY_REEL[reel]);
     expect(linePositions).toHaveLength(reel + 1);
     expect(linePositions[0][0]).toBe(0);
     expect(lineIndex).toBeGreaterThanOrEqual(0);
@@ -89,20 +101,40 @@ describe("UniGlee marathon plan", () => {
     expect(reel).toBe(4);
   });
 
+  it("rolls decorative sightings independently at roughly 1 in 850", () => {
+    const rng = mulberry32(20260810);
+    const draws = 1_000_000;
+    let sightings = 0;
+    for (let i = 0; i < draws; i++) {
+      if (rollUniGleeTease(rng)) sightings++;
+    }
+    const measured = sightings / draws;
+    expect(measured).toBeGreaterThan(UNIGLEE_TEASE_RATE * 0.9);
+    expect(measured).toBeLessThan(UNIGLEE_TEASE_RATE * 1.1);
+  });
+
+  it("places a decorative sighting without creating an active trigger payload", () => {
+    const placed = placeUniGleeTease(mulberry32(20260810), blankGrid());
+    const [reel, row] = placed.tease.position;
+    expect(UNIGLEE_ACTIVE_REELS).toContain(reel);
+    expect(placed.grid[reel][row].symbol).toBe("uniglee");
+    expect(placed.tease).toEqual({ position: [reel, row] });
+  });
+
   it("honors an explicitly captured reel when placing the trigger", () => {
     for (const reel of UNIGLEE_ACTIVE_REELS) {
       const placed = placeUniGleeTrigger(mulberry32(5), blankGrid(), reel);
       expect(placed.trigger.reel).toBe(reel);
-      expect(placed.trigger.initialAwardSpins).toBe(reel * 20);
+      expect(placed.trigger.initialAwardSpins).toBe(UNIGLEE_AWARD_BY_REEL[reel]);
     }
   });
 
   it("resolves all four base chapters with chapter-local spin accounting", () => {
-    const result = runUniGleeBaseMarathon(mulberry32(9), 1, 40);
+    const result = runUniGleeBaseMarathon(mulberry32(9), 1, 300);
     expect(result.kind).toBe("uniglee_base_marathon_result");
     expect(result.chapters).toHaveLength(4);
-    expect(result.chapters.reduce((sum, chapter) => sum + chapter.baseSpins, 0)).toBe(40);
-    expect(result.totalSpins).toBeGreaterThanOrEqual(40);
+    expect(result.chapters.reduce((sum, chapter) => sum + chapter.baseSpins, 0)).toBe(300);
+    expect(result.totalSpins).toBeGreaterThanOrEqual(300);
     expect(result.chapters.every((chapter) => chapter.totalSpins >= chapter.baseSpins)).toBe(true);
   });
 });

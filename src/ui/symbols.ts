@@ -180,10 +180,10 @@ export function gardenForegroundSvg(): string {
   </svg>`;
 }
 
-/** Illustrated firefly jar — the cascade meter housing. fillLevel 0-8+. */
+/** Illustrated firefly jar — the six-step cascade meter housing. */
 export function fireflyJarSvg(fillLevel: number): string {
-  const clamped = Math.max(0, Math.min(8, fillLevel));
-  const glowT = clamped / 8;
+  const clamped = Math.max(0, Math.min(6, Math.floor(fillLevel)));
+  const glowT = clamped / 6;
   const fireflies = Array.from({ length: clamped }, (_, i) => {
     const x = 18 + ((i * 13) % 28);
     const y = 34 - ((i * 7) % 20);

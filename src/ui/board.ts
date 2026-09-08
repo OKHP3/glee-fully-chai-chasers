@@ -929,6 +929,8 @@ async function runSpin(
   const result = spin({
     rng: mulberry32(seed),
     treatTimeRng: mulberry32(seed ^ 0x9e3779b9),
+    unigleeCaptureRng: mulberry32(seed ^ 0x243f6a88),
+    unigleeTeaseRng: mulberry32(seed ^ 0xb7e15162),
     allowTreatTimeBonus: true,
     betPerLine: betPerLine(state.bet),
     treatJar: state.treatJar,
@@ -976,7 +978,7 @@ async function runSpin(
 
   if (result.unigleeTriggered) {
     playUniGleeSting();
-    const award = result.unigleeTrigger?.initialAwardSpins ?? 40;
+    const award = result.unigleeTrigger?.initialAwardSpins ?? 300;
     startUniGleeMusic();
     await showUnigleeTakeover(root, result.unigleeTrigger, award);
     await runUniGleeMarathonBonus(root, state, award, seed ^ 0x51f15e5d);

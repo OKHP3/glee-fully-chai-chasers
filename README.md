@@ -28,7 +28,7 @@ The game opens on an illustrated splash. One tap unlocks audio and drops you int
 - **Treat Time:** Morning and Nighttime Treat Time sessions toss cat wilds onto the board before the cascades begin.
 - **Doorbell Panic:** a matching pair of doorbells opens a cat-powered free-spin bonus of three to six spins, with Joey and Phoebe landing as wilds on payline coordinates each round.
 - **Bold Chai:** a matching pair of chai pumps opens a 30-second iced-chai pump scene. Every completed 12-pump cup awards 3 free spins.
-- **UniGlee:** the rare rainbow butterfly. Reels 3, 4, and 5 each roll their own independent capture at 1-in-2,500, 1-in-4,000, and 1-in-7,500, which is roughly one capture every 1,300 spins. The capturing reel sizes the award at 40, 60, or 80 free spins, and those spins play out as a five-act marathon: Joey's Laundry Helper first, then We're Multiplying, Keepsake Collection, and Nighttime Treat Time in seeded random order, with Phoebe's Lap Quest always last. Lap Quest adds its own spins and coins on top.
+- **UniGlee:** the rare rainbow butterfly has two outcomes. A decorative, non-paying sighting appears roughly once every 850 spins and never starts the marathon. Real captures roll independently on reels 3, 4, and 5 at 1-in-8,250, 1-in-13,200, and 1-in-24,750, combining to roughly one capture every 4,212 spins. The capturing reel awards 300, 400, or 500 initial free spins, divided into four acts of 75, 100, or 125 spins: Joey's Laundry Helper first, then We're Multiplying, Keepsake Collection, and Nighttime Treat Time in seeded random order. Phoebe's Lap Quest is always last and adds its own spins and coins on top.
 
 ### The meta layer
 
@@ -73,13 +73,13 @@ The game is a Vite + TypeScript single-page app with no framework. Game math liv
 
 ## Engineering status
 
-Verified 2026-08-11 against `main`:
+Verified 2026-09-08 after the owner-confirmed UniGlee and Firefly contract update:
 
-- **Tests:** 360 tests across 28 files, all green.
+- **Tests:** full Vitest suite green, including the seven-gate seeded oracle.
 - **Build:** `tsc --noEmit` and the Vite production build both clean.
-- **Spec oracle** (seeded 200,000-spin run in `src/engine/simulation.test.ts`, all six gates green): base-game RTP 61.08%, any win 1 in 3.15 spins, free spins 1 in 151, eight-plus cascade 1 in 980, UniGlee capture 1 in 1,370, cat pop-in 1 in 32.3.
-- **Full-game RTP:** ~98.1% — converged result from independent multi-agent external validation runs totalling several million paid spins (Claude Cowork + ChatGPT Work fleets, 2026-08-11). This supersedes the earlier 40-seed 2,000,000-spin internal reading of 105.79%, which was a statistical overestimate at that sample size. Reproduce the internal harness with `seq 1 40 | xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'`. Base game contributes ~61.1% (spec oracle); bonus layer contributes the remainder (~37%).
-- **What that figure assumes.** Bold Chai is pumped at a steady six times per second for the full 30-second window; the Moonlit Keepsake Trail is always completed; and an uninformed Lap Quest player picks randomly and uniformly among the three offered spots, finding the perfect lap 1 time in 3, while petting often enough to avoid inactivity so Joey's seeded arrival ends the chapter. Real play may differ. The ~98.1% reading sits at the upper edge of the documented 95-98% design band; the band and the measurement are now consistent. See decision D8 in `docs/DECISION-LOG.md`.
+- **Spec oracle** (seed `20260717`, 200,000 spins): all seven gates green. Base RTP 61.05%, any win 1 in 3.14, free spins 1 in 156, eight-plus cascades 1 in 1,026, UniGlee capture 1 in 3,448, decorative UniGlee sighting 1 in 948, and cat pop-in 1 in 33.3.
+- **Full-game fleet:** seeds 1–40 × 50,000 paid spins = 2,000,000 spins at `betPerLine = 1`. It measured **106.54% RTP** with a per-seed 95% confidence interval of **104.94% to 108.14%**: base 60.77%, bonus 45.77%. The fleet observed 492 real captures (1 in 4,065) and 2,357 decorative sightings (1 in 849). Reproduce it with `seq 1 40 | xargs -P4 -I{} sh -c 'pnpm exec tsx scripts/sim-agent.ts a{} {} 50000 > seed-{}.json'`.
+- **What that figure assumes.** Bold Chai is pumped at a steady six times per second for the full 30-second window; the Moonlit Keepsake Trail is always completed; and an uninformed Lap Quest player picks randomly and uniformly among the three offered spots, finding the perfect lap 1 time in 3, while petting often enough to avoid inactivity so Joey's seeded arrival ends the chapter. Real play may differ. The measured 106.54% is above the documented 95–98% design band; no compensating retune was made without a separate owner decision.
 - **Runaway check:** zero capped bonus sessions and zero `terminatedByCascadeCap` activations across the fleet.
 
 The oracle is a deliberately strict gate. It was written to fail, and it is not weakened to reach green.

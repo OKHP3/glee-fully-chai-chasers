@@ -15,7 +15,7 @@ import { rollCatVisit, type TreatJar } from "./features";
 import { rollTreatTimeTrigger } from "./treattime";
 import type { Rng } from "./rng";
 import { applyKeepsakeZone, cloneKeepsakeZone, isKeepsakePosition, rollKeepsakeSymbol } from "./keepsake-constellation";
-import { placeUniGleeTrigger, rollUniGleeCapture, UNIGLEE_ACTIVE_RATE } from "./uniglee";
+import { placeUniGleeTease, placeUniGleeTrigger, rollUniGleeCapture, rollUniGleeTease, UNIGLEE_ACTIVE_RATE } from "./uniglee";
 
 const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
   treat_chicken: "chicken",
@@ -23,7 +23,7 @@ const TREAT_SYMBOL_TO_KIND: Record<string, TreatKind> = {
   treat_bougie: "bougie",
 };
 
-/** Compatibility export: combined per-reel active-line capture rate (~1 in 1,277). */
+/** Compatibility export: combined per-reel active-line capture rate (~1 in 4,212). */
 export const UNIGLEE_RATE = UNIGLEE_ACTIVE_RATE;
 
 /** Chance a wild participating in a line win queues a specialty (tuned for §4 mega-cascade band). */
@@ -241,6 +241,10 @@ export interface SpinInput {
   treatTimeRng?: Rng;
   /** Secondary chapter rounds suppress recursive UniGlee triggers. */
   allowUniGlee?: boolean;
+  /** Independent stream for capture rolls and capture placement. */
+  unigleeCaptureRng?: Rng;
+  /** Independent stream for the decorative, non-triggering sighting. */
+  unigleeTeaseRng?: Rng;
   /** Fixed chapter wilds that survive the complete cascade chain. */
   stickyWilds?: StickyWild[];
   /**
@@ -271,6 +275,8 @@ export function spin({
   treatTimeMode = "either",
   treatTimeRng,
   allowUniGlee = true,
+  unigleeCaptureRng,
+  unigleeTeaseRng,
   stickyWilds: inputStickyWilds,
   _guardCascadeCap,
 }: SpinInput): SpinResult {
@@ -283,15 +289,23 @@ export function spin({
   const steps: CascadeStep[] = [];
   let keepsakeZone = cloneKeepsakeZone(inputKeepsakeZone);
   if (keepsakeZone) grid = applyKeepsakeZone(grid, keepsakeZone);
-  const treatsCollected = collectTreats(grid);
+  const captureRng = unigleeCaptureRng ?? rng;
   // Each active reel rolls independently at its own capture rate.
-  const unigleeCapturedReel = allowUniGlee && spinArea === "main" ? rollUniGleeCapture(rng) : undefined;
+  const unigleeCapturedReel = allowUniGlee && spinArea === "main" ? rollUniGleeCapture(captureRng) : undefined;
   const unigleeTriggered = unigleeCapturedReel !== undefined;
   // A supplied grid is a test/bonus fixture, not a main-game opening reel
   // window. Keep its legacy takeover behavior intact while live main spins
   // receive the reel-activated capture payload.
-  const unigleeTrigger = unigleeTriggered && !startingGrid ? placeUniGleeTrigger(rng, grid, unigleeCapturedReel) : undefined;
+  const unigleeTrigger = unigleeTriggered && !startingGrid ? placeUniGleeTrigger(captureRng, grid, unigleeCapturedReel) : undefined;
   if (unigleeTrigger) grid = unigleeTrigger.grid;
+  const teaseRolled = allowUniGlee && spinArea === "main" && unigleeTeaseRng
+    ? rollUniGleeTease(unigleeTeaseRng)
+    : false;
+  const unigleeTease = teaseRolled && !unigleeTriggered && !startingGrid
+    ? placeUniGleeTease(unigleeTeaseRng, grid)
+    : undefined;
+  if (unigleeTease) grid = unigleeTease.grid;
+  const treatsCollected = collectTreats(grid);
 
   let totalWin = 0;
   let cascades = 0;
@@ -489,6 +503,7 @@ export function spin({
     catVisit,
     unigleeTriggered,
     ...(unigleeTrigger ? { unigleeTrigger: unigleeTrigger.trigger } : {}),
+    ...(unigleeTease ? { unigleeTease: unigleeTease.tease } : {}),
     treatsCollected,
     doorbellPanic,
     boldChaiPump,
