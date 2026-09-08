@@ -300,3 +300,120 @@ jobs:
           echo "::error::One or more skill landings failed verification." \
                "Download the 'landing-reports' artifact for details."
           exit 1
+
+      # -----------------------------------------------------------------------
+      # Publish the result back to the originating OKHP3/skillz commit.  This
+      # must run after the deliberate failure step and use always(), otherwise
+      # a failed landing would prevent the badge from being posted.
+      # -----------------------------------------------------------------------
+      - name: Post landing verification status to OKHP3/skillz
+        if: always() && steps.resolve.outputs.skillz_sha != ''
+        continue-on-error: true
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+          SKILLZ_SHA: ${{ steps.resolve.outputs.skillz_sha }}
+          NO_MATCH_IS_FAILURE: ${{ steps.resolve.outputs.no_match_is_failure }}
+          OVERALL_FAIL: ${{ steps.run_verify.outputs.overall_fail }}
+          REPORT_DIR: ${{ steps.run_verify.outputs.report_dir }}
+          PR_NUMBER: ${{ github.event.client_payload.pr_number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${NO_MATCH_IS_FAILURE:-false}" == "true" ||
+                "${OVERALL_FAIL:-false}" == "true" ]]; then
+            STATE="failure"
+          else
+            STATE="success"
+          fi
+
+          # Use the verifier's JSON report shape to give the status a useful,
+          # compact description.  The no-manifest path has no report.
+          DESCRIPTION="$(python3 - "${REPORT_DIR:-}" "${STATE}" "${SKILLZ_SHA}" <<'PY'
+          import glob
+          import json
+          import os
+          import sys
+
+          report_dir, state, sha = sys.argv[1:]
+          rows = []
+          if report_dir and os.path.isdir(report_dir):
+              for report_path in sorted(glob.glob(os.path.join(report_dir, "*.json"))):
+                  try:
+                      with open(report_path, encoding="utf-8") as handle:
+                          report = json.load(handle)
+                  except (OSError, json.JSONDecodeError):
+                      continue
+                  rows.append(
+                      f"{report.get('skill', '?')}: {report.get('overall', 'ERROR')}"
+                  )
+
+          if rows:
+              description = f"Landing verification {state}: {', '.join(rows)}"
+          elif state == "failure":
+              description = (
+                  "Landing verification failure: no promotion manifest records "
+                  f"commit {sha[:12]}"
+              )
+          else:
+              description = f"Landing verification passed for commit {sha[:12]}"
+
+          # GitHub limits commit status descriptions to 140 characters.
+          print(description[:140])
+          PY
+          )"
+
+          STATUS_PAYLOAD="$(python3 - "${STATE}" "${DESCRIPTION}" "${RUN_URL}" <<'PY'
+          import json
+          import sys
+
+          state, description, target_url = sys.argv[1:]
+          print(json.dumps({
+              "state": state,
+              "target_url": target_url,
+              "description": description,
+              "context": "skillz/landing-verification",
+          }))
+          PY
+          )"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --url "https://api.github.com/repos/OKHP3/skillz/statuses/${SKILLZ_SHA}" \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GITHUB_PAT}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --header "Content-Type: application/json" \
+            --data "${STATUS_PAYLOAD}"
+
+          # A dispatch may optionally include the PR number that introduced the
+          # commit.  Keep this best-effort so status publication remains the
+          # primary signal when a PR is unavailable or already closed.
+          if [[ "${STATE}" == "failure" &&
+                -n "${PR_NUMBER:-}" &&
+                "${PR_NUMBER}" != "null" ]]; then
+            COMMENT_PAYLOAD="$(python3 - "${STATE}" "${DESCRIPTION}" "${SKILLZ_SHA}" "${RUN_URL}" <<'PY'
+          import json
+          import sys
+
+          state, description, sha, run_url = sys.argv[1:]
+          icon = "✅" if state == "success" else "❌"
+          print(json.dumps({
+              "body": (
+                  f"{icon} **Skill landing verification {state}** for commit "
+                  f"`{sha}`.\n\n{description}\n\n[View workflow run]({run_url})"
+              )
+          }))
+          PY
+            )"
+
+            curl --fail-with-body --silent --show-error \
+              --request POST \
+              --url "https://api.github.com/repos/OKHP3/skillz/issues/${PR_NUMBER}/comments" \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer ${GITHUB_PAT}" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              --header "Content-Type: application/json" \
+              --data "${COMMENT_PAYLOAD}"
+          fi
