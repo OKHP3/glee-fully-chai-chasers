@@ -33,6 +33,30 @@ class DispatchContractTests(unittest.TestCase):
         self.assertIn('^[0-9a-f]{40}$', step['run'])
         self.assertEqual(step['env']['PROMOTION_SHA'], '${{ inputs.commit_sha }}')
 
+    def test_ci_enforces_offline_suite_on_prs_and_main(self):
+        ci = yaml.load((ROOT / '.github/workflows/ci.yml').read_text(),
+                       Loader=yaml.BaseLoader)
+        self.assertIn('pull_request', ci['on'])
+        self.assertIn('main', ci['on']['push']['branches'])
+        # Existing CI is unfiltered: template, tests, receiver and CI edits all run.
+        for event in ['pull_request', 'push']:
+            self.assertNotIn('paths', ci['on'][event] or {})
+            self.assertNotIn('paths-ignore', ci['on'][event] or {})
+        job = ci['jobs']['landing-dispatch-contract']
+        self.assertNotIn('if', job)
+        self.assertNotIn('continue-on-error', job)
+        steps = job['steps']
+        for step in steps:
+            self.assertNotIn('if', step)
+            self.assertNotIn('continue-on-error', step)
+            if 'uses' in step:
+                self.assertRegex(step['uses'], r'^actions/[^@]+@[0-9a-f]{40}$')
+        commands = [step['run'] for step in steps if 'run' in step]
+        self.assertIn('python -m pip install --disable-pip-version-check PyYAML==6.0.3',
+                      commands)
+        self.assertIn('python -B -m unittest discover -s skills/promotion-handoff/tests -v',
+                      commands)
+
     def run_resolver(self, recorded_sha):
         script = self.resolve['run']
         self.assertIn('\nPYEOF\n', script, 'YAML must strip heredoc indentation')

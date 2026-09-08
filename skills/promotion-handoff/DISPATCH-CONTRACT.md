@@ -56,6 +56,11 @@ python3 -B -m unittest discover -s skills/promotion-handoff/tests -v
 
 These offline fixtures cover the correctly dedented heredoc, exact manifest
 matching, and the hard failure for a dispatched SHA without a matching manifest.
+The existing `.github/workflows/ci.yml` now runs this suite in the dedicated
+**Landing dispatch contract** job, with immutable action pins and PyYAML 6.0.3.
+Its existing unfiltered pull-request and main-push triggers include template,
+receiver, test, and CI changes without narrowing the game's CI coverage.
+The job uses Python 3.12, matching the receiver's selected Python version.
 
 ## Review adjudication, 2026-09-08
 
