@@ -28,6 +28,10 @@ recorded. Install `okhp3-skillz-verify-landing.yml` as
 ## Preserved gates
 
 - Explicit targeted commits with no matching manifest still fail.
+- Producer input is exactly 40 lowercase hexadecimal characters. Uppercase
+  letters and surrounding whitespace are rejected, not silently normalized.
+  Copy the exact recorded accepted commit; input convenience must not rewrite
+  an acceptance record or turn an unrelated main commit into a promotion.
 - Content/hash verification remains unchanged; do not rewrite historical
   acceptance records to silence unrelated alerts.
 - An explicit dispatch without credentials fails visibly.
@@ -42,3 +46,36 @@ requests and main pushes. The test executes the actual workflow shell with a
 local HTTP stub, checks the exact payload, and rejects invalid input, missing
 credentials, and non-main invocation. HTTP failures must propagate. It makes
 no network requests and does not establish live cross-repository delivery.
+
+For this template and the receiver's decoded resolver, install `PyYAML==6.0.3`
+in the test environment, then run from this repository root:
+
+```text
+python3 -B -m unittest discover -s skills/promotion-handoff/tests -v
+```
+
+These offline fixtures cover the correctly dedented heredoc, exact manifest
+matching, and the hard failure for a dispatched SHA without a matching manifest.
+
+## Review adjudication, 2026-09-08
+
+- The producer and this template explicitly send `Content-Type: application/json`.
+  The offline HTTP stub rejects a missing or incorrect JSON content type.
+- The Skillz contract test selects the dispatch step by its unique stable name,
+  not its position. Setup steps may be inserted without changing the test target.
+  Its CI actions follow existing immutable SHA pins and use the tracked Python
+  and Node version files, including triggering tests when those files change.
+- SHA normalization is a usability suggestion, not a correctness repair.
+  Strict accepted-SHA validation and the receiver's missing-manifest failure
+  gate remain unchanged. No historical acceptance records were rewritten.
+- The existing **Notify landing verification** display name is retained in this
+  bounded correction. Its explicit-only trigger and the distinction between
+  dispatch success and verification success are documented above.
+- The heredoc comment on [PR 15](https://github.com/OKHP3/glee-fully-chai-chasers/pull/15#discussion_r3939108840)
+  is a false positive: YAML removes the common block indentation, leaving
+  `PYEOF` at column zero in the shell script. No receiver change is needed.
+  [Receiver run 34240718717](https://github.com/OKHP3/glee-fully-chai-chasers/actions/runs/34240718717),
+  inspected on 2026-09-08 at commit
+  `3a40deea2b3e3007e72fc572688c9037cd937f33`, successfully executed both
+  **Resolve target commit SHA and manifest list** and **Run landing verification**.
+  That is evidence for the heredoc path, not blanket proof of every promotion.
