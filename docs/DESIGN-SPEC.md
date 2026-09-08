@@ -7,6 +7,8 @@
 > **APPROVED AMENDMENT — 2026-07-12:** `GAME-REALIGNMENT-2026-07-12.md` and decisions S20-S23 supersede this document wherever it uses GPT-Toolbox metaphors, treats twelve as sacred/system-wide, or describes the earlier short UniGlee package. Claude owns the eventual v3 math/spec integration; no tool may use the older language to roll back the approved Chai Chase direction.
 
 > **RUNNING-STATE NOTE — 2026-09-08:** This document remains the design authority, but its RTP and event-frequency rows are targets, not measurements. The current five-act implementation and its measured 106.54% full-game fleet result are recorded in `README.md`, `AGENTS.md`, and `docs/IMPLEMENTATION-BASELINE.md`.
+>
+> **RELEASE-BOUNDARY NOTE — 2026-09-08:** The design spec contains adopted future directions as well as the current product contract. The dated disposition in `docs/RELEASE-SCOPE.md` is authoritative for what is shipped, deferred, or retired in the current release. A planned section is not implementation evidence.
 
 ---
 
@@ -189,6 +191,10 @@ Vanilla TypeScript + Vite + Tailwind (S9). `src/engine/` pure TS, seeded RNG, vi
 
 If the 17th arrives early, tier 1 + 2 IS the gift. Tier 3 ships as "new features appearing in your game" across the following weeks — a gift that keeps unwrapping.
 
+## 15A. Current release disposition
+
+The original build-order language above is retained as dated design history. For the current release, the Birthday Reveal scene, daily bonus, milestone and collection presentation, UniGlee pause/fast/skip/reload comfort controls, final audio mix/stems, offline verification, asset optimization, and device-regression gallery are deferred. The Chai Tea shelf/pick-game concept is retired from the canonical roadmap; Bold Chai is the current iced-chai bonus. See the dated [release-scope matrix](./RELEASE-SCOPE.md) for owners and acceptance boundaries.
+
 ## 16. Acceptance criteria (Codex's list, kept nearly whole)
 
 - Glee opens it on her iPhone from a home-screen icon and understands it with zero instructions.
@@ -199,3 +205,7 @@ If the 17th arrives early, tier 1 + 2 IS the gift. Tier 3 ships as "new features
 - No Glee photo, unlicensed media, or private file in the repo, its history, or the bundle (CI-gated).
 - Builds clean, no console errors, reduced motion respected, 60fps on a recent iPhone.
 - Jamie watches her play it for ten minutes and she doesn't ask a single "how do I" question. She just plays.
+
+## 17. Release and history boundary
+
+The current product is shipped to the owner-approved boundary in `docs/RELEASE-SCOPE.md`; it is not a claim that every adopted idea in this historical specification is implemented. The public tree and deployed bundle must remain free of private source material, while repository history requires the separate, reversible process in `docs/HISTORY-REMEDIATION-PLAN.md`. No history rewrite is authorized by the specification.

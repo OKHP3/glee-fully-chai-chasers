@@ -43,16 +43,11 @@ Separate music and sound-effect volumes with a master mute, a system/dark/light 
 
 Every symbol, cat, saucer, jar, and wheel face on the shipped board is original inline SVG or original illustration. There is no emoji on the board.
 
-## Still planned
+## Release boundary
 
-These are approved directions that are not in the current build:
+The current product is shipped to an intentional release boundary. The animated Birthday Reveal scene, daily bonus, milestone scenes and collection shelf, UniGlee pause/fast/skip/reload comfort features, additional chapter presentation, final audio mix/stems, offline verification, asset optimization, and the saved device-regression gallery are **deferred roadmap work**, not accidental omissions. The Chai Tea shelf and pick-game concept is **retired** from the canonical roadmap; Bold Chai is the current iced-chai bonus.
 
-- Birthday Reveal scene, daily bonus, milestone scenes, and the collection shelf.
-- UniGlee marathon comfort features: pause/resume, fast mode, skip-to-summary, and in-flight reload persistence.
-- Additional chapter-specific bonus presentation and the final music stems and mix.
-- Service-worker/offline verification and the saved device-regression gallery.
-
-The Chai Tea shelf and pick-game concept is not a shipped feature. Bold Chai is the current iced-chai bonus.
+The complete shipped-versus-planned matrix, owners, acceptance boundaries, open gates, and the safe public-history plan live in [the release scope](./docs/RELEASE-SCOPE.md) and [the history-remediation plan](./docs/HISTORY-REMEDIATION-PLAN.md). The deployed bundle and current tree are clean of known private directories, but public Git history remediation is prepared and **not yet executed**.
 
 ## Run it locally
 

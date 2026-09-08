@@ -40,3 +40,5 @@ Hot chai. Photos of Glee. Cow/farm/"Moolah" trade dress. Brand names or logos of
 **Game-world boundary:** Toolbox, Tool, Tool-ette, branch, leaf, and similar organization vocabulary belongs to the separate Glee-fully custom-GPT ecosystem. It is not game canon. The game's fantasy is Joey and Phoebe helping Glee on the Chai Chase through music, books, PNW/Alaska keepsakes, and their shared life.
 
 **Narrative canon (all public artifacts, all agents):** the game exists because Jamie wanted to give Glee a personalized birthday game built around a genre she loves. That is the entire public motivation. Do not invent or imply any additional backstory, and never commit raw working notes or pasted prompt dumps as project artifacts.
+
+**Release-status boundary:** canon describes the world and approved direction; it does not prove implementation. For shipped, deferred, retired, and open-gate status, use the dated [release-scope matrix](./RELEASE-SCOPE.md). The matrix preserves this narrative and does not authorize a new story or a history rewrite.

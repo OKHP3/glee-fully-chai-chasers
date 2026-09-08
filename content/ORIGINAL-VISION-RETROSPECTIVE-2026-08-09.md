@@ -99,3 +99,11 @@ The honest conclusion is therefore two-part:
 
 - **The game became worthy of the intention behind the gift.**
 - **The public repository still needs its final truth, termination, and history-cleanup work.**
+
+## 8. Close-out addendum — 2026-09-08
+
+The repository now has an explicit [release-scope matrix](../docs/RELEASE-SCOPE.md). It records the current game as shipped to an owner-approved boundary, assigns the remaining Birthday Reveal, daily bonus, milestone/collection, UniGlee comfort, audio, offline, asset, and device-gallery work to named future phases, and retires the Chai Tea shelf/pick-game concept from the canonical roadmap. This prevents the older specification from turning a planned feature into an accidental release claim.
+
+The public-history obligation is also separated from product scope. The current tree and deployed bundle are clean of the known private directories, but the [history-remediation plan](../docs/HISTORY-REMEDIATION-PLAN.md) remains prepared rather than executed. It requires preservation backups, collaborator stop/resync coordination, a dry run, owner approval, and post-rewrite validation. This addendum does not authorize a rewrite and does not reproduce private source material.
+
+The unconditional closure claim therefore remains blocked by the open payout-band ruling, the separately documented Lap Quest termination gate, and the unexecuted history remediation. Those are visible gates, not hidden omissions.

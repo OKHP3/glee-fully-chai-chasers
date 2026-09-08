@@ -6,6 +6,8 @@
 **Integration base commit:** `58970e7eac25d8352371103217d3b70809ff6440` on GitHub `main` (includes Replit's bounded splash pointer-event fix and removes the obsolete raw synchronization-prompt attachment). The approved Chai Chase realignment lands as a reviewed descendant of this base.
 
 > **2026-09-08 supersession for UniGlee and Firefly:** Jamie confirmed 300 / 400 / 500 initial UniGlee spins, 75 / 100 / 125 per act, and a visible Firefly cap of six. Decorative sightings are implemented at roughly 1 in 850 and real captures at roughly 1 in 4,212. The required seeds 1–40 fleet measured 106.54% RTP (95% CI 104.94%–108.14%) under its printed mixed player model, above the 95–98% band. The older UniGlee and RTP passages later in this dated baseline are retained as history and are not current contract statements; use `docs/DECISION-LOG.md`, `docs/DESIGN-SPEC.md`, and `docs/GAME-MECHANICS.md`.
+>
+> **2026-09-08 release boundary:** `docs/RELEASE-SCOPE.md` is the current shipped/deferred/retired matrix. `docs/HISTORY-REMEDIATION-PLAN.md` is a review-only cleanup plan; no Git history rewrite is part of this baseline.
 
 This document answers one question for Claude, Codex, Replit, Copilot, Notion, and every future tool: **what is authoritative now, and how may it be changed without one system overwriting another system's best work?**
 
@@ -224,3 +226,9 @@ This section is the current handoff for the shipped tree. The engine/UI boundary
 - **Firefly meter:** the visible jar and label cap at six. Higher cascade counts still select the existing ladder awards, and retriggers remain blocked.
 - **Full-game fleet:** seeds 1–40 × 50,000 paid spins = 2,000,000 spins, measured 106.54% RTP with a per-seed 95% confidence interval of 104.94% to 108.14%. The model uses six Bold Chai pumps per second for 30 seconds, always completes Keepsake Trail, and chooses uniformly among three Lap Quest spots while petting through Joey's arrival. This is above the 95–98% design target and does not authorize a mechanics retune.
 - **Public handoffs:** the target repositories for the OverKill Hill Patch 3 and Glee-fully Arcade refresh are not present in this checkout. `PATCH-3-HANDOFF.md` and `ARCADE-REFRESH-HANDOFF.md` record the verified external blocker; no application or publish claim is made.
+
+## 11. Current completion boundary — 2026-09-08
+
+The current tree is an intentional release, not an accidental midpoint. Use `docs/RELEASE-SCOPE.md` for the reconciled matrix: shipped product capabilities are listed separately from deferred roadmap work, the retired Chai Tea shelf concept, and the open payout, Lap Quest, public-page, and history gates. The design spec remains the product authority, but its future-facing sections do not promote themselves to shipped status.
+
+The current checkout and deployed bundle are distinct from public Git history. Known private directories are absent from the current tree; the affected historical categories, preservation requirements, collaborator stop/resync steps, and approval gates are documented in `docs/HISTORY-REMEDIATION-PLAN.md`. Do not rewrite history, delete files, or force-push without a separately reviewed owner approval.

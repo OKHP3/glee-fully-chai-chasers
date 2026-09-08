@@ -17,3 +17,4 @@ Every tool and every commit follows these. Not legal advice; a conservative zero
 
 - Pre-release audit step in the deploy checklist: grep shipped bundle for brand strings; verify `reference-photos/` and `private-work/` absent from `dist/` and git history.
 - Any asset without documented provenance in `docs/ASSET-CHECKLIST.md` does not ship.
+- Public-history cleanup is a separate, owner-approved operation governed by [`docs/HISTORY-REMEDIATION-PLAN.md`](./HISTORY-REMEDIATION-PLAN.md); a clean current tree or bundle is not evidence that Git history is clean.

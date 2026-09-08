@@ -21,6 +21,8 @@ Read these in order when the task touches product behavior, UI, content, or arch
 7. `docs/IP-GUARDRAILS.md` — non-negotiable public-repo safety rules (includes explicit WMS / SciPlay / Moolah brand prohibitions).
 8. `docs/ASSET-CHECKLIST.md` — provenance and release inventory.
 9. `docs/ANALYTICS-PRIVACY.md` — the only permitted measurement policy.
+10. `docs/RELEASE-SCOPE.md` — the current shipped/deferred/retired boundary and open gates.
+11. `docs/HISTORY-REMEDIATION-PLAN.md` — the review-only public-history cleanup plan.
 
 Historical handoffs, assessments, pasted prompts, and `attached_assets/` are context only. In particular, do not build from `docs/DESIGN-HANDOFF.md`, `docs/REPLIT-HANDOFF.md`, or `docs/REPLIT-IMPLEMENTATION-BRIEF.md` when they conflict with the canonical documents above.
 
@@ -45,9 +47,11 @@ Implemented and integrated in the current tree:
 - versioned browser-local persistence for balance, bet, XP, Treat Jar, meter, progress, settings, and reset; and
 - GitHub Pages deployment configuration, PWA manifest/icons, and the current public art under `public/assets/` and `public/icons/`.
 
-Still planned or partial, and not evidence of being shipped merely because the spec describes them: the Birthday Reveal **scene**, Chai Tea Bonus pick shelf, daily bonus, milestone scenes/collection shelf, in-flight UniGlee reload persistence and fast/skip controls, additional chapter-specific bonus presentation, service-worker/offline verification, final audio mix/stems, asset optimization, and device-regression gallery.
+The current release boundary is recorded in `docs/RELEASE-SCOPE.md`. In brief, the Birthday Reveal **scene**, daily bonus, milestone scenes/collection shelf, in-flight UniGlee reload persistence and pause/fast/skip controls, additional chapter-specific presentation, final audio mix/stems, service-worker/offline verification, asset optimization, and device-regression gallery are deferred with named owners and acceptance boundaries. The Chai Tea Bonus pick shelf is retired from the canonical roadmap; Bold Chai is the current iced-chai bonus.
 
 Note the Birthday Reveal distinction, because it has been mis-stated before. The birthday **message** and the **10,000-coin grant** are shipped, on the splash, gated to the July 17 to 31 window and claimable once per device per year. Only the Reveal **scene**, the animated moment described in the spec, is unshipped. Do not describe the birthday feature as unshipped in any public artifact.
+
+The current checkout is tree-clean for the known private directories, but that is not history cleanliness. The review-only remediation plan in `docs/HISTORY-REMEDIATION-PLAN.md` must be owner-approved and coordinated before any history rewrite; no collaborator may force-push or resync from an unreviewed rewrite.
 
 The approved realignment also leaves a math migration gap: legacy uses of twelve remain in some engine constants (including level/treat-cap behavior). Do not expand those uses or silently retune them; any migration belongs to the engine owner and must be simulation-backed.
 
