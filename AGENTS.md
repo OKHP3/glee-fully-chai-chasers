@@ -88,6 +88,27 @@ The engine/UI boundary is mandatory: engine code stays browser-DOM-free and test
 
 ## Development and validation
 
+### Technology maintenance clarification — 2026-09-18
+
+The current technology contract and update procedure are in
+[`docs/TECHNOLOGY-MAINTENANCE.md`](docs/TECHNOLOGY-MAINTENANCE.md); the complete,
+dated package comparison is in [`docs/technology/latest.md`](docs/technology/latest.md).
+Regenerate it with `python scripts/technology_audit.py --online` after installing
+`scripts/requirements.txt`. Use a supported stable Python explicitly on Windows.
+
+The canonical dependency installer is the pnpm version in `package.json#packageManager`,
+with `pnpm install --frozen-lockfile`; the older `npm ci` instruction below does not
+apply to this catalog-based workspace. Build/CI Node follows `.node-version`, and
+the main Python CI jobs follow `.python-version`. Dependency upgrades are proposed
+through Dependabot PRs and retain owner review. The scheduled inventory workflow
+reports newer runtime and transitive releases; it does not deploy or merge them.
+
+Correction to the scaffolding paragraph above: the game has no React or database
+runtime dependency, but `vite.config.ts` does copy scene HTML from
+`artifacts/mockup-sandbox/public/scenes/` into the shipped build. Those scene files
+are real production build inputs. Slides/video are separate showcase applications.
+Do not infer that all `artifacts/` files are unreachable from production output.
+
 ```bash
 npm ci
 npm run dev       # Vite dev server, port 5000

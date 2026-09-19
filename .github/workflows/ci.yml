@@ -27,10 +27,14 @@ jobs:
       - name: Set up Python for landing contract tests
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: '3.12'
+          python-version-file: .python-version
+          check-latest: true
 
       - name: Install pinned YAML parser
-        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+        run: python -m pip install --disable-pip-version-check -r scripts/requirements.txt
+
+      - name: Test technology inventory and maintenance configuration
+        run: python -B -m unittest discover -s scripts/tests -v
 
       - name: Run offline landing contract and manifest tests
         run: python -B -m unittest discover -s skills/promotion-handoff/tests -v
@@ -43,13 +47,12 @@ jobs:
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
-        with:
-          version: 10.26.1
 
       - name: Set up Node 24 with pnpm cache
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version-file: .node-version
+          check-latest: true
           cache: pnpm
 
       - name: Install dependencies — a failure here means the lockfile and package.json disagree
