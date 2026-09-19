@@ -121,6 +121,14 @@ Repository acceptance is the existing full `pnpm test` and `pnpm run build`, art
 
 ## Evidence and activation
 
+Verification on 2026-09-18 America/Chicago (2026-09-19 UTC):
+
+- The online inventory completed with no release lookup errors. Successful same-session registry responses were reused after rate limiting, with their original retrieval times preserved in JSON; this is not a claim that every response arrived simultaneously.
+- Local stable Python 3.12 passed `python -B -m unittest discover -s scripts/tests -v`. The updated landing-install contract passed its targeted test. The unchanged broader landing suite includes Linux-specific shell/path behavior, so its full acceptance comes from Linux CI.
+- [Continuous integration for `ce536cc2dcd30709348264543b01fa90754ffc71`](https://github.com/OKHP3/glee-fully-chai-chasers/actions/runs/35419633183) passed the full landing suite, frozen installs, game tests, engine tests, asset/privacy checks, showcase typechecks and production build. The log confirms Node 24.21.0 and pnpm 10.26.1, proving that the new version-file and package-manager consumers work.
+- [The inventory workflow for the same commit](https://github.com/OKHP3/glee-fully-chai-chasers/actions/runs/35419633181) passed its offline PR run and uploaded its report. The scheduled online mode still requires default-branch activation; the equivalent online script was verified locally.
+- Changed workflows passed actionlint 1.7.12 (`-shellcheck='' -pyflakes=''`); `git diff --check` passed. The published snapshot's input and generator SHA-256 values matched the audited local bytes.
+
 | Claim | Tier | Evidence | Consequence if wrong / next check |
 |---|---|---|---|
 | Resolved package versions | Confirmed for audited input bytes | Generated JSON input hashes and pnpm/npm lock entries | Re-run after manifest/lock changes; do not equate this with deployed bytes |
