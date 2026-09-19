@@ -8,8 +8,8 @@ description: >
   repository detritus. Also activate for "decrapify this Repl", "tidy this
   repo", "prune dead branches", or "fix inconsistent filenames". This is the
   authoritative one-time cleanup workflow for one Replit checkout; use
-  okhp3-repository-garden for recurring maintenance, okhp3-repository-janitor
-  for multiple local clones, and okhp3-repository-organizer for structural
+  okhp3-repository-janitor for recurring maintenance and multiple local clones,
+  and okhp3-repository-organizer for structural
   reorganization.
 license: MIT
 metadata:
@@ -49,7 +49,7 @@ evidence-led, and destructive only after the owner approves exact line items.
 
 | In scope | Out of scope |
 |---|---|
-| One-time cleanup of one Replit checkout | Recurring maintenance; use `okhp3-repository-garden` |
+| One-time cleanup of one Replit checkout | Recurring maintenance; use `okhp3-repository-janitor` |
 | Branch and PR classification against a verified base | Multi-clone reconciliation; use `okhp3-repository-janitor` |
 | Naming and detritus audit | Structural redesign; use `okhp3-repository-organizer` |
 | Exact, owner-approved cleanup execution | Autonomous deletion, merging, renaming, or publishing |
@@ -182,7 +182,24 @@ line; obtain an exact go/no-go for each merge, delete, and rename.
 
 ### 6. Execute approved items in small batches
 
-Before each branch operation, refresh and verify the expected head SHA.
+Before each branch operation, run the bundled pre-delete check with the exact
+branch and SHA recorded in the approved plan:
+
+```bash
+python3 .agents/skills/okhp3-replit-repl-janitor/scripts/audit-repo.py \
+  --root . \
+  --check-delete \
+  --branch '<branch>' \
+  --reviewed-head '<reviewed SHA>'
+```
+
+The JSON result records both `reviewed_head` and the freshly read
+`current_head`. If the bucket is `review`, stop, record the hold, and run no
+deletion command. Only a `delete` result may be executed, and its
+`deletion_commands` must be run in the emitted order. The sequence is
+remote-first (`git push origin --delete <branch>`) and local second
+(`git branch -d <branch>`). The check is read-only and never executes either
+command.
 
 For an approved merge:
 
