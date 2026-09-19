@@ -1,4 +1,4 @@
-"""Offline YAML-decoded dispatch/receiver checks; requires PyYAML 6.0.3."""
+"""Offline YAML-decoded dispatch/receiver checks; uses scripts/requirements.txt."""
 import json
 import os
 from pathlib import Path
@@ -52,8 +52,10 @@ class DispatchContractTests(unittest.TestCase):
             if 'uses' in step:
                 self.assertRegex(step['uses'], r'^actions/[^@]+@[0-9a-f]{40}$')
         commands = [step['run'] for step in steps if 'run' in step]
-        self.assertIn('python -m pip install --disable-pip-version-check PyYAML==6.0.3',
+        self.assertIn('python -m pip install --disable-pip-version-check -r scripts/requirements.txt',
                       commands)
+        requirements = (ROOT / 'scripts/requirements.txt').read_text(encoding='utf-8')
+        self.assertRegex(requirements, r'(?m)^PyYAML==\d+\.\d+\.\d+$')
         self.assertIn('python -B -m unittest discover -s skills/promotion-handoff/tests -v',
                       commands)
 
