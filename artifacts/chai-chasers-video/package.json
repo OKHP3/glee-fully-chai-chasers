@@ -33,7 +33,7 @@
     "react-dom": "catalog:",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
-    "three": "^0.182.0",
+    "three": "^0.186.0",
     "vite": "catalog:"
   }
 }

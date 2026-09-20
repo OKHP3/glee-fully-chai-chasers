@@ -14,6 +14,20 @@ spec.loader.exec_module(audit)
 
 
 class VersionTests(unittest.TestCase):
+    def test_registry_workers_share_pacing_and_retry_cooldown(self):
+        with patch.object(audit, 'REGISTRY_NEXT', 0), \
+                patch.object(audit.time, 'monotonic', return_value=100), \
+                patch.object(audit.time, 'sleep') as sleep:
+            audit.pace_registry('https://registry.npmjs.org/a/latest')
+            audit.pace_registry('https://registry.npmjs.org/b/latest')
+            sleep.assert_called_once_with(0.5)
+            audit.pace_registry('https://registry.npmjs.org/a/latest', cooldown=30)
+            audit.pace_registry('https://registry.npmjs.org/c/latest')
+            self.assertEqual(sleep.call_args.args, (30,))
+            sleep.reset_mock()
+            audit.pace_registry('https://pypi.org/pypi/example/json')
+            sleep.assert_not_called()
+
     def test_numeric_order_and_breaking_versions(self):
         self.assertEqual(audit.relation('7.3.6', '8.3.0'), 'major available')
         self.assertEqual(audit.relation('4.23.1', '4.23.13'), 'patch available')
