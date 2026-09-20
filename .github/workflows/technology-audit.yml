@@ -65,7 +65,7 @@ jobs:
                   for row in data.get('runtimeReleases', []):
                       out.write(f"- {row['name']} latest stable: {row.get('latest')}; latest LTS: {row.get('latestLts', 'n/a')}\n")
           PY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: technology-inventory
