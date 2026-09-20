@@ -18,6 +18,7 @@ import re
 import subprocess
 import sys
 import time
+import threading
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
@@ -27,6 +28,25 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SECTIONS = ('dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies')
 STABLE = re.compile(r'^v?(\d+)\.(\d+)\.(\d+)$')
+
+# All workers share the registry budget, including retries and fallback lookups.
+REGISTRY_LOCK = threading.Lock()
+REGISTRY_NEXT = 0.0
+
+
+def pace_registry(url, cooldown=0):
+    global REGISTRY_NEXT
+    if urlparse(url).hostname != 'registry.npmjs.org':
+        return
+    with REGISTRY_LOCK:
+        now = time.monotonic()
+        if cooldown:
+            REGISTRY_NEXT = max(REGISTRY_NEXT, now + cooldown)
+            return
+        delay = max(0, REGISTRY_NEXT - now)
+        if delay:
+            time.sleep(delay)
+        REGISTRY_NEXT = time.monotonic() + 0.5
 
 
 def version_key(value):
@@ -185,6 +205,7 @@ def request(url, as_json=True):
         headers['Authorization'] = 'Bearer ' + os.environ['GH_TOKEN']
     for attempt in range(3):
         try:
+            pace_registry(url)
             with urlopen(Request(url, headers=headers), timeout=25) as response:
                 raw = response.read()
                 if raw.startswith(b'\x1f\x8b'):
@@ -198,6 +219,7 @@ def request(url, as_json=True):
             if isinstance(exc, HTTPError) and exc.code == 429:
                 retry_after = exc.headers.get('Retry-After', '30')
                 delay = min(60, max(5, int(retry_after))) if retry_after.isdigit() else 30
+                pace_registry(url, cooldown=delay)
             time.sleep(delay)
 
 
