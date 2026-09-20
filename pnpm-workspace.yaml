@@ -29,7 +29,7 @@ minimumReleaseAge: 1440
 
 minimumReleaseAgeExclude:
   # Exclude @replit scoped packages from the minimum release age check.
-  # These are published by Replit and trusted — the supply-chain attack vector
+  # These are published by Replit and trusted â€” the supply-chain attack vector
   # this setting guards against does not apply to our own packages.
   - '@replit/*'
   - stripe-replit-sync
@@ -64,7 +64,7 @@ catalog:
   tsx: ^4.23.13
   vite: ^7.3.2
   wouter: ^3.11.0
-  zod: ^3.25.76
+  zod: ^4.6.5
 
 autoInstallPeers: false
 
