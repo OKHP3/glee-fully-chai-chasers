@@ -38,6 +38,8 @@ Package release claims above come from the official npm and PyPI endpoints recor
 
 The workspace inventory also includes React/React DOM, Radix UI, React Hook Form, TanStack Query, Recharts, Wouter, Framer Motion, GSAP, Three.js, React Three Fiber/Drei, React Spring, Lottie, Lucide, Zod, TypeBox, Express, Pino, PostgreSQL's `pg` client, Drizzle, Orval, Replit Vite plugins, Rollup, esbuild, Lightning CSS, native bindings, and their complete locked dependencies. Their exact versions and current stable comparisons are in the linked report; a declaration does not prove that an otherwise unused library reaches a browser bundle.
 
+September 20 clarification: the API scaffold retains esbuild 0.27.3, matching the existing workspace override and canonical lockfile. The proposed 0.28.2 declaration did not change the installed version. A future esbuild upgrade must review that shared override and validate the API scaffold build together.
+
 ## Architecture and technology boundaries
 
 The game entry point remains vanilla TypeScript, DOM, CSS, browser-local storage, and Web Audio. React belongs to the separate mockup, slides, and video applications. Express/PostgreSQL/Drizzle declarations belong to workspace scaffolding; they do not establish a product backend or a deployed database version.
