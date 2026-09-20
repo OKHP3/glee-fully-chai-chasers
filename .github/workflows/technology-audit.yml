@@ -1,0 +1,75 @@
+name: Technology inventory
+
+on:
+  schedule:
+    - cron: '23 11 * * 1'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/technology_audit.py'
+      - 'scripts/tests/test_technology_audit.py'
+      - 'scripts/requirements.txt'
+      - '.github/workflows/technology-audit.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: technology-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version-file: .python-version
+          check-latest: true
+      - run: python -m pip install --disable-pip-version-check -r scripts/requirements.txt
+      - run: python -B -m unittest discover -s scripts/tests -v
+      - name: Inventory manifests without network on pull requests
+        if: github.event_name == 'pull_request'
+        run: python scripts/technology_audit.py --output .local/technology-audit/latest
+      - name: Compare every locked package with official stable releases
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/technology_audit.py --online --output .local/technology-audit/latest
+      - name: Publish concise run summary
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path('.local/technology-audit/latest.json')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              if not path.exists():
+                  out.write('Inventory failed before a report was produced. Inspect the failed step.\n')
+              else:
+                  data = json.loads(path.read_text())
+                  out.write(f"Inventory checked at {data['checkedAt']}; source {data['sourceHead']}.\n\n")
+                  out.write(f"Release lookup failures: {data['lookupErrors']}. Full inventory is in the artifact.\n\n")
+                  seen = set()
+                  for row in data['rows']:
+                      key = (row['name'], row.get('current'), row.get('latest'))
+                      if key in seen or row['status'] == 'current':
+                          continue
+                      seen.add(key)
+                      out.write(f"- {row['name']}: {row.get('current') or 'unlocked'} → {row.get('latest') or 'unknown'} ({row['status']})\n")
+                  for row in data.get('runtimeReleases', []):
+                      out.write(f"- {row['name']} latest stable: {row.get('latest')}; latest LTS: {row.get('latestLts', 'n/a')}\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: technology-inventory
+          path: .local/technology-audit/latest.*
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30

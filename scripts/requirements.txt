@@ -1,0 +1,2 @@
+# Repository audit and workflow-contract tooling; never shipped to the browser.
+PyYAML==6.0.3

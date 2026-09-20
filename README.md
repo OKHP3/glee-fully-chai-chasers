@@ -91,6 +91,10 @@ Five portable [Agent Skills](https://docs.replit.com/agent-skills) were extracte
 
 ## Credits and project notes
 
+Maintainers: the [technology inventory and update policy](./docs/TECHNOLOGY-MAINTENANCE.md)
+links every declared and locked dependency to its current stable release source,
+and explains the automated upgrade PRs and weekly inventory report.
+
 **Glee:** the muse, the reason, the whole point.
 
 **Joey and Phoebe:** the cats who lead the Chai Chase.

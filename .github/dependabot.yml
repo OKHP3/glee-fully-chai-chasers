@@ -3,22 +3,48 @@ updates:
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 10
-    versioning-strategy: increase
-
-  - package-ecosystem: pip
-    directory: "/.github/skills/heic-image-convert"
-    schedule:
-      interval: monthly
-      day: first
+      interval: daily
+      time: "06:00"
+      timezone: America/Chicago
     open-pull-requests-limit: 5
     versioning-strategy: increase
+    cooldown:
+      default-days: 3
+    groups:
+      tailwind:
+        patterns: ["tailwindcss", "@tailwindcss/*"]
+      compatible-tooling:
+        patterns: ["*"]
+        exclude-patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+        update-types: ["minor", "patch"]
+    # Owner-approved Expo compatibility pins remain visible in the audit.
+    # Revisit as a coordinated React/renderer migration, not a bot-only bump.
+    ignore:
+      - dependency-name: react
+      - dependency-name: react-dom
+
+  - package-ecosystem: pip
+    directories:
+      - "/.github/skills/heic-image-convert"
+      - "/scripts"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 2
+    versioning-strategy: increase
+    cooldown:
+      default-days: 3
+    groups:
+      python-tooling:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
 
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
+    groups:
+      github-actions:
+        patterns: ["*"]
