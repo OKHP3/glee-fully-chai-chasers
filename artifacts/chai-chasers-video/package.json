@@ -15,7 +15,7 @@
     "vitest": "^4.1.10",
     "@react-spring/web": "^10.0.3",
     "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
+    "@react-three/fiber": "^9.8.1",
     "@replit/vite-plugin-cartographer": "catalog:",
     "@replit/vite-plugin-dev-banner": "catalog:",
     "@replit/vite-plugin-runtime-error-modal": "catalog:",
@@ -33,7 +33,7 @@
     "react-dom": "catalog:",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
-    "three": "^0.186.0",
+    "three": "^0.186.1",
     "vite": "catalog:"
   }
 }
