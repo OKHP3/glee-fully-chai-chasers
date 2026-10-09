@@ -194,3 +194,5 @@ When syncing files between the cloud container and the Mac clone, record the tra
 The same applies in reverse: when the code and a document disagree, the code is what players experience, but the document may record a real ruling. Do not silently change either one. Note the delta with the source line, and raise it as an open decision for Jamie.
 
 Update this file when verified architecture, commands, deployment behavior, protected baselines, privacy rules, or shipped-vs-planned status changes. Keep detailed mechanics and product decisions in their canonical documents instead of duplicating them here. Re-read every changed guidance file and run the practical checks that the change affects.
+
+## Imported Claude Cowork project instructions
