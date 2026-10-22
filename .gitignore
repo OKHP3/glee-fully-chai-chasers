@@ -49,6 +49,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Finder duplicate folders are not Agent Skill packages
+/.agents/skills/* copy/
+
 # Python generated artifacts
 __pycache__/
 *.py[cod]
