@@ -402,6 +402,7 @@ def write_family_md(
 
     bio     = ""
     summary = extract_family_summary(family_dir, skills)
+    display_name_line = ""
 
     absorb_this_run = False
 
@@ -410,6 +411,14 @@ def write_family_md(
             existing_text = family_md.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
             existing_text = ""
+
+        frontmatter = re.match(r"^---\n(.*?)\n---", existing_text, re.DOTALL)
+        if frontmatter:
+            display_name = re.search(
+                r"^display_name:[^\n]*$", frontmatter.group(1), re.MULTILINE
+            )
+            if display_name:
+                display_name_line = f"{display_name.group(0)}\n"
 
         # Preserve bio: everything between the title line and FAMILY_SUMMARY_START
         title_m = re.search(r"^# .+\n", existing_text, re.MULTILINE)
@@ -446,6 +455,7 @@ def write_family_md(
     new_content = (
         f"---\n"
         f"family: {name}\n"
+        f"{display_name_line}"
         f"skill_count: {n}\n"
         f"generated_by: okhp3-skill-cataloger v{CATALOGER_VERSION}\n"
         f"generated_at: {now_iso}\n"
