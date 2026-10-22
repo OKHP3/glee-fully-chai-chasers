@@ -1,8 +1,11 @@
 # Personal experience research closeout
 
-**Research completed:** September 6, 2026  
-**Closeout recorded:** October 21, 2026  
-**Status:** research complete; design recommendations remain proposals  
+**Research completed:** September 6, 2026
+
+**Closeout recorded:** October 21, 2026
+
+**Status:** research complete; design recommendations remain proposals
+
 **Decision owner:** Jamie
 
 ## Outcome
