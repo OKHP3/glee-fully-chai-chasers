@@ -139,7 +139,10 @@ export const ICE_NOTES: readonly IceNote[] = [
 /** Select a random entry while avoiding an immediate repeat. UI-only; never game math. */
 export function nextIceNoteIndex(previousIndex: number, random = Math.random): number {
   if (ICE_NOTES.length < 2) return 0;
-  const boundedRandom = Math.min(Math.max(random(), 0), 0.9999999999999999);
+  const roll = random();
+  const boundedRandom = Number.isFinite(roll)
+    ? Math.min(Math.max(roll, 0), 1 - Number.EPSILON)
+    : 0;
   const candidate = Math.floor(boundedRandom * (ICE_NOTES.length - 1));
   return candidate >= previousIndex ? candidate + 1 : candidate;
 }

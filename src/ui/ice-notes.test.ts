@@ -30,6 +30,11 @@ describe("Ice Notes", () => {
     expect(nextIceNoteIndex(65, () => 0.999999)).toBe(64);
   });
 
+  it("keeps the note index valid when an injected random source is non-finite", () => {
+    expect(nextIceNoteIndex(10, () => Number.NaN)).toBe(0);
+    expect(nextIceNoteIndex(10, () => Number.POSITIVE_INFINITY)).toBe(0);
+  });
+
   // ── Placeholder name detection ────────────────────────────────────────────
   //
   // A naive length check (ingredient.length >= 3) would pass a placeholder
