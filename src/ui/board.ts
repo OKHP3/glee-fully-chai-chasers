@@ -2128,7 +2128,7 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
     overlay.className = "bonus-cabinet-overlay wheel-scrim text-amber-100";
     overlay.innerHTML = `
       <h2 class="wheel-heading"><span>Free Spins!</span> Joey &amp; Phoebe's Sparkle Wheel</h2>
-      <div class="wheel-stage">
+      <div class="wheel-stage-fit"><div class="wheel-stage">
         ${wheelHeroArt()}
         <div class="wheel-glow-ring"></div>
         <div class="wheel-mechanical-face" style="--wheel-final-deg:${finalDeg}deg">
@@ -2138,7 +2138,7 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
           <span></span><span></span><span></span>
         </div>
         <div class="wheel-pointer"></div>
-      </div>
+      </div></div>
       <div class="wheel-legends" aria-hidden="true">
         <span><b>We're Multiplying</b> Extra sparkle</span>
         <span><b>Moonlit Keepsake Trail</b> memory match</span>
@@ -2146,7 +2146,9 @@ function showWheelScreen(root: HTMLElement, rng: () => number): Promise<WheelWed
       </div>
       <p id="wheel-result" class="min-h-[1.5rem] text-center font-semibold"></p>
     `;
-    const host = root.querySelector<HTMLElement>(".cabinet-frame") ?? root;
+    // Use the whole cabinet, including its flexible space below the reels.
+    // The reel frame alone clips the title, legends, and result on phones.
+    const host = root.querySelector<HTMLElement>(".cabinet-shell") ?? root;
     host.appendChild(overlay);
 
     playWheelTick();

@@ -681,6 +681,21 @@ body {
 .bonus-cabinet-overlay .wheel-stage { width: min(100%, 420px); }
 .bonus-cabinet-overlay .wheel-legends { width: 100%; padding-inline: 0; }
 .bonus-cabinet-overlay #wheel-result { min-width: 0; width: min(100%, 440px); }
+.bonus-cabinet-overlay.wheel-scrim {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  justify-items: center;
+}
+.wheel-stage-fit {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+.wheel-stage-fit .wheel-stage { width: min(100cqw, 150cqh, 420px); }
+.bonus-cabinet-overlay.wheel-scrim .wheel-heading { font-size: clamp(18px, 5vw, 30px); }
 
 /* ------------------------------------------------------------------ */
 /* One-shot Wild Chai Storm                                           */
@@ -1035,6 +1050,7 @@ body {
 
 /* ── Unified cabinet shell: encloses bonus-banner + reel grid ── */
 .cabinet-shell {
+  position: relative;
   width: calc(100% - 20px);
   margin: 8px auto 0;
   flex: 1 1 auto;
