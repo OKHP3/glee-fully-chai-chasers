@@ -134,12 +134,30 @@ export const ICE_NOTES: readonly IceNote[] = [
     "In fortified milk, vitamin D is added in a measured amount rather than occurring as a chai spice.",
     "Vitamin D helps the body absorb calcium from foods and drinks.",
   ]),
+  ...noteSet("Sugar", { flavor: "Clean sweetness", chaiRole: "Balances bold tea and spice", source: "Sugarcane or sugar-beet crops", harvest: "Stalks or roots harvested; juice concentrated" }, [
+    "Table sugar is sucrose, a compound built from glucose and fructose.",
+    "Sugar can be extracted from either sugarcane stalks or sugar-beet roots.",
+    "Processors concentrate the extracted juice until sucrose crystallizes.",
+  ]),
+  ...noteSet("Dried Cane Sugar Syrup", { flavor: "Sweet, lightly caramel-like", chaiRole: "Sweetens a chai concentrate", source: "Sugarcane fields", harvest: "Stalks cut; juice concentrated and dried" }, [
+    "This sweetener begins with juice extracted from harvested sugarcane stalks.",
+    "The juice is concentrated into syrup before it is dried for blending.",
+    "Drying a cane syrup changes its handling form, not its sugarcane origin.",
+  ]),
+  ...noteSet("Potassium Sorbate", { flavor: "Neutral at small amounts", chaiRole: "Helps preserve an added sweetener", source: "Food-grade ingredient production", harvest: "Manufactured, purified, and measured" }, [
+    "Potassium sorbate is a preservative used in some sweetened drink ingredients.",
+    "It helps slow spoilage by yeasts and molds in prepared foods and syrups.",
+    "Potassium sorbate is manufactured for food use rather than harvested as a chai spice.",
+  ]),
 ] as const;
 
 /** Select a random entry while avoiding an immediate repeat. UI-only; never game math. */
 export function nextIceNoteIndex(previousIndex: number, random = Math.random): number {
   if (ICE_NOTES.length < 2) return 0;
-  const boundedRandom = Math.min(Math.max(random(), 0), 0.9999999999999999);
+  const roll = random();
+  const boundedRandom = Number.isFinite(roll)
+    ? Math.min(Math.max(roll, 0), 1 - Number.EPSILON)
+    : 0;
   const candidate = Math.floor(boundedRandom * (ICE_NOTES.length - 1));
   return candidate >= previousIndex ? candidate + 1 : candidate;
 }
