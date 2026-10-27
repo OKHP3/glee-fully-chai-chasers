@@ -22,6 +22,9 @@
  * CHECK 5 — Cinematic mobile iced-chai logo
  *   Reject the known hot-drink logo regression in hero source (CANON.md).
  *
+ * CHECK 6 — Review stylesheet fonts
+ *   Font URLs must resolve relative to the sandbox, not a baked Pages base.
+ *
  * Self-test:  tsx scripts/check-exports.ts --self-test
  *   Runs fixture assertions for the placeholder and iced-chai logo predicates
  *   and exits. The check-exports npm script always runs this first.
@@ -283,7 +286,7 @@ console.log("\n── Check 3: Ice-notes-card completeness ───────
 // ice-notes-card.  A companion-row without a card means the ingredient context
 // strip is missing — this check prevents the omission from shipping silently.
 
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const scenesDir = join(process.cwd(), "public", "scenes");
@@ -520,6 +523,21 @@ if (icedChaiLogoFailed) {
   console.log("✅  Cinematic mobile hero source uses the iced-chai logo without a hot-coffee cup.");
 }
 
+// ── CHECK 6: Review stylesheet fonts ─────────────────────────────────────────
+
+console.log("\n── Check 6: Review stylesheet fonts ──────────────────────────");
+const reviewPublicDir = join(process.cwd(), "public");
+const reviewStyle = readFileSync(join(reviewPublicDir, "game-style.css"), "utf8");
+const reviewFontUrls = [...reviewStyle.matchAll(/url\(["']?([^"')]+\.woff2)["']?\)/g)].map((match) => match[1]);
+const reviewFontsFailed = reviewFontUrls.length === 0 || reviewFontUrls.some((url) =>
+  url.startsWith("/") || /^[a-z]+:/i.test(url) || !existsSync(join(reviewPublicDir, url)),
+);
+if (reviewFontsFailed) {
+  console.error("❌  Review stylesheet must reference existing sandbox fonts with relative URLs; a baked GitHub Pages path fails on Replit.");
+} else {
+  console.log("✅  Review stylesheet fonts resolve relative to the sandbox base.");
+}
+
 // ── Final exit ──────────────────────────────────────────────────────────────
 
 const totalFailures =
@@ -528,7 +546,8 @@ const totalFailures =
   iceNotesFailures.length +
   labelDriftFailures.length +
   labelDriftMissingFile.length +
-  Number(icedChaiLogoFailed);
+  Number(icedChaiLogoFailed) +
+  Number(reviewFontsFailed);
 if (totalFailures > 0) {
   process.exit(1);
 }

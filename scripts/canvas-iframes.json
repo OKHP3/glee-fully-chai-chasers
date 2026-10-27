@@ -129,7 +129,7 @@
     },
     {
       "shapeId": "scene-ice-notes",
-      "name": "Game Scene — Ice Notes (All 3 States)",
+      "name": "Game Scene — Ice Notes (Full Current Deck)",
       "path": "/__mockup/scenes/ice-notes.html"
     },
     {
