@@ -77,7 +77,7 @@ export function Hero(){
 
         {/* Logo — top-left */}
         <div style={{position:"absolute",top:20,left:18,zIndex:10,display:"flex",alignItems:"center",gap:8}}>
-          <div style={{width:30,height:30,borderRadius:8,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17}}>☕</div>
+          <div style={{width:30,height:30,borderRadius:8,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17}}>🥤</div>
           <div>
             <div style={{fontFamily:"'Baloo 2',system-ui,sans-serif",fontSize:12.5,fontWeight:800,color:C.cream,lineHeight:1,letterSpacing:"-.02em"}}>Glee-fully</div>
             <div style={{fontSize:8.5,fontWeight:700,color:C.gold,letterSpacing:"0.06em"}}>Chai Chasers</div>
