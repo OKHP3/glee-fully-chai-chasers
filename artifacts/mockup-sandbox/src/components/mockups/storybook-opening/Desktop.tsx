@@ -13,6 +13,9 @@ const KF = `
 @keyframes sb-flicker{0%,100%{opacity:.8}45%{opacity:1}50%{opacity:.6}55%{opacity:1}}
 @keyframes sb-star{0%,100%{opacity:.18;transform:scale(1)}50%{opacity:.62;transform:scale(1.3)}}
 @keyframes sb-orb{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
 `;
 
 const C = {

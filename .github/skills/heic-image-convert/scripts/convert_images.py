@@ -48,6 +48,8 @@ def write_svg_wrapper(image: Image.Image, destination: Path) -> None:
 def convert(source: Path, output_dir: Path, formats: list[str], max_edge: int | None, quality: int, overwrite: bool) -> list[Path]:
     with Image.open(source) as opened:
         image = resize(ImageOps.exif_transpose(opened).convert("RGBA"), max_edge)
+    # Save pixel data only; Pillow otherwise carries ICC and other source metadata.
+    image.info.clear()
     written: list[Path] = []
     for image_format in formats:
         destination = output_dir / f"{source.stem}.{image_format}"

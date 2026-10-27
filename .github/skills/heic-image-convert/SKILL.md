@@ -9,7 +9,7 @@ Use this project-local skill to prepare photos for inspection and web use. Keep 
 
 ## Setup
 
-Use the repository's Python environment and install the locked conversion requirements when `pillow_heif` is unavailable:
+Use the repository's Python environment and install the declared conversion requirements when `pillow_heif` is unavailable (these are minimum versions, not a lockfile):
 
 ```powershell
 python -m pip install -r .github/skills/heic-image-convert/requirements.txt
@@ -32,3 +32,9 @@ Photos do not meaningfully convert into editable SVG artwork. `--formats svg` cr
 ## Privacy
 
 Treat source photos and private conversions as non-public. Do not add them to `src/`, `public/`, or deployment output unless the user explicitly approves that exact asset for publication.
+
+Metadata stripping does not anonymize visible image content. It removes the source metadata, including embedded color profiles, without performing a color-space conversion; review color appearance before using a derivative as final art. Existing outputs skipped without `--overwrite` are not sanitized retroactively.
+
+## Regression checks
+
+Run `python -B -m unittest discover -s .github/skills/heic-image-convert/tests -v` to check HEIC decoding, all three output containers, orientation/resize, metadata removal, and preservation of sources and existing destinations. Use an approved private scratch directory for the test runtime's temporary files.

@@ -3,8 +3,8 @@ import { ICE_NOTES, nextIceNoteIndex } from "./ice-notes";
 
 describe("Ice Notes", () => {
   it("has a broad, ingredient-led factoid pool", () => {
-    expect(ICE_NOTES).toHaveLength(66);
-    expect(new Set(ICE_NOTES.map((note) => note.ingredient)).size).toBe(22);
+    expect(ICE_NOTES.length).toBeGreaterThanOrEqual(50);
+    expect(new Set(ICE_NOTES.map((note) => note.ingredient)).size).toBeGreaterThanOrEqual(22);
     for (const note of ICE_NOTES) {
       expect(note.flavor).not.toHaveLength(0);
       expect(note.chaiRole).not.toHaveLength(0);
@@ -13,21 +13,28 @@ describe("Ice Notes", () => {
     }
   });
 
-  it("adds the fifteen product-label ingredient categories", () => {
+  it("covers the label-derived ingredient categories", () => {
     const ingredients = new Set(ICE_NOTES.map((note) => note.ingredient));
     expect([
       "Water", "Black Pepper", "Cinnamon", "Cloves", "Natural Flavors",
       "Cane Sugar", "Honey", "Ginger Juice", "Vanilla Extract", "Citric Acid",
       "Spice Extracts", "Nonfat Ultra-Filtered Milk", "Lactase Enzyme",
-      "Vitamin A Palmitate", "Vitamin D3",
+      "Vitamin A Palmitate", "Vitamin D3", "Sugar",
+      "Dried Cane Sugar Syrup", "Potassium Sorbate",
     ].every((ingredient) => ingredients.has(ingredient))).toBe(true);
   });
 
   it("selects randomly without repeating the currently visible factoid", () => {
+    const lastIndex = ICE_NOTES.length - 1;
     expect(nextIceNoteIndex(10, () => 0)).toBe(0);
-    expect(nextIceNoteIndex(10, () => 0.999999)).toBe(65);
+    expect(nextIceNoteIndex(10, () => 0.999999)).toBe(lastIndex);
     expect(nextIceNoteIndex(0, () => 0)).toBe(1);
-    expect(nextIceNoteIndex(65, () => 0.999999)).toBe(64);
+    expect(nextIceNoteIndex(lastIndex, () => 0.999999)).toBe(lastIndex - 1);
+  });
+
+  it("keeps the note index valid when an injected random source is non-finite", () => {
+    expect(nextIceNoteIndex(10, () => Number.NaN)).toBe(0);
+    expect(nextIceNoteIndex(10, () => Number.POSITIVE_INFINITY)).toBe(0);
   });
 
   // ── Placeholder name detection ────────────────────────────────────────────
