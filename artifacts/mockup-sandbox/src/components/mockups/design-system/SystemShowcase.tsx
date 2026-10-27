@@ -38,6 +38,9 @@ const KF = `
 /* Fonts are self-hosted via @font-face in src/index.css (public/fonts/) */
 @keyframes ds-pulse{0%,100%{opacity:.5}50%{opacity:1}}
 @keyframes ds-rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
 `;
 
 const TOKENS = {

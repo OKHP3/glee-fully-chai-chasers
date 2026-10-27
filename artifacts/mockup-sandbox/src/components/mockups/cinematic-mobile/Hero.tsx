@@ -40,8 +40,8 @@ export function Hero(){
     <div style={{width:390,height:844,overflow:"hidden",fontFamily:"system-ui,sans-serif",background:C.void,position:"relative",display:"flex",flexDirection:"column"}}>
       <style>{KF}</style>
 
-      {/* ── HERO ART ZONE (top ~62% = 524px) ── */}
-      <div style={{position:"relative",height:524,flexShrink:0,overflow:"hidden"}}>
+      {/* Reserve enough room below for copy and full-size tap targets. */}
+      <div style={{position:"relative",height:430,flexShrink:0,overflow:"hidden"}}>
         {/* Aurora atmosphere */}
         <div style={{position:"absolute",inset:0,zIndex:1,background:`
           radial-gradient(ellipse at 30% 18%, ${C.auroraTeal}, transparent 50%),
@@ -63,10 +63,10 @@ export function Hero(){
         </svg>
 
         {/* Character art */}
-        <div style={{position:"absolute",inset:0,zIndex:4,display:"flex",alignItems:"flex-end",justifyContent:"center",paddingBottom:60}}>
-          <div style={{position:"relative",width:"86%"}}>
+        <div style={{position:"absolute",inset:0,zIndex:4,display:"flex",justifyContent:"center"}}>
+          <div style={{position:"relative",width:"86%",height:"100%"}}>
             <div style={{position:"absolute",bottom:-10,left:"50%",transform:"translateX(-50%)",width:260,height:120,borderRadius:"50%",background:"radial-gradient(ellipse,rgba(65,184,183,.14),transparent 70%)",filter:"blur(16px)",animation:"cm-pulse 6s ease-in-out infinite"}}/>
-            <img src="/__mockup/images/chai-chase-splash.png" alt="Joey and Phoebe in the cosmic chai garden" style={{width:"100%",height:"auto",objectFit:"contain",display:"block",filter:"drop-shadow(0 6px 24px rgba(65,184,183,.2))",position:"relative",zIndex:1}}/>
+            <img src="/__mockup/images/chai-chase-splash.png" alt="Joey and Phoebe in the cosmic chai garden" style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block",filter:"drop-shadow(0 6px 24px rgba(65,184,183,.2))",position:"relative",zIndex:1}}/>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ export function Hero(){
 
         {/* Logo — top-left */}
         <div style={{position:"absolute",top:20,left:18,zIndex:10,display:"flex",alignItems:"center",gap:8}}>
-          <div style={{width:30,height:30,borderRadius:8,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17}}>☕</div>
+          <div style={{width:30,height:30,borderRadius:8,background:`linear-gradient(135deg,${C.mint},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17}}>🥤</div>
           <div>
             <div style={{fontFamily:"'Baloo 2',system-ui,sans-serif",fontSize:12.5,fontWeight:800,color:C.cream,lineHeight:1,letterSpacing:"-.02em"}}>Glee-fully</div>
             <div style={{fontSize:8.5,fontWeight:700,color:C.gold,letterSpacing:"0.06em"}}>Chai Chasers</div>
@@ -88,7 +88,7 @@ export function Hero(){
         <div style={{position:"absolute",bottom:0,left:0,right:0,height:200,background:`linear-gradient(0deg,${C.panel} 0%,rgba(24,30,80,.95) 30%,rgba(24,30,80,.7) 60%,transparent 100%)`,zIndex:6,pointerEvents:"none"}}/>
       </div>
 
-      {/* ── CONTENT PANEL (bottom ~38% = 320px) ── */}
+      {/* ── CONTENT PANEL (remaining 414px) ── */}
       <div style={{
         flex:1,
         background:`linear-gradient(180deg,${C.panel},#0e1230)`,
@@ -124,7 +124,7 @@ export function Hero(){
 
         {/* Primary CTA — large tap target */}
         <button style={{
-          width:"100%",height:60,
+          width:"100%",height:60,minHeight:60,flexShrink:0,
           border:"none",borderRadius:16,
           background:`linear-gradient(160deg,${C.gold},#e5a800 60%,#c8860a)`,
           boxShadow:`0 5px 0 #8a5a00,0 9px 24px rgba(242,200,75,.35)`,
@@ -143,7 +143,7 @@ export function Hero(){
 
         {/* Ghost secondary */}
         <button style={{
-          width:"100%",height:44,
+          width:"100%",height:44,minHeight:44,flexShrink:0,
           border:`1.5px solid rgba(255,248,238,.2)`,borderRadius:12,
           background:"transparent",
           color:C.creamDim,fontSize:13,fontWeight:600,cursor:"pointer",

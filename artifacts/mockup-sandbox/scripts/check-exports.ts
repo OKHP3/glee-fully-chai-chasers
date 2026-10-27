@@ -19,9 +19,12 @@
  *   Every scene HTML with a companion-row must include an ice-notes-card
  *   with a non-placeholder ingredient name and description.
  *
+ * CHECK 5 — Cinematic mobile iced-chai logo
+ *   Reject the known hot-drink logo regression in hero source (CANON.md).
+ *
  * Self-test:  tsx scripts/check-exports.ts --self-test
- *   Runs fixture assertions for the placeholder-detection predicates used in
- *   CHECK 3 and exits.  The check-exports npm script always runs this first.
+ *   Runs fixture assertions for the placeholder and iced-chai logo predicates
+ *   and exits. The check-exports npm script always runs this first.
  *
  * Run from the mockup-sandbox package root:
  *   pnpm run check-exports
@@ -33,6 +36,10 @@
 // import.meta.env usage inside component bodies is fine; we never render.
 import { modules } from "../src/.generated/mockup-components.ts";
 import glob from "fast-glob";
+
+function hasIcedChaiLogo(source: string): boolean {
+  return />\s*🥤\s*<\/div>/.test(source) && !source.includes("☕");
+}
 
 // ── Placeholder-detection predicates (module scope) ─────────────────────────
 //
@@ -105,6 +112,11 @@ if (process.argv.includes("--self-test")) {
       selfTestFailed++;
     }
   }
+
+  assert("iced-chai logo passes", hasIcedChaiLogo("<div>🥤</div>"), true);
+  assert("hot-coffee logo fails", hasIcedChaiLogo("<div>☕</div>"), false);
+  assert("missing logo fails", hasIcedChaiLogo("<div></div>"), false);
+  assert("mixed hot/cold logos fail", hasIcedChaiLogo("<div>🥤</div><div>☕</div>"), false);
 
   // ── isPlaceholderName fixtures ───────────────────────────────────────────
   // Should be flagged as placeholder:
@@ -497,6 +509,17 @@ if (labelDriftTotalFailures > 0) {
   );
 }
 
+// ── CHECK 5: Cinematic mobile iced-chai logo ──────────────────────────────────
+
+console.log("\n── Check 5: Cinematic mobile iced-chai logo ───────────────────");
+const heroSource = readFileSync(join(process.cwd(), "src/components/mockups/cinematic-mobile/Hero.tsx"), "utf8");
+const icedChaiLogoFailed = !hasIcedChaiLogo(heroSource);
+if (icedChaiLogoFailed) {
+  console.error("❌  Cinematic mobile hero must show the cold-drink logo, never a hot-coffee cup (docs/CANON.md).");
+} else {
+  console.log("✅  Cinematic mobile hero source uses the iced-chai logo without a hot-coffee cup.");
+}
+
 // ── Final exit ──────────────────────────────────────────────────────────────
 
 const totalFailures =
@@ -504,7 +527,8 @@ const totalFailures =
   coverageFailures.length +
   iceNotesFailures.length +
   labelDriftFailures.length +
-  labelDriftMissingFile.length;
+  labelDriftMissingFile.length +
+  Number(icedChaiLogoFailed);
 if (totalFailures > 0) {
   process.exit(1);
 }
