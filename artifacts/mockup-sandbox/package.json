@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check-exports": "tsx scripts/check-exports.ts --self-test && tsx --import ./scripts/css-stub-loader.mjs scripts/check-exports.ts"
+    "check-exports": "tsx scripts/check-exports.ts --self-test && tsx --import ./scripts/css-stub-loader.mjs scripts/check-exports.ts && tsx scripts/generate-ice-notes-review.ts --check",
+    "sync-ice-notes-review": "tsx scripts/generate-ice-notes-review.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.9.1",
