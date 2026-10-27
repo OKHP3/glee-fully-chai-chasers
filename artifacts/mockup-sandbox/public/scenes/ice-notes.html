@@ -6,7 +6,8 @@
 <title>Ice Notes — Chai Chasers Design Review</title>
 <link rel="stylesheet" href="../game-style.css">
 <style>
-html,body{margin:0;padding:0;width:390px;overflow-x:hidden;overflow-y:auto;background:#06081a}
+html,body{margin:0;padding:0;width:390px;min-height:100%;overflow-x:hidden;overflow-y:auto;background:#06081a}
+.cc-root{height:auto;min-height:100dvh;overflow:visible}
 .ice-notes-review{
   position:relative;z-index:5;
   display:flex;flex-direction:column;
@@ -20,58 +21,1139 @@ html,body{margin:0;padding:0;width:390px;overflow-x:hidden;overflow-y:auto;backg
   font-family:sans-serif;color:#f5d576;font-size:11px;
   letter-spacing:.15em;text-transform:uppercase;margin:0 4px 4px;opacity:0.8;
 }
+.ice-notes-review .ice-notes-card{height:auto;min-height:110px;overflow:visible}
+.ice-notes-review .ice-notes-body{min-height:auto}
+.ice-notes-review .ice-notes-name-group{display:block;overflow:visible}
+.ice-notes-review .ice-notes-profile{margin-top:8px}
 </style>
 </head>
 <body>
 <div class="cc-root">
   <div id="bg-layer" class="night-garden aurora" aria-hidden="true"></div>
   <div class="ice-notes-review">
-    <p class="ice-notes-review-heading">Ice Notes Design Review — All three note states</p>
-    <!-- Note 1: Cardamom -->
-    <aside class="ice-notes-card" aria-label="Chai ingredient note">
-      <p class="ice-notes-eyebrow">ICE NOTES</p>
+    <p class="ice-notes-review-heading">Ice Notes Design Review — 75 current in-game entries, in source order</p>
+    <aside class="ice-notes-card" data-note-index="1" aria-label="Cardamom note 1">
+      <p class="ice-notes-eyebrow">ICE NOTES · 1 / 75</p>
       <div class="ice-notes-body">
         <div class="ice-notes-header">
           <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
-          <span class="ice-notes-name-group"><span class="ice-notes-name">Cardamom</span> <span class="ice-notes-text">Chai's signature warming spice — opens the nose, lingers on the finish.</span></span>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cardamom</span> <span class="ice-notes-text">Green cardamom keeps its tiny seeds inside a papery pod, which helps protect its fragrant oils.</span></span>
         </div>
         <dl class="ice-notes-profile">
-          <div><dt>Flavor</dt><dd>Floral, citrusy, warmly spiced</dd></div>
-          <div><dt>Chai role</dt><dd>Cornerstone spice</dd></div>
-          <div><dt>Source</dt><dd>Guatemala &amp; India</dd></div>
-          <div><dt>Gathering</dt><dd>Hand-picked, twice a year</dd></div>
+          <div><dt>Flavor</dt><dd>Floral, citrusy warmth</dd></div>
+          <div><dt>Chai role</dt><dd>Lifts the spice blend</dd></div>
+          <div><dt>Source</dt><dd>Tropical South Asian farms</dd></div>
+          <div><dt>Gathering</dt><dd>Pods picked, then dried</dd></div>
         </dl>
       </div>
     </aside>
-    <!-- Note 2: Ginger -->
-    <aside class="ice-notes-card" aria-label="Chai ingredient note">
-      <p class="ice-notes-eyebrow">ICE NOTES</p>
+    <aside class="ice-notes-card" data-note-index="2" aria-label="Cardamom note 2">
+      <p class="ice-notes-eyebrow">ICE NOTES · 2 / 75</p>
       <div class="ice-notes-body">
         <div class="ice-notes-header">
           <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
-          <span class="ice-notes-name-group"><span class="ice-notes-name">Ginger</span> <span class="ice-notes-text">Provides the bright heat that chai builds around — always fresh, never harsh.</span></span>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cardamom</span> <span class="ice-notes-text">Cardamom pods are picked and dried; gentle drying helps preserve their color and aroma.</span></span>
         </div>
         <dl class="ice-notes-profile">
-          <div><dt>Flavor</dt><dd>Bright, peppery, slightly sweet</dd></div>
-          <div><dt>Chai role</dt><dd>Heat anchor &amp; digestive</dd></div>
-          <div><dt>Source</dt><dd>Kerala, India</dd></div>
-          <div><dt>Gathering</dt><dd>Rhizome harvest, late autumn</dd></div>
+          <div><dt>Flavor</dt><dd>Floral, citrusy warmth</dd></div>
+          <div><dt>Chai role</dt><dd>Lifts the spice blend</dd></div>
+          <div><dt>Source</dt><dd>Tropical South Asian farms</dd></div>
+          <div><dt>Gathering</dt><dd>Pods picked, then dried</dd></div>
         </dl>
       </div>
     </aside>
-    <!-- Note 3: Black Tea -->
-    <aside class="ice-notes-card" aria-label="Chai ingredient note">
-      <p class="ice-notes-eyebrow">ICE NOTES</p>
+    <aside class="ice-notes-card" data-note-index="3" aria-label="Cardamom note 3">
+      <p class="ice-notes-eyebrow">ICE NOTES · 3 / 75</p>
       <div class="ice-notes-body">
         <div class="ice-notes-header">
           <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
-          <span class="ice-notes-name-group"><span class="ice-notes-name">Assam Black Tea</span> <span class="ice-notes-text">The bold malty backbone that holds every chai blend together.</span></span>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cardamom</span> <span class="ice-notes-text">The warm, almost citrusy character comes from aromatic oils in both the seeds and the pod.</span></span>
         </div>
         <dl class="ice-notes-profile">
-          <div><dt>Flavor</dt><dd>Malty, robust, slightly brisk</dd></div>
-          <div><dt>Chai role</dt><dd>Base &amp; body</dd></div>
-          <div><dt>Source</dt><dd>Assam, Northeast India</dd></div>
-          <div><dt>Gathering</dt><dd>Second flush, June–July</dd></div>
+          <div><dt>Flavor</dt><dd>Floral, citrusy warmth</dd></div>
+          <div><dt>Chai role</dt><dd>Lifts the spice blend</dd></div>
+          <div><dt>Source</dt><dd>Tropical South Asian farms</dd></div>
+          <div><dt>Gathering</dt><dd>Pods picked, then dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="4" aria-label="Black Tea note 4">
+      <p class="ice-notes-eyebrow">ICE NOTES · 4 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Black Tea</span> <span class="ice-notes-text">Black, green, and oolong teas all begin as leaves from the Camellia sinensis plant.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Malty, brisk, tannic</dd></div>
+          <div><dt>Chai role</dt><dd>Builds the tea backbone</dd></div>
+          <div><dt>Source</dt><dd>Camellia sinensis gardens</dd></div>
+          <div><dt>Gathering</dt><dd>Leaves plucked and oxidized</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="5" aria-label="Black Tea note 5">
+      <p class="ice-notes-eyebrow">ICE NOTES · 5 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Black Tea</span> <span class="ice-notes-text">For black tea, the leaves are allowed to oxidize fully, which deepens their color and malty character.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Malty, brisk, tannic</dd></div>
+          <div><dt>Chai role</dt><dd>Builds the tea backbone</dd></div>
+          <div><dt>Source</dt><dd>Camellia sinensis gardens</dd></div>
+          <div><dt>Gathering</dt><dd>Leaves plucked and oxidized</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="6" aria-label="Black Tea note 6">
+      <p class="ice-notes-eyebrow">ICE NOTES · 6 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Black Tea</span> <span class="ice-notes-text">Rolling or crushing tea leaves exposes their contents to oxygen and starts the oxidation process.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Malty, brisk, tannic</dd></div>
+          <div><dt>Chai role</dt><dd>Builds the tea backbone</dd></div>
+          <div><dt>Source</dt><dd>Camellia sinensis gardens</dd></div>
+          <div><dt>Gathering</dt><dd>Leaves plucked and oxidized</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="7" aria-label="Ginger note 7">
+      <p class="ice-notes-eyebrow">ICE NOTES · 7 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ginger</span> <span class="ice-notes-text">Ginger is a rhizome: a horizontal underground stem, not a root.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Peppery, bright heat</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a fresh spark</dd></div>
+          <div><dt>Source</dt><dd>Tropical rhizome fields</dd></div>
+          <div><dt>Gathering</dt><dd>Rhizomes lifted and washed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="8" aria-label="Ginger note 8">
+      <p class="ice-notes-eyebrow">ICE NOTES · 8 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ginger</span> <span class="ice-notes-text">A ginger plant stores energy in its branching rhizome, growing joint by joint below the soil.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Peppery, bright heat</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a fresh spark</dd></div>
+          <div><dt>Source</dt><dd>Tropical rhizome fields</dd></div>
+          <div><dt>Gathering</dt><dd>Rhizomes lifted and washed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="9" aria-label="Ginger note 9">
+      <p class="ice-notes-eyebrow">ICE NOTES · 9 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ginger</span> <span class="ice-notes-text">The lively bite of fresh ginger comes largely from compounds called gingerols.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Peppery, bright heat</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a fresh spark</dd></div>
+          <div><dt>Source</dt><dd>Tropical rhizome fields</dd></div>
+          <div><dt>Gathering</dt><dd>Rhizomes lifted and washed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="10" aria-label="Star Anise note 10">
+      <p class="ice-notes-eyebrow">ICE NOTES · 10 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Star Anise</span> <span class="ice-notes-text">Star anise is a dried fruit, not a seed; each point of the star is a small fruit segment.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, licorice-like</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a high warm note</dd></div>
+          <div><dt>Source</dt><dd>Evergreen orchards in East Asia</dd></div>
+          <div><dt>Gathering</dt><dd>Fruit picked green, then dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="11" aria-label="Star Anise note 11">
+      <p class="ice-notes-eyebrow">ICE NOTES · 11 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Star Anise</span> <span class="ice-notes-text">The star-shaped fruit is picked before it is fully ripe, then dried until firm and fragrant.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, licorice-like</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a high warm note</dd></div>
+          <div><dt>Source</dt><dd>Evergreen orchards in East Asia</dd></div>
+          <div><dt>Gathering</dt><dd>Fruit picked green, then dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="12" aria-label="Star Anise note 12">
+      <p class="ice-notes-eyebrow">ICE NOTES · 12 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Star Anise</span> <span class="ice-notes-text">Its sweet licorice-like aroma comes from anethole, an aromatic oil also found in anise.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, licorice-like</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a high warm note</dd></div>
+          <div><dt>Source</dt><dd>Evergreen orchards in East Asia</dd></div>
+          <div><dt>Gathering</dt><dd>Fruit picked green, then dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="13" aria-label="Oat Milk note 13">
+      <p class="ice-notes-eyebrow">ICE NOTES · 13 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Oat Milk</span> <span class="ice-notes-text">Oat milk starts with oats blended with water and strained into a smooth, pale liquid.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Mild, cereal, creamy</dd></div>
+          <div><dt>Chai role</dt><dd>Softens the spice body</dd></div>
+          <div><dt>Source</dt><dd>Temperate oat fields</dd></div>
+          <div><dt>Gathering</dt><dd>Grain cut, threshed, and milled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="14" aria-label="Oat Milk note 14">
+      <p class="ice-notes-eyebrow">ICE NOTES · 14 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Oat Milk</span> <span class="ice-notes-text">Oats naturally contain soluble fiber called beta-glucan, which contributes to a silky texture.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Mild, cereal, creamy</dd></div>
+          <div><dt>Chai role</dt><dd>Softens the spice body</dd></div>
+          <div><dt>Source</dt><dd>Temperate oat fields</dd></div>
+          <div><dt>Gathering</dt><dd>Grain cut, threshed, and milled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="15" aria-label="Oat Milk note 15">
+      <p class="ice-notes-eyebrow">ICE NOTES · 15 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Oat Milk</span> <span class="ice-notes-text">Some oat-milk methods use enzymes to break down part of the oat starch into smaller sugars.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Mild, cereal, creamy</dd></div>
+          <div><dt>Chai role</dt><dd>Softens the spice body</dd></div>
+          <div><dt>Source</dt><dd>Temperate oat fields</dd></div>
+          <div><dt>Gathering</dt><dd>Grain cut, threshed, and milled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="16" aria-label="Raw Cane Sugar note 16">
+      <p class="ice-notes-eyebrow">ICE NOTES · 16 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Raw Cane Sugar</span> <span class="ice-notes-text">Cane sugar begins as juice pressed from tall sugarcane stalks.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Golden, lightly molassesy</dd></div>
+          <div><dt>Chai role</dt><dd>Rounds sweetness</dd></div>
+          <div><dt>Source</dt><dd>Tropical cane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut, crushed, crystallized</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="17" aria-label="Raw Cane Sugar note 17">
+      <p class="ice-notes-eyebrow">ICE NOTES · 17 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Raw Cane Sugar</span> <span class="ice-notes-text">The juice is clarified and concentrated until sucrose forms crystals.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Golden, lightly molassesy</dd></div>
+          <div><dt>Chai role</dt><dd>Rounds sweetness</dd></div>
+          <div><dt>Source</dt><dd>Tropical cane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut, crushed, crystallized</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="18" aria-label="Raw Cane Sugar note 18">
+      <p class="ice-notes-eyebrow">ICE NOTES · 18 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Raw Cane Sugar</span> <span class="ice-notes-text">A trace of molasses left with the crystals gives less-refined cane sugar its warm golden color.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Golden, lightly molassesy</dd></div>
+          <div><dt>Chai role</dt><dd>Rounds sweetness</dd></div>
+          <div><dt>Source</dt><dd>Tropical cane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut, crushed, crystallized</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="19" aria-label="Ice note 19">
+      <p class="ice-notes-eyebrow">ICE NOTES · 19 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ice</span> <span class="ice-notes-text">When water freezes, its molecules arrange into an open crystal structure.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean and cooling</dd></div>
+          <div><dt>Chai role</dt><dd>Keeps the chai iced</dd></div>
+          <div><dt>Source</dt><dd>Clean potable water</dd></div>
+          <div><dt>Gathering</dt><dd>Water frozen into cubes</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="20" aria-label="Ice note 20">
+      <p class="ice-notes-eyebrow">ICE NOTES · 20 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ice</span> <span class="ice-notes-text">That open structure makes ice less dense than liquid water, which is why ice floats.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean and cooling</dd></div>
+          <div><dt>Chai role</dt><dd>Keeps the chai iced</dd></div>
+          <div><dt>Source</dt><dd>Clean potable water</dd></div>
+          <div><dt>Gathering</dt><dd>Water frozen into cubes</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="21" aria-label="Ice note 21">
+      <p class="ice-notes-eyebrow">ICE NOTES · 21 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ice</span> <span class="ice-notes-text">A generously iced drink stays cold because melting ice absorbs heat from the liquid around it.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean and cooling</dd></div>
+          <div><dt>Chai role</dt><dd>Keeps the chai iced</dd></div>
+          <div><dt>Source</dt><dd>Clean potable water</dd></div>
+          <div><dt>Gathering</dt><dd>Water frozen into cubes</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="22" aria-label="Water note 22">
+      <p class="ice-notes-eyebrow">ICE NOTES · 22 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Water</span> <span class="ice-notes-text">Water is the quiet carrier that dissolves and carries tea and spice flavors into the cup.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Carries tea and spice</dd></div>
+          <div><dt>Source</dt><dd>Treated potable water</dd></div>
+          <div><dt>Gathering</dt><dd>Collected, treated, then brewed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="23" aria-label="Water note 23">
+      <p class="ice-notes-eyebrow">ICE NOTES · 23 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Water</span> <span class="ice-notes-text">Steep time and temperature both change how quickly tea and spices give up their soluble flavor compounds.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Carries tea and spice</dd></div>
+          <div><dt>Source</dt><dd>Treated potable water</dd></div>
+          <div><dt>Gathering</dt><dd>Collected, treated, then brewed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="24" aria-label="Water note 24">
+      <p class="ice-notes-eyebrow">ICE NOTES · 24 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Water</span> <span class="ice-notes-text">Pouring a finished concentrate over ice cools it quickly while keeping the drink firmly iced.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Carries tea and spice</dd></div>
+          <div><dt>Source</dt><dd>Treated potable water</dd></div>
+          <div><dt>Gathering</dt><dd>Collected, treated, then brewed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="25" aria-label="Black Pepper note 25">
+      <p class="ice-notes-eyebrow">ICE NOTES · 25 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Black Pepper</span> <span class="ice-notes-text">A black peppercorn is the dried berry of a climbing pepper vine.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sharp, tingly heat</dd></div>
+          <div><dt>Chai role</dt><dd>Balances sweetness</dd></div>
+          <div><dt>Source</dt><dd>Tropical pepper vines</dd></div>
+          <div><dt>Gathering</dt><dd>Green berries picked and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="26" aria-label="Black Pepper note 26">
+      <p class="ice-notes-eyebrow">ICE NOTES · 26 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Black Pepper</span> <span class="ice-notes-text">Pepper berries are harvested green, then dried until their skins darken and wrinkle.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sharp, tingly heat</dd></div>
+          <div><dt>Chai role</dt><dd>Balances sweetness</dd></div>
+          <div><dt>Source</dt><dd>Tropical pepper vines</dd></div>
+          <div><dt>Gathering</dt><dd>Green berries picked and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="27" aria-label="Black Pepper note 27">
+      <p class="ice-notes-eyebrow">ICE NOTES · 27 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Black Pepper</span> <span class="ice-notes-text">Piperine is the compound responsible for black pepper&#39;s recognizable, tingly heat.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sharp, tingly heat</dd></div>
+          <div><dt>Chai role</dt><dd>Balances sweetness</dd></div>
+          <div><dt>Source</dt><dd>Tropical pepper vines</dd></div>
+          <div><dt>Gathering</dt><dd>Green berries picked and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="28" aria-label="Cinnamon note 28">
+      <p class="ice-notes-eyebrow">ICE NOTES · 28 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cinnamon</span> <span class="ice-notes-text">Cinnamon is made from the inner bark of selected evergreen tree shoots.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Woody, sweet warmth</dd></div>
+          <div><dt>Chai role</dt><dd>Sets the cozy base</dd></div>
+          <div><dt>Source</dt><dd>Evergreen bark groves</dd></div>
+          <div><dt>Gathering</dt><dd>Young shoots cut and peeled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="29" aria-label="Cinnamon note 29">
+      <p class="ice-notes-eyebrow">ICE NOTES · 29 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cinnamon</span> <span class="ice-notes-text">As thin strips of bark dry, they curl naturally into the familiar quill shape.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Woody, sweet warmth</dd></div>
+          <div><dt>Chai role</dt><dd>Sets the cozy base</dd></div>
+          <div><dt>Source</dt><dd>Evergreen bark groves</dd></div>
+          <div><dt>Gathering</dt><dd>Young shoots cut and peeled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="30" aria-label="Cinnamon note 30">
+      <p class="ice-notes-eyebrow">ICE NOTES · 30 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cinnamon</span> <span class="ice-notes-text">Cinnamaldehyde is the aromatic compound most closely associated with cinnamon&#39;s warm scent.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Woody, sweet warmth</dd></div>
+          <div><dt>Chai role</dt><dd>Sets the cozy base</dd></div>
+          <div><dt>Source</dt><dd>Evergreen bark groves</dd></div>
+          <div><dt>Gathering</dt><dd>Young shoots cut and peeled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="31" aria-label="Cloves note 31">
+      <p class="ice-notes-eyebrow">ICE NOTES · 31 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cloves</span> <span class="ice-notes-text">Cloves are unopened flower buds harvested before they bloom.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, intense spice</dd></div>
+          <div><dt>Chai role</dt><dd>Deepens the blend</dd></div>
+          <div><dt>Source</dt><dd>Tropical clove trees</dd></div>
+          <div><dt>Gathering</dt><dd>Unopened buds picked and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="32" aria-label="Cloves note 32">
+      <p class="ice-notes-eyebrow">ICE NOTES · 32 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cloves</span> <span class="ice-notes-text">The buds are dried until they become the small, dark, nail-shaped spice used in chai blends.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, intense spice</dd></div>
+          <div><dt>Chai role</dt><dd>Deepens the blend</dd></div>
+          <div><dt>Source</dt><dd>Tropical clove trees</dd></div>
+          <div><dt>Gathering</dt><dd>Unopened buds picked and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="33" aria-label="Cloves note 33">
+      <p class="ice-notes-eyebrow">ICE NOTES · 33 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cloves</span> <span class="ice-notes-text">Eugenol is a major aromatic compound in clove oil and gives cloves their sweet-spicy intensity.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, intense spice</dd></div>
+          <div><dt>Chai role</dt><dd>Deepens the blend</dd></div>
+          <div><dt>Source</dt><dd>Tropical clove trees</dd></div>
+          <div><dt>Gathering</dt><dd>Unopened buds picked and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="34" aria-label="Natural Flavors note 34">
+      <p class="ice-notes-eyebrow">ICE NOTES · 34 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Natural Flavors</span> <span class="ice-notes-text">Natural flavors are an ingredient-label category, not one single crop or spice.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Blend-specific aroma</dd></div>
+          <div><dt>Chai role</dt><dd>Rounds the finish</dd></div>
+          <div><dt>Source</dt><dd>Plant, spice, or dairy materials</dd></div>
+          <div><dt>Gathering</dt><dd>Extracted and blended</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="35" aria-label="Natural Flavors note 35">
+      <p class="ice-notes-eyebrow">ICE NOTES · 35 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Natural Flavors</span> <span class="ice-notes-text">The category can include flavoring materials derived from plants, spices, fruits, herbs, or dairy ingredients.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Blend-specific aroma</dd></div>
+          <div><dt>Chai role</dt><dd>Rounds the finish</dd></div>
+          <div><dt>Source</dt><dd>Plant, spice, or dairy materials</dd></div>
+          <div><dt>Gathering</dt><dd>Extracted and blended</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="36" aria-label="Natural Flavors note 36">
+      <p class="ice-notes-eyebrow">ICE NOTES · 36 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Natural Flavors</span> <span class="ice-notes-text">A small amount of a flavor extract can round out a blend without changing its visible texture.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Blend-specific aroma</dd></div>
+          <div><dt>Chai role</dt><dd>Rounds the finish</dd></div>
+          <div><dt>Source</dt><dd>Plant, spice, or dairy materials</dd></div>
+          <div><dt>Gathering</dt><dd>Extracted and blended</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="37" aria-label="Cane Sugar note 37">
+      <p class="ice-notes-eyebrow">ICE NOTES · 37 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cane Sugar</span> <span class="ice-notes-text">Sugarcane stores sucrose in its fibrous stalk rather than in a fruit.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean, caramel sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Balances spice heat</dd></div>
+          <div><dt>Source</dt><dd>Tropical cane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut, crushed, and boiled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="38" aria-label="Cane Sugar note 38">
+      <p class="ice-notes-eyebrow">ICE NOTES · 38 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cane Sugar</span> <span class="ice-notes-text">Mills crush the stalks to release cane juice before the juice is filtered and concentrated.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean, caramel sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Balances spice heat</dd></div>
+          <div><dt>Source</dt><dd>Tropical cane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut, crushed, and boiled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="39" aria-label="Cane Sugar note 39">
+      <p class="ice-notes-eyebrow">ICE NOTES · 39 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Cane Sugar</span> <span class="ice-notes-text">As concentrated cane juice cools, sucrose molecules organize into crystals.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean, caramel sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Balances spice heat</dd></div>
+          <div><dt>Source</dt><dd>Tropical cane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut, crushed, and boiled</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="40" aria-label="Honey note 40">
+      <p class="ice-notes-eyebrow">ICE NOTES · 40 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Honey</span> <span class="ice-notes-text">Honey begins as floral nectar gathered by bees.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Floral, mellow sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a round note</dd></div>
+          <div><dt>Source</dt><dd>Beehives near flowering plants</dd></div>
+          <div><dt>Gathering</dt><dd>Bees gather nectar; comb is collected</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="41" aria-label="Honey note 41">
+      <p class="ice-notes-eyebrow">ICE NOTES · 41 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Honey</span> <span class="ice-notes-text">Bees reduce nectar&#39;s water content in the hive, concentrating the sugars into honey.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Floral, mellow sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a round note</dd></div>
+          <div><dt>Source</dt><dd>Beehives near flowering plants</dd></div>
+          <div><dt>Gathering</dt><dd>Bees gather nectar; comb is collected</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="42" aria-label="Honey note 42">
+      <p class="ice-notes-eyebrow">ICE NOTES · 42 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Honey</span> <span class="ice-notes-text">The flower sources available to bees influence honey&#39;s color, aroma, and flavor.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Floral, mellow sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Adds a round note</dd></div>
+          <div><dt>Source</dt><dd>Beehives near flowering plants</dd></div>
+          <div><dt>Gathering</dt><dd>Bees gather nectar; comb is collected</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="43" aria-label="Ginger Juice note 43">
+      <p class="ice-notes-eyebrow">ICE NOTES · 43 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ginger Juice</span> <span class="ice-notes-text">Ginger juice is made by crushing or pressing fresh ginger rhizome to release its flavorful liquid.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Fresh, peppery lift</dd></div>
+          <div><dt>Chai role</dt><dd>Boosts ginger presence</dd></div>
+          <div><dt>Source</dt><dd>Tropical rhizome fields</dd></div>
+          <div><dt>Gathering</dt><dd>Rhizomes washed and pressed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="44" aria-label="Ginger Juice note 44">
+      <p class="ice-notes-eyebrow">ICE NOTES · 44 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ginger Juice</span> <span class="ice-notes-text">The juice carries ginger&#39;s bright, peppery character into a blend without adding pieces of root.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Fresh, peppery lift</dd></div>
+          <div><dt>Chai role</dt><dd>Boosts ginger presence</dd></div>
+          <div><dt>Source</dt><dd>Tropical rhizome fields</dd></div>
+          <div><dt>Gathering</dt><dd>Rhizomes washed and pressed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="45" aria-label="Ginger Juice note 45">
+      <p class="ice-notes-eyebrow">ICE NOTES · 45 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Ginger Juice</span> <span class="ice-notes-text">Fresh ginger&#39;s pungency comes from the same gingerol-rich rhizome used for dried ginger spice.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Fresh, peppery lift</dd></div>
+          <div><dt>Chai role</dt><dd>Boosts ginger presence</dd></div>
+          <div><dt>Source</dt><dd>Tropical rhizome fields</dd></div>
+          <div><dt>Gathering</dt><dd>Rhizomes washed and pressed</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="46" aria-label="Vanilla Extract note 46">
+      <p class="ice-notes-eyebrow">ICE NOTES · 46 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vanilla Extract</span> <span class="ice-notes-text">Vanilla comes from the long seed pods of a tropical orchid.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Creamy, floral, soft</dd></div>
+          <div><dt>Chai role</dt><dd>Smooths sharp spice</dd></div>
+          <div><dt>Source</dt><dd>Tropical orchid vines</dd></div>
+          <div><dt>Gathering</dt><dd>Pods cured after harvest</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="47" aria-label="Vanilla Extract note 47">
+      <p class="ice-notes-eyebrow">ICE NOTES · 47 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vanilla Extract</span> <span class="ice-notes-text">The pods are cured after harvest; that slow process develops vanilla&#39;s familiar deep aroma.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Creamy, floral, soft</dd></div>
+          <div><dt>Chai role</dt><dd>Smooths sharp spice</dd></div>
+          <div><dt>Source</dt><dd>Tropical orchid vines</dd></div>
+          <div><dt>Gathering</dt><dd>Pods cured after harvest</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="48" aria-label="Vanilla Extract note 48">
+      <p class="ice-notes-eyebrow">ICE NOTES · 48 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vanilla Extract</span> <span class="ice-notes-text">Vanillin is the best-known aroma compound in vanilla, though a real extract contains many more notes.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Creamy, floral, soft</dd></div>
+          <div><dt>Chai role</dt><dd>Smooths sharp spice</dd></div>
+          <div><dt>Source</dt><dd>Tropical orchid vines</dd></div>
+          <div><dt>Gathering</dt><dd>Pods cured after harvest</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="49" aria-label="Citric Acid note 49">
+      <p class="ice-notes-eyebrow">ICE NOTES · 49 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Citric Acid</span> <span class="ice-notes-text">Citric acid occurs naturally in citrus fruits such as lemons and limes.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Bright, clean tartness</dd></div>
+          <div><dt>Chai role</dt><dd>Sharpens sweet notes</dd></div>
+          <div><dt>Source</dt><dd>Citrus fruit or sugar fermentation</dd></div>
+          <div><dt>Gathering</dt><dd>Fruit pressed or acid purified</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="50" aria-label="Citric Acid note 50">
+      <p class="ice-notes-eyebrow">ICE NOTES · 50 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Citric Acid</span> <span class="ice-notes-text">In a drink, a small amount of citric acid adds a clean tart note that can sharpen sweeter flavors.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Bright, clean tartness</dd></div>
+          <div><dt>Chai role</dt><dd>Sharpens sweet notes</dd></div>
+          <div><dt>Source</dt><dd>Citrus fruit or sugar fermentation</dd></div>
+          <div><dt>Gathering</dt><dd>Fruit pressed or acid purified</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="51" aria-label="Citric Acid note 51">
+      <p class="ice-notes-eyebrow">ICE NOTES · 51 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Citric Acid</span> <span class="ice-notes-text">Commercial food-grade citric acid is commonly produced by fermenting sugars, then purifying the result.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Bright, clean tartness</dd></div>
+          <div><dt>Chai role</dt><dd>Sharpens sweet notes</dd></div>
+          <div><dt>Source</dt><dd>Citrus fruit or sugar fermentation</dd></div>
+          <div><dt>Gathering</dt><dd>Fruit pressed or acid purified</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="52" aria-label="Spice Extracts note 52">
+      <p class="ice-notes-eyebrow">ICE NOTES · 52 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Spice Extracts</span> <span class="ice-notes-text">A spice extract concentrates aroma compounds from a spice into a liquid or oil-based ingredient.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Concentrated aroma</dd></div>
+          <div><dt>Chai role</dt><dd>Distributes spice evenly</dd></div>
+          <div><dt>Source</dt><dd>Harvested spices and botanicals</dd></div>
+          <div><dt>Gathering</dt><dd>Spices extracted into liquid</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="53" aria-label="Spice Extracts note 53">
+      <p class="ice-notes-eyebrow">ICE NOTES · 53 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Spice Extracts</span> <span class="ice-notes-text">Extracts can be made with methods that use water, alcohol, oil, carbon dioxide, or combinations of them.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Concentrated aroma</dd></div>
+          <div><dt>Chai role</dt><dd>Distributes spice evenly</dd></div>
+          <div><dt>Source</dt><dd>Harvested spices and botanicals</dd></div>
+          <div><dt>Gathering</dt><dd>Spices extracted into liquid</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="54" aria-label="Spice Extracts note 54">
+      <p class="ice-notes-eyebrow">ICE NOTES · 54 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Spice Extracts</span> <span class="ice-notes-text">Because extracts are concentrated, very small amounts can distribute a spice note evenly through a drink.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Concentrated aroma</dd></div>
+          <div><dt>Chai role</dt><dd>Distributes spice evenly</dd></div>
+          <div><dt>Source</dt><dd>Harvested spices and botanicals</dd></div>
+          <div><dt>Gathering</dt><dd>Spices extracted into liquid</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="55" aria-label="Nonfat Ultra-Filtered Milk note 55">
+      <p class="ice-notes-eyebrow">ICE NOTES · 55 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Nonfat Ultra-Filtered Milk</span> <span class="ice-notes-text">Nonfat milk has most of its cream removed while retaining water, protein, minerals, and natural milk sugars.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean dairy, gentle creaminess</dd></div>
+          <div><dt>Chai role</dt><dd>Adds body without heaviness</dd></div>
+          <div><dt>Source</dt><dd>Dairy farms</dd></div>
+          <div><dt>Gathering</dt><dd>Milk collected, separated, filtered</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="56" aria-label="Nonfat Ultra-Filtered Milk note 56">
+      <p class="ice-notes-eyebrow">ICE NOTES · 56 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Nonfat Ultra-Filtered Milk</span> <span class="ice-notes-text">Ultra-filtration uses fine membranes to separate some milk components by size.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean dairy, gentle creaminess</dd></div>
+          <div><dt>Chai role</dt><dd>Adds body without heaviness</dd></div>
+          <div><dt>Source</dt><dd>Dairy farms</dd></div>
+          <div><dt>Gathering</dt><dd>Milk collected, separated, filtered</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="57" aria-label="Nonfat Ultra-Filtered Milk note 57">
+      <p class="ice-notes-eyebrow">ICE NOTES · 57 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Nonfat Ultra-Filtered Milk</span> <span class="ice-notes-text">Filtering and blending can change the balance of milk proteins and sugars without turning it into a plant-based drink.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean dairy, gentle creaminess</dd></div>
+          <div><dt>Chai role</dt><dd>Adds body without heaviness</dd></div>
+          <div><dt>Source</dt><dd>Dairy farms</dd></div>
+          <div><dt>Gathering</dt><dd>Milk collected, separated, filtered</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="58" aria-label="Lactase Enzyme note 58">
+      <p class="ice-notes-eyebrow">ICE NOTES · 58 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Lactase Enzyme</span> <span class="ice-notes-text">Lactase is an enzyme that splits lactose, the natural sugar in milk, into glucose and galactose.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>No direct flavor; sweeter finish</dd></div>
+          <div><dt>Chai role</dt><dd>Makes the milk lactose-free</dd></div>
+          <div><dt>Source</dt><dd>Cultured enzyme production</dd></div>
+          <div><dt>Gathering</dt><dd>Fermented, then purified</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="59" aria-label="Lactase Enzyme note 59">
+      <p class="ice-notes-eyebrow">ICE NOTES · 59 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Lactase Enzyme</span> <span class="ice-notes-text">Adding lactase before packaging is how lactose-free milk is made from dairy milk.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>No direct flavor; sweeter finish</dd></div>
+          <div><dt>Chai role</dt><dd>Makes the milk lactose-free</dd></div>
+          <div><dt>Source</dt><dd>Cultured enzyme production</dd></div>
+          <div><dt>Gathering</dt><dd>Fermented, then purified</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="60" aria-label="Lactase Enzyme note 60">
+      <p class="ice-notes-eyebrow">ICE NOTES · 60 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Lactase Enzyme</span> <span class="ice-notes-text">Because glucose and galactose taste sweeter than lactose, lactose-free milk can seem sweeter without extra sugar.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>No direct flavor; sweeter finish</dd></div>
+          <div><dt>Chai role</dt><dd>Makes the milk lactose-free</dd></div>
+          <div><dt>Source</dt><dd>Cultured enzyme production</dd></div>
+          <div><dt>Gathering</dt><dd>Fermented, then purified</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="61" aria-label="Vitamin A Palmitate note 61">
+      <p class="ice-notes-eyebrow">ICE NOTES · 61 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vitamin A Palmitate</span> <span class="ice-notes-text">Vitamin A palmitate is a stable form of vitamin A used in food fortification.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Restores milk fortification</dd></div>
+          <div><dt>Source</dt><dd>Food-grade vitamin supply</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="62" aria-label="Vitamin A Palmitate note 62">
+      <p class="ice-notes-eyebrow">ICE NOTES · 62 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vitamin A Palmitate</span> <span class="ice-notes-text">It pairs vitamin A with palmitic acid, a fatty acid, to make a form that stores well.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Restores milk fortification</dd></div>
+          <div><dt>Source</dt><dd>Food-grade vitamin supply</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="63" aria-label="Vitamin A Palmitate note 63">
+      <p class="ice-notes-eyebrow">ICE NOTES · 63 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vitamin A Palmitate</span> <span class="ice-notes-text">Vitamin A is fat-soluble, so it is commonly restored to low-fat and nonfat dairy products.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Restores milk fortification</dd></div>
+          <div><dt>Source</dt><dd>Food-grade vitamin supply</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="64" aria-label="Vitamin D3 note 64">
+      <p class="ice-notes-eyebrow">ICE NOTES · 64 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vitamin D3</span> <span class="ice-notes-text">Vitamin D3 is also called cholecalciferol.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Completes milk fortification</dd></div>
+          <div><dt>Source</dt><dd>Food-grade vitamin supply</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="65" aria-label="Vitamin D3 note 65">
+      <p class="ice-notes-eyebrow">ICE NOTES · 65 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vitamin D3</span> <span class="ice-notes-text">In fortified milk, vitamin D is added in a measured amount rather than occurring as a chai spice.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Completes milk fortification</dd></div>
+          <div><dt>Source</dt><dd>Food-grade vitamin supply</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="66" aria-label="Vitamin D3 note 66">
+      <p class="ice-notes-eyebrow">ICE NOTES · 66 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Vitamin D3</span> <span class="ice-notes-text">Vitamin D helps the body absorb calcium from foods and drinks.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral</dd></div>
+          <div><dt>Chai role</dt><dd>Completes milk fortification</dd></div>
+          <div><dt>Source</dt><dd>Food-grade vitamin supply</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="67" aria-label="Sugar note 67">
+      <p class="ice-notes-eyebrow">ICE NOTES · 67 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Sugar</span> <span class="ice-notes-text">Table sugar is sucrose, a compound built from glucose and fructose.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Balances bold tea and spice</dd></div>
+          <div><dt>Source</dt><dd>Sugarcane or sugar-beet crops</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks or roots harvested; juice concentrated</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="68" aria-label="Sugar note 68">
+      <p class="ice-notes-eyebrow">ICE NOTES · 68 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Sugar</span> <span class="ice-notes-text">Sugar can be extracted from either sugarcane stalks or sugar-beet roots.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Balances bold tea and spice</dd></div>
+          <div><dt>Source</dt><dd>Sugarcane or sugar-beet crops</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks or roots harvested; juice concentrated</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="69" aria-label="Sugar note 69">
+      <p class="ice-notes-eyebrow">ICE NOTES · 69 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Sugar</span> <span class="ice-notes-text">Processors concentrate the extracted juice until sucrose crystallizes.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Clean sweetness</dd></div>
+          <div><dt>Chai role</dt><dd>Balances bold tea and spice</dd></div>
+          <div><dt>Source</dt><dd>Sugarcane or sugar-beet crops</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks or roots harvested; juice concentrated</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="70" aria-label="Dried Cane Sugar Syrup note 70">
+      <p class="ice-notes-eyebrow">ICE NOTES · 70 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Dried Cane Sugar Syrup</span> <span class="ice-notes-text">This sweetener begins with juice extracted from harvested sugarcane stalks.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, lightly caramel-like</dd></div>
+          <div><dt>Chai role</dt><dd>Sweetens a chai concentrate</dd></div>
+          <div><dt>Source</dt><dd>Sugarcane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut; juice concentrated and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="71" aria-label="Dried Cane Sugar Syrup note 71">
+      <p class="ice-notes-eyebrow">ICE NOTES · 71 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Dried Cane Sugar Syrup</span> <span class="ice-notes-text">The juice is concentrated into syrup before it is dried for blending.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, lightly caramel-like</dd></div>
+          <div><dt>Chai role</dt><dd>Sweetens a chai concentrate</dd></div>
+          <div><dt>Source</dt><dd>Sugarcane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut; juice concentrated and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="72" aria-label="Dried Cane Sugar Syrup note 72">
+      <p class="ice-notes-eyebrow">ICE NOTES · 72 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Dried Cane Sugar Syrup</span> <span class="ice-notes-text">Drying a cane syrup changes its handling form, not its sugarcane origin.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Sweet, lightly caramel-like</dd></div>
+          <div><dt>Chai role</dt><dd>Sweetens a chai concentrate</dd></div>
+          <div><dt>Source</dt><dd>Sugarcane fields</dd></div>
+          <div><dt>Gathering</dt><dd>Stalks cut; juice concentrated and dried</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="73" aria-label="Potassium Sorbate note 73">
+      <p class="ice-notes-eyebrow">ICE NOTES · 73 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Potassium Sorbate</span> <span class="ice-notes-text">Potassium sorbate is a preservative used in some sweetened drink ingredients.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral at small amounts</dd></div>
+          <div><dt>Chai role</dt><dd>Helps preserve an added sweetener</dd></div>
+          <div><dt>Source</dt><dd>Food-grade ingredient production</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured, purified, and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="74" aria-label="Potassium Sorbate note 74">
+      <p class="ice-notes-eyebrow">ICE NOTES · 74 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Potassium Sorbate</span> <span class="ice-notes-text">It helps slow spoilage by yeasts and molds in prepared foods and syrups.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral at small amounts</dd></div>
+          <div><dt>Chai role</dt><dd>Helps preserve an added sweetener</dd></div>
+          <div><dt>Source</dt><dd>Food-grade ingredient production</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured, purified, and measured</dd></div>
+        </dl>
+      </div>
+    </aside>
+    <aside class="ice-notes-card" data-note-index="75" aria-label="Potassium Sorbate note 75">
+      <p class="ice-notes-eyebrow">ICE NOTES · 75 / 75</p>
+      <div class="ice-notes-body">
+        <div class="ice-notes-header">
+          <svg viewBox="0 0 20 20" class="ice-notes-icon" aria-hidden="true"><path d="M10 2.5 11.8 8.2 17.5 10l-5.7 1.8L10 17.5l-1.8-5.7L2.5 10l5.7-1.8Z" fill="currentColor"/></svg>
+          <span class="ice-notes-name-group"><span class="ice-notes-name">Potassium Sorbate</span> <span class="ice-notes-text">Potassium sorbate is manufactured for food use rather than harvested as a chai spice.</span></span>
+        </div>
+        <dl class="ice-notes-profile">
+          <div><dt>Flavor</dt><dd>Neutral at small amounts</dd></div>
+          <div><dt>Chai role</dt><dd>Helps preserve an added sweetener</dd></div>
+          <div><dt>Source</dt><dd>Food-grade ingredient production</dd></div>
+          <div><dt>Gathering</dt><dd>Manufactured, purified, and measured</dd></div>
         </dl>
       </div>
     </aside>
