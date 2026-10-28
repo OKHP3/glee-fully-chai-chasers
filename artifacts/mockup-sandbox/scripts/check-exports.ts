@@ -19,8 +19,8 @@
  *   Every scene HTML with a companion-row must include an ice-notes-card
  *   with a non-placeholder ingredient name and description.
  *
- * CHECK 5 — Cinematic mobile iced-chai logo
- *   Reject the known hot-drink logo regression in hero source (CANON.md).
+ * CHECK 5 — Iced-chai logos
+ *   Reject hot-drink logos in the mobile hero and shipped pump scene (CANON.md).
  *
  * CHECK 6 — Review stylesheet fonts
  *   Font URLs must resolve relative to the sandbox, not a baked Pages base.
@@ -120,6 +120,8 @@ if (process.argv.includes("--self-test")) {
   assert("hot-coffee logo fails", hasIcedChaiLogo("<div>☕</div>"), false);
   assert("missing logo fails", hasIcedChaiLogo("<div></div>"), false);
   assert("mixed hot/cold logos fail", hasIcedChaiLogo("<div>🥤</div><div>☕</div>"), false);
+  assert("shipped scene cold fallback passes", hasIcedChaiLogo('<html><div class="fallback">🥤</div></html>'), true);
+  assert("shipped scene hot fallback fails", hasIcedChaiLogo('<html><div class="fallback">☕</div></html>'), false);
 
   // ── isPlaceholderName fixtures ───────────────────────────────────────────
   // Should be flagged as placeholder:
@@ -512,15 +514,21 @@ if (labelDriftTotalFailures > 0) {
   );
 }
 
-// ── CHECK 5: Cinematic mobile iced-chai logo ──────────────────────────────────
+// ── CHECK 5: Iced-chai logos ─────────────────────────────────────────────────
 
-console.log("\n── Check 5: Cinematic mobile iced-chai logo ───────────────────");
-const heroSource = readFileSync(join(process.cwd(), "src/components/mockups/cinematic-mobile/Hero.tsx"), "utf8");
-const icedChaiLogoFailed = !hasIcedChaiLogo(heroSource);
-if (icedChaiLogoFailed) {
-  console.error("❌  Cinematic mobile hero must show the cold-drink logo, never a hot-coffee cup (docs/CANON.md).");
-} else {
-  console.log("✅  Cinematic mobile hero source uses the iced-chai logo without a hot-coffee cup.");
+console.log("\n── Check 5: Iced-chai logos ───────────────────────────────────");
+let icedChaiLogoFailed = false;
+for (const [label, sourcePath] of [
+  ["Cinematic mobile hero", "src/components/mockups/cinematic-mobile/Hero.tsx"],
+  ["Shipped Bold Chai Pump scene", "public/scenes/bold-chai-pump.html"],
+]) {
+  const source = readFileSync(join(process.cwd(), sourcePath), "utf8");
+  if (!hasIcedChaiLogo(source)) {
+    icedChaiLogoFailed = true;
+    console.error(`❌  ${label} must show the cold-drink logo, never a hot-coffee cup (docs/CANON.md).`);
+  } else {
+    console.log(`✅  ${label} uses the iced-chai logo without a hot-coffee cup.`);
+  }
 }
 
 // ── CHECK 6: Review stylesheet fonts ─────────────────────────────────────────
